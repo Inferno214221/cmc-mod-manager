@@ -1,0 +1,61 @@
+@import "./global.css";
+
+body {
+    /* My Palette */
+    /* Titlebar */
+    --inf-grey1: #16171e;
+    /* Side-est-bar */
+    --inf-grey2: #1a1c23;
+    /* Sidebar */
+    --inf-grey3: #23252e;
+    /* Body */
+    --inf-grey4: #272a34;
+    /* Buttons */
+    --inf-grey5: #323643;
+
+    /* Primary Blue */
+    --inf-blue1: #2777ff;
+    /* Secondary Blue */
+    --inf-blue2: #005af3;
+
+    /* Text */
+    --inf-white3: #eeeeec;
+    /* Sidebar Icons */
+    --inf-white2: #bbbbbd;
+    /* Inactive (Used with sidebar) */
+    --inf-white1: #888a8d;
+}
+
+fieldset {
+    max-width: 700px;
+    margin: auto;
+}
+
+input,
+select {
+    width: 100px;
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 3px;
+    background-color: var(--inf-grey5);
+    border-color: black;
+    color: inherit;
+    font-family: inherit;
+    font-size: 11pt;
+    margin: 0px 5px 0px 0px;
+    outline: none;
+}
+
+input {
+    height: 27px;
+    padding: 0px 5px;
+}
+
+select {
+    height: 29px;
+    padding: 0px;
+}
+
+.controls {
+    display: inline;
+}

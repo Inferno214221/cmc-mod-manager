@@ -1,0 +1,19 @@
+{
+  "name": "cmcmodmanager",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron ."
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^24.4.0"
+  },
+  "dependencies": {
+    "fs": "^0.0.1-security",
+    "fs-extra": "^11.1.1"
+  }
+}

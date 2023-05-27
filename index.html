@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>CMC Mod Manager - Home</title>
+    <link rel="icon" href="">
+    <link rel="stylesheet" type="text/css" href="./program/css/index.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Ubuntu">
+</head>
+
+<body>
+    <nav>
+        <ul id="navBar">
+            <li>
+                <a href="./index.html" class="tab">
+                    <div class="activeTab">
+                        Home
+                    </div>
+                </a>
+            </li>
+            <li>
+                <a href="./program/html/characterManager.html" class="tab">
+                    <div class="inactiveTab">
+                        Character Manager
+                    </div>
+                </a>
+            </li>
+            <li>
+                <a href="./program/html/characterSelectionScreen.html" class="tab">
+                    <div class="inactiveTab">
+                        Character Selection Screen
+                    </div>
+                </a>
+            </li>
+            <li>
+                <a href="./program/html/stageManager.html" class="tab">
+                    <div class="inactiveTab">
+                        Stage Manager
+                    </div>
+                </a>
+            </li>
+            <li>
+                <a href="./program/html/stageSelectionScreen.html" class="tab">
+                    <div class="inactiveTab">
+                        Stage Selection Screen
+                    </div>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <section>
+        <fieldset>
+            <legend>Un-Modded Game</legend>
+            <span id="gameSource"></span><br />
+            <button type="button" onclick="getGameSource()">Install Un-Modded CMC Source</button>
+            <button type="button" onclick="" class="right">Open Un-Modified Directory</button>
+        </fieldset>
+        <fieldset>
+            <legend>Merge</legend>
+            <span>Last Merge: 2:13 PM 27/5/23</span><br />
+            <!-- Eventually should implement a check for wether a change has been made without merging or not -->
+            <button type="button" onclick="mergeInstalledMods()">Merge All Installed Mods</button>
+            <button type="button" onclick="" class="right">Open Merged Directory</button>
+        </fieldset>
+        <fieldset>
+            <legend>Run</legend>
+            <button type="button" onclick="runCMC('/merged')">Run Modified Version</button>
+            <button type="button" onclick="runCMC('/basegame')">Run Un-Modified Version</button>
+        </fieldset>
+        <fieldset>
+            <legend>Controls</legend>
+            <div class="controls">
+                <button type="button" onclick="console.log('saved')">
+                    Save Controls Profile:
+                </button>
+                <input type="text" value="Default" id="controlsSaveName" onfocus="inputFocused('controlsSaveName')" onblur="inputBlurred('controlsSaveName')"/>
+            </div>
+            <div class="right controls">
+                <button type="button" onclick="console.log('loaded')">
+                    Load Controls Profile:
+                </button>
+                <select id="controlsLoadName" onfocus="inputFocused('controlsLoadName')" onblur="inputBlurred('controlsLoadName')" onchange="inputBlurred('controlsLoadName')">
+                    <option value="_default">Default</option>
+                </select>
+            </div>
+        </fieldset>
+    </section>
+    <script src="./program/js/index.js">
+    </script>
+</body>
+
+</html>
