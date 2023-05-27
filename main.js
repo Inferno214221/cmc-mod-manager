@@ -65,8 +65,31 @@ ipcMain.on("getGameSource", async (event, args) => {
         });
         // fs.emptyDirSync(__dirname + "/basegame/");
         // fs.rmSync(__dirname + "/basegame", {recursive: true});
-        fs.copySync(dir.filePaths[0], __dirname + "/basegame/", {overwrite: true});
+        fs.copySync(dir.filePaths[0], __dirname + "/basegame/", { overwrite: true });
         fs.copyFileSync(__dirname + "/basegame/controls.ini", __dirname + "/profiles/controls/_default.ini");
+
+        var cmcFightersTxt = fs.readFileSync(__dirname + "/basegame/data/fighters.txt", 'utf-8').split(/\r?\n/);
+        var cmcFighters = [];
+        for (let fighter = 0; fighter in cmcFightersTxt; fighter++) {
+            if (fighter != 0) {
+                let fighterData = {
+                    name: cmcFightersTxt[fighter],
+                    displayName: fs.readFileSync(__dirname + "/basegame/data/dats/" + cmcFightersTxt[fighter] + ".dat", 'utf-8')
+                        .split(/\r?\n/)[1]
+                }
+                cmcFighters.push(fighterData);
+            }
+        }
+
+        fs.writeFileSync(
+            __dirname + "/characters/default.json",
+            JSON.stringify({
+                ssbc: require(__dirname + "/characters/default.json").ssbc,
+                cmc: cmcFighters
+            }, null, 4),
+            "utf-8"
+        );
+
         win.webContents.send("fromGetGameSource", {
             call: "gameSourceInstalled",
             result: true
@@ -81,7 +104,7 @@ ipcMain.on("mergeInstalledMods", async (event, args) => {
     if (fs.existsSync(__dirname + "/merged/controls.ini")) {
         fs.copyFileSync(__dirname + "/merged/controls.ini", __dirname + "/profiles/controls/_inUse.ini");
     }
-    fs.copySync(__dirname + "/basegame/", __dirname + "/merged/", {overwrite: true});
+    fs.copySync(__dirname + "/basegame/", __dirname + "/merged/", { overwrite: true });
     //TODO: for each stage
     //TODO: for each character
     if (fs.existsSync(__dirname + "/profiles/controls/_inUse.ini")) {

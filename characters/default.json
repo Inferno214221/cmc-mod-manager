@@ -1,0 +1,1017 @@
+{
+    "ssbc": [],
+    "cmc": [
+        {
+            "name": "ciel_cloudcsw",
+            "displayName": "Cloud (CSW)"
+        },
+        {
+            "name": "fnfrog",
+            "displayName": "Flipnote Frog"
+        },
+        {
+            "name": "neco",
+            "displayName": "Neco-Arc"
+        },
+        {
+            "name": "scottc",
+            "displayName": "Scott Pilgrim"
+        },
+        {
+            "name": "okitan",
+            "displayName": "Okita Soji"
+        },
+        {
+            "name": "dan",
+            "displayName": "Dan"
+        },
+        {
+            "name": "serio",
+            "displayName": "Serio"
+        },
+        {
+            "name": "gamma",
+            "displayName": "Gamma"
+        },
+        {
+            "name": "emerl",
+            "displayName": "Emerl"
+        },
+        {
+            "name": "jotaro",
+            "displayName": "Jotaro"
+        },
+        {
+            "name": "windows",
+            "displayName": "Windows 10"
+        },
+        {
+            "name": "iggy",
+            "displayName": "Iggy"
+        },
+        {
+            "name": "marina",
+            "displayName": "Marina Liteyear"
+        },
+        {
+            "name": "archive",
+            "displayName": "Weapons Archive"
+        },
+        {
+            "name": "x",
+            "displayName": "X"
+        },
+        {
+            "name": "zero",
+            "displayName": "Zero"
+        },
+        {
+            "name": "iris",
+            "displayName": "Iris"
+        },
+        {
+            "name": "mmzero",
+            "displayName": "Zero (MMZ)"
+        },
+        {
+            "name": "ozero",
+            "displayName": "Omega Zero"
+        },
+        {
+            "name": "sato_yamcha",
+            "displayName": "Yamcha"
+        },
+        {
+            "name": "a16",
+            "displayName": "Android 16"
+        },
+        {
+            "name": "gokub",
+            "displayName": "Goku Black"
+        },
+        {
+            "name": "zamasu",
+            "displayName": "Zamasu (Fused)"
+        },
+        {
+            "name": "a21",
+            "displayName": "Android 21"
+        },
+        {
+            "name": "sato_reimu",
+            "displayName": "Reimu Hakurei"
+        },
+        {
+            "name": "marisa_mash",
+            "displayName": "Marisa Kirisame"
+        },
+        {
+            "name": "sato_clownpiece",
+            "displayName": "Clownpiece"
+        },
+        {
+            "name": "ciel_milla",
+            "displayName": "Milla"
+        },
+        {
+            "name": "nueHoujuu",
+            "displayName": "Nue Houjuu"
+        },
+        {
+            "name": "ciel_mugetsu",
+            "displayName": "Mugetsu"
+        },
+        {
+            "name": "remilia",
+            "displayName": "Remilia Scarlet"
+        },
+        {
+            "name": "flandre",
+            "displayName": "Flandre Scarlet"
+        },
+        {
+            "name": "aya",
+            "displayName": "Aya Shameimaru"
+        },
+        {
+            "name": "komachi",
+            "displayName": "Komachi Onozuka"
+        },
+        {
+            "name": "shana",
+            "displayName": "Shana"
+        },
+        {
+            "name": "chief",
+            "displayName": "Master Chief"
+        },
+        {
+            "name": "shuma",
+            "displayName": "Shuma-Gorath"
+        },
+        {
+            "name": "gardevoir",
+            "displayName": "Gardevoir"
+        },
+        {
+            "name": "koopa",
+            "displayName": "Koopa Troopa"
+        },
+        {
+            "name": "sans",
+            "displayName": "Sans"
+        },
+        {
+            "name": "khanagent5",
+            "displayName": "Khan"
+        },
+        {
+            "name": "mai",
+            "displayName": "Mai Shiranui "
+        },
+        {
+            "name": "chopper",
+            "displayName": "Chopper"
+        },
+        {
+            "name": "sato_chaos",
+            "displayName": "Neco-Arc CHAOS"
+        },
+        {
+            "name": "zeraora",
+            "displayName": "Zeraora"
+        },
+        {
+            "name": "asuka",
+            "displayName": "Asuka"
+        },
+        {
+            "name": "oleva",
+            "displayName": "Olevadon"
+        },
+        {
+            "name": "rash",
+            "displayName": "Rash"
+        },
+        {
+            "name": "ichigo",
+            "displayName": "Ichigo"
+        },
+        {
+            "name": "mimikyu",
+            "displayName": "Mimikyu"
+        },
+        {
+            "name": "taigabysato",
+            "displayName": "Taiga Aisaka"
+        },
+        {
+            "name": "kohaku",
+            "displayName": "Kohaku"
+        },
+        {
+            "name": "silverfang",
+            "displayName": "Silver Fang"
+        },
+        {
+            "name": "seiya",
+            "displayName": "Seiya"
+        },
+        {
+            "name": "soma",
+            "displayName": "Soma Cruz"
+        },
+        {
+            "name": "presea",
+            "displayName": "Presea"
+        },
+        {
+            "name": "kfg",
+            "displayName": "Kung Fu Girl"
+        },
+        {
+            "name": "vegeta",
+            "displayName": "Vegeta"
+        },
+        {
+            "name": "lilina",
+            "displayName": "Lilina"
+        },
+        {
+            "name": "ciel_goomba",
+            "displayName": "Goomba"
+        },
+        {
+            "name": "iori",
+            "displayName": "Iori Yagami"
+        },
+        {
+            "name": "strider",
+            "displayName": "Strider Hiryu"
+        },
+        {
+            "name": "yoko",
+            "displayName": "Yoko Littner"
+        },
+        {
+            "name": "crono",
+            "displayName": "Crono"
+        },
+        {
+            "name": "rika",
+            "displayName": "Rika Furude"
+        },
+        {
+            "name": "sanders",
+            "displayName": "Colonel Sanders"
+        },
+        {
+            "name": "train",
+            "displayName": "Train Heartnet"
+        },
+        {
+            "name": "manta",
+            "displayName": "Black Manta"
+        },
+        {
+            "name": "iku_mash",
+            "displayName": "Iku Nagae"
+        },
+        {
+            "name": "sato_cless",
+            "displayName": "Cless Alvein"
+        },
+        {
+            "name": "metalbat",
+            "displayName": "Metal Bat"
+        },
+        {
+            "name": "bulleta",
+            "displayName": "Baby Bonnie Hood"
+        },
+        {
+            "name": "fritzagent5",
+            "displayName": "Fritz"
+        },
+        {
+            "name": "kosmos",
+            "displayName": "KOS-MOS"
+        },
+        {
+            "name": "terry",
+            "displayName": "Terry Bogard"
+        },
+        {
+            "name": "shrek",
+            "displayName": "Shrek"
+        },
+        {
+            "name": "lupin",
+            "displayName": "Lupin the 3rd"
+        },
+        {
+            "name": "slkdoom",
+            "displayName": "Seelkadoom"
+        },
+        {
+            "name": "hecate",
+            "displayName": "Hecate"
+        },
+        {
+            "name": "arle",
+            "displayName": "Arle Nadja"
+        },
+        {
+            "name": "athenaa",
+            "displayName": "Athena Asamiya"
+        },
+        {
+            "name": "josuke",
+            "displayName": "Josuke Higashikata"
+        },
+        {
+            "name": "mchnika",
+            "displayName": "Nika"
+        },
+        {
+            "name": "spiderman",
+            "displayName": "Spider-Man"
+        },
+        {
+            "name": "jill",
+            "displayName": "Jill Valentine"
+        },
+        {
+            "name": "weiss2",
+            "displayName": "Weiss Schnee"
+        },
+        {
+            "name": "yang",
+            "displayName": "Yang Xiao Long"
+        },
+        {
+            "name": "ellie",
+            "displayName": "Ellie"
+        },
+        {
+            "name": "draco",
+            "displayName": "Dracobot"
+        },
+        {
+            "name": "rock",
+            "displayName": "Rock Howard"
+        },
+        {
+            "name": "sanae_mash",
+            "displayName": "Sanae Kochiya"
+        },
+        {
+            "name": "gg_bass",
+            "displayName": "Bass"
+        },
+        {
+            "name": "misaka",
+            "displayName": "Misaka Mikoto"
+        },
+        {
+            "name": "accel",
+            "displayName": "Accelerator"
+        },
+        {
+            "name": "silver",
+            "displayName": "Silver"
+        },
+        {
+            "name": "hyde_cogu",
+            "displayName": "Hyde Kido"
+        },
+        {
+            "name": "kris",
+            "displayName": "Kris"
+        },
+        {
+            "name": "gilgamesh",
+            "displayName": "Gilgamesh"
+        },
+        {
+            "name": "blizzard",
+            "displayName": "Blizzard Man"
+        },
+        {
+            "name": "meiling_cogu",
+            "displayName": "Hong Meiling"
+        },
+        {
+            "name": "alucard",
+            "displayName": "Alucard"
+        },
+        {
+            "name": "sora",
+            "displayName": "Sora"
+        },
+        {
+            "name": "sato_kuroko",
+            "displayName": "Shirai Kuroko"
+        },
+        {
+            "name": "mami",
+            "displayName": "Mami Tomoe"
+        },
+        {
+            "name": "sato_mugino",
+            "displayName": "Mugino Shizuri"
+        },
+        {
+            "name": "kyo_cogu",
+            "displayName": "Kyo Kusanagi"
+        },
+        {
+            "name": "oribyanxiousluku",
+            "displayName": "Ori & Sein"
+        },
+        {
+            "name": "gunvolt_mash",
+            "displayName": "Gunvolt"
+        },
+        {
+            "name": "kars",
+            "displayName": "Kars"
+        },
+        {
+            "name": "ciel_kfm",
+            "displayName": "Kung Fu Man"
+        },
+        {
+            "name": "suika",
+            "displayName": "Suika Ibuki"
+        },
+        {
+            "name": "sigma_mash",
+            "displayName": "Sigma"
+        },
+        {
+            "name": "ptbravo_misako",
+            "displayName": "Misako"
+        },
+        {
+            "name": "ptbravo_kyoko",
+            "displayName": "Kyoko"
+        },
+        {
+            "name": "guilmon",
+            "displayName": "Guilmon"
+        },
+        {
+            "name": "blackguilmon",
+            "displayName": "BlackGuilmon"
+        },
+        {
+            "name": "paper",
+            "displayName": "Paper Mario"
+        },
+        {
+            "name": "supersonic",
+            "displayName": "Super Sonic"
+        },
+        {
+            "name": "utsuho_cogu",
+            "displayName": "Utsuho Reiuji"
+        },
+        {
+            "name": "sato_parsee",
+            "displayName": "Parsee Mizuhashi"
+        },
+        {
+            "name": "ciel_koa",
+            "displayName": "Koakuma"
+        },
+        {
+            "name": "icemanagent5",
+            "displayName": "Iceman"
+        },
+        {
+            "name": "espio_mash",
+            "displayName": "Espio"
+        },
+        {
+            "name": "azrael",
+            "displayName": "Azrael"
+        },
+        {
+            "name": "skarmory",
+            "displayName": "Skarmory"
+        },
+        {
+            "name": "sato_rena",
+            "displayName": "Rena Ryuugu"
+        },
+        {
+            "name": "haruhi_dg",
+            "displayName": "Haruhi Suzumiya"
+        },
+        {
+            "name": "chad_mrnope",
+            "displayName": "Sado 'Chad' Yasutora"
+        },
+        {
+            "name": "wrastor",
+            "displayName": "Wrastor"
+        },
+        {
+            "name": "kim",
+            "displayName": "Kim Kaphwan"
+        },
+        {
+            "name": "lyn_sk00ps",
+            "displayName": "Lyn"
+        },
+        {
+            "name": "mokou_solo",
+            "displayName": "Fujiwara no Mokou"
+        },
+        {
+            "name": "friezaagent5",
+            "displayName": "Frieza"
+        },
+        {
+            "name": "sato_shinki",
+            "displayName": "Shinki"
+        },
+        {
+            "name": "sato_alexkidd",
+            "displayName": "Alex Kidd"
+        },
+        {
+            "name": "7d6",
+            "displayName": "Yggdrasil"
+        },
+        {
+            "name": "josephbt",
+            "displayName": "Joseph Joestar"
+        },
+        {
+            "name": "mistel_solo",
+            "displayName": "Mistel"
+        },
+        {
+            "name": "kratos",
+            "displayName": "Kratos Aurion"
+        },
+        {
+            "name": "cirno",
+            "displayName": "Cirno"
+        },
+        {
+            "name": "bladeedit",
+            "displayName": "Blade"
+        },
+        {
+            "name": "gg_sonder",
+            "displayName": "Sonder"
+        },
+        {
+            "name": "cucco",
+            "displayName": "Cucco"
+        },
+        {
+            "name": "mchsnc",
+            "displayName": "Mecha Sonic"
+        },
+        {
+            "name": "azero",
+            "displayName": "Awakened Zero"
+        },
+        {
+            "name": "gallantmon",
+            "displayName": "Gallantmon"
+        },
+        {
+            "name": "toehoe",
+            "displayName": "Toehoe"
+        },
+        {
+            "name": "dedede",
+            "displayName": "King Dedede"
+        },
+        {
+            "name": "ciel_sorrel",
+            "displayName": "Lady's Sorrel"
+        },
+        {
+            "name": "ash-roa",
+            "displayName": "Ash"
+        },
+        {
+            "name": "sato_pleinair",
+            "displayName": "Pleinair"
+        },
+        {
+            "name": "wart_by_waluigidx",
+            "displayName": "Wart"
+        },
+        {
+            "name": "sakuya_cogu",
+            "displayName": "Sakuya Izayoi"
+        },
+        {
+            "name": "sato_youmu",
+            "displayName": "Konpaku Youmu"
+        },
+        {
+            "name": "yuyuko",
+            "displayName": "Yuyuko Saigyouji"
+        },
+        {
+            "name": "renamon",
+            "displayName": "Renamon"
+        },
+        {
+            "name": "riolu",
+            "displayName": "Partner Riolu"
+        },
+        {
+            "name": "ciel_schmietta",
+            "displayName": "Schmietta"
+        },
+        {
+            "name": "ptbravo_ramona",
+            "displayName": "Ramona Flowers"
+        },
+        {
+            "name": "ptbravo_hatkid",
+            "displayName": "Hat Kid"
+        },
+        {
+            "name": "sakurakyoko_dg",
+            "displayName": "Kyouko Sakura"
+        },
+        {
+            "name": "sion_cogu",
+            "displayName": "Sion Eltnam Atlasia"
+        },
+        {
+            "name": "bedr_mhisui",
+            "displayName": "Mech-Hisui"
+        },
+        {
+            "name": "akyuu",
+            "displayName": "Hieda no Akyuu"
+        },
+        {
+            "name": "mumenrideragent5",
+            "displayName": "Mumen Rider"
+        },
+        {
+            "name": "numemon",
+            "displayName": "Numemon"
+        },
+        {
+            "name": "bedr_nozomi",
+            "displayName": "Smol Nozomi"
+        },
+        {
+            "name": "kiraagent5",
+            "displayName": "Kira Yoshikage"
+        },
+        {
+            "name": "boss_sato_goliathdoll",
+            "displayName": "Goliath Doll"
+        },
+        {
+            "name": "ptbravo_ena",
+            "displayName": "ENA & Moony"
+        },
+        {
+            "name": "10032_cogu",
+            "displayName": "Misaka 10032"
+        },
+        {
+            "name": "ciel_maitokiha",
+            "displayName": "Mai Tokiha"
+        },
+        {
+            "name": "pegasusmon",
+            "displayName": "Pegasusmon"
+        },
+        {
+            "name": "asagi",
+            "displayName": "Asagi"
+        },
+        {
+            "name": "nitoriagent5",
+            "displayName": "Nitori Kawashiro"
+        },
+        {
+            "name": "sato_aria",
+            "displayName": "Aria"
+        },
+        {
+            "name": "akatsuki_mash",
+            "displayName": "Akatsuki"
+        },
+        {
+            "name": "boss_marietta",
+            "displayName": "Marietta"
+        },
+        {
+            "name": "chef",
+            "displayName": "Chef Kawasaki"
+        },
+        {
+            "name": "boss_thwomp",
+            "displayName": "Thwomp"
+        },
+        {
+            "name": "sato_kyoko",
+            "displayName": "Kyoko"
+        },
+        {
+            "name": "bubsy",
+            "displayName": "Bubsy"
+        },
+        {
+            "name": "ptbravo_incredible",
+            "displayName": "Mr. Incredible"
+        },
+        {
+            "name": "impmon",
+            "displayName": "Impmon"
+        },
+        {
+            "name": "jonathan",
+            "displayName": "Jonathan Joestar"
+        },
+        {
+            "name": "lobster",
+            "displayName": "Rock Lobster"
+        },
+        {
+            "name": "boss_azero",
+            "displayName": "Awakened Zero"
+        },
+        {
+            "name": "bedr_aigis",
+            "displayName": "Aigis"
+        },
+        {
+            "name": "wriggle",
+            "displayName": "Wriggle Nightbug"
+        },
+        {
+            "name": "aru",
+            "displayName": "Aru"
+        },
+        {
+            "name": "marumaro",
+            "displayName": "Marumaro"
+        },
+        {
+            "name": "googly",
+            "displayName": "John Googly"
+        },
+        {
+            "name": "necoarcnrvnqsrchaosbyathorment",
+            "displayName": "Barack Obama"
+        },
+        {
+            "name": "murasa_cogu",
+            "displayName": "Murasa Minamitsu"
+        },
+        {
+            "name": "koishi",
+            "displayName": "Koishi"
+        },
+        {
+            "name": "volnutt_mash",
+            "displayName": "Mega Man Volnutt"
+        },
+        {
+            "name": "garfield_alem",
+            "displayName": "Garfield"
+        },
+        {
+            "name": "richter",
+            "displayName": "Richter Belmont"
+        },
+        {
+            "name": "sseraphimon",
+            "displayName": "ShadowSeraphimon"
+        },
+        {
+            "name": "snowy_miku",
+            "displayName": "Hatsune Miku"
+        },
+        {
+            "name": "thanos",
+            "displayName": "Thanos"
+        },
+        {
+            "name": "ptbravo_luna",
+            "displayName": "Luna"
+        },
+        {
+            "name": "sayaka_dg",
+            "displayName": "Sayaka Miki"
+        },
+        {
+            "name": "agatha",
+            "displayName": "Agatha"
+        },
+        {
+            "name": "sato_suguri",
+            "displayName": "Suguri"
+        },
+        {
+            "name": "naruto",
+            "displayName": "Naruto Uzumaki"
+        },
+        {
+            "name": "hinatabydamn",
+            "displayName": "Hinata Hyuga"
+        },
+        {
+            "name": "sato_alice",
+            "displayName": "Alice Margatroid"
+        },
+        {
+            "name": "smorg",
+            "displayName": "Smorg"
+        },
+        {
+            "name": "axl_mash",
+            "displayName": "Axl"
+        },
+        {
+            "name": "sk00ps_sephiroth",
+            "displayName": "Sephiroth"
+        },
+        {
+            "name": "ptbravo_waitress",
+            "displayName": "Waitress"
+        },
+        {
+            "name": "susagent5",
+            "displayName": "Impostor"
+        },
+        {
+            "name": "kumagawa",
+            "displayName": "Kumagawa Misogi"
+        },
+        {
+            "name": "patchouli_mp3",
+            "displayName": "Patchouli Knowledge"
+        },
+        {
+            "name": "agent5genos",
+            "displayName": "Genos"
+        },
+        {
+            "name": "nacidio",
+            "displayName": "Nacidio"
+        },
+        {
+            "name": "bedr_2b",
+            "displayName": "Yorha n.2 Type B"
+        },
+        {
+            "name": "akihav",
+            "displayName": "Akiha Vermillion"
+        },
+        {
+            "name": "boss_sato_hime",
+            "displayName": "Hime"
+        },
+        {
+            "name": "sato_hime",
+            "displayName": "Hime"
+        },
+        {
+            "name": "sans_tp",
+            "displayName": "Sans"
+        },
+        {
+            "name": "agent5ike",
+            "displayName": "Ike"
+        },
+        {
+            "name": "undyne_mrnope",
+            "displayName": "Undyne"
+        },
+        {
+            "name": "boss_mash_dracula",
+            "displayName": "Dracula"
+        },
+        {
+            "name": "boss_apocalypse",
+            "displayName": "Apocalypse"
+        },
+        {
+            "name": "reisen",
+            "displayName": "Reisen U. Inaba"
+        },
+        {
+            "name": "sato_miguelrios",
+            "displayName": "Miguel Rios"
+        },
+        {
+            "name": "sato_mrsatan",
+            "displayName": "Mr. Satan"
+        },
+        {
+            "name": "metalman",
+            "displayName": "Metal Man"
+        },
+        {
+            "name": "lloyd_cogu",
+            "displayName": "Lloyd Irving"
+        },
+        {
+            "name": "ragna_cogu",
+            "displayName": "Ragna the Bloodedge"
+        },
+        {
+            "name": "gg_zx",
+            "displayName": "Vent"
+        },
+        {
+            "name": "mash_heart",
+            "displayName": "Heart Aino"
+        },
+        {
+            "name": "ronald",
+            "displayName": "Ronald McDonald"
+        },
+        {
+            "name": "sato_tsu",
+            "displayName": "Tsuchimikado M."
+        },
+        {
+            "name": "misaki",
+            "displayName": "Shokuhou Misaki"
+        },
+        {
+            "name": "piggodagent5",
+            "displayName": "Pig God"
+        },
+        {
+            "name": "kingagent5",
+            "displayName": "King"
+        },
+        {
+            "name": "daiyousei",
+            "displayName": "Daiyousei"
+        },
+        {
+            "name": "cjbyhelguari",
+            "displayName": "Carl Johnson"
+        },
+        {
+            "name": "jalter",
+            "displayName": "J'Alter"
+        },
+        {
+            "name": "ragnaunlimited_cogu",
+            "displayName": "Unlimited Ragna"
+        },
+        {
+            "name": "ptbravo_noize",
+            "displayName": "Noize"
+        },
+        {
+            "name": "lucemon",
+            "displayName": "Lucemon"
+        },
+        {
+            "name": "tank",
+            "displayName": "Blitztank"
+        },
+        {
+            "name": "gg_supreme_bass",
+            "displayName": "Bass"
+        },
+        {
+            "name": "gg_ssonder",
+            "displayName": "Super Sonder"
+        },
+        {
+            "name": "deoxys",
+            "displayName": "Deoxys"
+        },
+        {
+            "name": "boss_marx",
+            "displayName": "Marx"
+        },
+        {
+            "name": "plent",
+            "displayName": "Perana Plent"
+        },
+        {
+            "name": "shy",
+            "displayName": "Shy Guy"
+        },
+        {
+            "name": "ikki_cogu",
+            "displayName": "Ikki"
+        }
+    ]
+}
