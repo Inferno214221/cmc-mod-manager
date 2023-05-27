@@ -1,18 +1,26 @@
 {
   "name": "cmcmodmanager",
   "version": "1.0.0",
-  "description": "",
+  "description": "A WIP Mod Manager For SSBC CMC+ v7 Made With Electron",
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "electron ."
+    "start": "electron-forge start",
+    "package": "electron-forge package",
+    "make": "electron-forge make"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@electron-forge/cli": "^6.1.1",
+    "@electron-forge/maker-deb": "^6.1.1",
+    "@electron-forge/maker-rpm": "^6.1.1",
+    "@electron-forge/maker-squirrel": "^6.1.1",
+    "@electron-forge/maker-zip": "^6.1.1",
     "electron": "^24.4.0"
   },
   "dependencies": {
+    "electron-squirrel-startup": "^1.0.0",
     "fs": "^0.0.1-security",
     "fs-extra": "^11.1.1"
   }
