@@ -67,44 +67,67 @@ ipcMain.on("getGameSource", async (event, args) => {
         // fs.emptyDirSync(__dirname + "/basegame/");
         // fs.rmSync(__dirname + "/basegame", {recursive: true});
         fs.copySync(dir.filePaths[0], __dirname + "/basegame/", { overwrite: true });
-        fs.copyFileSync(__dirname + "/basegame/controls.ini", __dirname + "/profiles/controls/_default.ini");
+        fs.copyFileSync(__dirname + "/basegame/controls.ini", __dirname + "/profiles/controls/default.ini");
+
+        var ssbcFighters = require(__dirname + "/characters/default.json").ssbc;
 
         var cmcFightersTxt = fs.readFileSync(__dirname + "/basegame/data/fighters.txt", 'utf-8').split(/\r?\n/);
-        var cmcFighters = [];
+        var cmcFighters = {};
         for (let fighter = 0; fighter in cmcFightersTxt; fighter++) {
             if (fighter != 0) {
                 let fighterDat = fs.readFileSync(__dirname + "/basegame/data/dats/" + cmcFightersTxt[fighter] + ".dat", 'utf-8')
                 .split(/\r?\n/);
                 let fighterData = {
-                    name: cmcFightersTxt[fighter],
+                    // name: cmcFightersTxt[fighter],
                     displayName: fighterDat[1],
                     franchise: fighterDat[3],
                     number: fighter + 65 // Evil ryu is 65 and the last character on the ssbc roster
                     // Easier than working it out later
                 };
-                cmcFighters.push(fighterData);
+                cmcFighters[cmcFightersTxt[fighter]] = fighterData;
+                // cmcFighters.push(fighterData);
             }
         }
-        //TODO: Add alts
+        //FIXME:? assumes that all alts are not fighters - toon link
+        //FIXME:? some alts are an alt of themselves (resolved differently)
         var altFightersTxt = fs.readFileSync(__dirname + "/basegame/data/alts.txt", 'utf-8').split(/\r?\n/);
-        var altFighters = [];
+        var altFighters = {};
         var noAlts = parseInt(altFightersTxt[0]);
         altFightersTxt.shift();
         for (let fighter = 0; fighter < noAlts; fighter++) {
-            let fighterData = {
-                name: altFightersTxt[(fighter * 5) + 2],
-                displayName: altFightersTxt[(fighter * 5) + 3],
-                franchise: "",
-                altNumber: altFightersTxt[(fighter * 5) + 1],
-                baseFighter: altFightersTxt[(fighter * 5) + 0],
+            let baseFighter = altFightersTxt[fighter * 5];
+            let franchise = "";
+            let altNumber = parseInt(altFightersTxt[(fighter * 5) + 1]);
+            
+            try {
+                let fighterDat = fs.readFileSync(__dirname + "/basegame/data/dats/" + altFightersTxt[(fighter * 5) + 2] + ".dat", 'utf-8')
+                    .split(/\r?\n/);
+                if (fighterDat[3] != "") {
+                    altNumber = fighterDat[3];
+                }
+            } catch (error) {}
+
+            if (ssbcFighters[baseFighter] != undefined) {
+                franchise = ssbcFighters[baseFighter].franchise;
+            } else if (cmcFighters[baseFighter] != undefined) {
+                franchise = cmcFighters[baseFighter].franchise;
             }
-            altFighters.push(fighterData);
+
+            let fighterData = {
+                // name: altFightersTxt[(fighter * 5) + 2],
+                displayName: altFightersTxt[(fighter * 5) + 3],
+                franchise: franchise,
+                altNumber: parseInt(altFightersTxt[(fighter * 5) + 1]),
+                baseFighter: baseFighter,
+            }
+            altFighters[altFightersTxt[(fighter * 5) + 2]] = fighterData;
+            // altFighters.push(fighterData);
         }
 
         fs.writeFileSync(
             __dirname + "/characters/default.json",
             JSON.stringify({
-                ssbc: require(__dirname + "/characters/default.json").ssbc,
+                ssbc: ssbcFighters,
                 cmc: cmcFighters,
                 alts: altFighters
             }, null, 4),
@@ -123,13 +146,13 @@ ipcMain.on("mergeInstalledMods", async (event, args) => {
         return;//TODO: add alerts
     }
     if (fs.existsSync(__dirname + "/merged/controls.ini")) {
-        fs.copyFileSync(__dirname + "/merged/controls.ini", __dirname + "/profiles/controls/_inUse.ini");
+        fs.copyFileSync(__dirname + "/merged/controls.ini", __dirname + "/profiles/controls/inUse.ini");
     }
     fs.copySync(__dirname + "/basegame/", __dirname + "/merged/", { overwrite: true });
     //TODO: for each stage
     //TODO: for each character
     if (fs.existsSync(__dirname + "/profiles/controls/_inUse.ini")) {
-        fs.copyFileSync(__dirname + "/profiles/controls/_inUse.ini", __dirname + "/merged/controls.ini");
+        fs.copyFileSync(__dirname + "/profiles/controls/inUse.ini", __dirname + "/merged/controls.ini");
     }
     //TODO: generate fighters.txt and stage.txt
     //TODO: load profile css.txt and sss.txt
@@ -167,3 +190,20 @@ ipcMain.on("runCMC", async (event, args) => {
     //TODO: Catch fails e.g. merged empty
     app.quit();
 });
+
+ipcMain.on("saveControls", async (event, args) => {
+    fs.copyFileSync(__dirname + "/merged/controls.ini", __dirname + "/profiles/controls/" + args.name + ".ini");
+    updateControlProfiles();
+});
+
+ipcMain.on("loadControls", async (event, args) => {
+    fs.copyFileSync(__dirname + "/profiles/controls/" + args.name + ".ini", __dirname + "/merged/controls.ini");
+});
+
+ipcMain.on("updateControlProfiles", async (event, args) => {
+    updateControlProfiles();
+});
+
+function updateControlProfiles () {
+    win.webContents.send("fromUpdateControlProfiles", fs.readdirSync(__dirname + "/profiles/controls/"));
+}

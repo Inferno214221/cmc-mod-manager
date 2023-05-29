@@ -1,5 +1,6 @@
 // On Page Load
 checkGameSourceInstalled();
+updateControlProfiles();
 
 // Called when message received from main process
 this.api.receive("fromFs", (data) => {
@@ -9,10 +10,6 @@ this.api.receive("fromFs", (data) => {
 // this.api.receive("fromShowOpenDialog", (data) => {
 //     this[data.call](data.result, data.callArgs);
 // });
-
-this.api.receive("fromGetGameSource", (data) => {
-    this[data.call](data.result, data.callArgs);
-});
 
 function checkGameSourceInstalled() {
     // console.info("Checking if the game is installed");
@@ -32,6 +29,10 @@ function getGameSource() {
     this.api.send("getGameSource");
 }
 
+this.api.receive("fromGetGameSource", (data) => {
+    this[data.call](data.result, data.callArgs);
+});
+
 function mergeInstalledMods() {
     this.api.send("mergeInstalledMods");
 }
@@ -50,3 +51,28 @@ function inputFocused(element) {
 function inputBlurred(element) {
     this[element].style.borderColor = "black";
 }
+
+function saveControls() {
+    this.api.send("saveControls", {
+        name: controlsSaveName.value
+    });
+}
+
+function loadControls() {
+    this.api.send("loadControls", {
+        name: controlsLoadName.value
+    });
+}
+
+function updateControlProfiles() {
+    this.api.send("updateControlProfiles");
+}
+
+this.api.receive("fromUpdateControlProfiles", (profiles) => {
+    let options = ""
+    for (let profile of profiles) {
+        profile = profile.slice(0, -4)
+        options += '<option value="' + profile + '">' + profile + '</option>\n';
+    }
+    controlsLoadName.innerHTML = options;
+});

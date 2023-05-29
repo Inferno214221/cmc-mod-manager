@@ -1618,13 +1618,13 @@
         },
         "mugenluigi": {
             "displayName": "M.U.G.E.N Luigi",
-            "franchise": "mario",
+            "franchise": "",
             "altNumber": 2,
             "baseFighter": "luigi"
         },
         "weegee": {
             "displayName": "That's Mama Luigi to you Mario",
-            "franchise": "mario",
+            "franchise": "",
             "altNumber": 3,
             "baseFighter": "luigi"
         },
@@ -1654,31 +1654,31 @@
         },
         "firesonic": {
             "displayName": "Fire Sonic",
-            "franchise": "sonic",
+            "franchise": "",
             "altNumber": 2,
             "baseFighter": "sonic"
         },
         "dsonicbydamn": {
             "displayName": "Dark Sonic",
-            "franchise": "sonic",
+            "franchise": "",
             "altNumber": 3,
             "baseFighter": "sonic"
         },
         "ashura": {
             "displayName": "Ashura",
-            "franchise": "sonic",
+            "franchise": "",
             "altNumber": 4,
             "baseFighter": "sonic"
         },
         "sanic": {
             "displayName": "Sanic",
-            "franchise": "sonic",
+            "franchise": "",
             "altNumber": 5,
             "baseFighter": "sonic"
         },
         "krystalcmc": {
             "displayName": "Krystal (CMC)",
-            "franchise": "?",
+            "franchise": "",
             "altNumber": 2,
             "baseFighter": "krystal"
         },
@@ -1696,19 +1696,19 @@
         },
         "gokuold": {
             "displayName": "Goku (Kaio-Ken)",
-            "franchise": "dbz",
+            "franchise": "",
             "altNumber": 2,
             "baseFighter": "goku"
         },
         "rayvampbyanxiousluku": {
             "displayName": "Rayman (Revamped)",
-            "franchise": "rayman",
+            "franchise": "",
             "altNumber": 2,
             "baseFighter": "rayman"
         },
         "nega": {
             "displayName": "Nega Shantae",
-            "franchise": "shantae",
+            "franchise": "",
             "altNumber": 2,
             "baseFighter": "shantae"
         },
@@ -1738,7 +1738,7 @@
         },
         "evil": {
             "displayName": "Evil Ryu (Raging Demon)",
-            "franchise": "sf",
+            "franchise": "",
             "altNumber": 6,
             "baseFighter": "ryu"
         },
@@ -1774,7 +1774,7 @@
         },
         "zsamus": {
             "displayName": "Zero Suit Samus",
-            "franchise": "metroid",
+            "franchise": "",
             "altNumber": 2,
             "baseFighter": "samus"
         },
@@ -1834,7 +1834,7 @@
         },
         "daisy_by_LJ": {
             "displayName": "Daisy",
-            "franchise": "mario",
+            "franchise": "",
             "altNumber": 2,
             "baseFighter": "peach"
         },
@@ -1858,7 +1858,7 @@
         },
         "clink": {
             "displayName": "Toon Link",
-            "franchise": "zelda",
+            "franchise": "",
             "altNumber": 3,
             "baseFighter": "link"
         },
