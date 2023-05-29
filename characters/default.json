@@ -3,1015 +3,1859 @@
     "cmc": [
         {
             "name": "ciel_cloudcsw",
-            "displayName": "Cloud (CSW)"
+            "displayName": "Cloud (CSW)",
+            "franchise": "ff",
+            "number": 66
         },
         {
             "name": "fnfrog",
-            "displayName": "Flipnote Frog"
+            "displayName": "Flipnote Frog",
+            "franchise": "hatena",
+            "number": 67
         },
         {
             "name": "neco",
-            "displayName": "Neco-Arc"
+            "displayName": "Neco-Arc",
+            "franchise": "tsukihime",
+            "number": 68
         },
         {
             "name": "scottc",
-            "displayName": "Scott Pilgrim"
+            "displayName": "Scott Pilgrim",
+            "franchise": "sp",
+            "number": 69
         },
         {
             "name": "okitan",
-            "displayName": "Okita Soji"
+            "displayName": "Okita Soji",
+            "franchise": "fate",
+            "number": 70
         },
         {
             "name": "dan",
-            "displayName": "Dan"
+            "displayName": "Dan",
+            "franchise": "sf",
+            "number": 71
         },
         {
             "name": "serio",
-            "displayName": "Serio"
+            "displayName": "Serio",
+            "franchise": "toheart",
+            "number": 72
         },
         {
             "name": "gamma",
-            "displayName": "Gamma"
+            "displayName": "Gamma",
+            "franchise": "sonic",
+            "number": 73
         },
         {
             "name": "emerl",
-            "displayName": "Emerl"
+            "displayName": "Emerl",
+            "franchise": "sonic",
+            "number": 74
         },
         {
             "name": "jotaro",
-            "displayName": "Jotaro"
+            "displayName": "Jotaro",
+            "franchise": "jojo",
+            "number": 75
         },
         {
             "name": "windows",
-            "displayName": "Windows 10"
+            "displayName": "Windows 10",
+            "franchise": "microsoft",
+            "number": 76
         },
         {
             "name": "iggy",
-            "displayName": "Iggy"
+            "displayName": "Iggy",
+            "franchise": "jojo",
+            "number": 77
         },
         {
             "name": "marina",
-            "displayName": "Marina Liteyear"
+            "displayName": "Marina Liteyear",
+            "franchise": "mm",
+            "number": 78
         },
         {
             "name": "archive",
-            "displayName": "Weapons Archive"
+            "displayName": "Weapons Archive",
+            "franchise": "megaman",
+            "number": 79
         },
         {
             "name": "x",
-            "displayName": "X"
+            "displayName": "X",
+            "franchise": "megaman",
+            "number": 80
         },
         {
             "name": "zero",
-            "displayName": "Zero"
+            "displayName": "Zero",
+            "franchise": "megaman",
+            "number": 81
         },
         {
             "name": "iris",
-            "displayName": "Iris"
+            "displayName": "Iris",
+            "franchise": "megaman",
+            "number": 82
         },
         {
             "name": "mmzero",
-            "displayName": "Zero (MMZ)"
+            "displayName": "Zero (MMZ)",
+            "franchise": "megaman",
+            "number": 83
         },
         {
             "name": "ozero",
-            "displayName": "Omega Zero"
+            "displayName": "Omega Zero",
+            "franchise": "megaman",
+            "number": 84
         },
         {
             "name": "sato_yamcha",
-            "displayName": "Yamcha"
+            "displayName": "Yamcha",
+            "franchise": "dbz",
+            "number": 85
         },
         {
             "name": "a16",
-            "displayName": "Android 16"
+            "displayName": "Android 16",
+            "franchise": "dbz",
+            "number": 86
         },
         {
             "name": "gokub",
-            "displayName": "Goku Black"
+            "displayName": "Goku Black",
+            "franchise": "dbz",
+            "number": 87
         },
         {
             "name": "zamasu",
-            "displayName": "Zamasu (Fused)"
+            "displayName": "Zamasu (Fused)",
+            "franchise": "dbz",
+            "number": 88
         },
         {
             "name": "a21",
-            "displayName": "Android 21"
+            "displayName": "Android 21",
+            "franchise": "dbz",
+            "number": 89
         },
         {
             "name": "sato_reimu",
-            "displayName": "Reimu Hakurei"
+            "displayName": "Reimu Hakurei",
+            "franchise": "touhou",
+            "number": 90
         },
         {
             "name": "marisa_mash",
-            "displayName": "Marisa Kirisame"
+            "displayName": "Marisa Kirisame",
+            "franchise": "touhou",
+            "number": 91
         },
         {
             "name": "sato_clownpiece",
-            "displayName": "Clownpiece"
+            "displayName": "Clownpiece",
+            "franchise": "touhou",
+            "number": 92
         },
         {
             "name": "ciel_milla",
-            "displayName": "Milla"
+            "displayName": "Milla",
+            "franchise": "fp",
+            "number": 93
         },
         {
             "name": "nueHoujuu",
-            "displayName": "Nue Houjuu"
+            "displayName": "Nue Houjuu",
+            "franchise": "touhou",
+            "number": 94
         },
         {
             "name": "ciel_mugetsu",
-            "displayName": "Mugetsu"
+            "displayName": "Mugetsu",
+            "franchise": "touhou",
+            "number": 95
         },
         {
             "name": "remilia",
-            "displayName": "Remilia Scarlet"
+            "displayName": "Remilia Scarlet",
+            "franchise": "touhou",
+            "number": 96
         },
         {
             "name": "flandre",
-            "displayName": "Flandre Scarlet"
+            "displayName": "Flandre Scarlet",
+            "franchise": "touhou",
+            "number": 97
         },
         {
             "name": "aya",
-            "displayName": "Aya Shameimaru"
+            "displayName": "Aya Shameimaru",
+            "franchise": "touhou",
+            "number": 98
         },
         {
             "name": "komachi",
-            "displayName": "Komachi Onozuka"
+            "displayName": "Komachi Onozuka",
+            "franchise": "touhou",
+            "number": 99
         },
         {
             "name": "shana",
-            "displayName": "Shana"
+            "displayName": "Shana",
+            "franchise": "sns",
+            "number": 100
         },
         {
             "name": "chief",
-            "displayName": "Master Chief"
+            "displayName": "Master Chief",
+            "franchise": "halo",
+            "number": 101
         },
         {
             "name": "shuma",
-            "displayName": "Shuma-Gorath"
+            "displayName": "Shuma-Gorath",
+            "franchise": "drstrange",
+            "number": 102
         },
         {
             "name": "gardevoir",
-            "displayName": "Gardevoir"
+            "displayName": "Gardevoir",
+            "franchise": "pokemon",
+            "number": 103
         },
         {
             "name": "koopa",
-            "displayName": "Koopa Troopa"
+            "displayName": "Koopa Troopa",
+            "franchise": "mario",
+            "number": 104
         },
         {
             "name": "sans",
-            "displayName": "Sans"
+            "displayName": "Sans",
+            "franchise": "undertale",
+            "number": 105
         },
         {
             "name": "khanagent5",
-            "displayName": "Khan"
+            "displayName": "Khan",
+            "franchise": "jojo",
+            "number": 106
         },
         {
             "name": "mai",
-            "displayName": "Mai Shiranui "
+            "displayName": "Mai Shiranui ",
+            "franchise": "fatalfury",
+            "number": 107
         },
         {
             "name": "chopper",
-            "displayName": "Chopper"
+            "displayName": "Chopper",
+            "franchise": "onepiece",
+            "number": 108
         },
         {
             "name": "sato_chaos",
-            "displayName": "Neco-Arc CHAOS"
+            "displayName": "Neco-Arc CHAOS",
+            "franchise": "tsukihime",
+            "number": 109
         },
         {
             "name": "zeraora",
-            "displayName": "Zeraora"
+            "displayName": "Zeraora",
+            "franchise": "pokemon",
+            "number": 110
         },
         {
             "name": "asuka",
-            "displayName": "Asuka"
+            "displayName": "Asuka",
+            "franchise": "sk",
+            "number": 111
         },
         {
             "name": "oleva",
-            "displayName": "Olevadon"
+            "displayName": "Olevadon",
+            "franchise": "pok",
+            "number": 112
         },
         {
             "name": "rash",
-            "displayName": "Rash"
+            "displayName": "Rash",
+            "franchise": "battletoads",
+            "number": 113
         },
         {
             "name": "ichigo",
-            "displayName": "Ichigo"
+            "displayName": "Ichigo",
+            "franchise": "bleach",
+            "number": 114
         },
         {
             "name": "mimikyu",
-            "displayName": "Mimikyu"
+            "displayName": "Mimikyu",
+            "franchise": "pokemon",
+            "number": 115
         },
         {
             "name": "taigabysato",
-            "displayName": "Taiga Aisaka"
+            "displayName": "Taiga Aisaka",
+            "franchise": "toradora",
+            "number": 116
         },
         {
             "name": "kohaku",
-            "displayName": "Kohaku"
+            "displayName": "Kohaku",
+            "franchise": "tsukihime",
+            "number": 117
         },
         {
             "name": "silverfang",
-            "displayName": "Silver Fang"
+            "displayName": "Silver Fang",
+            "franchise": "opm",
+            "number": 118
         },
         {
             "name": "seiya",
-            "displayName": "Seiya"
+            "displayName": "Seiya",
+            "franchise": "cdz",
+            "number": 119
         },
         {
             "name": "soma",
-            "displayName": "Soma Cruz"
+            "displayName": "Soma Cruz",
+            "franchise": "castlevania",
+            "number": 120
         },
         {
             "name": "presea",
-            "displayName": "Presea"
+            "displayName": "Presea",
+            "franchise": "talesof",
+            "number": 121
         },
         {
             "name": "kfg",
-            "displayName": "Kung Fu Girl"
+            "displayName": "Kung Fu Girl",
+            "franchise": "mugen",
+            "number": 122
         },
         {
             "name": "vegeta",
-            "displayName": "Vegeta"
+            "displayName": "Vegeta",
+            "franchise": "dbz",
+            "number": 123
         },
         {
             "name": "lilina",
-            "displayName": "Lilina"
+            "displayName": "Lilina",
+            "franchise": "fe",
+            "number": 124
         },
         {
             "name": "ciel_goomba",
-            "displayName": "Goomba"
+            "displayName": "Goomba",
+            "franchise": "mario",
+            "number": 125
         },
         {
             "name": "iori",
-            "displayName": "Iori Yagami"
+            "displayName": "Iori Yagami",
+            "franchise": "kof",
+            "number": 126
         },
         {
             "name": "strider",
-            "displayName": "Strider Hiryu"
+            "displayName": "Strider Hiryu",
+            "franchise": "strider",
+            "number": 127
         },
         {
             "name": "yoko",
-            "displayName": "Yoko Littner"
+            "displayName": "Yoko Littner",
+            "franchise": "gurren",
+            "number": 128
         },
         {
             "name": "crono",
-            "displayName": "Crono"
+            "displayName": "Crono",
+            "franchise": "ctrigger",
+            "number": 129
         },
         {
             "name": "rika",
-            "displayName": "Rika Furude"
+            "displayName": "Rika Furude",
+            "franchise": "higurashi",
+            "number": 130
         },
         {
             "name": "sanders",
-            "displayName": "Colonel Sanders"
+            "displayName": "Colonel Sanders",
+            "franchise": "kfc",
+            "number": 131
         },
         {
             "name": "train",
-            "displayName": "Train Heartnet"
+            "displayName": "Train Heartnet",
+            "franchise": "blackcat",
+            "number": 132
         },
         {
             "name": "manta",
-            "displayName": "Black Manta"
+            "displayName": "Black Manta",
+            "franchise": "dc",
+            "number": 133
         },
         {
             "name": "iku_mash",
-            "displayName": "Iku Nagae"
+            "displayName": "Iku Nagae",
+            "franchise": "touhou",
+            "number": 134
         },
         {
             "name": "sato_cless",
-            "displayName": "Cless Alvein"
+            "displayName": "Cless Alvein",
+            "franchise": "talesof",
+            "number": 135
         },
         {
             "name": "metalbat",
-            "displayName": "Metal Bat"
+            "displayName": "Metal Bat",
+            "franchise": "opm",
+            "number": 136
         },
         {
             "name": "bulleta",
-            "displayName": "Baby Bonnie Hood"
+            "displayName": "Baby Bonnie Hood",
+            "franchise": "ds",
+            "number": 137
         },
         {
             "name": "fritzagent5",
-            "displayName": "Fritz"
+            "displayName": "Fritz",
+            "franchise": "blitzkampf",
+            "number": 138
         },
         {
             "name": "kosmos",
-            "displayName": "KOS-MOS"
+            "displayName": "KOS-MOS",
+            "franchise": "xenosaga",
+            "number": 139
         },
         {
             "name": "terry",
-            "displayName": "Terry Bogard"
+            "displayName": "Terry Bogard",
+            "franchise": "fatalfury",
+            "number": 140
         },
         {
             "name": "shrek",
-            "displayName": "Shrek"
+            "displayName": "Shrek",
+            "franchise": "shrek",
+            "number": 141
         },
         {
             "name": "lupin",
-            "displayName": "Lupin the 3rd"
+            "displayName": "Lupin the 3rd",
+            "franchise": "lupin",
+            "number": 142
         },
         {
             "name": "slkdoom",
-            "displayName": "Seelkadoom"
+            "displayName": "Seelkadoom",
+            "franchise": "sonic",
+            "number": 143
         },
         {
             "name": "hecate",
-            "displayName": "Hecate"
+            "displayName": "Hecate",
+            "franchise": "sns",
+            "number": 144
         },
         {
             "name": "arle",
-            "displayName": "Arle Nadja"
+            "displayName": "Arle Nadja",
+            "franchise": "puyopuyo",
+            "number": 145
         },
         {
             "name": "athenaa",
-            "displayName": "Athena Asamiya"
+            "displayName": "Athena Asamiya",
+            "franchise": "psysol",
+            "number": 146
         },
         {
             "name": "josuke",
-            "displayName": "Josuke Higashikata"
+            "displayName": "Josuke Higashikata",
+            "franchise": "jojo",
+            "number": 147
         },
         {
             "name": "mchnika",
-            "displayName": "Nika"
+            "displayName": "Nika",
+            "franchise": "mechanika",
+            "number": 148
         },
         {
             "name": "spiderman",
-            "displayName": "Spider-Man"
+            "displayName": "Spider-Man",
+            "franchise": "spiderman",
+            "number": 149
         },
         {
             "name": "jill",
-            "displayName": "Jill Valentine"
+            "displayName": "Jill Valentine",
+            "franchise": "re",
+            "number": 150
         },
         {
             "name": "weiss2",
-            "displayName": "Weiss Schnee"
+            "displayName": "Weiss Schnee",
+            "franchise": "rwby",
+            "number": 151
         },
         {
             "name": "yang",
-            "displayName": "Yang Xiao Long"
+            "displayName": "Yang Xiao Long",
+            "franchise": "rwby",
+            "number": 152
         },
         {
             "name": "ellie",
-            "displayName": "Ellie"
+            "displayName": "Ellie",
+            "franchise": "mtale",
+            "number": 153
         },
         {
             "name": "draco",
-            "displayName": "Dracobot"
+            "displayName": "Dracobot",
+            "franchise": "pok",
+            "number": 154
         },
         {
             "name": "rock",
-            "displayName": "Rock Howard"
+            "displayName": "Rock Howard",
+            "franchise": "fatalfury",
+            "number": 155
         },
         {
             "name": "sanae_mash",
-            "displayName": "Sanae Kochiya"
+            "displayName": "Sanae Kochiya",
+            "franchise": "touhou",
+            "number": 156
         },
         {
             "name": "gg_bass",
-            "displayName": "Bass"
+            "displayName": "Bass",
+            "franchise": "megaman",
+            "number": 157
         },
         {
             "name": "misaka",
-            "displayName": "Misaka Mikoto"
+            "displayName": "Misaka Mikoto",
+            "franchise": "toaru",
+            "number": 158
         },
         {
             "name": "accel",
-            "displayName": "Accelerator"
+            "displayName": "Accelerator",
+            "franchise": "toaru",
+            "number": 159
         },
         {
             "name": "silver",
-            "displayName": "Silver"
+            "displayName": "Silver",
+            "franchise": "sonic",
+            "number": 160
         },
         {
             "name": "hyde_cogu",
-            "displayName": "Hyde Kido"
+            "displayName": "Hyde Kido",
+            "franchise": "unib",
+            "number": 161
         },
         {
             "name": "kris",
-            "displayName": "Kris"
+            "displayName": "Kris",
+            "franchise": "deltarune",
+            "number": 162
         },
         {
             "name": "gilgamesh",
-            "displayName": "Gilgamesh"
+            "displayName": "Gilgamesh",
+            "franchise": "fate",
+            "number": 163
         },
         {
             "name": "blizzard",
-            "displayName": "Blizzard Man"
+            "displayName": "Blizzard Man",
+            "franchise": "megaman",
+            "number": 164
         },
         {
             "name": "meiling_cogu",
-            "displayName": "Hong Meiling"
+            "displayName": "Hong Meiling",
+            "franchise": "touhou",
+            "number": 165
         },
         {
             "name": "alucard",
-            "displayName": "Alucard"
+            "displayName": "Alucard",
+            "franchise": "castlevania",
+            "number": 166
         },
         {
             "name": "sora",
-            "displayName": "Sora"
+            "displayName": "Sora",
+            "franchise": "kh",
+            "number": 167
         },
         {
             "name": "sato_kuroko",
-            "displayName": "Shirai Kuroko"
+            "displayName": "Shirai Kuroko",
+            "franchise": "toaru",
+            "number": 168
         },
         {
             "name": "mami",
-            "displayName": "Mami Tomoe"
+            "displayName": "Mami Tomoe",
+            "franchise": "madoka",
+            "number": 169
         },
         {
             "name": "sato_mugino",
-            "displayName": "Mugino Shizuri"
+            "displayName": "Mugino Shizuri",
+            "franchise": "toaru",
+            "number": 170
         },
         {
             "name": "kyo_cogu",
-            "displayName": "Kyo Kusanagi"
+            "displayName": "Kyo Kusanagi",
+            "franchise": "kof",
+            "number": 171
         },
         {
             "name": "oribyanxiousluku",
-            "displayName": "Ori & Sein"
+            "displayName": "Ori & Sein",
+            "franchise": "ori",
+            "number": 172
         },
         {
             "name": "gunvolt_mash",
-            "displayName": "Gunvolt"
+            "displayName": "Gunvolt",
+            "franchise": "gunvolt",
+            "number": 173
         },
         {
             "name": "kars",
-            "displayName": "Kars"
+            "displayName": "Kars",
+            "franchise": "jojo",
+            "number": 174
         },
         {
             "name": "ciel_kfm",
-            "displayName": "Kung Fu Man"
+            "displayName": "Kung Fu Man",
+            "franchise": "mugen",
+            "number": 175
         },
         {
             "name": "suika",
-            "displayName": "Suika Ibuki"
+            "displayName": "Suika Ibuki",
+            "franchise": "touhou",
+            "number": 176
         },
         {
             "name": "sigma_mash",
-            "displayName": "Sigma"
+            "displayName": "Sigma",
+            "franchise": "megaman",
+            "number": 177
         },
         {
             "name": "ptbravo_misako",
-            "displayName": "Misako"
+            "displayName": "Misako",
+            "franchise": "rivercity",
+            "number": 178
         },
         {
             "name": "ptbravo_kyoko",
-            "displayName": "Kyoko"
+            "displayName": "Kyoko",
+            "franchise": "rivercity",
+            "number": 179
         },
         {
             "name": "guilmon",
-            "displayName": "Guilmon"
+            "displayName": "Guilmon",
+            "franchise": "digit",
+            "number": 180
         },
         {
             "name": "blackguilmon",
-            "displayName": "BlackGuilmon"
+            "displayName": "BlackGuilmon",
+            "franchise": "digi",
+            "number": 181
         },
         {
             "name": "paper",
-            "displayName": "Paper Mario"
+            "displayName": "Paper Mario",
+            "franchise": "mario",
+            "number": 182
         },
         {
             "name": "supersonic",
-            "displayName": "Super Sonic"
+            "displayName": "Super Sonic",
+            "franchise": "sonic",
+            "number": 183
         },
         {
             "name": "utsuho_cogu",
-            "displayName": "Utsuho Reiuji"
+            "displayName": "Utsuho Reiuji",
+            "franchise": "touhou",
+            "number": 184
         },
         {
             "name": "sato_parsee",
-            "displayName": "Parsee Mizuhashi"
+            "displayName": "Parsee Mizuhashi",
+            "franchise": "touhou",
+            "number": 185
         },
         {
             "name": "ciel_koa",
-            "displayName": "Koakuma"
+            "displayName": "Koakuma",
+            "franchise": "touhou",
+            "number": 186
         },
         {
             "name": "icemanagent5",
-            "displayName": "Iceman"
+            "displayName": "Iceman",
+            "franchise": "xmen",
+            "number": 187
         },
         {
             "name": "espio_mash",
-            "displayName": "Espio"
+            "displayName": "Espio",
+            "franchise": "sonic",
+            "number": 188
         },
         {
             "name": "azrael",
-            "displayName": "Azrael"
+            "displayName": "Azrael",
+            "franchise": "azraelmcleod",
+            "number": 189
         },
         {
             "name": "skarmory",
-            "displayName": "Skarmory"
+            "displayName": "Skarmory",
+            "franchise": "pokemon",
+            "number": 190
         },
         {
             "name": "sato_rena",
-            "displayName": "Rena Ryuugu"
+            "displayName": "Rena Ryuugu",
+            "franchise": "higurashi",
+            "number": 191
         },
         {
             "name": "haruhi_dg",
-            "displayName": "Haruhi Suzumiya"
+            "displayName": "Haruhi Suzumiya",
+            "franchise": "haruhi",
+            "number": 192
         },
         {
             "name": "chad_mrnope",
-            "displayName": "Sado 'Chad' Yasutora"
+            "displayName": "Sado 'Chad' Yasutora",
+            "franchise": "bleach",
+            "number": 193
         },
         {
             "name": "wrastor",
-            "displayName": "Wrastor"
+            "displayName": "Wrastor",
+            "franchise": "roa",
+            "number": 194
         },
         {
             "name": "kim",
-            "displayName": "Kim Kaphwan"
+            "displayName": "Kim Kaphwan",
+            "franchise": "fatalfury",
+            "number": 195
         },
         {
             "name": "lyn_sk00ps",
-            "displayName": "Lyn"
+            "displayName": "Lyn",
+            "franchise": "fe",
+            "number": 196
         },
         {
             "name": "mokou_solo",
-            "displayName": "Fujiwara no Mokou"
+            "displayName": "Fujiwara no Mokou",
+            "franchise": "touhou",
+            "number": 197
         },
         {
             "name": "friezaagent5",
-            "displayName": "Frieza"
+            "displayName": "Frieza",
+            "franchise": "dbz",
+            "number": 198
         },
         {
             "name": "sato_shinki",
-            "displayName": "Shinki"
+            "displayName": "Shinki",
+            "franchise": "touhou",
+            "number": 199
         },
         {
             "name": "sato_alexkidd",
-            "displayName": "Alex Kidd"
+            "displayName": "Alex Kidd",
+            "franchise": "alexkidd",
+            "number": 200
         },
         {
             "name": "7d6",
-            "displayName": "Yggdrasil"
+            "displayName": "Yggdrasil",
+            "franchise": "digi",
+            "number": 201
         },
         {
             "name": "josephbt",
-            "displayName": "Joseph Joestar"
+            "displayName": "Joseph Joestar",
+            "franchise": "jojo",
+            "number": 202
         },
         {
             "name": "mistel_solo",
-            "displayName": "Mistel"
+            "displayName": "Mistel",
+            "franchise": "yggdra",
+            "number": 203
         },
         {
             "name": "kratos",
-            "displayName": "Kratos Aurion"
+            "displayName": "Kratos Aurion",
+            "franchise": "talesof",
+            "number": 204
         },
         {
             "name": "cirno",
-            "displayName": "Cirno"
+            "displayName": "Cirno",
+            "franchise": "touhou",
+            "number": 205
         },
         {
             "name": "bladeedit",
-            "displayName": "Blade"
+            "displayName": "Blade",
+            "franchise": "sonic",
+            "number": 206
         },
         {
             "name": "gg_sonder",
-            "displayName": "Sonder"
+            "displayName": "Sonder",
+            "franchise": "sonic",
+            "number": 207
         },
         {
             "name": "cucco",
-            "displayName": "Cucco"
+            "displayName": "Cucco",
+            "franchise": "zelda",
+            "number": 208
         },
         {
             "name": "mchsnc",
-            "displayName": "Mecha Sonic"
+            "displayName": "Mecha Sonic",
+            "franchise": "sonic",
+            "number": 209
         },
         {
             "name": "azero",
-            "displayName": "Awakened Zero"
+            "displayName": "Awakened Zero",
+            "franchise": "megaman",
+            "number": 210
         },
         {
             "name": "gallantmon",
-            "displayName": "Gallantmon"
+            "displayName": "Gallantmon",
+            "franchise": "digit",
+            "number": 211
         },
         {
             "name": "toehoe",
-            "displayName": "Toehoe"
+            "displayName": "Toehoe",
+            "franchise": "touhou",
+            "number": 212
         },
         {
             "name": "dedede",
-            "displayName": "King Dedede"
+            "displayName": "King Dedede",
+            "franchise": "kirby",
+            "number": 213
         },
         {
             "name": "ciel_sorrel",
-            "displayName": "Lady's Sorrel"
+            "displayName": "Lady's Sorrel",
+            "franchise": "fkg",
+            "number": 214
         },
         {
             "name": "ash-roa",
-            "displayName": "Ash"
+            "displayName": "Ash",
+            "franchise": "roa",
+            "number": 215
         },
         {
             "name": "sato_pleinair",
-            "displayName": "Pleinair"
+            "displayName": "Pleinair",
+            "franchise": "disgaea",
+            "number": 216
         },
         {
             "name": "wart_by_waluigidx",
-            "displayName": "Wart"
+            "displayName": "Wart",
+            "franchise": "mario",
+            "number": 217
         },
         {
             "name": "sakuya_cogu",
-            "displayName": "Sakuya Izayoi"
+            "displayName": "Sakuya Izayoi",
+            "franchise": "touhou",
+            "number": 218
         },
         {
             "name": "sato_youmu",
-            "displayName": "Konpaku Youmu"
+            "displayName": "Konpaku Youmu",
+            "franchise": "touhou",
+            "number": 219
         },
         {
             "name": "yuyuko",
-            "displayName": "Yuyuko Saigyouji"
+            "displayName": "Yuyuko Saigyouji",
+            "franchise": "touhou",
+            "number": 220
         },
         {
             "name": "renamon",
-            "displayName": "Renamon"
+            "displayName": "Renamon",
+            "franchise": "digit",
+            "number": 221
         },
         {
             "name": "riolu",
-            "displayName": "Partner Riolu"
+            "displayName": "Partner Riolu",
+            "franchise": "pmd",
+            "number": 222
         },
         {
             "name": "ciel_schmietta",
-            "displayName": "Schmietta"
+            "displayName": "Schmietta",
+            "franchise": "touhou",
+            "number": 223
         },
         {
             "name": "ptbravo_ramona",
-            "displayName": "Ramona Flowers"
+            "displayName": "Ramona Flowers",
+            "franchise": "sp",
+            "number": 224
         },
         {
             "name": "ptbravo_hatkid",
-            "displayName": "Hat Kid"
+            "displayName": "Hat Kid",
+            "franchise": "hatintime",
+            "number": 225
         },
         {
             "name": "sakurakyoko_dg",
-            "displayName": "Kyouko Sakura"
+            "displayName": "Kyouko Sakura",
+            "franchise": "madoka",
+            "number": 226
         },
         {
             "name": "sion_cogu",
-            "displayName": "Sion Eltnam Atlasia"
+            "displayName": "Sion Eltnam Atlasia",
+            "franchise": "tsukihime",
+            "number": 227
         },
         {
             "name": "bedr_mhisui",
-            "displayName": "Mech-Hisui"
+            "displayName": "Mech-Hisui",
+            "franchise": "tsukihime",
+            "number": 228
         },
         {
             "name": "akyuu",
-            "displayName": "Hieda no Akyuu"
+            "displayName": "Hieda no Akyuu",
+            "franchise": "touhou",
+            "number": 229
         },
         {
             "name": "mumenrideragent5",
-            "displayName": "Mumen Rider"
+            "displayName": "Mumen Rider",
+            "franchise": "opm",
+            "number": 230
         },
         {
             "name": "numemon",
-            "displayName": "Numemon"
+            "displayName": "Numemon",
+            "franchise": "digi",
+            "number": 231
         },
         {
             "name": "bedr_nozomi",
-            "displayName": "Smol Nozomi"
+            "displayName": "Smol Nozomi",
+            "franchise": "siivagunner",
+            "number": 232
         },
         {
             "name": "kiraagent5",
-            "displayName": "Kira Yoshikage"
+            "displayName": "Kira Yoshikage",
+            "franchise": "jojo",
+            "number": 233
         },
         {
             "name": "boss_sato_goliathdoll",
-            "displayName": "Goliath Doll"
+            "displayName": "Goliath Doll",
+            "franchise": "touhou",
+            "number": 234
         },
         {
             "name": "ptbravo_ena",
-            "displayName": "ENA & Moony"
+            "displayName": "ENA & Moony",
+            "franchise": "ENA",
+            "number": 235
         },
         {
             "name": "10032_cogu",
-            "displayName": "Misaka 10032"
+            "displayName": "Misaka 10032",
+            "franchise": "toaru",
+            "number": 236
         },
         {
             "name": "ciel_maitokiha",
-            "displayName": "Mai Tokiha"
+            "displayName": "Mai Tokiha",
+            "franchise": "fuukataisen",
+            "number": 237
         },
         {
             "name": "pegasusmon",
-            "displayName": "Pegasusmon"
+            "displayName": "Pegasusmon",
+            "franchise": "digi",
+            "number": 238
         },
         {
             "name": "asagi",
-            "displayName": "Asagi"
+            "displayName": "Asagi",
+            "franchise": "nipponichi",
+            "number": 239
         },
         {
             "name": "nitoriagent5",
-            "displayName": "Nitori Kawashiro"
+            "displayName": "Nitori Kawashiro",
+            "franchise": "touhou",
+            "number": 240
         },
         {
             "name": "sato_aria",
-            "displayName": "Aria"
+            "displayName": "Aria",
+            "franchise": "rpgmakervxace",
+            "number": 241
         },
         {
             "name": "akatsuki_mash",
-            "displayName": "Akatsuki"
+            "displayName": "Akatsuki",
+            "franchise": "blitzkampf",
+            "number": 242
         },
         {
             "name": "boss_marietta",
-            "displayName": "Marietta"
+            "displayName": "Marietta",
+            "franchise": "yggdra",
+            "number": 243
         },
         {
             "name": "chef",
-            "displayName": "Chef Kawasaki"
+            "displayName": "Chef Kawasaki",
+            "franchise": "kirby",
+            "number": 244
         },
         {
             "name": "boss_thwomp",
-            "displayName": "Thwomp"
+            "displayName": "Thwomp",
+            "franchise": "mario",
+            "number": 245
         },
         {
             "name": "sato_kyoko",
-            "displayName": "Kyoko"
+            "displayName": "Kyoko",
+            "franchise": "suguri",
+            "number": 246
         },
         {
             "name": "bubsy",
-            "displayName": "Bubsy"
+            "displayName": "Bubsy",
+            "franchise": "bubsy",
+            "number": 247
         },
         {
             "name": "ptbravo_incredible",
-            "displayName": "Mr. Incredible"
+            "displayName": "Mr. Incredible",
+            "franchise": "incredibles",
+            "number": 248
         },
         {
             "name": "impmon",
-            "displayName": "Impmon"
+            "displayName": "Impmon",
+            "franchise": "digit",
+            "number": 249
         },
         {
             "name": "jonathan",
-            "displayName": "Jonathan Joestar"
+            "displayName": "Jonathan Joestar",
+            "franchise": "jojo",
+            "number": 250
         },
         {
             "name": "lobster",
-            "displayName": "Rock Lobster"
+            "displayName": "Rock Lobster",
+            "franchise": "mother",
+            "number": 251
         },
         {
             "name": "boss_azero",
-            "displayName": "Awakened Zero"
+            "displayName": "Awakened Zero",
+            "franchise": "megaman",
+            "number": 252
         },
         {
             "name": "bedr_aigis",
-            "displayName": "Aigis"
+            "displayName": "Aigis",
+            "franchise": "persona",
+            "number": 253
         },
         {
             "name": "wriggle",
-            "displayName": "Wriggle Nightbug"
+            "displayName": "Wriggle Nightbug",
+            "franchise": "touhou",
+            "number": 254
         },
         {
             "name": "aru",
-            "displayName": "Aru"
+            "displayName": "Aru",
+            "franchise": "100oj",
+            "number": 255
         },
         {
             "name": "marumaro",
-            "displayName": "Marumaro"
+            "displayName": "Marumaro",
+            "franchise": "bluedragon",
+            "number": 256
         },
         {
             "name": "googly",
-            "displayName": "John Googly"
+            "displayName": "John Googly",
+            "franchise": "jojo",
+            "number": 257
         },
         {
             "name": "necoarcnrvnqsrchaosbyathorment",
-            "displayName": "Barack Obama"
+            "displayName": "Barack Obama",
+            "franchise": "usa",
+            "number": 258
         },
         {
             "name": "murasa_cogu",
-            "displayName": "Murasa Minamitsu"
+            "displayName": "Murasa Minamitsu",
+            "franchise": "touhou",
+            "number": 259
         },
         {
             "name": "koishi",
-            "displayName": "Koishi"
+            "displayName": "Koishi",
+            "franchise": "touhou",
+            "number": 260
         },
         {
             "name": "volnutt_mash",
-            "displayName": "Mega Man Volnutt"
+            "displayName": "Mega Man Volnutt",
+            "franchise": "megaman",
+            "number": 261
         },
         {
             "name": "garfield_alem",
-            "displayName": "Garfield"
+            "displayName": "Garfield",
+            "franchise": "garfield",
+            "number": 262
         },
         {
             "name": "richter",
-            "displayName": "Richter Belmont"
+            "displayName": "Richter Belmont",
+            "franchise": "castlevania",
+            "number": 263
         },
         {
             "name": "sseraphimon",
-            "displayName": "ShadowSeraphimon"
+            "displayName": "ShadowSeraphimon",
+            "franchise": "digit",
+            "number": 264
         },
         {
             "name": "snowy_miku",
-            "displayName": "Hatsune Miku"
+            "displayName": "Hatsune Miku",
+            "franchise": "vocaloid",
+            "number": 265
         },
         {
             "name": "thanos",
-            "displayName": "Thanos"
+            "displayName": "Thanos",
+            "franchise": "blackorder",
+            "number": 266
         },
         {
             "name": "ptbravo_luna",
-            "displayName": "Luna"
+            "displayName": "Luna",
+            "franchise": "willofsteel",
+            "number": 267
         },
         {
             "name": "sayaka_dg",
-            "displayName": "Sayaka Miki"
+            "displayName": "Sayaka Miki",
+            "franchise": "madoka",
+            "number": 268
         },
         {
             "name": "agatha",
-            "displayName": "Agatha"
+            "displayName": "Agatha",
+            "franchise": "mechanika",
+            "number": 269
         },
         {
             "name": "sato_suguri",
-            "displayName": "Suguri"
+            "displayName": "Suguri",
+            "franchise": "suguri",
+            "number": 270
         },
         {
             "name": "naruto",
-            "displayName": "Naruto Uzumaki"
+            "displayName": "Naruto Uzumaki",
+            "franchise": "naruto",
+            "number": 271
         },
         {
             "name": "hinatabydamn",
-            "displayName": "Hinata Hyuga"
+            "displayName": "Hinata Hyuga",
+            "franchise": "naruto",
+            "number": 272
         },
         {
             "name": "sato_alice",
-            "displayName": "Alice Margatroid"
+            "displayName": "Alice Margatroid",
+            "franchise": "touhou",
+            "number": 273
         },
         {
             "name": "smorg",
-            "displayName": "Smorg"
+            "displayName": "Smorg",
+            "franchise": "mario",
+            "number": 274
         },
         {
             "name": "axl_mash",
-            "displayName": "Axl"
+            "displayName": "Axl",
+            "franchise": "megaman",
+            "number": 275
         },
         {
             "name": "sk00ps_sephiroth",
-            "displayName": "Sephiroth"
+            "displayName": "Sephiroth",
+            "franchise": "ff",
+            "number": 276
         },
         {
             "name": "ptbravo_waitress",
-            "displayName": "Waitress"
+            "displayName": "Waitress",
+            "franchise": "rivercity",
+            "number": 277
         },
         {
             "name": "susagent5",
-            "displayName": "Impostor"
+            "displayName": "Impostor",
+            "franchise": "amongus",
+            "number": 278
         },
         {
             "name": "kumagawa",
-            "displayName": "Kumagawa Misogi"
+            "displayName": "Kumagawa Misogi",
+            "franchise": "medaka",
+            "number": 279
         },
         {
             "name": "patchouli_mp3",
-            "displayName": "Patchouli Knowledge"
+            "displayName": "Patchouli Knowledge",
+            "franchise": "touhou",
+            "number": 280
         },
         {
             "name": "agent5genos",
-            "displayName": "Genos"
+            "displayName": "Genos",
+            "franchise": "opm",
+            "number": 281
         },
         {
             "name": "nacidio",
-            "displayName": "Nacidio"
+            "displayName": "Nacidio",
+            "franchise": "pok",
+            "number": 282
         },
         {
             "name": "bedr_2b",
-            "displayName": "Yorha n.2 Type B"
+            "displayName": "Yorha n.2 Type B",
+            "franchise": "nier",
+            "number": 283
         },
         {
             "name": "akihav",
-            "displayName": "Akiha Vermillion"
+            "displayName": "Akiha Vermillion",
+            "franchise": "tsukihime",
+            "number": 284
         },
         {
             "name": "boss_sato_hime",
-            "displayName": "Hime"
+            "displayName": "Hime",
+            "franchise": "suguri",
+            "number": 285
         },
         {
             "name": "sato_hime",
-            "displayName": "Hime"
+            "displayName": "Hime",
+            "franchise": "suguri",
+            "number": 286
         },
         {
             "name": "sans_tp",
-            "displayName": "Sans"
+            "displayName": "Sans",
+            "franchise": "undertale",
+            "number": 287
         },
         {
             "name": "agent5ike",
-            "displayName": "Ike"
+            "displayName": "Ike",
+            "franchise": "fe",
+            "number": 288
         },
         {
             "name": "undyne_mrnope",
-            "displayName": "Undyne"
+            "displayName": "Undyne",
+            "franchise": "undertale",
+            "number": 289
         },
         {
             "name": "boss_mash_dracula",
-            "displayName": "Dracula"
+            "displayName": "Dracula",
+            "franchise": "castlevania",
+            "number": 290
         },
         {
             "name": "boss_apocalypse",
-            "displayName": "Apocalypse"
+            "displayName": "Apocalypse",
+            "franchise": "xmen",
+            "number": 291
         },
         {
             "name": "reisen",
-            "displayName": "Reisen U. Inaba"
+            "displayName": "Reisen U. Inaba",
+            "franchise": "touhou",
+            "number": 292
         },
         {
             "name": "sato_miguelrios",
-            "displayName": "Miguel Rios"
+            "displayName": "Miguel Rios",
+            "franchise": "zelda",
+            "number": 293
         },
         {
             "name": "sato_mrsatan",
-            "displayName": "Mr. Satan"
+            "displayName": "Mr. Satan",
+            "franchise": "dbz",
+            "number": 294
         },
         {
             "name": "metalman",
-            "displayName": "Metal Man"
+            "displayName": "Metal Man",
+            "franchise": "megaman",
+            "number": 295
         },
         {
             "name": "lloyd_cogu",
-            "displayName": "Lloyd Irving"
+            "displayName": "Lloyd Irving",
+            "franchise": "talesof",
+            "number": 296
         },
         {
             "name": "ragna_cogu",
-            "displayName": "Ragna the Bloodedge"
+            "displayName": "Ragna the Bloodedge",
+            "franchise": "blazblue",
+            "number": 297
         },
         {
             "name": "gg_zx",
-            "displayName": "Vent"
+            "displayName": "Vent",
+            "franchise": "megaman",
+            "number": 298
         },
         {
             "name": "mash_heart",
-            "displayName": "Heart Aino"
+            "displayName": "Heart Aino",
+            "franchise": "arcanaheart",
+            "number": 299
         },
         {
             "name": "ronald",
-            "displayName": "Ronald McDonald"
+            "displayName": "Ronald McDonald",
+            "franchise": "mcdonalds",
+            "number": 300
         },
         {
             "name": "sato_tsu",
-            "displayName": "Tsuchimikado M."
+            "displayName": "Tsuchimikado M.",
+            "franchise": "toaru",
+            "number": 301
         },
         {
             "name": "misaki",
-            "displayName": "Shokuhou Misaki"
+            "displayName": "Shokuhou Misaki",
+            "franchise": "toaru",
+            "number": 302
         },
         {
             "name": "piggodagent5",
-            "displayName": "Pig God"
+            "displayName": "Pig God",
+            "franchise": "opm",
+            "number": 303
         },
         {
             "name": "kingagent5",
-            "displayName": "King"
+            "displayName": "King",
+            "franchise": "opm",
+            "number": 304
         },
         {
             "name": "daiyousei",
-            "displayName": "Daiyousei"
+            "displayName": "Daiyousei",
+            "franchise": "touhou",
+            "number": 305
         },
         {
             "name": "cjbyhelguari",
-            "displayName": "Carl Johnson"
+            "displayName": "Carl Johnson",
+            "franchise": "gta",
+            "number": 306
         },
         {
             "name": "jalter",
-            "displayName": "J'Alter"
+            "displayName": "J'Alter",
+            "franchise": "fate",
+            "number": 307
         },
         {
             "name": "ragnaunlimited_cogu",
-            "displayName": "Unlimited Ragna"
+            "displayName": "Unlimited Ragna",
+            "franchise": "blazblue",
+            "number": 308
         },
         {
             "name": "ptbravo_noize",
-            "displayName": "Noize"
+            "displayName": "Noize",
+            "franchise": "rivercity",
+            "number": 309
         },
         {
             "name": "lucemon",
-            "displayName": "Lucemon"
+            "displayName": "Lucemon",
+            "franchise": "digi",
+            "number": 310
         },
         {
             "name": "tank",
-            "displayName": "Blitztank"
+            "displayName": "Blitztank",
+            "franchise": "blitzkampf",
+            "number": 311
         },
         {
             "name": "gg_supreme_bass",
-            "displayName": "Bass"
+            "displayName": "Bass",
+            "franchise": "megaman",
+            "number": 312
         },
         {
             "name": "gg_ssonder",
-            "displayName": "Super Sonder"
+            "displayName": "Super Sonder",
+            "franchise": "sonic",
+            "number": 313
         },
         {
             "name": "deoxys",
-            "displayName": "Deoxys"
+            "displayName": "Deoxys",
+            "franchise": "pokemon",
+            "number": 314
         },
         {
             "name": "boss_marx",
-            "displayName": "Marx"
+            "displayName": "Marx",
+            "franchise": "marx",
+            "number": 315
         },
         {
             "name": "plent",
-            "displayName": "Perana Plent"
+            "displayName": "Perana Plent",
+            "franchise": "mario",
+            "number": 316
         },
         {
             "name": "shy",
-            "displayName": "Shy Guy"
+            "displayName": "Shy Guy",
+            "franchise": "mario",
+            "number": 317
         },
         {
             "name": "ikki_cogu",
-            "displayName": "Ikki"
+            "displayName": "Ikki",
+            "franchise": "cdz",
+            "number": 318
+        }
+    ],
+    "alts": [
+        {
+            "name": "drmario",
+            "displayName": "Dr. Mario",
+            "franchise": "",
+            "altNumber": "2",
+            "baseFighter": "mario"
+        },
+        {
+            "name": "nesmario",
+            "displayName": "NES Mario",
+            "franchise": "",
+            "altNumber": "3",
+            "baseFighter": "mario"
+        },
+        {
+            "name": "mugenmario",
+            "displayName": "M.U.G.E.N Mario",
+            "franchise": "",
+            "altNumber": "4",
+            "baseFighter": "mario"
+        },
+        {
+            "name": "mugenluigi",
+            "displayName": "M.U.G.E.N Luigi",
+            "franchise": "",
+            "altNumber": "2",
+            "baseFighter": "luigi"
+        },
+        {
+            "name": "weegee",
+            "displayName": "That's Mama Luigi to you Mario",
+            "franchise": "",
+            "altNumber": "3",
+            "baseFighter": "luigi"
+        },
+        {
+            "name": "arle",
+            "displayName": "Arle (English VA)",
+            "franchise": "",
+            "altNumber": "2",
+            "baseFighter": "arle"
+        },
+        {
+            "name": "joseph",
+            "displayName": "Joseph Joestar (SC)",
+            "franchise": "",
+            "altNumber": "2",
+            "baseFighter": "josephbt"
+        },
+        {
+            "name": "scott",
+            "displayName": "Scott (Crazy)",
+            "franchise": "",
+            "altNumber": "2",
+            "baseFighter": "scottc"
+        },
+        {
+            "name": "okita",
+            "displayName": "Okita (Old)",
+            "franchise": "",
+            "altNumber": "2",
+            "baseFighter": "okitan"
+        },
+        {
+            "name": "firesonic",
+            "displayName": "Fire Sonic",
+            "franchise": "",
+            "altNumber": "2",
+            "baseFighter": "sonic"
+        },
+        {
+            "name": "dsonicbydamn",
+            "displayName": "Dark Sonic",
+            "franchise": "",
+            "altNumber": "3",
+            "baseFighter": "sonic"
+        },
+        {
+            "name": "ashura",
+            "displayName": "Ashura",
+            "franchise": "",
+            "altNumber": "4",
+            "baseFighter": "sonic"
+        },
+        {
+            "name": "sanic",
+            "displayName": "Sanic",
+            "franchise": "",
+            "altNumber": "5",
+            "baseFighter": "sonic"
+        },
+        {
+            "name": "krystalcmc",
+            "displayName": "Krystal (CMC)",
+            "franchise": "",
+            "altNumber": "2",
+            "baseFighter": "krystal"
+        },
+        {
+            "name": "athenaa",
+            "displayName": "Athena Asamiya (No Facing)",
+            "franchise": "",
+            "altNumber": "2",
+            "baseFighter": "athenaa"
+        },
+        {
+            "name": "crono_solo",
+            "displayName": "Crono (CSW)",
+            "franchise": "",
+            "altNumber": "2",
+            "baseFighter": "crono"
+        },
+        {
+            "name": "gokuold",
+            "displayName": "Goku (Kaio-Ken)",
+            "franchise": "",
+            "altNumber": "2",
+            "baseFighter": "goku"
+        },
+        {
+            "name": "rayvampbyanxiousluku",
+            "displayName": "Rayman (Revamped)",
+            "franchise": "",
+            "altNumber": "2",
+            "baseFighter": "rayman"
+        },
+        {
+            "name": "nega",
+            "displayName": "Nega Shantae",
+            "franchise": "",
+            "altNumber": "2",
+            "baseFighter": "shantae"
+        },
+        {
+            "name": "oleva",
+            "displayName": "Olevadon (Alt FS)",
+            "franchise": "",
+            "altNumber": "2",
+            "baseFighter": "oleva"
+        },
+        {
+            "name": "cloud",
+            "displayName": "Cloud (Legacy)",
+            "franchise": "",
+            "altNumber": "2",
+            "baseFighter": "ciel_cloudcsw"
+        },
+        {
+            "name": "marisa",
+            "displayName": "Marisa (Mystical Chain)",
+            "franchise": "",
+            "altNumber": "2",
+            "baseFighter": "marisa_mash"
+        },
+        {
+            "name": "ciel_kfm",
+            "displayName": "Kung Fu Man (Facing)",
+            "franchise": "",
+            "altNumber": "2",
+            "baseFighter": "ciel_kfm"
+        },
+        {
+            "name": "evil",
+            "displayName": "Evil Ryu (Shinku Tatsumaki)",
+            "franchise": "",
+            "altNumber": "4",
+            "baseFighter": "ryu"
+        },
+        {
+            "name": "evil",
+            "displayName": "Evil Ryu (Messatsu Goshoryu)",
+            "franchise": "",
+            "altNumber": "5",
+            "baseFighter": "ryu"
+        },
+        {
+            "name": "evil",
+            "displayName": "Evil Ryu (Raging Demon)",
+            "franchise": "",
+            "altNumber": "6",
+            "baseFighter": "ryu"
+        },
+        {
+            "name": "oribyanxiousluku",
+            "displayName": "Ori (Smash)",
+            "franchise": "",
+            "altNumber": "2",
+            "baseFighter": "oribyanxiousluku"
+        },
+        {
+            "name": "riolusmash",
+            "displayName": "Riolu (Smash)",
+            "franchise": "",
+            "altNumber": "2",
+            "baseFighter": "riolu"
+        },
+        {
+            "name": "evildan",
+            "displayName": "Evil Dan",
+            "franchise": "",
+            "altNumber": "2",
+            "baseFighter": "dan"
+        },
+        {
+            "name": "firecirno",
+            "displayName": "Fire Cirno",
+            "franchise": "",
+            "altNumber": "2",
+            "baseFighter": "cirno"
+        },
+        {
+            "name": "chopper2",
+            "displayName": "Chopper (PTS)",
+            "franchise": "",
+            "altNumber": "2",
+            "baseFighter": "chopper"
+        },
+        {
+            "name": "zsamus",
+            "displayName": "Zero Suit Samus",
+            "franchise": "",
+            "altNumber": "2",
+            "baseFighter": "samus"
+        },
+        {
+            "name": "boss_marietta",
+            "displayName": "Marietta",
+            "franchise": "",
+            "altNumber": "2",
+            "baseFighter": "boss_marietta"
+        },
+        {
+            "name": "koishi",
+            "displayName": "Koishi (Non-Passive)",
+            "franchise": "",
+            "altNumber": "2",
+            "baseFighter": "koishi"
+        },
+        {
+            "name": "gg_sonder",
+            "displayName": "Sonder (Classic)",
+            "franchise": "",
+            "altNumber": "2",
+            "baseFighter": "gg_sonder"
+        },
+        {
+            "name": "kris",
+            "displayName": "Kris (Passive)",
+            "franchise": "",
+            "altNumber": "2",
+            "baseFighter": "kris"
+        },
+        {
+            "name": "sato_alice_shanghai",
+            "displayName": "Shanghai Doll",
+            "franchise": "",
+            "altNumber": "2",
+            "baseFighter": "sato_alice"
+        },
+        {
+            "name": "meimu",
+            "displayName": "Meimu",
+            "franchise": "",
+            "altNumber": "2",
+            "baseFighter": "sato_reimu"
+        },
+        {
+            "name": "sato_yukkureimu",
+            "displayName": "Yukkuri Reimu",
+            "franchise": "",
+            "altNumber": "3",
+            "baseFighter": "sato_reimu"
+        },
+        {
+            "name": "meiling_lie",
+            "displayName": "Lie Meiling",
+            "franchise": "",
+            "altNumber": "2",
+            "baseFighter": "meiling_cogu"
+        },
+        {
+            "name": "amooogusagent5",
+            "displayName": "Impostor (Sus)",
+            "franchise": "",
+            "altNumber": "2",
+            "baseFighter": "susagent5"
+        },
+        {
+            "name": "daisy_by_LJ",
+            "displayName": "Daisy",
+            "franchise": "",
+            "altNumber": "2",
+            "baseFighter": "peach"
+        },
+        {
+            "name": "bedr_2b",
+            "displayName": "2B (Hover Glitch)",
+            "franchise": "",
+            "altNumber": "2",
+            "baseFighter": "bedr_2b"
+        },
+        {
+            "name": "gallantmon",
+            "displayName": "ChaosGallantmon",
+            "franchise": "",
+            "altNumber": "2",
+            "baseFighter": "gallantmon"
+        },
+        {
+            "name": "gg_zx",
+            "displayName": "Aile",
+            "franchise": "",
+            "altNumber": "2",
+            "baseFighter": "gg_zx"
+        },
+        {
+            "name": "clink",
+            "displayName": "Toon Link",
+            "franchise": "",
+            "altNumber": "3",
+            "baseFighter": "link"
+        },
+        {
+            "name": "sans_tp",
+            "displayName": "Sans (KARMA coursing through your veins",
+            "franchise": "",
+            "altNumber": "2",
+            "baseFighter": "sans_tp"
+        },
+        {
+            "name": "agent5genos",
+            "displayName": "Genos (English)",
+            "franchise": "",
+            "altNumber": "2",
+            "baseFighter": "agent5genos"
         }
     ]
 }

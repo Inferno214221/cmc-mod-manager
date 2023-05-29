@@ -14,6 +14,7 @@ const createWindow = () => {
         webPreferences: {
             preload: path.join(__dirname, "preload.js")
         },
+        autoHideMenuBar: true
     });
 
     win.loadFile('index.html');
@@ -72,20 +73,40 @@ ipcMain.on("getGameSource", async (event, args) => {
         var cmcFighters = [];
         for (let fighter = 0; fighter in cmcFightersTxt; fighter++) {
             if (fighter != 0) {
+                let fighterDat = fs.readFileSync(__dirname + "/basegame/data/dats/" + cmcFightersTxt[fighter] + ".dat", 'utf-8')
+                .split(/\r?\n/);
                 let fighterData = {
                     name: cmcFightersTxt[fighter],
-                    displayName: fs.readFileSync(__dirname + "/basegame/data/dats/" + cmcFightersTxt[fighter] + ".dat", 'utf-8')
-                        .split(/\r?\n/)[1]
-                }
+                    displayName: fighterDat[1],
+                    franchise: fighterDat[3],
+                    number: fighter + 65 // Evil ryu is 65 and the last character on the ssbc roster
+                    // Easier than working it out later
+                };
                 cmcFighters.push(fighterData);
             }
+        }
+        //TODO: Add alts
+        var altFightersTxt = fs.readFileSync(__dirname + "/basegame/data/alts.txt", 'utf-8').split(/\r?\n/);
+        var altFighters = [];
+        var noAlts = parseInt(altFightersTxt[0]);
+        altFightersTxt.shift();
+        for (let fighter = 0; fighter < noAlts; fighter++) {
+            let fighterData = {
+                name: altFightersTxt[(fighter * 5) + 2],
+                displayName: altFightersTxt[(fighter * 5) + 3],
+                franchise: "",
+                altNumber: altFightersTxt[(fighter * 5) + 1],
+                baseFighter: altFightersTxt[(fighter * 5) + 0],
+            }
+            altFighters.push(fighterData);
         }
 
         fs.writeFileSync(
             __dirname + "/characters/default.json",
             JSON.stringify({
                 ssbc: require(__dirname + "/characters/default.json").ssbc,
-                cmc: cmcFighters
+                cmc: cmcFighters,
+                alts: altFighters
             }, null, 4),
             "utf-8"
         );
