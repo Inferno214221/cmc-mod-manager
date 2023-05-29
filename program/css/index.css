@@ -26,10 +26,10 @@ body {
     --inf-white1: #888a8d;
 }
 
-fieldset {
+/* fieldset {
     max-width: 700px;
     margin: auto;
-}
+} */
 
 input,
 select {
@@ -42,7 +42,6 @@ select {
     color: inherit;
     font-family: inherit;
     font-size: 11pt;
-    margin: 0px 5px 0px 0px;
     outline: none;
 }
 
@@ -59,3 +58,7 @@ select {
 .controls {
     display: inline;
 }
+
+/* button {
+    width: 33%;
+} */

@@ -50,8 +50,31 @@
         </ul>
     </nav>
     <section>
-        E
+        <fieldset>
+            <legend>Installation</legend>
+            <button type="button" onclick="installCharacter()">Install Character From Directory</button>
+            <button type="button">Install Character From Zip</button>
+        </fieldset>
+        <fieldset>
+            <legend>Installed Characters</legend>
+            <table>
+                <tr id="name">
+                    <td>Display Name</td>
+                    <td><button type="button">Remove</button></td>
+                    <td><button type="button" onclick="openCharacterFolder('name')">Open Directory</button></td>
+                    <td><button type="button">Increase Merge Priority</button></td>
+                </tr>
+                <tr id="name1">
+                    <td>Display Name1</td>
+                    <td><button type="button">Remove</button></td>
+                    <td><button type="button" onclick="openCharacterFolder('name1')">Open Directory</button></td>
+                    <td><button type="button">Increase Merge Priority</button></td>
+                </tr>
+            </table>
+        </fieldset>
     </section>
+    <script src="../js/characterManager.js">
+    </script>
 </body>
 
 </html>

@@ -37,6 +37,10 @@ function mergeInstalledMods() {
     this.api.send("mergeInstalledMods");
 }
 
+this.api.receive("fromMergeInstalledMods", (data) => {
+    //TODO: update merge date
+});
+
 function runCMC(path) {
     this.api.send("runCMC", {
         path: path
@@ -76,3 +80,7 @@ this.api.receive("fromUpdateControlProfiles", (profiles) => {
     }
     controlsLoadName.innerHTML = options;
 });
+
+function openFolder(directory) {
+    this.api.send("openFolder", directory);
+}

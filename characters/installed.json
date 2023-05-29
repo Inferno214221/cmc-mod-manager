@@ -1,7 +1,5 @@
-[
-    {
-        "name": "/fighter/*.bin",
-        "displayName": "/data/dats/*.dat@2",
-        "dir": "similar to name but likely has a version"
+{
+    "number": 318,
+    "characters": {
     }
-]
+}

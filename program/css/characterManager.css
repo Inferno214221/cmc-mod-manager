@@ -1,1 +1,12 @@
 @import "./global.css";
+
+/* button {
+    width: 33%;
+} */
+
+table, th, td {
+    border-style: solid;
+    border-width: 1px;
+    border-collapse: collapse;
+    padding: 0px 5px;
+}

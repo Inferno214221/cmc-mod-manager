@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron');
 const path = require("path");
 // const fs = require("fs");
 const fs = require("fs-extra");
@@ -73,6 +73,7 @@ ipcMain.on("getGameSource", async (event, args) => {
 
         var cmcFightersTxt = fs.readFileSync(__dirname + "/basegame/data/fighters.txt", 'utf-8').split(/\r?\n/);
         var cmcFighters = {};
+        let installed = require(__dirname + "/characters/installed.json");
         for (let fighter = 0; fighter in cmcFightersTxt; fighter++) {
             if (fighter != 0) {
                 let fighterDat = fs.readFileSync(__dirname + "/basegame/data/dats/" + cmcFightersTxt[fighter] + ".dat", 'utf-8')
@@ -85,9 +86,12 @@ ipcMain.on("getGameSource", async (event, args) => {
                     // Easier than working it out later
                 };
                 cmcFighters[cmcFightersTxt[fighter]] = fighterData;
+                installed.number = fighter;
                 // cmcFighters.push(fighterData);
             }
         }
+        installed.number += 65;
+
         //FIXME:? assumes that all alts are not fighters - toon link
         //FIXME:? some alts are an alt of themselves (resolved differently)
         var altFightersTxt = fs.readFileSync(__dirname + "/basegame/data/alts.txt", 'utf-8').split(/\r?\n/);
@@ -134,6 +138,19 @@ ipcMain.on("getGameSource", async (event, args) => {
             "utf-8"
         );
 
+        installed.number += Object.keys(installed.characters).length;
+        let oldInstalled = require(__dirname + "/characters/installed.json");
+        let numberDifference = installed.number - oldInstalled.number;
+        for (let character of Object.keys(installed.characters)) {
+            installed.characters[character].number += numberDifference;
+        }
+
+        fs.writeFileSync(
+            __dirname + "/characters/installed.json",
+            JSON.stringify(installed, null, 4),
+            "utf-8"
+        );
+
         win.webContents.send("fromGetGameSource", {
             call: "gameSourceInstalled",
             result: true
@@ -149,10 +166,14 @@ ipcMain.on("mergeInstalledMods", async (event, args) => {
         fs.copyFileSync(__dirname + "/merged/controls.ini", __dirname + "/profiles/controls/inUse.ini");
     }
     fs.copySync(__dirname + "/basegame/", __dirname + "/merged/", { overwrite: true });
-    //TODO: for each stage
-    //TODO: for each character
-    if (fs.existsSync(__dirname + "/profiles/controls/_inUse.ini")) {
+    if (fs.existsSync(__dirname + "/profiles/controls/inUse.ini")) {
         fs.copyFileSync(__dirname + "/profiles/controls/inUse.ini", __dirname + "/merged/controls.ini");
+    }
+    //TODO: for each stage
+    //FIXME: sort by number
+    let installed = require(__dirname + "/characters/installed.json");
+    for (let character of Object.keys(installed.characters)) {
+        fs.copySync(__dirname + "/characters/" + character, __dirname + "/merged/", { overwrite: true });
     }
     //TODO: generate fighters.txt and stage.txt
     //TODO: load profile css.txt and sss.txt
@@ -207,3 +228,52 @@ ipcMain.on("updateControlProfiles", async (event, args) => {
 function updateControlProfiles () {
     win.webContents.send("fromUpdateControlProfiles", fs.readdirSync(__dirname + "/profiles/controls/"));
 }
+
+ipcMain.on("openFolder", async (event, args) => {
+    shell.openPath(__dirname + args);
+});
+
+ipcMain.on("openCharacterFolder", async (event, args) => {
+    shell.openPath(__dirname + "/characters/" + args);
+});
+
+ipcMain.on("installCharacter", async (event, args) => {
+    dialog.showOpenDialog(win, {
+        properties: ["openDirectory"]
+    }).then(dir => {
+        if (dir.canceled === true) {
+            return;//TODO: add alerts
+        }
+        if (!fs.existsSync(dir.filePaths[0] + "/fighter/")) {
+            return;//TODO: add alerts
+        }
+        let characterName = fs.readdirSync(dir.filePaths[0] + "/fighter/")[0].split(".")[0];
+
+        // let characterDir = dir.filePaths[0].split("/")
+        // characterDir = characterDir[characterDir.length - 1];
+
+        fs.copySync(dir.filePaths[0], __dirname + "/characters/" + characterName, { overwrite: true });
+        //FIXME: if it overwrites a directory it will cause issue later
+
+        let characterDat = [];
+        //TODO: errors on no dat
+        if (!fs.existsSync(__dirname + "/characters/" + characterName + "/data/dats/")) {
+            fs.moveSync(__dirname + "/characters/" + characterName + "/data/" + characterName + ".dat", __dirname + "/data/dats/" + characterName + ".dat", { overwrite: true });
+        }
+        characterDat = fs.readFileSync(__dirname + "/characters/" + characterName + "/data/dats/" + characterName + ".dat", "utf-8").split(/\r?\n/);
+        
+        let installed = require(__dirname + "/characters/installed.json");
+        installed.number += 1;
+        let characterData = {
+            "displayName": characterDat[1],
+            "franchise": characterDat[3],
+            "number": installed.number
+        };
+        installed.characters[characterName] = characterData;
+        fs.writeFileSync(
+            __dirname + "/characters/installed.json",
+            JSON.stringify(installed, null, 4),
+            "utf-8"
+        );
+    });
+});
