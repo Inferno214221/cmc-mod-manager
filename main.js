@@ -275,5 +275,7 @@ ipcMain.on("installCharacter", async (event, args) => {
             JSON.stringify(installed, null, 4),
             "utf-8"
         );
+
+        win.webContents.send("fromInstallCharacter", installed);
     });
 });
