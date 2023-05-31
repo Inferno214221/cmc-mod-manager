@@ -30,6 +30,7 @@ body {
     font-family: Ubuntu;
     color: var(--inf-white3);
     background-color: var(--inf-grey4);
+    font-size: 11pt;
 }
 
 nav {
@@ -65,12 +66,13 @@ a {
 button {
     border-width: 1px;
     border-style: solid;
-    border-radius: 3px;
+    border-radius: 4px;
     padding: 5px 10px;
+    font-size: 11pt;
 }
 
 .activeTab {
-    background-color: var(--inf-grey4);
+    background-color: var(--inf-grey5);
     border-color: black;
 }
 
@@ -83,10 +85,21 @@ button {
     border-color: black;
     color: inherit;
     font-family: inherit;
-    font-size: 11pt;
     margin: 5px 0px;
+    box-shadow: 0px 1px #00000088;
 }
 
 .right {
     float: right;
+}
+
+fieldset {
+    border: none;
+    padding-left: 15px;
+}
+
+legend {
+    font-weight: bold;
+    margin-left: -15px;
+    margin-bottom: 5px;
 }

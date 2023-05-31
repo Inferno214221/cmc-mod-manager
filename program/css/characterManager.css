@@ -8,5 +8,6 @@ table, th, td {
     border-style: solid;
     border-width: 1px;
     border-collapse: collapse;
+    border-color: var(--inf-white3);
     padding: 0px 5px;
 }

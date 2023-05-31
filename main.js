@@ -69,10 +69,10 @@ ipcMain.on("getGameSource", async (event, args) => {
         fs.copySync(dir.filePaths[0], __dirname + "/basegame/", { overwrite: true });
         fs.copyFileSync(__dirname + "/basegame/controls.ini", __dirname + "/profiles/controls/default.ini");
 
-        var ssbcFighters = require(__dirname + "/characters/default.json").ssbc;
+        let ssbcFighters = require(__dirname + "/characters/default.json").ssbc;
 
-        var cmcFightersTxt = fs.readFileSync(__dirname + "/basegame/data/fighters.txt", 'utf-8').split(/\r?\n/);
-        var cmcFighters = {};
+        let cmcFightersTxt = fs.readFileSync(__dirname + "/basegame/data/fighters.txt", 'utf-8').split(/\r?\n/);
+        let cmcFighters = {};
         let installed = require(__dirname + "/characters/installed.json");
         for (let fighter = 0; fighter in cmcFightersTxt; fighter++) {
             if (fighter != 0) {
@@ -94,9 +94,9 @@ ipcMain.on("getGameSource", async (event, args) => {
 
         //FIXME:? assumes that all alts are not fighters - toon link
         //FIXME:? some alts are an alt of themselves (resolved differently)
-        var altFightersTxt = fs.readFileSync(__dirname + "/basegame/data/alts.txt", 'utf-8').split(/\r?\n/);
-        var altFighters = {};
-        var noAlts = parseInt(altFightersTxt[0]);
+        let altFightersTxt = fs.readFileSync(__dirname + "/basegame/data/alts.txt", 'utf-8').split(/\r?\n/);
+        let altFighters = {};
+        let noAlts = parseInt(altFightersTxt[0]);
         altFightersTxt.shift();
         for (let fighter = 0; fighter < noAlts; fighter++) {
             let baseFighter = altFightersTxt[fighter * 5];
@@ -212,16 +212,16 @@ ipcMain.on("runCMC", async (event, args) => {
     app.quit();
 });
 
-ipcMain.on("saveControls", async (event, args) => {
+ipcMain.on("saveControls", (event, args) => {
     fs.copyFileSync(__dirname + "/merged/controls.ini", __dirname + "/profiles/controls/" + args.name + ".ini");
     updateControlProfiles();
 });
 
-ipcMain.on("loadControls", async (event, args) => {
+ipcMain.on("loadControls", (event, args) => {
     fs.copyFileSync(__dirname + "/profiles/controls/" + args.name + ".ini", __dirname + "/merged/controls.ini");
 });
 
-ipcMain.on("updateControlProfiles", async (event, args) => {
+ipcMain.on("updateControlProfiles", (event, args) => {
     updateControlProfiles();
 });
 
@@ -229,11 +229,11 @@ function updateControlProfiles () {
     win.webContents.send("fromUpdateControlProfiles", fs.readdirSync(__dirname + "/profiles/controls/"));
 }
 
-ipcMain.on("openFolder", async (event, args) => {
+ipcMain.on("openFolder", (event, args) => {
     shell.openPath(__dirname + args);
 });
 
-ipcMain.on("openCharacterFolder", async (event, args) => {
+ipcMain.on("openCharacterFolder", (event, args) => {
     shell.openPath(__dirname + "/characters/" + args);
 });
 
@@ -278,4 +278,9 @@ ipcMain.on("installCharacter", async (event, args) => {
 
         win.webContents.send("fromInstallCharacter", installed);
     });
+});
+
+ipcMain.on("getInstalledCharList", (event, args) => {
+    let installed = require(__dirname + "/characters/installed.json");
+    win.webContents.send("fromGetInstalledCharList", installed);
 });
