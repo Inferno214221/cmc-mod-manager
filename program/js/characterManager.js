@@ -13,12 +13,20 @@ this.api.receive("fromInstallCharacter", (installed) => {
     listCharacters(installed);
 });
 
+function removeCharacter(character) {
+    this.api.send("removeCharacter", character);
+}
+
+this.api.receive("fromRemoveCharacter", (installed) => {
+    listCharacters(installed);
+});
+
 function listCharacters(installed) {
     let output = "";
     Object.keys(installed.characters).forEach((character) => {
         output += 
         "<tr id=\"" + character + "\">\n\
-            <td><image src=\"../../characters/" + character + "/gfx/mugs/" + character + ".png\" /></td>\n\
+            <td class=\"mug\"><image src=\"../../characters/" + character + "/gfx/mugs/" + character + ".png\" /></td>\n\
             <td>" + installed.characters[character].displayName + "</td>\n\
             <td><button type=\"button\" onclick=\"removeCharacter('" + character + "')\">Remove</button></td>\n\
             <td><button type=\"button\" onclick=\"openCharacterFolder('" + character + "')\">Open Directory</button></td>\n\
@@ -26,10 +34,6 @@ function listCharacters(installed) {
         </tr>\n"
     });
     characterTable.innerHTML = output;
-}
-
-function removeCharacter(character) {
-    this.api.send("removeCharacter", character);
 }
 
 function openCharacterFolder(character) {

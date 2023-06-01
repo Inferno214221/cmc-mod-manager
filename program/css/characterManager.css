@@ -4,10 +4,21 @@
     width: 33%;
 } */
 
-table, th, td {
-    border-style: solid;
+table,
+th,
+td {
+    border-style: none;
+    /* border-style: solid;
     border-width: 1px;
     border-collapse: collapse;
-    border-color: var(--inf-white3);
+    border-color: var(--inf-white3); */
+    padding: 0px 10px;
+}
+
+.mug {
     padding: 0px 5px;
+}
+
+#characterTable {
+    margin-left: -15px;
 }

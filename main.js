@@ -284,3 +284,16 @@ ipcMain.on("getInstalledCharList", (event, args) => {
     let installed = require(__dirname + "/characters/installed.json");
     win.webContents.send("fromGetInstalledCharList", installed);
 });
+
+ipcMain.on("removeCharacter", (event, args) => {
+    let installed = require(__dirname + "/characters/installed.json");
+    delete installed.characters[args];
+    installed.number -= 1;
+    fs.removeSync(__dirname + "/characters/" + args);
+    fs.writeFileSync(
+        __dirname + "/characters/installed.json",
+        JSON.stringify(installed, null, 4),
+        "utf-8"
+    );
+    win.webContents.send("fromRemoveCharacter", installed);
+});
