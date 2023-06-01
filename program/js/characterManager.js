@@ -9,6 +9,10 @@ function installCharacter() {
     this.api.send("installCharacter");
 }
 
+function installCharacterZip() {
+    this.api.send("installCharacterZip");
+}
+
 this.api.receive("fromInstallCharacter", (installed) => {
     listCharacters(installed);
 });
@@ -21,9 +25,17 @@ this.api.receive("fromRemoveCharacter", (installed) => {
     listCharacters(installed);
 });
 
+function increaseMergePriority(character) {
+    this.api.send("increaseMergePriority", character);
+}
+
+this.api.receive("fromIncreaseMergePriority", (installed) => {
+    listCharacters(installed);
+});
+
 function listCharacters(installed) {
     let output = "";
-    Object.keys(installed.characters).forEach((character) => {
+    installed.priority.forEach((character) => {
         output += 
         "<tr id=\"" + character + "\">\n\
             <td class=\"mug\"><image src=\"../../characters/" + character + "/gfx/mugs/" + character + ".png\" /></td>\n\
@@ -38,8 +50,4 @@ function listCharacters(installed) {
 
 function openCharacterFolder(character) {
     this.api.send("openCharacterFolder", character);
-}
-
-function increaseMergePriority(character) {
-    this.api.send("increaseMergePriority", character);
 }

@@ -3,6 +3,8 @@ const path = require("path");
 // const fs = require("fs");
 const fs = require("fs-extra");
 const childProcess = require("child_process");
+require('array.prototype.move');
+const extract = require('extract-zip');
 var win;
 
 const createWindow = () => {
@@ -138,10 +140,10 @@ ipcMain.on("getGameSource", async (event, args) => {
             "utf-8"
         );
 
-        installed.number += Object.keys(installed.characters).length;
+        installed.number += installed.priority.length;
         let oldInstalled = require(__dirname + "/characters/installed.json");
         let numberDifference = installed.number - oldInstalled.number;
-        for (let character of Object.keys(installed.characters)) {
+        for (let character of installed.priority) {
             installed.characters[character].number += numberDifference;
         }
 
@@ -172,7 +174,7 @@ ipcMain.on("mergeInstalledMods", async (event, args) => {
     //TODO: for each stage
     //FIXME: sort by number
     let installed = require(__dirname + "/characters/installed.json");
-    for (let character of Object.keys(installed.characters)) {
+    for (let character of installed.priority) {
         fs.copySync(__dirname + "/characters/" + character, __dirname + "/merged/", { overwrite: true });
     }
     //TODO: generate fighters.txt and stage.txt
@@ -244,41 +246,64 @@ ipcMain.on("installCharacter", async (event, args) => {
         if (dir.canceled === true) {
             return;//TODO: add alerts
         }
-        if (!fs.existsSync(dir.filePaths[0] + "/fighter/")) {
-            return;//TODO: add alerts
-        }
-        let characterName = fs.readdirSync(dir.filePaths[0] + "/fighter/")[0].split(".")[0];
-
-        // let characterDir = dir.filePaths[0].split("/")
-        // characterDir = characterDir[characterDir.length - 1];
-
-        fs.copySync(dir.filePaths[0], __dirname + "/characters/" + characterName, { overwrite: true });
-        //FIXME: if it overwrites a directory it will cause issue later
-
-        let characterDat = [];
-        //TODO: errors on no dat
-        if (!fs.existsSync(__dirname + "/characters/" + characterName + "/data/dats/")) {
-            fs.moveSync(__dirname + "/characters/" + characterName + "/data/" + characterName + ".dat", __dirname + "/data/dats/" + characterName + ".dat", { overwrite: true });
-        }
-        characterDat = fs.readFileSync(__dirname + "/characters/" + characterName + "/data/dats/" + characterName + ".dat", "utf-8").split(/\r?\n/);
-        
-        let installed = require(__dirname + "/characters/installed.json");
-        installed.number += 1;
-        let characterData = {
-            "displayName": characterDat[1],
-            "franchise": characterDat[3],
-            "number": installed.number
-        };
-        installed.characters[characterName] = characterData;
-        fs.writeFileSync(
-            __dirname + "/characters/installed.json",
-            JSON.stringify(installed, null, 4),
-            "utf-8"
-        );
-
-        win.webContents.send("fromInstallCharacter", installed);
+        installCharacter(dir.filePaths[0]);
     });
 });
+
+ipcMain.on("installCharacterZip", async (event, args) => {
+    dialog.showOpenDialog(win, {
+        properties: ["openFile"]
+    }).then(async (file) => {
+        if (file.canceled === true) {
+            return;//TODO: add alerts
+        }
+        let dir = __dirname + "/characters/_temp"
+        await extract(file.filePaths[0], {
+            dir: dir,
+            defaultDirMode: 0o777,
+            defaultFileMode: 0o777,
+        });
+        await installCharacter(dir);
+        fs.removeSync(dir);
+    });
+});
+
+function installCharacter(dir) {
+    if (!fs.existsSync(dir + "/fighter/")) {
+        return;//TODO: add alerts
+    }
+    let characterName = fs.readdirSync(dir + "/fighter/")[0].split(".")[0];
+
+    // let characterDir = dir.filePaths[0].split("/")
+    // characterDir = characterDir[characterDir.length - 1];
+
+    fs.copySync(dir, __dirname + "/characters/" + characterName, { overwrite: true });
+    //FIXME: if it overwrites a directory it will cause issue later
+
+    let characterDat = [];
+    //TODO: errors on no dat
+    if (!fs.existsSync(__dirname + "/characters/" + characterName + "/data/dats/")) {
+        fs.moveSync(__dirname + "/characters/" + characterName + "/data/" + characterName + ".dat", __dirname + "/data/dats/" + characterName + ".dat", { overwrite: true });
+    }
+    characterDat = fs.readFileSync(__dirname + "/characters/" + characterName + "/data/dats/" + characterName + ".dat", "utf-8").split(/\r?\n/);
+    
+    let installed = require(__dirname + "/characters/installed.json");
+    installed.number += 1;
+    let characterData = {
+        "displayName": characterDat[1],
+        "franchise": characterDat[3],
+        "number": installed.number
+    };
+    installed.characters[characterName] = characterData;
+    installed.priority.push(characterName);
+    fs.writeFileSync(
+        __dirname + "/characters/installed.json",
+        JSON.stringify(installed, null, 4),
+        "utf-8"
+    );
+
+    win.webContents.send("fromInstallCharacter", installed);
+}
 
 ipcMain.on("getInstalledCharList", (event, args) => {
     let installed = require(__dirname + "/characters/installed.json");
@@ -287,8 +312,17 @@ ipcMain.on("getInstalledCharList", (event, args) => {
 
 ipcMain.on("removeCharacter", (event, args) => {
     let installed = require(__dirname + "/characters/installed.json");
+    let removeNumber = installed.characters[args].number;
     delete installed.characters[args];
     installed.number -= 1;
+    installed.priority = installed.priority.filter((character) => {
+        return character !== args;
+    });
+    installed.priority.forEach((character) => {
+        if (installed.characters[character].number > removeNumber) {
+            installed.characters[character].number -= 1;
+        }
+    });
     fs.removeSync(__dirname + "/characters/" + args);
     fs.writeFileSync(
         __dirname + "/characters/installed.json",
@@ -296,4 +330,20 @@ ipcMain.on("removeCharacter", (event, args) => {
         "utf-8"
     );
     win.webContents.send("fromRemoveCharacter", installed);
+});
+
+ipcMain.on("increaseMergePriority", (event, args) => {
+    let installed = require(__dirname + "/characters/installed.json");
+    let index = installed.priority.indexOf(args);
+    if (index == 0) {
+        return;//TODO: add alerts
+    }
+    installed.priority.move(index, index - 1);
+    //TODO: error handling eg outside of range
+    fs.writeFileSync(
+        __dirname + "/characters/installed.json",
+        JSON.stringify(installed, null, 4),
+        "utf-8"
+    );
+    win.webContents.send("fromIncreaseMergePriority", installed);
 });
