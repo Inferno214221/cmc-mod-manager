@@ -174,7 +174,7 @@ ipcMain.on("mergeInstalledMods", async (event, args) => {
     //TODO: for each stage
     //FIXME: sort by number
     let installed = require(__dirname + "/characters/installed.json");
-    for (let character of installed.priority) {
+    for (let character of installed.priority.toReversed()) {
         fs.copySync(__dirname + "/characters/" + character, __dirname + "/merged/", { overwrite: true });
     }
     //TODO: generate fighters.txt and stage.txt
@@ -217,10 +217,12 @@ ipcMain.on("runCMC", async (event, args) => {
 ipcMain.on("saveControls", (event, args) => {
     fs.copyFileSync(__dirname + "/merged/controls.ini", __dirname + "/profiles/controls/" + args.name + ".ini");
     updateControlProfiles();
+    win.webContents.send("fromSaveControls");
 });
 
 ipcMain.on("loadControls", (event, args) => {
     fs.copyFileSync(__dirname + "/profiles/controls/" + args.name + ".ini", __dirname + "/merged/controls.ini");
+    win.webContents.send("fromLoadControls");
 });
 
 ipcMain.on("updateControlProfiles", (event, args) => {
@@ -346,4 +348,19 @@ ipcMain.on("increaseMergePriority", (event, args) => {
         "utf-8"
     );
     win.webContents.send("fromIncreaseMergePriority", installed);
+});
+
+ipcMain.on("getCSS", (event, args) => {
+    let cssFile = fs.readFileSync(__dirname + "/merged/data/css.txt", "utf-8").split(/\r?\n/);
+    let css = [];
+    for (let line = 0; line < cssFile.length; line++) {
+        css[line] = cssFile[line].split(" ");
+    }
+    let basegame = require(__dirname + "/characters/default.json");
+    let installed = require(__dirname + "/characters/installed.json");
+    win.webContents.send("fromGetCSS", {
+        css: css,
+        basegame: basegame, 
+        installed: installed
+    });
 });

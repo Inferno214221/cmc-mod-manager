@@ -50,8 +50,77 @@
         </ul>
     </nav>
     <section>
-        E
+        <fieldset>
+            <legend>CSS Profiles</legend>
+            <div class="cssProfiles">
+                <button type="button" onclick="saveControls()">
+                    Save CSS Profile:
+                </button>
+                <input type="text" value="default" id="controlsSaveName" onfocus="inputFocused('controlsSaveName')" onblur="inputBlurred('controlsSaveName')"/>
+            </div>
+            <div class="cssProfiles">
+                <button type="button" onclick="loadControls()">
+                    Load CSS Profile:
+                </button>
+                <select id="controlsLoadName" onfocus="inputFocused('controlsLoadName')" onblur="inputBlurred('controlsLoadName')" onchange="inputBlurred('controlsLoadName')">
+                    <option value="default">default</option>
+                </select>
+            </div>
+        </fieldset>
+        <fieldset>
+            <legend>Character Selection Screen</legend>
+            <table id="characterSelectTable">
+                <tr>
+                    <th class="cssSquare"></th>
+                    <th class="cssSquare">0</th>
+                    <th class="cssSquare">1</th>
+                    <th class="cssSquare">2</th>
+                    <th class="cssSquare">3</th>
+                    <th class="cssSquare">4</th>
+                    <th class="cssSquare">5</th>
+                    <th class="cssSquare">6</th>
+                </tr>
+                <tr>
+                    <th class="cssSquare">0</th>
+                    <td class="cssSquare" id="king_pig"><image class="icon" src="../../characters/king_pig/gfx/mugs/king_pig.png" /></td>
+                    <td class="cssSquare" id="none"><image class="icon" /></td>
+                    <td class="cssSquare" id="none"><image class="icon" /></td>
+                    <td class="cssSquare" id="none"><image class="icon" /></td>
+                    <td class="cssSquare" id="none"><image class="icon" /></td>
+                    <td class="cssSquare" id="none"><image class="icon" /></td>
+                    <td class="cssSquare" id="none"><image class="icon" /></td>
+                </tr>
+            </table>
+        </fieldset>
+        <fieldset id="hiddenCharacters">
+            <legend>Hidden Characters</legend>
+            <table id="hiddenCharactersTable">
+                <tr>
+                    <td class="mug"><image src="../../characters/king_pig/gfx/mugs/king_pig.png" /></td>
+                    <td>Display Name</td>
+                    <td><button type="button" onclick="addCharacter('king_pig')">Add</button></td>
+                </tr>
+            </table>
+        </fieldset>
+        <fieldset id="location">
+            <legend>Location</legend>
+            X: <input type="text" value="0" id="xInput" onfocus="inputFocused('xInput')" onblur="inputBlurred('xInput')"/>
+            Y: <input type="text" value="0" id="yInput" onfocus="inputFocused('yInput')" onblur="inputBlurred('yInput')"/><br />
+            <button type="button" onclick="hideCharacter()">Hide Characer @ Location</button>
+        </fieldset>
+        <!-- <fieldset id="altCharacters">
+            <legend>Alt Characters</legend>
+            <table id="altCharactersTable">
+                <tr>
+                    <td class="mug"><image src="../../characters/king_pig/gfx/mugs/king_pig.png" /></td>
+                    <td>Display Name</td>
+                    <td><button type="button" onclick="addCharacter('king_pig')">Add</button></td>
+                </tr>
+            </table>
+        </fieldset> -->
     </section>
+    <script src="../js/characterSelectionScreen.js">
+    </script>
 </body>
 
 </html>

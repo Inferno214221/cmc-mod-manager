@@ -1,1 +1,70 @@
 @import "./global.css";
+
+.mug {
+    padding: 0px 5px;
+    height: 62px;
+}
+
+.mugIcon {
+    max-width: 62px;
+    max-height: 62px;
+}
+
+.icon {
+    height: 35px;
+    width: 35px;
+}
+
+.cssSquare, .cssSquare {
+    padding: 1px;
+    height: 37px;
+    width: 37px;
+}
+
+
+input,
+select {
+    width: 100px;
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 3px;
+    background-color: var(--inf-grey5);
+    border-color: black;
+    color: inherit;
+    font-family: inherit;
+    font-size: 11pt;
+    outline: none;
+    box-shadow: 0px 1px #00000088;
+}
+
+input {
+    height: 27px;
+    padding: 0px 5px;
+}
+
+select {
+    height: 29px;
+    padding: 0px;
+}
+
+.cssProfiles {
+    display: inline;
+}
+
+#hiddenCharacters,
+#location {
+    width: 400px;
+    display: inline;
+    vertical-align: top;
+}
+
+#xInput,
+#yInput {
+    width: 50px;
+    margin-right: 5px;
+}
+
+/* #hiddenCharacters {
+    height: 300px;
+    overflow: scroll;
+} */

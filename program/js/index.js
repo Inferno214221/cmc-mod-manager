@@ -30,6 +30,7 @@ function getGameSource() {
 }
 
 this.api.receive("fromGetGameSource", (data) => {
+    alert("CMC base game installed succesfully");
     this[data.call](data.result, data.callArgs);
 });
 
@@ -39,6 +40,7 @@ function mergeInstalledMods() {
 
 this.api.receive("fromMergeInstalledMods", (data) => {
     //TODO: update merge date
+    alert("Mods merged succesfully");
 });
 
 function runCMC(path) {
@@ -62,11 +64,19 @@ function saveControls() {
     });
 }
 
+this.api.receive("fromSaveControls", (data) => {
+    alert("Controls saved succesfully");
+});
+
 function loadControls() {
     this.api.send("loadControls", {
         name: controlsLoadName.value
     });
 }
+
+this.api.receive("fromLoadControls", (data) => {
+    alert("Controls loaded succesfully");
+});
 
 function updateControlProfiles() {
     this.api.send("updateControlProfiles");

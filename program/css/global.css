@@ -44,8 +44,9 @@ nav {
 section {
     background-color: var(--inf-grey4);
     margin: 5px;
-    position: fixed;
-    top: 40px
+    /* position: fixed;
+    top: 40px */
+    margin-top: 45px;
 }
 
 a {
@@ -131,4 +132,15 @@ legend {
     font-weight: bold;
     margin-left: -15px;
     margin-bottom: 5px;
+}
+
+table,
+th,
+td {
+    border-style: none;
+    padding: 0px 10px;
+}
+
+table {
+    margin-left: -15px;
 }
