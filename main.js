@@ -351,7 +351,16 @@ ipcMain.on("increaseMergePriority", (event, args) => {
 });
 
 ipcMain.on("getCSS", (event, args) => {
-    let cssFile = fs.readFileSync(__dirname + "/merged/data/css.txt", "utf-8").split(/\r?\n/);
+    let cssFile;
+    try {
+        cssFile = fs.readFileSync(__dirname + "/merged/data/css.txt", "utf-8").split(/\r?\n/);
+    } catch (error) {
+        if (error.code == "ENOENT") {
+            win.webContents.send("errorGetCSS");
+        }
+        return;
+    }
+    if (cssFile == undefined) return;
     let css = [];
     for (let line = 0; line < cssFile.length; line++) {
         css[line] = cssFile[line].split(" ");

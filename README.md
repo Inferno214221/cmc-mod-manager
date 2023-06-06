@@ -23,8 +23,8 @@ When installing characters, it is likely that some mods will not work properly u
 ### Character Selection Screen
 - [x] Display the CSS
 - [x] Display unincluded characters (not alts)
-- [ ] Add characters to CSS
-- [ ] Remove from the CSS
+- [x] Add characters to CSS
+- [x] Remove from the CSS
 - [ ] Export CSS
 - [ ] Save / load Layouts
 - [ ] Change the number of rows & columns

@@ -51,10 +51,9 @@ select {
     display: inline;
 }
 
-#hiddenCharacters,
-#location {
-    width: 400px;
-    display: inline;
+.column {
+    /* width: 400px;
+    display: inline; */
     vertical-align: top;
 }
 
