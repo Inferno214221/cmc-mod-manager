@@ -1,4 +1,4 @@
-# CMCModManager
+# CMC Mod Manager
 ## What
 This project is a WIP mod manager for Super Smash Brothers Crusade CMC+ v7(.1.1).
 ## Features (WIP)
