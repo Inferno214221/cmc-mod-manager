@@ -25,6 +25,7 @@ When installing characters, it is likely that some mods will not work properly u
 - [x] Display unincluded characters (not alts)
 - [x] Add characters to CSS
 - [x] Remove from the CSS
+- [ ] Sort hidden characters
 - [ ] Export CSS
 - [ ] Save / load Layouts
 - [ ] Change the number of rows & columns

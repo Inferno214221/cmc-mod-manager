@@ -22,6 +22,7 @@ this.api.receive("fromGetCSS", (data) => {
     basegame = data.basegame;
     installed = data.installed;
     let allChars = Object.assign({}, basegame.ssbc, basegame.cmc, installed.characters);
+    xInput.value = - 1;
     makeTables(css, allChars);
 });
 
@@ -71,6 +72,16 @@ function makeTables(css, allChars) {
         </tr>\n";
     }
     hiddenCharactersTable.innerHTML = output;
+    //IDK if this is nessesary in all use cases
+    if (xInput.value < (maxX - 1)) {
+        xInput.value++;
+    } else {
+        xInput.value = 0;
+        yInput.value++;
+        if (yInput.value > (maxY - 1)) {
+            yInput.value = 0;
+        }
+    }
 }
 
 function hideCharacter() {
