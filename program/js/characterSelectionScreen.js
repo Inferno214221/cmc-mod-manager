@@ -22,7 +22,6 @@ this.api.receive("fromGetCSS", (data) => {
     basegame = data.basegame;
     installed = data.installed;
     let allChars = Object.assign({}, basegame.ssbc, basegame.cmc, installed.characters);
-    xInput.value = - 1;
     makeTables(css, allChars);
 });
 
@@ -38,6 +37,7 @@ function makeTables(css, allChars) {
     output += "</tr>\n";
 
     for (let y = 0; y < maxY; y++) {
+        if (css[y][0] == "") break;
         output += "<tr>\n\
             <th class=\"cssSquare\">"+ y + "</th>\n";
         for (let x = 0; x < maxX; x++) {
@@ -73,18 +73,20 @@ function makeTables(css, allChars) {
     }
     hiddenCharactersTable.innerHTML = output;
     //IDK if this is nessesary in all use cases
-    if (xInput.value < (maxX - 1)) {
-        xInput.value++;
-    } else {
-        xInput.value = 0;
-        yInput.value++;
-        if (yInput.value > (maxY - 1)) {
-            yInput.value = 0;
-        }
-    }
+    // if (xInput.value < (maxX - 1)) {
+    //     xInput.value++;
+    // } else {
+    //     xInput.value = 0;
+    //     yInput.value++;
+    //     if (yInput.value > (maxY - 1)) {
+    //         yInput.value = 0;
+    //     }
+    // }
 }
 
 function hideCharacter() {
+    yInput.value = parseInt(yInput.value);
+    xInput.value = parseInt(xInput.value);
     if ((css[yInput.value] == undefined) || (css[yInput.value][xInput.value] == undefined)) {
         return;//TODO: error
     }
@@ -107,9 +109,12 @@ function hideCharacter() {
     }
     hidden[character] = allChars[character];
     makeTables(css, allChars);
+    this.api.send("writeCSS", css);
 }
 
 function addCharacter(character) {
+    yInput.value = parseInt(yInput.value);
+    xInput.value = parseInt(xInput.value);
     if ((css[yInput.value] == undefined) || (css[yInput.value][xInput.value] == undefined)) {
         return;//TODO: error
     }
@@ -122,8 +127,8 @@ function addCharacter(character) {
     if (allChars[character] == undefined) {
         return;//TODO: error
     }
-    css[yInput.value][xInput.value] = ('0000'+allChars[character].number).slice(-4);
-    console.log(css[yInput.value][xInput.value]);
+    css[yInput.value][xInput.value] = ('0000' + allChars[character].number).slice(-4);
     delete hidden[character];
     makeTables(css, allChars);
+    this.api.send("writeCSS", css);
 }

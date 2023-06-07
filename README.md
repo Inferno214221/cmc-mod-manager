@@ -7,6 +7,8 @@ This project is a WIP mod manager for Super Smash Brothers Crusade CMC+ v7.
 - [ ] [CMC+ Open Build](https://discord.gg/kAbEBkx5Y4)
 - [ ] [CMC+ v8](https://youtu.be/VCl5DMRHYbM)
 - [ ] [SSBC- v2.1](https://gamebanana.com/mods/417588)
+## Install
+I haven't compiled this yet as it is currently unfinished, although when finished it will support Windows and Linux.
 ## Features (WIP)
 This mod manager works by storing a copy of the basegame and all installed mods seperatly and then merging them in the designated order.
 
@@ -18,7 +20,9 @@ When installing characters, it is likely that some mods will not work properly u
 - [x] Run both the basegame and merged version
 - [x] Save and load control profiles
 - [x] Controls persist through merges although the defaults are stored when imported
-- [ ] Determiner imported game's version
+- [ ] Determine imported game's version
+- [x] Make fighters.txt on export
+- [ ] Make stages.txt & others on export
 ### Character Manager
 - [x] Install characters from a folder (very picky)
 - [x] Install characters from a zip (extract, install folder, delete)
@@ -26,13 +30,14 @@ When installing characters, it is likely that some mods will not work properly u
 - [x] Remove installed characters
 - [x] Open installed character's directory
 - [x] Change character merge priority
+- [ ] Delete instructions txt file on import
 ### Character Selection Screen
 - [x] Display the CSS
 - [x] Display unincluded characters (not alts)
 - [x] Add characters to CSS
 - [x] Remove from the CSS
 - [ ] Sort hidden characters
-- [ ] Export CSS
+- [x] Export CSS
 - [ ] Save / load layouts
 - [ ] Change the number of rows & columns
 ### Alts

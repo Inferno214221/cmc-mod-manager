@@ -178,7 +178,28 @@ ipcMain.on("mergeInstalledMods", async (event, args) => {
         fs.copySync(__dirname + "/characters/" + character, __dirname + "/merged/", { overwrite: true });
     }
     //TODO: generate fighters.txt and stage.txt
-    //TODO: load profile css.txt and sss.txt
+    let cmcFighters = require(__dirname + "/characters/default.json").cmc;
+    let installedFighters = require(__dirname + "/characters/installed.json");
+    let fightersTxt = "";
+    fightersTxt += installedFighters.number - 65 + "\r\n";
+    for (let number = 65; number <= (installedFighters.number - installedFighters.priority.length); number++) {
+        for (let fighter of Object.keys(cmcFighters)) {
+            if (cmcFighters[fighter].number == number) {
+                fightersTxt += fighter + "\r\n";
+                break;
+            }
+        }
+    }
+    
+    for (let fighter of installedFighters.priority) {
+        fightersTxt += fighter + "\r\n";
+    }
+    fs.writeFileSync(
+        __dirname + "/merged/data/fighters.txt",
+        fightersTxt,
+        "ascii"
+    );
+
     win.webContents.send("fromMergeInstalledMods", {
         call: "modsMergeFinished",
         result: true
@@ -186,20 +207,20 @@ ipcMain.on("mergeInstalledMods", async (event, args) => {
 });
 
 const getAllFiles = function (dirPath, arrayOfFiles) {
-    files = fs.readdirSync(dirPath)
+    files = fs.readdirSync(dirPath);
 
-    arrayOfFiles = arrayOfFiles || []
+    arrayOfFiles = arrayOfFiles || [];
 
     files.forEach(function (file) {
         if (fs.statSync(dirPath + "/" + file).isDirectory()) {
-            arrayOfFiles = getAllFiles(dirPath + "/" + file, arrayOfFiles)
+            arrayOfFiles = getAllFiles(dirPath + "/" + file, arrayOfFiles);
         } else {
             // arrayOfFiles.push(path.join(__dirname, dirPath, "/", file))
-            arrayOfFiles.push(path.join(dirPath, "/", file))
+            arrayOfFiles.push(path.join(dirPath, "/", file));
         }
     })
 
-    return arrayOfFiles
+    return arrayOfFiles;
 }
 
 ipcMain.on("runCMC", async (event, args) => {
@@ -372,4 +393,29 @@ ipcMain.on("getCSS", (event, args) => {
         basegame: basegame, 
         installed: installed
     });
+});
+
+ipcMain.on("writeCSS", (event, css) => {
+    console.log(css);
+    let maxY = css.length;
+    // if (css[maxY - 1] == ['']) {
+    //     maxY--;
+    // }
+    //FIXME: merge -> mod css -> launch -> mod css -> prints undefined on the last line
+    let maxX = css[0].length;
+    let output = "";
+
+    for (let y = 0; y < maxY; y++) {
+        console.log(y);
+        for (let x = 0; x < maxX; x++) {
+            output += css[y][x] + (x == maxX - 1 ? /*(y == maxY - 1 ? " " : */"\r\n"/*)*/ : " ");
+        }
+    }
+    // output += " ";
+
+    fs.writeFileSync(
+        __dirname + "/merged/data/css.txt",
+        output,
+        "ascii"
+    );
 });
