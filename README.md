@@ -1,6 +1,12 @@
 # CMC Mod Manager
 ## What
-This project is a WIP mod manager for Super Smash Brothers Crusade CMC+ v7(.1.1).
+This project is a WIP mod manager for Super Smash Brothers Crusade CMC+ v7.
+
+### Supported Versions
+- [x] [CMC+ v7.1.1](https://gamebanana.com/mods/50383)
+- [ ] [CMC+ Open Build](https://discord.gg/kAbEBkx5Y4)
+- [ ] [CMC+ v8](https://youtu.be/VCl5DMRHYbM)
+- [ ] [SSBC- v2.1](https://gamebanana.com/mods/417588)
 ## Features (WIP)
 This mod manager works by storing a copy of the basegame and all installed mods seperatly and then merging them in the designated order.
 
@@ -8,11 +14,11 @@ When installing characters, it is likely that some mods will not work properly u
 ### Main Page
 - [x] Install the unmodified version of CMC
 - [x] Merge installed characters
-- [ ] Generate character selection screen for installed characters
 - [x] Open basegame and merged directories in local file manager
 - [x] Run both the basegame and merged version
 - [x] Save and load control profiles
 - [x] Controls persist through merges although the defaults are stored when imported
+- [ ] Determiner imported game's version
 ### Character Manager
 - [x] Install characters from a folder (very picky)
 - [x] Install characters from a zip (extract, install folder, delete)
@@ -27,13 +33,29 @@ When installing characters, it is likely that some mods will not work properly u
 - [x] Remove from the CSS
 - [ ] Sort hidden characters
 - [ ] Export CSS
-- [ ] Save / load Layouts
+- [ ] Save / load layouts
 - [ ] Change the number of rows & columns
-- [ ] Hide / sort by franchise
 ### Alts
 - [ ] IDFK how to deal with alts
 ### Stage Manager
+- [ ] Install stages from a folder
+- [ ] Install stages from a zip (extract, install folder, delete)
+- [ ] Manage stage merge priority
 ### Stage Selection Screen
+- [ ] Display the SSS w/ pages
+- [ ] Display unincluded stages
+- [ ] Add stages to SSS
+- [ ] Remove from the SSS
+- [ ] Sort hidden stages
+- [ ] Export SSS
+- [ ] Save / load layouts
+- [ ] Change the number of rows & columns
+- [ ] Add pages
+### Items
+- [ ] Install item mods - Not many mods & idk if it works with CMC+ v7
+- [ ] Remove item mods
+### Miscellanious Mods
+- [ ] Add option to import other types of mods e.g. obama cube / ui changes
 ## Usage
 E
 ## Notes
