@@ -97,6 +97,12 @@
                 <td class="column">
                     <fieldset>
                         <legend>Hidden Characters</legend>
+                        <span>Sorting:</span>
+                        <select id="sortingType" onfocus="inputFocused('sortingType')" onblur="inputBlurred('sortingType')" onchange="resort()" value="number">
+                            <option value="displayName">Alphabetical</option>
+                            <option value="number">Internal Number</option>
+                            <option value="franchise">Franchise</option>
+                        </select>
                         <table id="hiddenCharactersTable">
                             <tr>
                                 <td class="mug"><image src="../../characters/king_pig/gfx/mugs/king_pig.png" /></td>

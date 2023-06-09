@@ -1,6 +1,18 @@
 var css, basegame, installed, hidden;
 getCSS();
 
+function sortHidden(hidden, sortType) {
+    let hiddenArray = [];
+    for (let character of Object.keys(hidden)) {
+        hiddenArray.push({
+            name: character,
+            character: hidden[character]
+        });
+    }
+    let sorted = hiddenArray.toSorted((a, b) => (a.character[sortType] > b.character[sortType] ? 1 : -1));
+    return sorted;
+}
+
 function inputFocused(element) {
     this[element].style.borderColor = "#2777ff";
 }
@@ -64,7 +76,9 @@ function makeTables(css, allChars) {
     hidden = allChars;
     
     output = "";
-    for (let character of Object.keys(hidden)) {
+    sorted = sortHidden(hidden, sortingType.value);
+    for (let character of sorted) {
+        character = character.name
         output += "<tr>\n\
             <td class=\"mug\"><image class=\"mugIcon\" src=\"../../merged/gfx/mugs/" + character + ".png\" onerror=\"this.onerror=null; this.src='../images/missing.png'\" alt=\"\" /></td>\n\
             <td>" + hidden[character].displayName + "</td>\n\
@@ -131,4 +145,9 @@ function addCharacter(character) {
     delete hidden[character];
     makeTables(css, allChars);
     this.api.send("writeCSS", css);
+}
+
+function resort() {
+    inputBlurred('sortingType');
+    getCSS();
 }

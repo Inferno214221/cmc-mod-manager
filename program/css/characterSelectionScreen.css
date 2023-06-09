@@ -63,6 +63,11 @@ select {
     margin-right: 5px;
 }
 
+#sortingType {
+    margin-bottom: 10px;
+    width: 150px;
+}
+
 /* #hiddenCharacters {
     height: 300px;
     overflow: scroll;
