@@ -384,6 +384,9 @@ ipcMain.on("getCSS", (event, args) => {
     if (cssFile == undefined) return;
     let css = [];
     for (let line = 0; line < cssFile.length; line++) {
+        if (cssFile[line].includes("undefined")) {
+            break; //FIXME: this is a horrible fix
+        }
         css[line] = cssFile[line].split(" ");
     }
     let basegame = require(__dirname + "/characters/default.json");
