@@ -77,6 +77,10 @@ function makeTables(css, allChars) {
     
     output = "";
     sorted = sortHidden(hidden, sortingType.value);
+    if (reverseSort.checked) {
+        sorted.reverse();
+    }
+
     for (let character of sorted) {
         character = character.name
         output += "<tr>\n\

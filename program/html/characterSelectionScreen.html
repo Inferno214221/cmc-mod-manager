@@ -98,11 +98,13 @@
                     <fieldset>
                         <legend>Hidden Characters</legend>
                         <span>Sorting:</span>
-                        <select id="sortingType" onfocus="inputFocused('sortingType')" onblur="inputBlurred('sortingType')" onchange="resort()" value="number">
+                        <select id="sortingType" onfocus="inputFocused('sortingType')" onblur="inputBlurred('sortingType')" onchange="resort()">
                             <option value="displayName">Alphabetical</option>
                             <option value="number">Internal Number</option>
                             <option value="franchise">Franchise</option>
                         </select>
+                        <input type="checkbox" id="reverseSort" name="reverseSort" onchange="resort()">
+                        <label for="reverseSort" style="color: white">Reverse?</label>
                         <table id="hiddenCharactersTable">
                             <tr>
                                 <td class="mug"><image src="../../characters/king_pig/gfx/mugs/king_pig.png" /></td>
@@ -145,6 +147,14 @@
                     <!-- Franchise -->
                     <!-- Add All -->
                     <!-- Remove All -->
+                    <fieldset>
+                        <legend>Franchise</legend>
+                        <select id="" onfocus="inputFocused('')" onblur="inputBlurred('')" value="">
+                            <option value="displayName">Alphabetical</option>
+                        </select><br />
+                        <button type="button" onclick="">Add All Characters</button>
+                        <button type="button" onclick="">Remove All Characters</button>
+                    </fieldset>
                 </td>
             </tr>
         </table>
