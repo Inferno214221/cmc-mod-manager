@@ -12,8 +12,8 @@ I haven't compiled this yet as it is currently unfinished, although when finishe
 ## Features (WIP)
 This mod manager works by storing a copy of the basegame and all installed mods seperatly and then merging them in the designated order.
 
-When installing characters, it is likely that some mods will not work properly unless they are able to be copied straight into the CMC folder to install.
-### Main Page
+When installing characters, it is likely that some mods will not work properly unless they are in the correct format. Mods should be able to be copied straight into the CMC folder to install manually.
+### Main Page (Priority: 1)
 - [x] Install the unmodified version of CMC
 - [x] Merge installed characters
 - [x] Open basegame and merged directories in local file manager
@@ -23,7 +23,9 @@ When installing characters, it is likely that some mods will not work properly u
 - [ ] Determine imported game's version
 - [x] Make fighters.txt on export
 - [ ] Make stages.txt & others on export
-### Character Manager
+- [x] Alerts
+- [ ] Errors
+### Character Manager (Priority: 2)
 - [x] Install characters from a folder (very picky)
 - [x] Install characters from a zip (extract, install folder, delete)
 - [x] List installed mod characters
@@ -31,7 +33,9 @@ When installing characters, it is likely that some mods will not work properly u
 - [x] Open installed character's directory
 - [x] Change character merge priority
 - [ ] Delete instructions txt file on import
-### Character Selection Screen
+- [ ] Alerts
+- [ ] Errors
+### Character Selection Screen (Priority: 3)
 - [x] Display the CSS
 - [x] Display unincluded characters (not alts)
 - [x] Add characters to CSS
@@ -41,13 +45,19 @@ When installing characters, it is likely that some mods will not work properly u
 - [x] Remove all of a franchise
 - [ ] Save / load layouts
 - [ ] Change the number of rows & columns
-### Alts
-- [ ] IDFK how to deal with alts
-### Stage Manager
+- [ ] Alerts
+- [ ] Errors
+### Alts (Priority: 5)
+- [ ] IDFK how I should deal with alts
+- [ ] Alerts
+- [ ] Errors
+### Stage Manager (Priority: 6)
 - [ ] Install stages from a folder
 - [ ] Install stages from a zip (extract, install folder, delete)
 - [ ] Manage stage merge priority
-### Stage Selection Screen
+- [ ] Alerts
+- [ ] Errors
+### Stage Selection Screen (Priority: 7)
 - [ ] Display the SSS w/ pages
 - [ ] Display unincluded stages
 - [ ] Add stages to SSS
@@ -57,11 +67,17 @@ When installing characters, it is likely that some mods will not work properly u
 - [ ] Save / load layouts
 - [ ] Change the number of rows & columns
 - [ ] Add pages
-### Items
+- [ ] Alerts
+- [ ] Errors
+### Items (Priority: 8?)
 - [ ] Install item mods - Not many mods & idk if it works with CMC+ v7
 - [ ] Remove item mods
-### Miscellanious Mods
+- [ ] Alerts
+- [ ] Errors
+### Miscellanious Mods (Priority: 4)
 - [ ] Add option to import other types of mods e.g. obama cube / ui changes
+- [ ] Alerts
+- [ ] Errors
 ## Usage
 E
 ## Notes

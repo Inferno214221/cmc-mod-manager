@@ -64,7 +64,7 @@ ipcMain.on("getGameSource", async (event, args) => {
         }
         //The new version has horrible permissions so give everything xwr
         getAllFiles(dir.filePaths[0]).forEach((file) => {
-            fs.chmodSync(file, 0777);
+            fs.chmodSync(file, 0o777);
         });
         // fs.emptyDirSync(__dirname + "/basegame/");
         // fs.rmSync(__dirname + "/basegame", {recursive: true});
