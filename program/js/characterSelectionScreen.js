@@ -48,6 +48,7 @@ function makeTables(css, allChars) {
     }
     output += "</tr>\n";
 
+    hidden = allChars;
     for (let y = 0; y < maxY; y++) {
         if (css[y][0] == "") break;
         output += "<tr>\n\
@@ -57,10 +58,10 @@ function makeTables(css, allChars) {
                 output += "<td class=\"cssSquare\"><image class=\"icon\" src=\"../images/empty.png\" alt=\" \" /></td>";
             } else {
                 let character;
-                for (let e of Object.keys(allChars)) {
-                    if (allChars[e].number == css[y][x]) {
+                for (let e of Object.keys(hidden)) {
+                    if (hidden[e].number == css[y][x]) {
                         character = e;
-                        delete allChars[e];//Only one copy of each
+                        delete hidden[e];//Only one copy of each
                         break;
                     }
                 }
@@ -73,7 +74,6 @@ function makeTables(css, allChars) {
         output += "</tr>\n";
     }
     characterSelectTable.innerHTML = output;
-    hidden = allChars;
     
     output = "";
     sorted = sortHidden(hidden, sortingType.value);
@@ -90,6 +90,22 @@ function makeTables(css, allChars) {
         </tr>\n";
     }
     hiddenCharactersTable.innerHTML = output;
+
+
+    allChars = Object.assign({}, basegame.ssbc, basegame.cmc, installed.characters);
+    let franchises = [];
+    for (let character of Object.keys(allChars)) {
+        if (!franchises.includes(allChars[character].franchise)) {
+            franchises.push(allChars[character].franchise);
+        }
+    }
+
+    franchises.sort((a, b) => (a > b ? 1 : -1))
+    output = "";
+    for (franchise of franchises) {
+        output += "<option value=\"" + franchise + "\">" + franchise + "</option>";
+    }
+    franchiseSelect.innerHTML = output;
     //IDK if this is nessesary in all use cases
     // if (xInput.value < (maxX - 1)) {
     //     xInput.value++;
@@ -154,4 +170,52 @@ function addCharacter(character) {
 function resort() {
     inputBlurred('sortingType');
     getCSS();
+}
+
+// function addFranchise() {
+//     //REQUIRES empty css slots
+//     if (franchiseSelect.value == "") {
+//         return;//Doesn't really happen
+//     }
+//     for (character of Object.keys(hidden)) {
+//         if (allChars[character].franchise == franchiseSelect.value) {
+//             addCharacter(character);
+//         }
+//     }
+// }
+
+function removeFranchise() {
+    if (franchiseSelect.value == "") {
+        return;//Doesn't really happen
+    }
+    let allChars = Object.assign({}, basegame.ssbc, basegame.cmc, installed.characters);
+    for (character of Object.keys(allChars)) {
+        // console.log(character, allChars[character]);
+        if (allChars[character].franchise == franchiseSelect.value) {
+            let maxX = css[0].length;
+            let maxY = css.length;
+
+            for (let y = 0; y < maxY; y++) {
+                for (let x = 0; x < maxX; x++) {
+                    if (('0000' + allChars[character].number).slice(-4) == css[y][x]) {
+                        let characterNumber = css[y][x];
+                        css[y][x] = "0000";
+                        let add;
+                        for (let e of Object.keys(allChars)) {
+                            if (allChars[e].number == characterNumber) {
+                                add = e;
+                                break;
+                            }
+                        }
+                        if (add == undefined) {
+                            return;//TODO: error
+                        }
+                        hidden[add] = allChars[add];
+                    }
+                }
+            }
+        }
+    }
+    makeTables(css, allChars);
+    this.api.send("writeCSS", css);
 }

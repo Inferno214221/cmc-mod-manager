@@ -144,16 +144,13 @@
                             </tr>
                         </table>
                     </fieldset>
-                    <!-- Franchise -->
-                    <!-- Add All -->
-                    <!-- Remove All -->
                     <fieldset>
                         <legend>Franchise</legend>
-                        <select id="" onfocus="inputFocused('')" onblur="inputBlurred('')" value="">
-                            <option value="displayName">Alphabetical</option>
+                        <select id="franchiseSelect" onfocus="inputFocused('franchiseSelect')" onblur="inputBlurred('franchiseSelect')">
+                            <option value=""></option>
                         </select><br />
-                        <button type="button" onclick="">Add All Characters</button>
-                        <button type="button" onclick="">Remove All Characters</button>
+                        <!-- <button type="button" onclick="addFranchise()">Add Entire Franchise</button> -->
+                        <button type="button" onclick="removeFranchise()">Remove Entire Franchise</button>
                     </fieldset>
                 </td>
             </tr>

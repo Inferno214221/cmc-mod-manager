@@ -38,7 +38,7 @@ When installing characters, it is likely that some mods will not work properly u
 - [x] Remove from the CSS
 - [x] Sort hidden characters
 - [x] Export CSS
-- [ ] Add / remove all of a franchise
+- [x] Remove all of a franchise
 - [ ] Save / load layouts
 - [ ] Change the number of rows & columns
 ### Alts
