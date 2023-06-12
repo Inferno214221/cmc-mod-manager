@@ -5,6 +5,7 @@ const fs = require("fs-extra");
 const childProcess = require("child_process");
 require('array.prototype.move');
 const extract = require('extract-zip');
+const strftime = require('strftime');
 var win;
 
 const createWindow = () => {
@@ -73,12 +74,12 @@ ipcMain.on("getGameSource", async (event, args) => {
 
         let ssbcFighters = require(__dirname + "/characters/default.json").ssbc;
 
-        let cmcFightersTxt = fs.readFileSync(__dirname + "/basegame/data/fighters.txt", 'utf-8').split(/\r?\n/);
+        let cmcFightersTxt = fs.readFileSync(__dirname + "/basegame/data/fighters.txt", "utf-8").split(/\r?\n/);
         let cmcFighters = {};
         let installed = require(__dirname + "/characters/installed.json");
         for (let fighter = 0; fighter in cmcFightersTxt; fighter++) {
             if (fighter != 0) {
-                let fighterDat = fs.readFileSync(__dirname + "/basegame/data/dats/" + cmcFightersTxt[fighter] + ".dat", 'utf-8')
+                let fighterDat = fs.readFileSync(__dirname + "/basegame/data/dats/" + cmcFightersTxt[fighter] + ".dat", "utf-8")
                 .split(/\r?\n/);
                 let fighterData = {
                     // name: cmcFightersTxt[fighter],
@@ -96,7 +97,7 @@ ipcMain.on("getGameSource", async (event, args) => {
 
         //FIXME:? assumes that all alts are not fighters - toon link
         //FIXME:? some alts are an alt of themselves (resolved differently)
-        let altFightersTxt = fs.readFileSync(__dirname + "/basegame/data/alts.txt", 'utf-8').split(/\r?\n/);
+        let altFightersTxt = fs.readFileSync(__dirname + "/basegame/data/alts.txt", "utf-8").split(/\r?\n/);
         let altFighters = {};
         let noAlts = parseInt(altFightersTxt[0]);
         altFightersTxt.shift();
@@ -106,7 +107,7 @@ ipcMain.on("getGameSource", async (event, args) => {
             let altNumber = parseInt(altFightersTxt[(fighter * 5) + 1]);
             
             try {
-                let fighterDat = fs.readFileSync(__dirname + "/basegame/data/dats/" + altFightersTxt[(fighter * 5) + 2] + ".dat", 'utf-8')
+                let fighterDat = fs.readFileSync(__dirname + "/basegame/data/dats/" + altFightersTxt[(fighter * 5) + 2] + ".dat", "utf-8")
                     .split(/\r?\n/);
                 if (fighterDat[3] != "") {
                     altNumber = fighterDat[3];
@@ -200,10 +201,20 @@ ipcMain.on("mergeInstalledMods", async (event, args) => {
         "ascii"
     );
 
-    win.webContents.send("fromMergeInstalledMods", {
-        call: "modsMergeFinished",
-        result: true
-    });
+    let date = new Date();
+    let time = strftime("%I:%M %p %x", date);
+    fs.writeFileSync(
+        __dirname + "/program/info.json", JSON.stringify({
+            time: date
+        }, null, 4), "utf-8"
+    );
+    win.webContents.send("fromMergeInstalledMods", time);
+});
+
+ipcMain.on("getLastMerge", async (event, args) => {
+    let date = new Date(JSON.parse(fs.readFileSync('./program/info.json')).time);//require wasn't updating
+    let time = strftime("%I:%M %p %x", date);
+    win.webContents.send("fromGetLastMerge", time);
 });
 
 const getAllFiles = function (dirPath, arrayOfFiles) {

@@ -1,6 +1,11 @@
 // On Page Load
 checkGameSourceInstalled();
 updateControlProfiles();
+this.api.send("getLastMerge");
+
+this.api.receive("fromGetLastMerge", (data) => {
+    lastMerge.innerHTML = "Last Merge: " + data;
+});
 
 // Called when message received from main process
 this.api.receive("fromFs", (data) => {
@@ -39,7 +44,8 @@ function mergeInstalledMods() {
 }
 
 this.api.receive("fromMergeInstalledMods", (data) => {
-    //TODO: update merge date
+    lastMerge.innerHTML = "Last Merge: " + data;
+    //2:13 PM 27/5/23
     alert("Mods merged succesfully");
 });
 

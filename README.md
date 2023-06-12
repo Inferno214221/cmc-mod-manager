@@ -21,6 +21,7 @@ When installing characters, it is likely that some mods will not work properly u
 - [x] Save and load control profiles
 - [x] Controls persist through merges although the defaults are stored when imported
 - [ ] Determine imported game's version
+- [x] Update last merge time
 - [x] Make fighters.txt on export
 - [ ] Make stages.txt & others on export
 - [x] Alerts
