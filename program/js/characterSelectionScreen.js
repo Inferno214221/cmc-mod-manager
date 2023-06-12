@@ -31,6 +31,14 @@ this.api.receive("errorGetCSS", () => {
 
 this.api.receive("fromGetCSS", (data) => {
     css = data.css;
+    // let maxY = css.length;
+    for (let y in css) {
+        if (css[y][0] == "") {
+            // delete css[y];
+            css.splice(y, 1);
+        }
+    }
+    console.log(css);
     basegame = data.basegame;
     installed = data.installed;
     let allChars = Object.assign({}, basegame.ssbc, basegame.cmc, installed.characters);
@@ -50,7 +58,6 @@ function makeTables(css, allChars) {
 
     hidden = allChars;
     for (let y = 0; y < maxY; y++) {
-        if (css[y][0] == "") break;
         output += "<tr>\n\
             <th class=\"cssSquare\">"+ y + "</th>\n";
         for (let x = 0; x < maxX; x++) {
@@ -66,7 +73,7 @@ function makeTables(css, allChars) {
                     }
                 }
                 if (character === undefined) {
-                    break;
+                    break;//FIXME: display error
                 }
                 output += "<td class=\"cssSquare\" id=\"" + character + "\"><image class=\"icon\" src=\"../../merged/gfx/mugs/" + character + ".png\" onerror=\"this.onerror=null; this.src='../images/missing.png'\" alt=\" \" /></td>";
             }
@@ -106,6 +113,9 @@ function makeTables(css, allChars) {
         output += "<option value=\"" + franchise + "\">" + franchise + "</option>";
     }
     franchiseSelect.innerHTML = output;
+
+    rowNumber.innerHTML = "Rows: " + maxX;
+    columnNumber.innerHTML = "Columns: " + maxY;
     //IDK if this is nessesary in all use cases
     // if (xInput.value < (maxX - 1)) {
     //     xInput.value++;
@@ -216,6 +226,53 @@ function removeFranchise() {
             }
         }
     }
+    makeTables(css, allChars);
+    this.api.send("writeCSS", css);
+}
+
+function addRow() {
+    let maxX = css[0].length;
+    let allChars = Object.assign({}, basegame.ssbc, basegame.cmc, installed.characters);
+    
+    let output = [];
+    for (let x = 0; x < maxX; x++) {
+        output.push("0000");
+    }
+    css.push(output);
+
+    makeTables(css, allChars);
+    this.api.send("writeCSS", css);
+}
+
+function removeRow() {
+    let allChars = Object.assign({}, basegame.ssbc, basegame.cmc, installed.characters);
+
+    css.pop();
+
+    makeTables(css, allChars);
+    this.api.send("writeCSS", css);
+}
+
+function addColumn() {
+    let maxY = css.length;
+    let allChars = Object.assign({}, basegame.ssbc, basegame.cmc, installed.characters);
+
+    for (let y = 0; y < maxY; y++) {
+        css[y].push("0000");
+    }
+
+    makeTables(css, allChars);
+    this.api.send("writeCSS", css);
+}
+
+function removeColumn() {
+    let maxY = css.length;
+    let allChars = Object.assign({}, basegame.ssbc, basegame.cmc, installed.characters);
+
+    for (let y = 0; y < maxY; y++) {
+        css[y].pop();
+    }
+
     makeTables(css, allChars);
     this.api.send("writeCSS", css);
 }

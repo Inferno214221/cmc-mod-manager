@@ -50,7 +50,7 @@
         </ul>
     </nav>
     <section id="mainSection">
-        <fieldset>
+        <!-- <fieldset>
             <legend>CSS Profiles</legend>
             <div class="cssProfiles">
                 <button type="button" onclick="saveControls()">
@@ -66,7 +66,7 @@
                     <option value="default">default</option>
                 </select>
             </div>
-        </fieldset>
+        </fieldset> -->
         <fieldset>
             <legend>Character Selection Screen</legend>
             <table id="characterSelectTable">
@@ -129,8 +129,8 @@
                                     <span id="rowNumber">Rows: 27</span>
                                 </td>
                                 <td>
-                                    <button type="button" onclick="">+</button>
-                                    <button type="button" onclick="">-</button>
+                                    <button type="button" onclick="addRow()">+</button>
+                                    <button type="button" onclick="removeRow()">-</button>
                                 </td>
                             </tr>
                             <tr>
@@ -138,8 +138,8 @@
                                     <span id="columnNumber">Columns: 9</span>
                                 </td>
                                 <td>
-                                    <button type="button" onclick="">+</button>
-                                    <button type="button" onclick="">-</button>
+                                    <button type="button" onclick="addColumn()">+</button>
+                                    <button type="button" onclick="removeColumn()">-</button>
                                 </td>
                             </tr>
                         </table>

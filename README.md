@@ -22,6 +22,7 @@ When installing characters, it is likely that some mods will not work properly u
 - [x] Controls persist through merges although the defaults are stored when imported
 - [ ] Determine imported game's version
 - [x] Update last merge time
+- [ ] Persist: save data & favourite character / other settings
 - [x] Make fighters.txt on export
 - [ ] Make stages.txt & others on export
 - [x] Alerts
@@ -34,7 +35,7 @@ When installing characters, it is likely that some mods will not work properly u
 - [x] Open installed character's directory
 - [x] Change character merge priority
 - [ ] Delete instructions txt file on import
-- [ ] Alerts
+- [x] Alerts
 - [ ] Errors
 ### Character Selection Screen (Priority: 3)
 - [x] Display the CSS
@@ -45,8 +46,8 @@ When installing characters, it is likely that some mods will not work properly u
 - [x] Export CSS
 - [x] Remove all of a franchise
 - [ ] Save / load layouts
-- [ ] Change the number of rows & columns
-- [ ] Alerts
+- [x] Change the number of rows & columns
+- [x] Alerts
 - [ ] Errors
 ### Alts (Priority: 5)
 - [ ] IDFK how I should deal with alts

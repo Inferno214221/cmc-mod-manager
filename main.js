@@ -168,7 +168,9 @@ ipcMain.on("mergeInstalledMods", async (event, args) => {
     if (fs.existsSync(__dirname + "/merged/controls.ini")) {
         fs.copyFileSync(__dirname + "/merged/controls.ini", __dirname + "/profiles/controls/inUse.ini");
     }
+
     fs.copySync(__dirname + "/basegame/", __dirname + "/merged/", { overwrite: true });
+    
     if (fs.existsSync(__dirname + "/profiles/controls/inUse.ini")) {
         fs.copyFileSync(__dirname + "/profiles/controls/inUse.ini", __dirname + "/merged/controls.ini");
     }
