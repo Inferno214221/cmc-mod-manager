@@ -1,11 +1,11 @@
 # CMC Mod Manager
 ## What
-This project is a WIP mod manager for Super Smash Brothers Crusade CMC+ v7.
+This project is a WIP mod manager for Super Smash Brothers Crusade CMC+. (Aimed to release asap after CMC+ v8)
 
 ### Supported Versions
 - [x] [CMC+ v7.1.1](https://gamebanana.com/mods/50383)
-- [ ] [CMC+ Open Build](https://discord.gg/kAbEBkx5Y4)
 - [ ] [CMC+ v8](https://youtu.be/VCl5DMRHYbM)
+- [ ] [CMC+ Open Build](https://discord.gg/kAbEBkx5Y4)
 - [ ] [SSBC- v2.1](https://gamebanana.com/mods/417588)
 ## Install
 I haven't compiled this yet as it is currently unfinished, although when finished it will support Windows and Linux.

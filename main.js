@@ -168,9 +168,9 @@ ipcMain.on("mergeInstalledMods", async (event, args) => {
     if (fs.existsSync(__dirname + "/merged/controls.ini")) {
         fs.copyFileSync(__dirname + "/merged/controls.ini", __dirname + "/profiles/controls/inUse.ini");
     }
-
+    //FIXME: persist files as an array
     fs.copySync(__dirname + "/basegame/", __dirname + "/merged/", { overwrite: true });
-    
+
     if (fs.existsSync(__dirname + "/profiles/controls/inUse.ini")) {
         fs.copyFileSync(__dirname + "/profiles/controls/inUse.ini", __dirname + "/merged/controls.ini");
     }
@@ -412,7 +412,6 @@ ipcMain.on("getCSS", (event, args) => {
 });
 
 ipcMain.on("writeCSS", (event, css) => {
-    console.log(css);
     let maxY = css.length;
     // if (css[maxY - 1] == ['']) {
     //     maxY--;
@@ -422,7 +421,6 @@ ipcMain.on("writeCSS", (event, css) => {
     let output = "";
 
     for (let y = 0; y < maxY; y++) {
-        console.log(y);
         for (let x = 0; x < maxX; x++) {
             output += css[y][x] + (x == maxX - 1 ? /*(y == maxY - 1 ? " " : */"\r\n"/*)*/ : " ");
         }
