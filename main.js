@@ -12,8 +12,9 @@ const PERSIST = [
     "controls.ini",
     "settings.ini",
     "data/cmc_stuff.bin",
-    "data/records.bin"
-    //WhereTF is the favourite character
+    "data/records.bin",
+    "data/stats/general.bin"
+    //I think favourite character is in the last one
 ];
 
 const createWindow = () => {
@@ -177,11 +178,12 @@ ipcMain.on("mergeInstalledMods", async (event, args) => {
     if (!fs.existsSync(__dirname + "/tmp/")) {
         fs.mkdirSync(__dirname + "/tmp/");
         fs.mkdirSync(__dirname + "/tmp/data/");
+        fs.mkdirSync(__dirname + "/tmp/stats/");
     }
     for (let file of PERSIST) {
         console.log(file);
         if (fs.existsSync(__dirname + "/merged/" + file)) {
-            fs.copyFileSync(__dirname + "/merged/" + file, __dirname + "/tmp/" + file);
+            fs.copySync(__dirname + "/merged/" + file, __dirname + "/tmp/" + file, { overwrite: true });
         }
     }
 
@@ -189,7 +191,7 @@ ipcMain.on("mergeInstalledMods", async (event, args) => {
 
     for (let file of PERSIST) {
         if (fs.existsSync(__dirname + "/tmp/" + file)) {
-            fs.copyFileSync(__dirname + "/tmp/" + file, __dirname + "/merged/" + file);
+            fs.copySync(__dirname + "/tmp/" + file, __dirname + "/merged/" + file, { overwrite: true });
         }
     }
     fs.removeSync(__dirname + "/tmp/");

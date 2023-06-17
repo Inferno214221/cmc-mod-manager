@@ -21,8 +21,7 @@ When installing characters, it is likely that some mods will not work properly u
 - [x] Save and load control profiles
 - [ ] Determine imported game's version
 - [x] Update last merge time
-- [x] Persist: contols, settings, record
-- [ ] Persist: favourite character
+- [x] Persist: contols, settings, record, favourite character
 - [x] Make fighters.txt on export
 - [ ] Make stages.txt & others on export
 - [x] Alerts

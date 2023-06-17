@@ -60,6 +60,7 @@ select {
     display: inline;
 }
 
-/* button {
-    width: 33%;
-} */
+td {
+    align-content: left;
+    padding: 0;
+}

@@ -53,17 +53,39 @@
         <fieldset>
             <legend>Un-Modded Game</legend>
             <span id="gameSource"></span><br />
-            <button type="button" onclick="getGameSource()">Install Un-Modded CMC</button>
+            <table>
+                <tr>
+                    <td width="140px">
+                        <button type="button" onclick="getGameSource()">Install Base Game</button>
+                    </td>
+                    <td width="207px">
+                        <button type="button" onclick="openFolder('/basegame')">Open Un-Modded Directory</button>
+                    </td>
+                    <td>
+                        <button type="button" onclick="runCMC('/basegame')">Run Un-Modded Version</button>
+                    </td>
+                </tr>
+            </table>
+            <!-- <button type="button" onclick="getGameSource()">Install Un-Modded CMC</button>
             <button type="button" onclick="openFolder('/basegame')">Open Un-Modified Directory</button>
-            <button type="button" onclick="runCMC('/basegame')">Run Un-Modified Version</button>
+            <button type="button" onclick="runCMC('/basegame')">Run Un-Modified Version</button> -->
         </fieldset>
         <fieldset>
             <legend>Merge</legend>
             <span id="lastMerge">Last Merge: Never</span><br />
-            <!-- Eventually should implement a check for wether a change has been made without merging or not -->
-            <button type="button" onclick="mergeInstalledMods()">Merge All Installed Mods</button>
-            <button type="button" onclick="openFolder('/merged')">Open Merged Directory</button>
-            <button type="button" onclick="runCMC('/merged')">Run Modified Version</button>
+            <table>
+                <tr>
+                    <td width="140px">
+                        <button type="button" onclick="mergeInstalledMods()">Merge All Mods</button>
+                    </td>
+                    <td width="207px">
+                        <button type="button" onclick="openFolder('/merged')">Open Merged Directory</button>
+                    </td>
+                    <td>
+                        <button type="button" onclick="runCMC('/merged')">Run Modded Version</button>
+                    </td>
+                </tr>
+            </table>
         </fieldset>
         <fieldset>
             <legend>Controls Profiles</legend>
