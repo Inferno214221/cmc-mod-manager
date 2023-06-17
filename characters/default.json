@@ -1,333 +1,347 @@
 {
-    "ssbc": {
-        "mario": {
-            "displayName": "Mario",
-            "franchise": "mario",
-            "number": 1
-        },
-        "pika": {
-            "displayName": "Pikachu",
-            "franchise": "pokemon",
-            "number": 2
-        },
-        "ryu": {
-            "displayName": "Ryu",
-            "franchise": "sf",
-            "number": 3
-        },
-        "tails_cake": {
-            "displayName": "Tails",
-            "franchise": "sonic",
-            "number": 4
-        },
-        "luigi": {
-            "displayName": "Luigi",
-            "franchise": "mario",
-            "number": 5
-        },
-        "falcon": {
-            "displayName": "Falco",
-            "franchise": "fox",
-            "number": 6
-        },
-        "gooey": {
-            "displayName": "Gooey",
-            "franchise": "?",
-            "number": 7
-        },
-        "purin": {
-            "displayName": "Jigglypuff",
-            "franchise": "pokemon",
-            "number": 8
-        },
-        "samus": {
-            "displayName": "Samus",
-            "franchise": "metroid",
-            "number": 9
-        },
-        "lucario": {
-            "displayName": "Lucario",
-            "franchise": "pokemon",
-            "number": 10
-        },
-        "snivy": {
-            "displayName": "Snivy",
-            "franchise": "pokemon",
-            "number": 11
-        },
-        "sonic": {
-            "displayName": "Sonic",
-            "franchise": "sonic",
-            "number": 12
-        },
-        "chunli": {
-            "displayName": "Chun-Li",
-            "franchise": "sf",
-            "number": 13
-        },
-        "goku": {
-            "displayName": "Goku",
-            "franchise": "dbz",
-            "number": 14
-        },
-        "mrgw": {
-            "displayName": "Game & Watch",
-            "franchise": "?",
-            "number": 15
-        },
-        "marth": {
-            "displayName": "Marth",
-            "franchise": "?",
-            "number": 16
-        },
-        "link": {
-            "displayName": "Link",
-            "franchise": "zelda",
-            "number": 17
-        },
-        "snake": {
-            "displayName": "Snake",
-            "franchise": "?",
-            "number": 18
-        },
-        "peach": {
-            "displayName": "Peach",
-            "franchise": "mario",
-            "number": 19
-        },
-        "wario": {
-            "displayName": "Wario",
-            "franchise": "mario",
-            "number": 20
-        },
-        "mega": {
-            "displayName": "Megaman",
-            "franchise": "megaman",
-            "number": 21
-        },
-        "yoshi": {
-            "displayName": "Yoshi",
-            "franchise": "mario",
-            "number": 22
-        },
-        "falco": {
-            "displayName": "Falco",
-            "franchise": "?",
-            "number": 23
-        },
-        "wright": {
-            "displayName": "Pheonix Wright",
-            "franchise": "?",
-            "number": 24
-        },
-        "ridley": {
-            "displayName": "Ridley",
-            "franchise": "metroid",
-            "number": 25
-        },
-        "porky": {
-            "displayName": "Pork Minch",
-            "franchise": "?",
-            "number": 26
-        },
-        "dhd": {
-            "displayName": "Duck Hunt Duo",
-            "franchise": "?",
-            "number": 27
-        },
-        "bomber": {
-            "displayName": "Bomberman",
-            "franchise": "?",
-            "number": 28
-        },
-        "geno": {
-            "displayName": "Geno",
-            "franchise": "opm",
-            "number": 29
-        },
-        "metaknight": {
-            "displayName": "Meta Knight",
-            "franchise": "kirby",
-            "number": 30
-        },
-        "saki": {
-            "displayName": "Saki Amamiya",
-            "franchise": "?",
-            "number": 31
-        },
-        "waluigi": {
-            "displayName": "Waluigi",
-            "franchise": "mario",
-            "number": 32
-        },
-        "fox": {
-            "displayName": "Fox",
-            "franchise": "fox",
-            "number": 33
-        },
-        "clink": {
-            "displayName": "Toon Link",
-            "franchise": "zelda",
-            "number": 34
-        },
-        "lucas": {
-            "displayName": "Lucas",
-            "franchise": "earthbound",
-            "number": 35
-        },
-        "ristar": {
-            "displayName": "Ristar",
-            "franchise": "?",
-            "number": 36
-        },
-        "ness": {
-            "displayName": "Ness",
-            "franchise": "earthbound",
-            "number": 37
-        },
-        "mew2": {
-            "displayName": "Mewtwo",
-            "franchise": "pokemon",
-            "number": 38
-        },
-        "krystal": {
-            "displayName": "Krystal",
-            "franchise": "?",
-            "number": 39
-        },
-        "dk": {
-            "displayName": "Donkey Kong",
-            "franchise": "mario",
-            "number": 40
-        },
-        "rayman": {
-            "displayName": "Rayman",
-            "franchise": "rayman",
-            "number": 41
-        },
-        "mach": {
-            "displayName": "Mach Rider",
-            "franchise": "machrider",
-            "number": 42
-        },
-        "shadow": {
-            "displayName": "Shadow",
-            "franchise": "sonic",
-            "number": 43
-        },
-        "knux": {
-            "displayName": "Knuckles",
-            "franchise": "sonic",
-            "number": 44
-        },
-        "kirby": {
-            "displayName": "Kirby",
-            "franchise": "kirby",
-            "number": 45
-        },
-        "toad": {
-            "displayName": "Toad",
-            "franchise": "mario",
-            "number": 46
-        },
-        "ganon": {
-            "displayName": "Ganondorf",
-            "franchise": "zelda",
-            "number": 47
-        },
-        "climbers": {
-            "displayName": "Ice Climbers",
-            "franchise": "?",
-            "number": 48
-        },
-        "rob": {
-            "displayName": "ROB",
-            "franchise": "?",
-            "number": 49
-        },
-        "ashley": {
-            "displayName": "Ashley",
-            "franchise": "?",
-            "number": 50
-        },
-        "petey": {
-            "displayName": "Petey Piranha",
-            "franchise": "mario",
-            "number": 51
-        },
-        "pacman": {
-            "displayName": "Pacman",
-            "franchise": "pacman",
-            "number": 52
-        },
-        "bowser": {
-            "displayName": "Bowser",
-            "franchise": "mario",
-            "number": 53
-        },
-        "olimar": {
-            "displayName": "Olimar",
-            "franchise": "pikmin",
-            "number": 54
-        },
-        "tingle": {
-            "displayName": "Tingle",
-            "franchise": "zelda",
-            "number": 55
-        },
-        "mac": {
-            "displayName": "Little Mac",
-            "franchise": "?",
-            "number": 56
-        },
-        "crash": {
-            "displayName": "Crash",
-            "franchise": "crashbandicoot",
-            "number": 57
-        },
-        "klonoa": {
-            "displayName": "Klonoa",
-            "franchise": "?",
-            "number": 58
-        },
-        "pichu": {
-            "displayName": "Pichu",
-            "franchise": "pokemon",
-            "number": 59
-        },
-        "_": {
-            "displayName": "Fighting Sprite",
-            "franchise": "?",
-            "number": 60
-        },
-        "hand": {
-            "displayName": "Master Hand (Boss)",
-            "franchise": "?",
-            "number": 61
-        },
-        "drmario": {
-            "displayName": "Dr. Mario",
-            "franchise": "mario",
-            "number": 62
-        },
-        "shantae": {
-            "displayName": "Shantae",
-            "franchise": "shantae",
-            "number": 63
-        },
-        "nega": {
-            "displayName": "Nega Shantae",
-            "franchise": "shantae",
-            "number": 64
-        },
-        "evil": {
-            "displayName": "Evil Ryu",
-            "franchise": "sf",
+    "versions": {
+        "CMC+ v7.exe": {
+            "builtin": {
+                "mario": {
+                    "displayName": "Mario",
+                    "franchise": "mario",
+                    "number": 1
+                },
+                "pika": {
+                    "displayName": "Pikachu",
+                    "franchise": "pokemon",
+                    "number": 2
+                },
+                "ryu": {
+                    "displayName": "Ryu",
+                    "franchise": "sf",
+                    "number": 3
+                },
+                "tails_cake": {
+                    "displayName": "Tails",
+                    "franchise": "sonic",
+                    "number": 4
+                },
+                "luigi": {
+                    "displayName": "Luigi",
+                    "franchise": "mario",
+                    "number": 5
+                },
+                "falcon": {
+                    "displayName": "Falco",
+                    "franchise": "fox",
+                    "number": 6
+                },
+                "gooey": {
+                    "displayName": "Gooey",
+                    "franchise": "?",
+                    "number": 7
+                },
+                "purin": {
+                    "displayName": "Jigglypuff",
+                    "franchise": "pokemon",
+                    "number": 8
+                },
+                "samus": {
+                    "displayName": "Samus",
+                    "franchise": "metroid",
+                    "number": 9
+                },
+                "lucario": {
+                    "displayName": "Lucario",
+                    "franchise": "pokemon",
+                    "number": 10
+                },
+                "snivy": {
+                    "displayName": "Snivy",
+                    "franchise": "pokemon",
+                    "number": 11
+                },
+                "sonic": {
+                    "displayName": "Sonic",
+                    "franchise": "sonic",
+                    "number": 12
+                },
+                "chunli": {
+                    "displayName": "Chun-Li",
+                    "franchise": "sf",
+                    "number": 13
+                },
+                "goku": {
+                    "displayName": "Goku",
+                    "franchise": "dbz",
+                    "number": 14
+                },
+                "mrgw": {
+                    "displayName": "Game & Watch",
+                    "franchise": "?",
+                    "number": 15
+                },
+                "marth": {
+                    "displayName": "Marth",
+                    "franchise": "?",
+                    "number": 16
+                },
+                "link": {
+                    "displayName": "Link",
+                    "franchise": "zelda",
+                    "number": 17
+                },
+                "snake": {
+                    "displayName": "Snake",
+                    "franchise": "?",
+                    "number": 18
+                },
+                "peach": {
+                    "displayName": "Peach",
+                    "franchise": "mario",
+                    "number": 19
+                },
+                "wario": {
+                    "displayName": "Wario",
+                    "franchise": "mario",
+                    "number": 20
+                },
+                "mega": {
+                    "displayName": "Megaman",
+                    "franchise": "megaman",
+                    "number": 21
+                },
+                "yoshi": {
+                    "displayName": "Yoshi",
+                    "franchise": "mario",
+                    "number": 22
+                },
+                "falco": {
+                    "displayName": "Falco",
+                    "franchise": "?",
+                    "number": 23
+                },
+                "wright": {
+                    "displayName": "Pheonix Wright",
+                    "franchise": "?",
+                    "number": 24
+                },
+                "ridley": {
+                    "displayName": "Ridley",
+                    "franchise": "metroid",
+                    "number": 25
+                },
+                "porky": {
+                    "displayName": "Pork Minch",
+                    "franchise": "?",
+                    "number": 26
+                },
+                "dhd": {
+                    "displayName": "Duck Hunt Duo",
+                    "franchise": "?",
+                    "number": 27
+                },
+                "bomber": {
+                    "displayName": "Bomberman",
+                    "franchise": "?",
+                    "number": 28
+                },
+                "geno": {
+                    "displayName": "Geno",
+                    "franchise": "opm",
+                    "number": 29
+                },
+                "metaknight": {
+                    "displayName": "Meta Knight",
+                    "franchise": "kirby",
+                    "number": 30
+                },
+                "saki": {
+                    "displayName": "Saki Amamiya",
+                    "franchise": "?",
+                    "number": 31
+                },
+                "waluigi": {
+                    "displayName": "Waluigi",
+                    "franchise": "mario",
+                    "number": 32
+                },
+                "fox": {
+                    "displayName": "Fox",
+                    "franchise": "fox",
+                    "number": 33
+                },
+                "clink": {
+                    "displayName": "Toon Link",
+                    "franchise": "zelda",
+                    "number": 34
+                },
+                "lucas": {
+                    "displayName": "Lucas",
+                    "franchise": "earthbound",
+                    "number": 35
+                },
+                "ristar": {
+                    "displayName": "Ristar",
+                    "franchise": "?",
+                    "number": 36
+                },
+                "ness": {
+                    "displayName": "Ness",
+                    "franchise": "earthbound",
+                    "number": 37
+                },
+                "mew2": {
+                    "displayName": "Mewtwo",
+                    "franchise": "pokemon",
+                    "number": 38
+                },
+                "krystal": {
+                    "displayName": "Krystal",
+                    "franchise": "?",
+                    "number": 39
+                },
+                "dk": {
+                    "displayName": "Donkey Kong",
+                    "franchise": "mario",
+                    "number": 40
+                },
+                "rayman": {
+                    "displayName": "Rayman",
+                    "franchise": "rayman",
+                    "number": 41
+                },
+                "mach": {
+                    "displayName": "Mach Rider",
+                    "franchise": "machrider",
+                    "number": 42
+                },
+                "shadow": {
+                    "displayName": "Shadow",
+                    "franchise": "sonic",
+                    "number": 43
+                },
+                "knux": {
+                    "displayName": "Knuckles",
+                    "franchise": "sonic",
+                    "number": 44
+                },
+                "kirby": {
+                    "displayName": "Kirby",
+                    "franchise": "kirby",
+                    "number": 45
+                },
+                "toad": {
+                    "displayName": "Toad",
+                    "franchise": "mario",
+                    "number": 46
+                },
+                "ganon": {
+                    "displayName": "Ganondorf",
+                    "franchise": "zelda",
+                    "number": 47
+                },
+                "climbers": {
+                    "displayName": "Ice Climbers",
+                    "franchise": "?",
+                    "number": 48
+                },
+                "rob": {
+                    "displayName": "ROB",
+                    "franchise": "?",
+                    "number": 49
+                },
+                "ashley": {
+                    "displayName": "Ashley",
+                    "franchise": "?",
+                    "number": 50
+                },
+                "petey": {
+                    "displayName": "Petey Piranha",
+                    "franchise": "mario",
+                    "number": 51
+                },
+                "pacman": {
+                    "displayName": "Pacman",
+                    "franchise": "pacman",
+                    "number": 52
+                },
+                "bowser": {
+                    "displayName": "Bowser",
+                    "franchise": "mario",
+                    "number": 53
+                },
+                "olimar": {
+                    "displayName": "Olimar",
+                    "franchise": "pikmin",
+                    "number": 54
+                },
+                "tingle": {
+                    "displayName": "Tingle",
+                    "franchise": "zelda",
+                    "number": 55
+                },
+                "mac": {
+                    "displayName": "Little Mac",
+                    "franchise": "?",
+                    "number": 56
+                },
+                "crash": {
+                    "displayName": "Crash",
+                    "franchise": "crashbandicoot",
+                    "number": 57
+                },
+                "klonoa": {
+                    "displayName": "Klonoa",
+                    "franchise": "?",
+                    "number": 58
+                },
+                "pichu": {
+                    "displayName": "Pichu",
+                    "franchise": "pokemon",
+                    "number": 59
+                },
+                "_": {
+                    "displayName": "Fighting Sprite",
+                    "franchise": "?",
+                    "number": 60
+                },
+                "hand": {
+                    "displayName": "Master Hand (Boss)",
+                    "franchise": "?",
+                    "number": 61
+                },
+                "drmario": {
+                    "displayName": "Dr. Mario",
+                    "franchise": "mario",
+                    "number": 62
+                },
+                "shantae": {
+                    "displayName": "Shantae",
+                    "franchise": "shantae",
+                    "number": 63
+                },
+                "nega": {
+                    "displayName": "Nega Shantae",
+                    "franchise": "shantae",
+                    "number": 64
+                },
+                "evil": {
+                    "displayName": "Evil Ryu",
+                    "franchise": "sf",
+                    "number": 65
+                },
+                "random": {
+                    "displayName": "?",
+                    "number": 9999
+                }
+            },
             "number": 65
         },
-        "random": {
-            "displayName": "?",
-            "number": 9999
+        "CMC Plus Open.exe": {
+            "builtin": {
+                "random": {
+                    "displayName": "?",
+                    "number": 9999
+                }
+            },
+            "number": 0
         }
     },
     "cmc": {

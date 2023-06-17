@@ -1,4 +1,4 @@
-var css, basegame, installed, hidden;
+var css, basegame, installed, hidden, version;
 getCSS();
 
 function sortHidden(hidden, sortType) {
@@ -41,7 +41,8 @@ this.api.receive("fromGetCSS", (data) => {
     console.log(css);
     basegame = data.basegame;
     installed = data.installed;
-    let allChars = Object.assign({}, basegame.ssbc, basegame.cmc, installed.characters);
+    version = data.version;
+    let allChars = Object.assign({}, basegame.versions[version].builtin, basegame.cmc, installed.characters);
     makeTables(css, allChars);
 });
 
@@ -99,7 +100,7 @@ function makeTables(css, allChars) {
     hiddenCharactersTable.innerHTML = output;
 
 
-    allChars = Object.assign({}, basegame.ssbc, basegame.cmc, installed.characters);
+    allChars = Object.assign({}, basegame.versions[version].builtin, basegame.cmc, installed.characters);
     let franchises = [];
     for (let character of Object.keys(allChars)) {
         if (!franchises.includes(allChars[character].franchise)) {
@@ -139,7 +140,7 @@ function hideCharacter() {
     if (characterNumber === "0000") {
         return;//TODO: alert
     }
-    let allChars = Object.assign({}, basegame.ssbc, basegame.cmc, installed.characters);
+    let allChars = Object.assign({}, basegame.versions[version].builtin, basegame.cmc, installed.characters);
     css[yInput.value][xInput.value] = "0000";
     let character;
     for (let e of Object.keys(allChars)) {
@@ -167,7 +168,7 @@ function addCharacter(character) {
     if (characterNumber !== "0000") {
         return;//TODO: alert
     }
-    let allChars = Object.assign({}, basegame.ssbc, basegame.cmc, installed.characters);
+    let allChars = Object.assign({}, basegame.versions[version].builtin, basegame.cmc, installed.characters);
     if (allChars[character] == undefined) {
         return;//TODO: error
     }
@@ -198,7 +199,7 @@ function removeFranchise() {
     if (franchiseSelect.value == "") {
         return;//Doesn't really happen
     }
-    let allChars = Object.assign({}, basegame.ssbc, basegame.cmc, installed.characters);
+    let allChars = Object.assign({}, basegame.versions[version].builtin, basegame.cmc, installed.characters);
     for (character of Object.keys(allChars)) {
         // console.log(character, allChars[character]);
         if (allChars[character].franchise == franchiseSelect.value) {
@@ -232,7 +233,7 @@ function removeFranchise() {
 
 function addRow() {
     let maxX = css[0].length;
-    let allChars = Object.assign({}, basegame.ssbc, basegame.cmc, installed.characters);
+    let allChars = Object.assign({}, basegame.versions[version].builtin, basegame.cmc, installed.characters);
     
     let output = [];
     for (let x = 0; x < maxX; x++) {
@@ -245,7 +246,7 @@ function addRow() {
 }
 
 function removeRow() {
-    let allChars = Object.assign({}, basegame.ssbc, basegame.cmc, installed.characters);
+    let allChars = Object.assign({}, basegame.versions[version].builtin, basegame.cmc, installed.characters);
 
     css.pop();
 
@@ -255,7 +256,7 @@ function removeRow() {
 
 function addColumn() {
     let maxY = css.length;
-    let allChars = Object.assign({}, basegame.ssbc, basegame.cmc, installed.characters);
+    let allChars = Object.assign({}, basegame.versions[version].builtin, basegame.cmc, installed.characters);
 
     for (let y = 0; y < maxY; y++) {
         css[y].push("0000");
@@ -267,7 +268,7 @@ function addColumn() {
 
 function removeColumn() {
     let maxY = css.length;
-    let allChars = Object.assign({}, basegame.ssbc, basegame.cmc, installed.characters);
+    let allChars = Object.assign({}, basegame.versions[version].builtin, basegame.cmc, installed.characters);
 
     for (let y = 0; y < maxY; y++) {
         css[y].pop();

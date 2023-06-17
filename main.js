@@ -7,6 +7,7 @@ require('array.prototype.move');
 const extract = require('extract-zip');
 const strftime = require('strftime');
 var win;
+var version = getGameVersion(__dirname + "/basegame/");
 
 const PERSIST = [
     "controls.ini",
@@ -14,7 +15,6 @@ const PERSIST = [
     "data/cmc_stuff.bin",
     "data/records.bin",
     "data/stats/general.bin"
-    //I think favourite character is in the last one
 ];
 
 const createWindow = () => {
@@ -41,26 +41,18 @@ app.on('window-all-closed', () => {
     app.quit();
 });
 
-// Allow fs functions to be called from the app
-ipcMain.on("fs", (event, args) => {
-    win.webContents.send("fromFs", {
-        call: args.call,
-        callArgs: args.callArgs,
-        result: fs[args.method.toString()].apply(null, args.arguments)
-    });
-});
+function getGameVersion(dir) {
+    for(let game of Object.keys(require(__dirname + "/characters/default.json").versions)) {
+        if (fs.existsSync(dir + game)) {
+            return game;
+        }
+    }
+    return null;
+}
 
-// ipcMain.on("showOpenDialog", (event, args) => {
-//     dialog.showOpenDialog(win, {
-//         properties: [args.properties]
-//     }).then(dir => {
-//         win.webContents.send("fromShowOpenDialog", {
-//             call: args.call,
-//             callArgs: args.callArgs,
-//             result: dir
-//         });
-//     });
-// });
+ipcMain.on("checkGameSourceInstalled", (event, args) => {
+    win.webContents.send("fromCheckGameSourceInstalled", version != null);
+});
 
 ipcMain.on("getGameSource", async (event, args) => {
     dialog.showOpenDialog(win, {
@@ -69,19 +61,21 @@ ipcMain.on("getGameSource", async (event, args) => {
         if (dir.canceled === true) {
             return;//TODO: add alerts
         }
-        if (!fs.existsSync(dir.filePaths[0] + "/CMC+ v7.exe")) {
+        if (getGameVersion(dir.filePaths[0] + "/") == null) {
             return;//TODO: add alerts
         }
         //The new version has horrible permissions so give everything xwr
         getAllFiles(dir.filePaths[0]).forEach((file) => {
             fs.chmodSync(file, 0o777);
         });
-        // fs.emptyDirSync(__dirname + "/basegame/");
-        // fs.rmSync(__dirname + "/basegame", {recursive: true});
+        fs.emptyDirSync(__dirname + "/merged/");
+        
         fs.copySync(dir.filePaths[0], __dirname + "/basegame/", { overwrite: true });
         fs.copyFileSync(__dirname + "/basegame/controls.ini", __dirname + "/profiles/controls/default.ini");
+        version = getGameVersion(__dirname + "/basegame/");
 
-        let ssbcFighters = require(__dirname + "/characters/default.json").ssbc;
+        let builtinFighters = require(__dirname + "/characters/default.json").versions[version].builtin;
+        let builtinNumber = require(__dirname + "/characters/default.json").versions[version].number;
 
         let cmcFightersTxt = fs.readFileSync(__dirname + "/basegame/data/fighters.txt", "utf-8").split(/\r?\n/);
         let cmcFighters = {};
@@ -94,7 +88,7 @@ ipcMain.on("getGameSource", async (event, args) => {
                     // name: cmcFightersTxt[fighter],
                     displayName: fighterDat[1],
                     franchise: fighterDat[3],
-                    number: fighter + 65 // Evil ryu is 65 and the last character on the ssbc roster
+                    number: fighter + builtinNumber
                     // Easier than working it out later
                 };
                 cmcFighters[cmcFightersTxt[fighter]] = fighterData;
@@ -102,7 +96,7 @@ ipcMain.on("getGameSource", async (event, args) => {
                 // cmcFighters.push(fighterData);
             }
         }
-        installed.number += 65;
+        installed.number += builtinNumber;
 
         //FIXME:? assumes that all alts are not fighters - toon link
         //FIXME:? some alts are an alt of themselves (resolved differently)
@@ -123,8 +117,8 @@ ipcMain.on("getGameSource", async (event, args) => {
                 }
             } catch (error) {}
 
-            if (ssbcFighters[baseFighter] != undefined) {
-                franchise = ssbcFighters[baseFighter].franchise;
+            if (builtinFighters[baseFighter] != undefined) {
+                franchise = builtinFighters[baseFighter].franchise;
             } else if (cmcFighters[baseFighter] != undefined) {
                 franchise = cmcFighters[baseFighter].franchise;
             }
@@ -140,10 +134,11 @@ ipcMain.on("getGameSource", async (event, args) => {
             // altFighters.push(fighterData);
         }
 
+        let versions = require(__dirname + "/characters/default.json").versions;
         fs.writeFileSync(
             __dirname + "/characters/default.json",
             JSON.stringify({
-                ssbc: ssbcFighters,
+                versions: versions,
                 cmc: cmcFighters,
                 alts: altFighters
             }, null, 4),
@@ -163,15 +158,12 @@ ipcMain.on("getGameSource", async (event, args) => {
             "utf-8"
         );
 
-        win.webContents.send("fromGetGameSource", {
-            call: "gameSourceInstalled",
-            result: true
-        });
+        win.webContents.send("fromGetGameSource", true);
     });
 });
 
 ipcMain.on("mergeInstalledMods", async (event, args) => {
-    if (!fs.existsSync(__dirname + "/basegame/CMC+ v7.exe")) {
+    if (version == null) {
         return;//TODO: add alerts
     }
 
@@ -181,13 +173,13 @@ ipcMain.on("mergeInstalledMods", async (event, args) => {
         fs.mkdirSync(__dirname + "/tmp/stats/");
     }
     for (let file of PERSIST) {
-        console.log(file);
         if (fs.existsSync(__dirname + "/merged/" + file)) {
             fs.copySync(__dirname + "/merged/" + file, __dirname + "/tmp/" + file, { overwrite: true });
         }
     }
 
-    fs.copySync(__dirname + "/basegame/", __dirname + "/merged/", { overwrite: true });
+    fs.emptyDirSync(__dirname + "/merged/");
+    fs.copySync(__dirname + "/basegame/", __dirname + "/merged/");
 
     for (let file of PERSIST) {
         if (fs.existsSync(__dirname + "/tmp/" + file)) {
@@ -204,9 +196,10 @@ ipcMain.on("mergeInstalledMods", async (event, args) => {
     //TODO: generate fighters.txt and stage.txt
     let cmcFighters = require(__dirname + "/characters/default.json").cmc;
     let installedFighters = require(__dirname + "/characters/installed.json");
+    let builtinNumber = require(__dirname + "/characters/default.json").versions[version].number;
     let fightersTxt = "";
-    fightersTxt += installedFighters.number - 65 + "\r\n";
-    for (let number = 65; number <= (installedFighters.number - installedFighters.priority.length); number++) {
+    fightersTxt += installedFighters.number - builtinNumber + "\r\n";
+    for (let number = builtinNumber; number <= (installedFighters.number - installedFighters.priority.length); number++) {
         for (let fighter of Object.keys(cmcFighters)) {
             if (cmcFighters[fighter].number == number) {
                 fightersTxt += fighter + "\r\n";
@@ -261,7 +254,7 @@ ipcMain.on("runCMC", async (event, args) => {
     dir = args.path;
     //Additionally the exe doesn't have execute perms on linux
     //sudo chmod a+x ./* -R
-    childProcess.execFile(__dirname + dir + "/CMC+ v7.exe", {
+    childProcess.execFile(__dirname + dir + "/" + version, {
         cwd: __dirname + dir,
         windowsHide: true
     });
@@ -408,7 +401,8 @@ ipcMain.on("increaseMergePriority", (event, args) => {
 ipcMain.on("getCSS", (event, args) => {
     let cssFile;
     try {
-        cssFile = fs.readFileSync(__dirname + "/merged/data/css.txt", "utf-8").split(/\r?\n/);
+        // cssFile = fs.readFileSync(__dirname + "/merged/data/css.txt", "utf-8").split(/\r?\n/);
+        cssFile = fs.readFileSync(__dirname + "/merged/data/css.txt", "ascii").split(/\r?\n/);
     } catch (error) {
         if (error.code == "ENOENT") {
             win.webContents.send("errorGetCSS");
@@ -418,16 +412,14 @@ ipcMain.on("getCSS", (event, args) => {
     if (cssFile == undefined) return;
     let css = [];
     for (let line = 0; line < cssFile.length; line++) {
-        if (cssFile[line].includes("undefined")) {
-            break; //FIXME: this is a horrible fix
-        }
         css[line] = cssFile[line].split(" ");
     }
     let basegame = require(__dirname + "/characters/default.json");
     let installed = require(__dirname + "/characters/installed.json");
     win.webContents.send("fromGetCSS", {
         css: css,
-        basegame: basegame, 
+        version: version,
+        basegame: basegame,
         installed: installed
     });
 });

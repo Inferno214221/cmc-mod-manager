@@ -4,8 +4,8 @@ This project is a WIP mod manager for Super Smash Brothers Crusade CMC+. (Aimed 
 
 ### Supported Versions
 - [x] [CMC+ v7.1.1](https://gamebanana.com/mods/50383)
+- [x] [CMC+ Open Build](https://discord.gg/kAbEBkx5Y4)
 - [ ] [CMC+ v8](https://youtu.be/VCl5DMRHYbM)
-- [ ] [CMC+ Open Build](https://discord.gg/kAbEBkx5Y4)
 - [ ] [SSBC- v2.1](https://gamebanana.com/mods/417588)
 ## Install
 I haven't compiled this yet as it is currently unfinished, although when finished it will support Windows and Linux.
@@ -27,6 +27,7 @@ When installing characters, it is likely that some mods will not work properly u
 - [x] Alerts
 - [ ] Errors
 - [ ] Remove unessecary files? /tools, /data/*.dat if CMC
+- [ ] Fix Character Franchise List
 ### Character Manager (Priority: 2)
 - [x] Install characters from a folder (very picky)
 - [x] Install characters from a zip (extract, install folder, delete)

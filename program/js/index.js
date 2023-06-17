@@ -7,26 +7,15 @@ this.api.receive("fromGetLastMerge", (data) => {
     lastMerge.innerHTML = "Last Merge: " + data;
 });
 
-// Called when message received from main process
-this.api.receive("fromFs", (data) => {
-    this[data.call](data.result, data.callArgs);
-});
-
-// this.api.receive("fromShowOpenDialog", (data) => {
-//     this[data.call](data.result, data.callArgs);
-// });
-
 function checkGameSourceInstalled() {
-    // console.info("Checking if the game is installed");
-    this.api.send("fs", {
-        method: "existsSync",
-        arguments: ["./basegame/CMC+ v7.exe"],
-        call: "gameSourceInstalled",
-    });
+    this.api.send("checkGameSourceInstalled");
 }
 
+this.api.receive("fromCheckGameSourceInstalled", (data) => {
+    gameSourceInstalled(data);
+});
+
 function gameSourceInstalled(data) {
-    // console.info("CMC " + (data ? "is" : "isn't") + " installed");
     gameSource.innerHTML = "Base Game: " + (data ? "Found" : "Not Found");
 }
 
@@ -36,7 +25,7 @@ function getGameSource() {
 
 this.api.receive("fromGetGameSource", (data) => {
     alert("CMC base game installed succesfully");
-    this[data.call](data.result, data.callArgs);
+    gameSourceInstalled(data);
 });
 
 function mergeInstalledMods() {
