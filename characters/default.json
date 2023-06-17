@@ -27,14 +27,14 @@
                     "franchise": "mario",
                     "number": 5
                 },
-                "falcon": {
+                "falco": {
                     "displayName": "Falco",
-                    "franchise": "fox",
+                    "franchise": "starfox",
                     "number": 6
                 },
                 "gooey": {
                     "displayName": "Gooey",
-                    "franchise": "?",
+                    "franchise": "kiby",
                     "number": 7
                 },
                 "purin": {
@@ -74,12 +74,12 @@
                 },
                 "mrgw": {
                     "displayName": "Game & Watch",
-                    "franchise": "?",
+                    "franchise": "gw",
                     "number": 15
                 },
                 "marth": {
                     "displayName": "Marth",
-                    "franchise": "?",
+                    "franchise": "fe",
                     "number": 16
                 },
                 "link": {
@@ -89,7 +89,7 @@
                 },
                 "snake": {
                     "displayName": "Snake",
-                    "franchise": "?",
+                    "franchise": "mg",
                     "number": 18
                 },
                 "peach": {
@@ -99,7 +99,7 @@
                 },
                 "wario": {
                     "displayName": "Wario",
-                    "franchise": "mario",
+                    "franchise": "wario",
                     "number": 20
                 },
                 "mega": {
@@ -112,14 +112,14 @@
                     "franchise": "mario",
                     "number": 22
                 },
-                "falco": {
-                    "displayName": "Falco",
-                    "franchise": "?",
+                "falcon": {
+                    "displayName": "Captain Falcon",
+                    "franchise": "fzero",
                     "number": 23
                 },
                 "wright": {
                     "displayName": "Pheonix Wright",
-                    "franchise": "?",
+                    "franchise": "attorney",
                     "number": 24
                 },
                 "ridley": {
@@ -129,17 +129,17 @@
                 },
                 "porky": {
                     "displayName": "Pork Minch",
-                    "franchise": "?",
+                    "franchise": "mother",
                     "number": 26
                 },
                 "dhd": {
                     "displayName": "Duck Hunt Duo",
-                    "franchise": "?",
+                    "franchise": "dhunt",
                     "number": 27
                 },
                 "bomber": {
                     "displayName": "Bomberman",
-                    "franchise": "?",
+                    "franchise": "bomber",
                     "number": 28
                 },
                 "geno": {
@@ -154,7 +154,7 @@
                 },
                 "saki": {
                     "displayName": "Saki Amamiya",
-                    "franchise": "?",
+                    "franchise": "sin",
                     "number": 31
                 },
                 "waluigi": {
@@ -164,7 +164,7 @@
                 },
                 "fox": {
                     "displayName": "Fox",
-                    "franchise": "fox",
+                    "franchise": "starfox",
                     "number": 33
                 },
                 "clink": {
@@ -174,17 +174,17 @@
                 },
                 "lucas": {
                     "displayName": "Lucas",
-                    "franchise": "earthbound",
+                    "franchise": "mother",
                     "number": 35
                 },
                 "ristar": {
                     "displayName": "Ristar",
-                    "franchise": "?",
+                    "franchise": "ristar",
                     "number": 36
                 },
                 "ness": {
                     "displayName": "Ness",
-                    "franchise": "earthbound",
+                    "franchise": "mother",
                     "number": 37
                 },
                 "mew2": {
@@ -194,7 +194,7 @@
                 },
                 "krystal": {
                     "displayName": "Krystal",
-                    "franchise": "?",
+                    "franchise": "starfox",
                     "number": 39
                 },
                 "dk": {
@@ -239,17 +239,17 @@
                 },
                 "climbers": {
                     "displayName": "Ice Climbers",
-                    "franchise": "?",
+                    "franchise": "ic",
                     "number": 48
                 },
                 "rob": {
-                    "displayName": "ROB",
-                    "franchise": "?",
+                    "displayName": "R.O.B.",
+                    "franchise": "rob",
                     "number": 49
                 },
                 "ashley": {
                     "displayName": "Ashley",
-                    "franchise": "?",
+                    "franchise": "wario",
                     "number": 50
                 },
                 "petey": {
@@ -279,7 +279,7 @@
                 },
                 "mac": {
                     "displayName": "Little Mac",
-                    "franchise": "?",
+                    "franchise": "pnchout",
                     "number": 56
                 },
                 "crash": {
@@ -289,7 +289,7 @@
                 },
                 "klonoa": {
                     "displayName": "Klonoa",
-                    "franchise": "?",
+                    "franchise": "klonoa",
                     "number": 58
                 },
                 "pichu": {
@@ -299,12 +299,11 @@
                 },
                 "_": {
                     "displayName": "Fighting Sprite",
-                    "franchise": "?",
                     "number": 60
                 },
                 "hand": {
                     "displayName": "Master Hand (Boss)",
-                    "franchise": "?",
+                    "franchise": "ssb",
                     "number": 61
                 },
                 "drmario": {
@@ -1692,7 +1691,7 @@
         },
         "krystalcmc": {
             "displayName": "Krystal (CMC)",
-            "franchise": "?",
+            "franchise": "starfox",
             "altNumber": 2,
             "baseFighter": "krystal"
         },

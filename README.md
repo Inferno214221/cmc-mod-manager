@@ -19,7 +19,7 @@ When installing characters, it is likely that some mods will not work properly u
 - [x] Open basegame and merged directories in local file manager
 - [x] Run both the basegame and merged version
 - [x] Save and load control profiles
-- [ ] Determine imported game's version
+- [x] Determine imported game's version
 - [x] Update last merge time
 - [x] Persist: contols, settings, record, favourite character
 - [x] Make fighters.txt on export
@@ -27,7 +27,6 @@ When installing characters, it is likely that some mods will not work properly u
 - [x] Alerts
 - [ ] Errors
 - [ ] Remove unessecary files? /tools, /data/*.dat if CMC
-- [ ] Fix Character Franchise List
 ### Character Manager (Priority: 2)
 - [x] Install characters from a folder (very picky)
 - [x] Install characters from a zip (extract, install folder, delete)

@@ -43,6 +43,7 @@ this.api.receive("fromGetCSS", (data) => {
     installed = data.installed;
     version = data.version;
     let allChars = Object.assign({}, basegame.versions[version].builtin, basegame.cmc, installed.characters);
+    console.log(allChars);
     makeTables(css, allChars);
 });
 
@@ -57,7 +58,7 @@ function makeTables(css, allChars) {
     }
     output += "</tr>\n";
 
-    hidden = allChars;
+    hidden = Object.assign({}, allChars);
     for (let y = 0; y < maxY; y++) {
         output += "<tr>\n\
             <th class=\"cssSquare\">"+ y + "</th>\n";
@@ -69,14 +70,18 @@ function makeTables(css, allChars) {
                 for (let e of Object.keys(hidden)) {
                     if (hidden[e].number == css[y][x]) {
                         character = e;
+                        console.log(allChars,character,allChars[character])
                         delete hidden[e];//Only one copy of each
+                        console.log(allChars,character,allChars[character])
                         break;
                     }
                 }
                 if (character === undefined) {
                     break;//FIXME: display error
                 }
-                output += "<td class=\"cssSquare\" id=\"" + character + "\"><image class=\"icon\" src=\"../../merged/gfx/mugs/" + character + ".png\" onerror=\"this.onerror=null; this.src='../images/missing.png'\" alt=\" \" /></td>";
+                console.log(allChars,character,allChars[character])
+                output += "<td class=\"cssSquare\" id=\"" + character + "\"><image class=\"icon\" src=\"../../merged/gfx/mugs/" + character + ".png\" onerror=\"this.onerror=null; this.src='../images/missing.png'\" alt=\" \" />\
+                <div class=\"cssName\">" + allChars[character].displayName + "</div></td>";
             }
         }
         output += "</tr>\n";
