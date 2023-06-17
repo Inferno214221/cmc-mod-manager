@@ -19,14 +19,15 @@ When installing characters, it is likely that some mods will not work properly u
 - [x] Open basegame and merged directories in local file manager
 - [x] Run both the basegame and merged version
 - [x] Save and load control profiles
-- [x] Controls persist through merges although the defaults are stored when imported
 - [ ] Determine imported game's version
 - [x] Update last merge time
-- [ ] Persist: save data & favourite character / other settings
+- [x] Persist: contols, settings, record
+- [ ] Persist: favourite character
 - [x] Make fighters.txt on export
 - [ ] Make stages.txt & others on export
 - [x] Alerts
 - [ ] Errors
+- [ ] Remove unessecary files? /tools, /data/*.dat if CMC
 ### Character Manager (Priority: 2)
 - [x] Install characters from a folder (very picky)
 - [x] Install characters from a zip (extract, install folder, delete)

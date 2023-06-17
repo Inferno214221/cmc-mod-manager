@@ -8,6 +8,14 @@ const extract = require('extract-zip');
 const strftime = require('strftime');
 var win;
 
+const PERSIST = [
+    "controls.ini",
+    "settings.ini",
+    "data/cmc_stuff.bin",
+    "data/records.bin"
+    //WhereTF is the favourite character
+];
+
 const createWindow = () => {
     win = new BrowserWindow({
         width: 810,
@@ -165,17 +173,28 @@ ipcMain.on("mergeInstalledMods", async (event, args) => {
     if (!fs.existsSync(__dirname + "/basegame/CMC+ v7.exe")) {
         return;//TODO: add alerts
     }
-    if (fs.existsSync(__dirname + "/merged/controls.ini")) {
-        fs.copyFileSync(__dirname + "/merged/controls.ini", __dirname + "/profiles/controls/inUse.ini");
+
+    if (!fs.existsSync(__dirname + "/tmp/")) {
+        fs.mkdirSync(__dirname + "/tmp/");
+        fs.mkdirSync(__dirname + "/tmp/data/");
     }
-    //FIXME: persist files as an array
+    for (let file of PERSIST) {
+        console.log(file);
+        if (fs.existsSync(__dirname + "/merged/" + file)) {
+            fs.copyFileSync(__dirname + "/merged/" + file, __dirname + "/tmp/" + file);
+        }
+    }
+
     fs.copySync(__dirname + "/basegame/", __dirname + "/merged/", { overwrite: true });
 
-    if (fs.existsSync(__dirname + "/profiles/controls/inUse.ini")) {
-        fs.copyFileSync(__dirname + "/profiles/controls/inUse.ini", __dirname + "/merged/controls.ini");
+    for (let file of PERSIST) {
+        if (fs.existsSync(__dirname + "/tmp/" + file)) {
+            fs.copyFileSync(__dirname + "/tmp/" + file, __dirname + "/merged/" + file);
+        }
     }
+    fs.removeSync(__dirname + "/tmp/");
+
     //TODO: for each stage
-    //FIXME: sort by number
     let installed = require(__dirname + "/characters/installed.json");
     for (let character of installed.priority.toReversed()) {
         fs.copySync(__dirname + "/characters/" + character, __dirname + "/merged/", { overwrite: true });
