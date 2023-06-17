@@ -21,7 +21,7 @@ When installing characters, it is likely that some mods will not work properly u
 - [x] Save and load control profiles
 - [x] Determine imported game's version
 - [x] Update last merge time
-- [x] Persist: contols, settings, record, favourite character
+- [x] Persist: contols, settings, record, favourite character, css
 - [x] Make fighters.txt on export
 - [ ] Make stages.txt & others on export
 - [x] Alerts
@@ -45,7 +45,8 @@ When installing characters, it is likely that some mods will not work properly u
 - [x] Sort hidden characters
 - [x] Export CSS
 - [x] Remove all of a franchise
-- [ ] Save / load layouts
+- [x] Save / load layouts
+- [ ] User can over write default and css currently persists, making it impossbile to reset without reimporting basegame
 - [x] Change the number of rows & columns
 - [x] Alerts
 - [ ] Errors

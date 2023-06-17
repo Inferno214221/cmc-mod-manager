@@ -1,5 +1,6 @@
 var css, basegame, installed, hidden, version;
 getCSS();
+updateCSSProfiles();
 
 function sortHidden(hidden, sortType) {
     let hiddenArray = [];
@@ -20,6 +21,40 @@ function inputFocused(element) {
 function inputBlurred(element) {
     this[element].style.borderColor = "black";
 }
+
+function saveCSS() {
+    this.api.send("saveCSS", {
+        name: CSSSaveName.value
+    });
+}
+
+this.api.receive("fromSaveCSS", (data) => {
+    alert("CSS saved succesfully");
+});
+
+function loadCSS() {
+    this.api.send("loadCSS", {
+        name: CSSLoadName.value
+    });
+}
+
+this.api.receive("fromLoadCSS", (data) => {
+    getCSS();
+    alert("CSS loaded succesfully");
+});
+
+function updateCSSProfiles() {
+    this.api.send("updateCSSProfiles");
+}
+
+this.api.receive("fromUpdateCSSProfiles", (profiles) => {
+    let options = ""
+    for (let profile of profiles) {
+        profile = profile.slice(0, -4)
+        options += '<option value="' + profile + '">' + profile + '</option>\n';
+    }
+    CSSLoadName.innerHTML = options;
+});
 
 function getCSS() {
     this.api.send("getCSS");

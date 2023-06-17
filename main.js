@@ -14,13 +14,14 @@ const PERSIST = [
     "settings.ini",
     "data/cmc_stuff.bin",
     "data/records.bin",
-    "data/stats/general.bin"
+    "data/stats/general.bin",
+    "data/css.txt"
 ];
 
 const createWindow = () => {
     win = new BrowserWindow({
-        width: 810,
-        height: 600,
+        width: 1120,
+        height: 630,
         minWidth: 810,
         minHeight: 600,
         webPreferences: {
@@ -72,6 +73,7 @@ ipcMain.on("getGameSource", async (event, args) => {
         
         fs.copySync(dir.filePaths[0], __dirname + "/basegame/", { overwrite: true });
         fs.copyFileSync(__dirname + "/basegame/controls.ini", __dirname + "/profiles/controls/default.ini");
+        fs.copyFileSync(__dirname + "/basegame/data/css.txt", __dirname + "/profiles/css/default.txt");
         version = getGameVersion(__dirname + "/basegame/");
 
         let builtinFighters = require(__dirname + "/characters/default.json").versions[version].builtin;
@@ -279,6 +281,25 @@ ipcMain.on("updateControlProfiles", (event, args) => {
 
 function updateControlProfiles () {
     win.webContents.send("fromUpdateControlProfiles", fs.readdirSync(__dirname + "/profiles/controls/"));
+}
+
+ipcMain.on("saveCSS", (event, args) => {
+    fs.copyFileSync(__dirname + "/merged/data/css.txt", __dirname + "/profiles/css/" + args.name + ".txt");
+    updateCSSProfiles();
+    win.webContents.send("fromSaveCSS");
+});
+
+ipcMain.on("loadCSS", (event, args) => {
+    fs.copyFileSync(__dirname + "/profiles/css/" + args.name + ".txt", __dirname + "/merged/data/css.txt");
+    win.webContents.send("fromLoadCSS");
+});
+
+ipcMain.on("updateCSSProfiles", (event, args) => {
+    updateCSSProfiles();
+});
+
+function updateCSSProfiles () {
+    win.webContents.send("fromUpdateCSSProfiles", fs.readdirSync(__dirname + "/profiles/css/"));
 }
 
 ipcMain.on("openFolder", (event, args) => {
