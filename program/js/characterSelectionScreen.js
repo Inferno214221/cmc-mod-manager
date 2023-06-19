@@ -22,6 +22,59 @@ function inputBlurred(element) {
     this[element].style.borderColor = "black";
 }
 
+function findCSS(character) {
+    let allChars = Object.assign({}, basegame.versions[version].builtin, basegame.cmc, installed.characters);
+    let number = ('0000' + allChars[character].number).slice(-4);
+    let coords;
+
+    let maxX = css[0].length;
+    let maxY = css.length;
+    for (let y = 0; y < maxY; y++) {
+        for (let x = 0; x < maxX; x++) {
+            if (css[y][x] == number) {
+                coords = {
+                    x: x,
+                    y: y
+                };
+                break;
+            }
+        }
+    }
+    if (coords == undefined) {
+        return;//TODO: error
+    }
+    return coords;
+}
+
+function onDragStartCSS(ev) {
+    let coords = JSON.parse(ev.currentTarget.id);
+    ev.dataTransfer.setData("css", JSON.stringify(coords));
+}
+
+function onDropOnHidden(ev) {
+    ev.preventDefault();
+    if (ev.dataTransfer.getData("css") != "") {
+        let received = JSON.parse(ev.dataTransfer.getData("css"));
+        console.log(received);
+        removeCharacter(received.x, received.y);
+    }
+}
+
+function onDragStartHidden(ev) {
+    ev.dataTransfer.setData("hidden", ev.target.id);
+    console.log(ev);
+}
+
+function onDropOnCSS(ev) {
+    ev.preventDefault();
+    if (ev.dataTransfer.getData("hidden") != "") {
+        let coords = JSON.parse(ev.currentTarget.id);
+        addCharacterE(ev.dataTransfer.getData("hidden"), coords.x, coords.y);
+    } else if (ev.dataTransfer.getData("css") != "") {
+        //
+    }
+}
+
 function saveCSS() {
     this.api.send("saveCSS", {
         name: CSSSaveName.value
@@ -99,23 +152,20 @@ function makeTables(css, allChars) {
             <th class=\"cssSquare\">"+ y + "</th>\n";
         for (let x = 0; x < maxX; x++) {
             if (css[y][x] === "0000") {
-                output += "<td class=\"cssSquare\"><image class=\"icon\" src=\"../images/empty.png\" alt=\" \" /></td>";
+                output += "<td class=\"cssSquare\" id=\'{ \"x\": " + x + ", \"y\": " + y + " }\' draggable=\"false\" ondragover=\"event.preventDefault();\" ondrop=\"onDropOnCSS(event);\"><image class=\"icon\" src=\"../images/empty.png\" alt=\" \" /></td>";
             } else {
                 let character;
                 for (let e of Object.keys(hidden)) {
                     if (hidden[e].number == css[y][x]) {
                         character = e;
-                        console.log(allChars,character,allChars[character])
                         delete hidden[e];//Only one copy of each
-                        console.log(allChars,character,allChars[character])
                         break;
                     }
                 }
                 if (character === undefined) {
                     break;//FIXME: display error
                 }
-                console.log(allChars,character,allChars[character])
-                output += "<td class=\"cssSquare\" id=\"" + character + "\"><image class=\"icon\" src=\"../../merged/gfx/mugs/" + character + ".png\" onerror=\"this.onerror=null; this.src='../images/missing.png'\" alt=\" \" />\
+                output += "<td id=\'{ \"x\": " + x + ", \"y\": " + y + " }\' draggable=\"true\" ondragover=\"event.preventDefault();\" ondragstart=\"onDragStartCSS(event);\" ondrop=\"onDropOnCSS(event);\" class=\"cssSquare\" id=\"" + character + "\"><image draggable=\"false\" class=\"icon\" src=\"../../merged/gfx/mugs/" + character + ".png\" onerror=\"this.onerror=null; this.src='../images/missing.png'\" alt=\" \" />\
                 <div class=\"cssName\">" + allChars[character].displayName + "</div></td>";
             }
         }
@@ -131,8 +181,8 @@ function makeTables(css, allChars) {
 
     for (let character of sorted) {
         character = character.name
-        output += "<tr>\n\
-            <td class=\"mug\"><image class=\"mugIcon\" src=\"../../merged/gfx/mugs/" + character + ".png\" onerror=\"this.onerror=null; this.src='../images/missing.png'\" alt=\"\" /></td>\n\
+        output += "<tr draggable=\"true\" ondragover=\"event.preventDefault();\" ondragstart=\"onDragStartHidden(event);\" ondrop=\"onDropOnHidden(event);\" id=\"" + character + "\">\n\
+            <td class=\"mug\"><image draggable=\"false\" class=\"mugIcon\" src=\"../../merged/gfx/mugs/" + character + ".png\" onerror=\"this.onerror=null; this.src='../images/missing.png'\" alt=\"\" /></td>\n\
             <td>" + hidden[character].displayName + "</td>\n\
             <td><button type=\"button\" onclick=\"addCharacter('" + character + "')\">Add @ Location</button></td>\n\
         </tr>\n";
@@ -175,13 +225,17 @@ function hideCharacter() {
     if ((css[yInput.value] == undefined) || (css[yInput.value][xInput.value] == undefined)) {
         return;//TODO: error
     }
+    removeCharacter(xInput.value, yInput.value);
+}
 
-    let characterNumber = css[yInput.value][xInput.value];
+function removeCharacter(x, y) {
+    let characterNumber = css[y][x];
     if (characterNumber === "0000") {
         return;//TODO: alert
     }
+
     let allChars = Object.assign({}, basegame.versions[version].builtin, basegame.cmc, installed.characters);
-    css[yInput.value][xInput.value] = "0000";
+    css[y][x] = "0000";
     let character;
     for (let e of Object.keys(allChars)) {
         if (allChars[e].number == characterNumber) {
@@ -204,7 +258,11 @@ function addCharacter(character) {
         return;//TODO: error
     }
 
-    let characterNumber = css[yInput.value][xInput.value];
+    addCharacterE(character, xInput.value, yInput.value);
+}
+
+function addCharacterE(character, x, y) {
+    let characterNumber = css[y][x];
     if (characterNumber !== "0000") {
         return;//TODO: alert
     }
@@ -212,7 +270,7 @@ function addCharacter(character) {
     if (allChars[character] == undefined) {
         return;//TODO: error
     }
-    css[yInput.value][xInput.value] = ('0000' + allChars[character].number).slice(-4);
+    css[y][x] = ('0000' + allChars[character].number).slice(-4);
     delete hidden[character];
     makeTables(css, allChars);
     this.api.send("writeCSS", css);
