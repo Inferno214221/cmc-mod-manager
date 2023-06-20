@@ -58,6 +58,7 @@ a {
 
 ::-webkit-scrollbar {
     width: 7px;
+    height: 7px;
 }
 
 ::-webkit-scrollbar-track {
@@ -130,6 +131,7 @@ button:hover {
 fieldset {
     border: none;
     padding-left: 15px;
+    margin-top: 5px;
 }
 
 legend {

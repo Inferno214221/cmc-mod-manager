@@ -69,9 +69,15 @@ function onDropOnCSS(ev) {
     ev.preventDefault();
     if (ev.dataTransfer.getData("hidden") != "") {
         let coords = JSON.parse(ev.currentTarget.id);
+        removeCharacter(coords.x, coords.y);
         addCharacterE(ev.dataTransfer.getData("hidden"), coords.x, coords.y);
     } else if (ev.dataTransfer.getData("css") != "") {
-        //
+        let dropCoords = JSON.parse(ev.currentTarget.id);
+        let drop = removeCharacter(dropCoords.x, dropCoords.y);
+        let dragCoords = JSON.parse(ev.dataTransfer.getData("css"));
+        let drag = removeCharacter(dragCoords.x, dragCoords.y);
+        addCharacterE(drop, dragCoords.x, dragCoords.y);
+        addCharacterE(drag, dropCoords.x, dropCoords.y);
     }
 }
 
@@ -179,14 +185,23 @@ function makeTables(css, allChars) {
         sorted.reverse();
     }
 
+    output += "<tr>"
     for (let character of sorted) {
         character = character.name
-        output += "<tr draggable=\"true\" ondragover=\"event.preventDefault();\" ondragstart=\"onDragStartHidden(event);\" ondrop=\"onDropOnHidden(event);\" id=\"" + character + "\">\n\
-            <td class=\"mug\"><image draggable=\"false\" class=\"mugIcon\" src=\"../../merged/gfx/mugs/" + character + ".png\" onerror=\"this.onerror=null; this.src='../images/missing.png'\" alt=\"\" /></td>\n\
-            <td>" + hidden[character].displayName + "</td>\n\
-            <td><button type=\"button\" onclick=\"addCharacter('" + character + "')\">Add @ Location</button></td>\n\
-        </tr>\n";
+        output += 
+        "<td draggable=\"true\" ondragover=\"event.preventDefault();\" ondragstart=\"onDragStartHidden(event);\" ondrop=\"onDropOnHidden(event);\" id=\"" + character + "\">\n\
+            <image draggable=\"false\" class=\"mugIcon\" src=\"../../merged/gfx/mugs/" + character + ".png\" onerror=\"this.onerror=null; this.src='../images/missing.png'\" alt=\"\" />\n\
+            <div class=\"hiddenName\">" + hidden[character].displayName + "</div>\n\
+            <button class=\"addButton\" type=\"button\" onclick=\"addCharacter('" + character + "')\">Add</button>\n\
+        </td>\n";
+        // output += 
+        // "<tr draggable=\"true\" ondragover=\"event.preventDefault();\" ondragstart=\"onDragStartHidden(event);\" ondrop=\"onDropOnHidden(event);\" id=\"" + character + "\">\n\
+        //     <td class=\"mug\"><image draggable=\"false\" class=\"mugIcon\" src=\"../../merged/gfx/mugs/" + character + ".png\" onerror=\"this.onerror=null; this.src='../images/missing.png'\" alt=\"\" /></td>\n\
+        //     <td>" + hidden[character].displayName + "</td>\n\
+        //     <td><button type=\"button\" onclick=\"addCharacter('" + character + "')\">Add @ Location</button></td>\n\
+        // </tr>\n";
     }
+    output += "</tr>";
     hiddenCharactersTable.innerHTML = output;
 
 
@@ -207,16 +222,6 @@ function makeTables(css, allChars) {
 
     rowNumber.innerHTML = "Rows: " + maxX;
     columnNumber.innerHTML = "Columns: " + maxY;
-    //IDK if this is nessesary in all use cases
-    // if (xInput.value < (maxX - 1)) {
-    //     xInput.value++;
-    // } else {
-    //     xInput.value = 0;
-    //     yInput.value++;
-    //     if (yInput.value > (maxY - 1)) {
-    //         yInput.value = 0;
-    //     }
-    // }
 }
 
 function hideCharacter() {
@@ -249,6 +254,7 @@ function removeCharacter(x, y) {
     hidden[character] = allChars[character];
     makeTables(css, allChars);
     this.api.send("writeCSS", css);
+    return character;
 }
 
 function addCharacter(character) {

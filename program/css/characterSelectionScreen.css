@@ -6,8 +6,20 @@
 }
 
 .mugIcon {
-    max-width: 62px;
-    max-height: 62px;
+    width: 62px;
+    height: 62px;
+}
+
+.hiddenName {
+    font-size: 11pt;
+    height: 26pt;
+    width: 62px;
+    word-wrap: break-word;
+    overflow: hidden;
+}
+
+.addButton {
+    width: 62px;
 }
 
 .icon {
@@ -74,6 +86,11 @@ select {
 #sortingType {
     margin-bottom: 10px;
     width: 150px;
+}
+
+#hiddenCharactersCell {
+    overflow: hidden;
+    overflow-x: scroll;
 }
 
 /* #hiddenCharacters {

@@ -50,51 +50,26 @@
         </ul>
     </nav>
     <section id="mainSection">
-        <fieldset>
-            <legend>CSS Profiles</legend>
-            <div class="cssProfiles">
-                <button type="button" onclick="saveCSS()">
-                    Save CSS Profile:
-                </button>
-                <input type="text" value="default" id="CSSSaveName" onfocus="inputFocused('CSSSaveName')" onblur="inputBlurred('CSSSaveName')"/>
-            </div>
-            <div class="cssProfiles">
-                <button type="button" onclick="loadCSS()">
-                    Load CSS Profile:
-                </button>
-                <select id="CSSLoadName" onfocus="inputFocused('CSSLoadName')" onblur="inputBlurred('CSSLoadName')" onchange="inputBlurred('CSSLoadName')">
-                    <option value="default">default</option>
-                </select>
-            </div>
-        </fieldset>
-        <fieldset>
-            <legend>Character Selection Screen</legend>
-            <table id="characterSelectTable">
-                <tr>
-                    <th class="cssSquare"></th>
-                    <th class="cssSquare">0</th>
-                    <th class="cssSquare">1</th>
-                    <th class="cssSquare">2</th>
-                    <th class="cssSquare">3</th>
-                    <th class="cssSquare">4</th>
-                    <th class="cssSquare">5</th>
-                    <th class="cssSquare">6</th>
-                </tr>
-                <tr>
-                    <th class="cssSquare">0</th>
-                    <td class="cssSquare" id="none"><image class="icon" /></td>
-                    <td class="cssSquare" id="none"><image class="icon" /></td>
-                    <td class="cssSquare" id="none"><image class="icon" /></td>
-                    <td class="cssSquare" id="none"><image class="icon" /></td>
-                    <td class="cssSquare" id="none"><image class="icon" /></td>
-                    <td class="cssSquare" id="none"><image class="icon" /></td>
-                    <td class="cssSquare" id="none"><image class="icon" /></td>
-                </tr>
-            </table>
-        </fieldset>
-        <table>
+        <table style="table-layout: fixed; width: 100vw; margin-left: -20px; margin-top: -5px;">
             <tr>
-                <td class="column">
+                <td id="characterSelectionCell">
+                    <fieldset>
+                        <legend>Character Selection Screen</legend>
+                        <table id="characterSelectTable">
+                            <tr>
+                                <th class="cssSquare"></th>
+                                <th class="cssSquare">0</th>
+                            </tr>
+                            <tr>
+                                <th class="cssSquare">0</th>
+                                <td class="cssSquare" id="none"><image class="icon" /></td>
+                            </tr>
+                        </table>
+                    </fieldset>
+                </td>
+            </tr>
+            <tr>
+                <td id="hiddenCharactersCell">
                     <fieldset>
                         <legend>Hidden Characters</legend>
                         <span>Sorting:</span>
@@ -109,6 +84,10 @@
                         </table>
                     </fieldset>
                 </td>
+            </tr>
+        </table>
+        <table>
+            <tr>
                 <td class="column">
                     <fieldset>
                         <legend>Location</legend>
@@ -139,6 +118,8 @@
                             </tr>
                         </table>
                     </fieldset>
+                </td>
+                <td class="column">
                     <fieldset>
                         <legend>Franchise</legend>
                         <select id="franchiseSelect" onfocus="inputFocused('franchiseSelect')" onblur="inputBlurred('franchiseSelect')">
@@ -146,6 +127,23 @@
                         </select><br />
                         <!-- <button type="button" onclick="addFranchise()">Add Entire Franchise</button> -->
                         <button type="button" onclick="removeFranchise()">Remove Entire Franchise</button>
+                    </fieldset>
+                    <fieldset>
+                        <legend>CSS Profiles</legend>
+                        <div class="cssProfiles">
+                            <button type="button" onclick="saveCSS()">
+                                Save CSS Profile:
+                            </button>
+                            <input type="text" value="default" id="CSSSaveName" onfocus="inputFocused('CSSSaveName')" onblur="inputBlurred('CSSSaveName')"/>
+                        </div><br />
+                        <div class="cssProfiles">
+                            <button type="button" onclick="loadCSS()">
+                                Load CSS Profile:
+                            </button>
+                            <select id="CSSLoadName" onfocus="inputFocused('CSSLoadName')" onblur="inputBlurred('CSSLoadName')" onchange="inputBlurred('CSSLoadName')">
+                                <option value="default">default</option>
+                            </select>
+                        </div>
                     </fieldset>
                 </td>
             </tr>
