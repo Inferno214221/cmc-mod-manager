@@ -4,7 +4,6 @@ on: [push]
 
 jobs:
   windows-build:
-
     runs-on: windows-latest
 
     strategy:
@@ -19,3 +18,19 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - run: npm i
       - run: npm run make -- --platform win32 --targets @electron-forge/maker-squirrel
+
+  fedora-build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [16.x]
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm i
+      - run: npm run make -- --platform linux --targets @electron-forge/maker-deb
