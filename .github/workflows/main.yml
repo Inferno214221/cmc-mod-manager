@@ -19,7 +19,7 @@ jobs:
       - run: npm i
       - run: npm run make -- --platform win32 --targets @electron-forge/maker-squirrel
 
-  fedora-build:
+  ubuntu-build:
     runs-on: ubuntu-latest
 
     strategy:
