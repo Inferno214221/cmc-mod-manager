@@ -150,3 +150,7 @@ td {
 table {
     margin-left: -15px;
 }
+
+label {
+    color: white;
+}

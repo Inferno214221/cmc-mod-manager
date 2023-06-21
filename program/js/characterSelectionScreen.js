@@ -157,10 +157,7 @@ function makeTables(css, allChars) {
         output += "<tr>\n\
             <th class=\"cssSquare\">"+ (y + 1) + "</th>\n";
         for (let x = 0; x < maxX; x++) {
-            if (css[y][x] === "0000") {
-                output += "<td class=\"cssSquare\" id=\'{ \"x\": " + x + ", \"y\": " + y + " }\' draggable=\"false\" ondragover=\"event.preventDefault();\" ondrop=\"onDropOnCSS(event);\"><image class=\"icon\" src=\"../images/empty.png\" alt=\" \" /></td>";
-            } else {
-                let character;
+            let character;
                 for (let e of Object.keys(hidden)) {
                     if (hidden[e].number == css[y][x]) {
                         character = e;
@@ -169,11 +166,11 @@ function makeTables(css, allChars) {
                     }
                 }
                 if (character === undefined) {
-                    break;//FIXME: display error
+                    output += "<td class=\"cssSquare\" id=\'{ \"x\": " + x + ", \"y\": " + y + " }\' draggable=\"false\" ondragover=\"event.preventDefault();\" ondrop=\"onDropOnCSS(event);\"><image class=\"icon\" src=\"../images/empty.png\" alt=\" \" /></td>";
+                } else {
+                    output += "<td id=\'{ \"x\": " + x + ", \"y\": " + y + " }\' draggable=\"true\" ondragover=\"event.preventDefault();\" ondragstart=\"onDragStartCSS(event);\" ondrop=\"onDropOnCSS(event);\" class=\"cssSquare\" id=\"" + character + "\"><image draggable=\"false\" class=\"icon\" src=\"../../merged/gfx/mugs/" + character + ".png\" onerror=\"this.onerror=null; this.src='../images/missing.png'\" alt=\" \" />\
+                    <div class=\"cssName\">" + allChars[character].displayName + "</div></td>";
                 }
-                output += "<td id=\'{ \"x\": " + x + ", \"y\": " + y + " }\' draggable=\"true\" ondragover=\"event.preventDefault();\" ondragstart=\"onDragStartCSS(event);\" ondrop=\"onDropOnCSS(event);\" class=\"cssSquare\" id=\"" + character + "\"><image draggable=\"false\" class=\"icon\" src=\"../../merged/gfx/mugs/" + character + ".png\" onerror=\"this.onerror=null; this.src='../images/missing.png'\" alt=\" \" />\
-                <div class=\"cssName\">" + allChars[character].displayName + "</div></td>";
-            }
         }
         output += "</tr>\n";
     }

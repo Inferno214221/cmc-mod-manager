@@ -188,13 +188,24 @@ ipcMain.on("mergeInstalledMods", async (event, args) => {
             fs.copySync(__dirname + "/tmp/" + file, __dirname + "/merged/" + file, { overwrite: true });
         }
     }
-    fs.removeSync(__dirname + "/tmp/");
 
     //TODO: for each stage
     let installed = require(__dirname + "/characters/installed.json");
     for (let character of installed.priority.toReversed()) {
+        let files = [];
+        fs.readdirSync(__dirname + "/characters/" + character).forEach((file) => {
+            if (file.includes(".txt")) {
+                files.push(file);
+                fs.moveSync(__dirname + "/characters/" + character + "/" + file, __dirname + "/tmp/" + character + "/" + file, { overwrite: true });
+            }
+        });
         fs.copySync(__dirname + "/characters/" + character, __dirname + "/merged/", { overwrite: true });
+        files.forEach((file) => {
+            fs.moveSync(__dirname + "/tmp/" + character + "/" + file, __dirname + "/characters/" + character + "/" + file, { overwrite: true });
+        });
     }
+    fs.removeSync(__dirname + "/tmp/");
+
     //TODO: generate fighters.txt and stage.txt
     let cmcFighters = require(__dirname + "/characters/default.json").cmc;
     let installedFighters = require(__dirname + "/characters/installed.json");

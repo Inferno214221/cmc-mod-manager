@@ -34,8 +34,9 @@ When installing characters, it is likely that some mods will not work properly u
 - [x] Remove installed characters
 - [x] Open installed character's directory
 - [x] Change character merge priority
-- [ ] Delete instructions txt file on import
+- [x] Delete instructions txt file on merge
 - [x] Alerts
+- [ ] Removing characters on the css causes a locked icon to appear
 - [ ] Errors
 ### Character Selection Screen (Priority: 3)
 - [x] Display the CSS
