@@ -181,7 +181,7 @@ ipcMain.on("mergeInstalledMods", async (event, args) => {
     }
 
     fs.emptyDirSync(__dirname + "/merged/");
-    fs.copySync(__dirname + "/basegame/", __dirname + "/merged/");
+    fs.copySync(__dirname + "/basegame/", __dirname + "/merged/", { overwrite: true });
 
     for (let file of PERSIST) {
         if (fs.existsSync(__dirname + "/tmp/" + file)) {

@@ -148,14 +148,14 @@ function makeTables(css, allChars) {
     let output = "<tr>\n\
         <th class=\"cssSquare\"></th>\n";
     for(let i = 0; i < maxX; i++) {
-        output += "<th class=\"cssSquare\">" + i + "</th>\n";
+        output += "<th class=\"cssSquare\">" + (i + 1) + "</th>\n";
     }
     output += "</tr>\n";
 
     hidden = Object.assign({}, allChars);
     for (let y = 0; y < maxY; y++) {
         output += "<tr>\n\
-            <th class=\"cssSquare\">"+ y + "</th>\n";
+            <th class=\"cssSquare\">"+ (y + 1) + "</th>\n";
         for (let x = 0; x < maxX; x++) {
             if (css[y][x] === "0000") {
                 output += "<td class=\"cssSquare\" id=\'{ \"x\": " + x + ", \"y\": " + y + " }\' draggable=\"false\" ondragover=\"event.preventDefault();\" ondrop=\"onDropOnCSS(event);\"><image class=\"icon\" src=\"../images/empty.png\" alt=\" \" /></td>";
@@ -192,14 +192,8 @@ function makeTables(css, allChars) {
         "<td draggable=\"true\" ondragover=\"event.preventDefault();\" ondragstart=\"onDragStartHidden(event);\" ondrop=\"onDropOnHidden(event);\" id=\"" + character + "\">\n\
             <image draggable=\"false\" class=\"mugIcon\" src=\"../../merged/gfx/mugs/" + character + ".png\" onerror=\"this.onerror=null; this.src='../images/missing.png'\" alt=\"\" />\n\
             <div class=\"hiddenName\">" + hidden[character].displayName + "</div>\n\
-            <button class=\"addButton\" type=\"button\" onclick=\"addCharacter('" + character + "')\">Add</button>\n\
         </td>\n";
-        // output += 
-        // "<tr draggable=\"true\" ondragover=\"event.preventDefault();\" ondragstart=\"onDragStartHidden(event);\" ondrop=\"onDropOnHidden(event);\" id=\"" + character + "\">\n\
-        //     <td class=\"mug\"><image draggable=\"false\" class=\"mugIcon\" src=\"../../merged/gfx/mugs/" + character + ".png\" onerror=\"this.onerror=null; this.src='../images/missing.png'\" alt=\"\" /></td>\n\
-        //     <td>" + hidden[character].displayName + "</td>\n\
-        //     <td><button type=\"button\" onclick=\"addCharacter('" + character + "')\">Add @ Location</button></td>\n\
-        // </tr>\n";
+        //  <button class=\"addButton\" type=\"button\" onclick=\"addCharacter('" + character + "')\">Add</button>\n\
     }
     output += "</tr>";
     hiddenCharactersTable.innerHTML = output;
@@ -220,8 +214,8 @@ function makeTables(css, allChars) {
     }
     franchiseSelect.innerHTML = output;
 
-    rowNumber.innerHTML = "Rows: " + maxX;
-    columnNumber.innerHTML = "Columns: " + maxY;
+    rowNumber.innerHTML = "Rows: " + maxY;
+    columnNumber.innerHTML = "Columns: " + maxX;
 }
 
 function hideCharacter() {
@@ -350,6 +344,7 @@ function addRow() {
 }
 
 function removeRow() {
+    if (css.length < 2) return;
     let allChars = Object.assign({}, basegame.versions[version].builtin, basegame.cmc, installed.characters);
 
     css.pop();
@@ -371,6 +366,7 @@ function addColumn() {
 }
 
 function removeColumn() {
+    if (css[0].length < 2) return;
     let maxY = css.length;
     let allChars = Object.assign({}, basegame.versions[version].builtin, basegame.cmc, installed.characters);
 

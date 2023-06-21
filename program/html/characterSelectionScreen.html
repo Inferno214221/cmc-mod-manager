@@ -89,12 +89,12 @@
         <table>
             <tr>
                 <td class="column">
-                    <fieldset>
+                    <!-- <fieldset>
                         <legend>Location</legend>
                         <span>X: </span><input type="text" value="0" id="xInput" onfocus="inputFocused('xInput')" onblur="inputBlurred('xInput')"/>
                         <span>Y: </span><input type="text" value="0" id="yInput" onfocus="inputFocused('yInput')" onblur="inputBlurred('yInput')"/><br />
                         <button type="button" onclick="hideCharacter()">Hide Characer @ Location</button>
-                    </fieldset>
+                    </fieldset> -->
                     <fieldset>
                         <legend>Character Selection Screen Size</legend>
                         <table>
@@ -118,8 +118,6 @@
                             </tr>
                         </table>
                     </fieldset>
-                </td>
-                <td class="column">
                     <fieldset>
                         <legend>Franchise</legend>
                         <select id="franchiseSelect" onfocus="inputFocused('franchiseSelect')" onblur="inputBlurred('franchiseSelect')">
@@ -128,6 +126,8 @@
                         <!-- <button type="button" onclick="addFranchise()">Add Entire Franchise</button> -->
                         <button type="button" onclick="removeFranchise()">Remove Entire Franchise</button>
                     </fieldset>
+                </td>
+                <td class="column">
                     <fieldset>
                         <legend>CSS Profiles</legend>
                         <div class="cssProfiles">
