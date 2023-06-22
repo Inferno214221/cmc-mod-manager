@@ -49,7 +49,6 @@ When installing characters, it is likely that some mods will not work properly u
 - [x] Save / load layouts
 - [x] Drag and Drop
 - [x] Replace characters
-- [ ] User can over write default and css currently persists, making it impossbile to reset without reimporting basegame
 - [x] Change the number of rows & columns
 - [x] Alerts
 - [ ] Errors

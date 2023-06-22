@@ -55,14 +55,12 @@ function onDropOnHidden(ev) {
     ev.preventDefault();
     if (ev.dataTransfer.getData("css") != "") {
         let received = JSON.parse(ev.dataTransfer.getData("css"));
-        console.log(received);
         removeCharacter(received.x, received.y);
     }
 }
 
 function onDragStartHidden(ev) {
     ev.dataTransfer.setData("hidden", ev.target.id);
-    console.log(ev);
 }
 
 function onDropOnCSS(ev) {
@@ -82,6 +80,10 @@ function onDropOnCSS(ev) {
 }
 
 function saveCSS() {
+    if (CSSSaveName.value == "default") {
+        alert("Default should not be overriden.");
+        return;
+    }
     this.api.send("saveCSS", {
         name: CSSSaveName.value
     });
@@ -168,8 +170,12 @@ function makeTables(css, allChars) {
                 if (character === undefined) {
                     output += "<td class=\"cssSquare\" id=\'{ \"x\": " + x + ", \"y\": " + y + " }\' draggable=\"false\" ondragover=\"event.preventDefault();\" ondrop=\"onDropOnCSS(event);\"><image class=\"icon\" src=\"../images/empty.png\" alt=\" \" /></td>";
                 } else {
-                    output += "<td id=\'{ \"x\": " + x + ", \"y\": " + y + " }\' draggable=\"true\" ondragover=\"event.preventDefault();\" ondragstart=\"onDragStartCSS(event);\" ondrop=\"onDropOnCSS(event);\" class=\"cssSquare\" id=\"" + character + "\"><image draggable=\"false\" class=\"icon\" src=\"../../merged/gfx/mugs/" + character + ".png\" onerror=\"this.onerror=null; this.src='../images/missing.png'\" alt=\" \" />\
-                    <div class=\"cssName\">" + allChars[character].displayName + "</div></td>";
+                    output += "<td class=\"cssSquare hoverText\" id=\"" + character + "\">\n\
+                    <div id=\'{ \"x\": " + x + ", \"y\": " + y + " }\' draggable=\"true\" ondragover=\"event.preventDefault();\" ondragstart=\"onDragStartCSS(event);\" ondrop=\"onDropOnCSS(event);\">\n\
+                        <image draggable=\"false\" class=\"icon\" src=\"../../merged/gfx/mugs/" + character + ".png\" onerror=\"this.onerror=null; this.src='../images/missing.png'\" alt=\" \" />\n\
+                        <div class=\"cssName\">" + allChars[character].displayName + "</div>\n\
+                    </div>\n\
+                    <span class=\"tooltipText\">" + allChars[character].displayName + "</span></td>";
                 }
         }
         output += "</tr>\n";
@@ -186,9 +192,12 @@ function makeTables(css, allChars) {
     for (let character of sorted) {
         character = character.name
         output += 
-        "<td draggable=\"true\" ondragover=\"event.preventDefault();\" ondragstart=\"onDragStartHidden(event);\" ondrop=\"onDropOnHidden(event);\" id=\"" + character + "\">\n\
-            <image draggable=\"false\" class=\"mugIcon\" src=\"../../merged/gfx/mugs/" + character + ".png\" onerror=\"this.onerror=null; this.src='../images/missing.png'\" alt=\"\" />\n\
-            <div class=\"hiddenName\">" + allChars[character].displayName + "</div>\n\
+        "<td class=\"hoverText\">\n\
+            <div draggable=\"true\" ondragover=\"event.preventDefault();\" ondragstart=\"onDragStartHidden(event);\" ondrop=\"onDropOnHidden(event);\" id=\"" + character + "\">\n\
+                <image draggable=\"false\" class=\"mugIcon\" src=\"../../merged/gfx/mugs/" + character + ".png\" onerror=\"this.onerror=null; this.src='../images/missing.png'\" alt=\"\" />\n\
+                <div class=\"hiddenName\">" + allChars[character].displayName + "</div>\n\
+            </div>\n\
+            <span class=\"tooltipText\" draggable=\"false\">" + allChars[character].displayName + "</span>\n\
         </td>\n";
         //  <button class=\"addButton\" type=\"button\" onclick=\"addCharacter('" + character + "')\">Add</button>\n\
     }

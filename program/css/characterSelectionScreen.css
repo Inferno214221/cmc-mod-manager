@@ -34,6 +34,7 @@
 }
 
 .cssName {
+    position: relative;
     font-size: 8pt;
     width: 35px;
     height: 8pt;
@@ -92,8 +93,3 @@ select {
     overflow: hidden;
     overflow-x: scroll;
 }
-
-/* #hiddenCharacters {
-    height: 300px;
-    overflow: scroll;
-} */

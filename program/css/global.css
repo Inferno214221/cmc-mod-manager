@@ -39,6 +39,7 @@ nav {
     position: fixed;
     top: 0px;
     height: 40px;
+    z-index: 100;
 }
 
 section {
@@ -153,4 +154,25 @@ table {
 
 label {
     color: white;
+}
+
+.tooltipText {
+    visibility: hidden;
+    position: absolute;
+    z-index: 1;
+    color: white;
+    font-size: 12px;
+    background-color: black;
+    border-radius: 10px;
+    padding: 10px 15px 10px 15px;
+    margin-left: -5px;
+    margin-top: 0;
+}
+
+.hoverText:hover .tooltipText {
+    visibility: visible;
+}
+
+.hoverText:click .tooltipText {
+    visibility: visible;
 }

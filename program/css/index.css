@@ -31,7 +31,7 @@ body {
     margin: auto;
 } */
 
-input,
+input[type=text],
 select {
     width: 100px;
     border-width: 1px;
@@ -46,7 +46,7 @@ select {
     box-shadow: 0px 1px #00000088;
 }
 
-input {
+input[type=text] {
     height: 27px;
     padding: 0px 5px;
 }
