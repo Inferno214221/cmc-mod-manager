@@ -2,15 +2,15 @@ var css, basegame, installed, hidden, version;
 getCSS();
 updateCSSProfiles();
 
-function sortHidden(hidden, sortType) {
-    let hiddenArray = [];
-    for (let character of Object.keys(hidden)) {
-        hiddenArray.push({
+function sortCharacters(characters, sortType) {
+    let charactersSorted = [];
+    for (let character of Object.keys(characters)) {
+        charactersSorted.push({
             name: character,
-            character: hidden[character]
+            character: characters[character]
         });
     }
-    let sorted = hiddenArray.toSorted((a, b) => (a.character[sortType] > b.character[sortType] ? 1 : -1));
+    let sorted = charactersSorted.toSorted((a, b) => (a.character[sortType] > b.character[sortType] ? 1 : -1));
     return sorted;
 }
 
@@ -158,8 +158,8 @@ function makeTables(css, allChars) {
             <th class=\"cssSquare\">"+ (y + 1) + "</th>\n";
         for (let x = 0; x < maxX; x++) {
             let character;
-                for (let e of Object.keys(hidden)) {
-                    if (hidden[e].number == css[y][x]) {
+                for (let e of Object.keys(allChars)) {
+                    if (allChars[e].number == css[y][x]) {
                         character = e;
                         delete hidden[e];//Only one copy of each
                         break;
@@ -177,7 +177,7 @@ function makeTables(css, allChars) {
     characterSelectTable.innerHTML = output;
     
     output = "";
-    sorted = sortHidden(hidden, sortingType.value);
+    sorted = sortCharacters((showAll.checked ? allChars : hidden), sortingType.value);
     if (reverseSort.checked) {
         sorted.reverse();
     }
@@ -188,7 +188,7 @@ function makeTables(css, allChars) {
         output += 
         "<td draggable=\"true\" ondragover=\"event.preventDefault();\" ondragstart=\"onDragStartHidden(event);\" ondrop=\"onDropOnHidden(event);\" id=\"" + character + "\">\n\
             <image draggable=\"false\" class=\"mugIcon\" src=\"../../merged/gfx/mugs/" + character + ".png\" onerror=\"this.onerror=null; this.src='../images/missing.png'\" alt=\"\" />\n\
-            <div class=\"hiddenName\">" + hidden[character].displayName + "</div>\n\
+            <div class=\"hiddenName\">" + allChars[character].displayName + "</div>\n\
         </td>\n";
         //  <button class=\"addButton\" type=\"button\" onclick=\"addCharacter('" + character + "')\">Add</button>\n\
     }

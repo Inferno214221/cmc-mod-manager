@@ -70,6 +70,7 @@ ipcMain.on("getGameSource", async (event, args) => {
             fs.chmodSync(file, 0o777);
         });
         fs.emptyDirSync(__dirname + "/merged/");
+        fs.emptyDirSync(__dirname + "/basegame/");
         
         fs.copySync(dir.filePaths[0], __dirname + "/basegame/", { overwrite: true });
         fs.copyFileSync(__dirname + "/basegame/controls.ini", __dirname + "/profiles/controls/default.ini");
