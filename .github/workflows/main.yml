@@ -85,6 +85,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           custom_tag: auto
+          tag_prefix: ""
       
       - name: Make A Release
         uses: ncipollo/release-action@v1
