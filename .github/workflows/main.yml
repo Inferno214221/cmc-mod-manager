@@ -16,8 +16,21 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-      - run: npm i
-      - run: npm run make -- --platform win32 --targets @electron-forge/maker-squirrel
+      - name: Install Node Dependencies
+        run: npm i
+      - name: Electron Forge Build
+        run: npm run make -- --platform win32 --targets @electron-forge/maker-squirrel
+      - name: Zip Output
+        uses: thedoctor0/zip-release@0.7.1
+        with:
+          type: 'zip'
+          filename: './cmc-mod-manager-windows.zip'
+          path: './out/cmcmodmanager-win32-x64'
+      - name: Upload Zip For Release
+        uses: actions/upload-artifact@v3.1.2
+        with:
+          name: windows
+          path: './cmc-mod-manager-windows.zip'
 
   ubuntu-build:
     runs-on: ubuntu-latest
@@ -34,3 +47,48 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - run: npm i
       - run: npm run make -- --platform linux --targets @electron-forge/maker-deb
+      - name: Zip Output
+        uses: thedoctor0/zip-release@0.7.1
+        with:
+          type: 'zip'
+          filename: 'cmc-mod-manager-deb.zip'
+          path: './out/cmcmodmanager-linux-x64'
+      - name: Upload Zip For Release
+        uses: actions/upload-artifact@v3.1.2
+        with:
+          name: deb
+          path: './cmc-mod-manager-deb.zip'
+
+  make-release:
+    runs-on: ubuntu-latest
+    
+    if: ${{ always() }}
+    needs: [windows-build, ubuntu-build]
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Retrieve Windows Build Output
+        uses: actions/download-artifact@v3
+        with:
+          name: windows
+          
+      - name: Retrieve Debian Build Output 
+        uses: actions/download-artifact@v3
+        with:
+          name: deb
+          
+      - run: ls -l
+      
+      - name: Make Auto Tag
+        uses: mathieudutour/github-tag-action@v6.1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          custom_tag: auto
+      
+      - name: Make A Release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "./cmc-mod-manager-windows.zip,cmc-mod-manager-deb.zip"
+          tag: auto
+          prerelease: true
