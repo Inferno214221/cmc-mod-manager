@@ -344,38 +344,7 @@
         }
     },
     "cmc": {
-        "neco": {
-            "displayName": "Neco-Arc",
-            "franchise": "tsukihime",
-            "number": 1
-        },
-        "sato_chaos": {
-            "displayName": "Neco-Arc CHAOS",
-            "franchise": "tsukihime",
-            "number": 2
-        },
-        "boss_sato_hime": {
-            "displayName": "Hime",
-            "franchise": "suguri",
-            "number": 3
-        },
-        "hand": {
-            "displayName": "Master Hand",
-            "franchise": "smash",
-            "number": 4
-        },
-        "sprite": {
-            "displayName": "Fighting Sprite",
-            "franchise": "touhou",
-            "number": 5
-        }
     },
     "alts": {
-        "hand": {
-            "displayName": "Crazy Hand",
-            "franchise": "smash",
-            "altNumber": 2,
-            "baseFighter": "hand"
-        }
     }
 }

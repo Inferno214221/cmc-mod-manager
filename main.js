@@ -33,6 +33,10 @@ const createWindow = () => {
     win.loadFile('index.html');
 }
 
+function reRequire(file) {
+    return JSON.parse(fs.readFileSync(file));
+}
+
 app.whenReady().then(() => {
     createWindow();
 });
@@ -43,7 +47,7 @@ app.on('window-all-closed', () => {
 });
 
 function getGameVersion(dir) {
-    for(let game of Object.keys(require(__dirname + "/characters/default.json").versions)) {
+    for(let game of Object.keys(reRequire(__dirname + "/characters/default.json").versions)) {
         if (fs.existsSync(dir + game)) {
             return game;
         }
@@ -77,12 +81,12 @@ ipcMain.on("getGameSource", async (event, args) => {
         fs.copyFileSync(__dirname + "/basegame/data/css.txt", __dirname + "/profiles/css/default.txt");
         version = getGameVersion(__dirname + "/basegame/");
 
-        let builtinFighters = require(__dirname + "/characters/default.json").versions[version].builtin;
-        let builtinNumber = require(__dirname + "/characters/default.json").versions[version].number;
+        let builtinFighters = reRequire(__dirname + "/characters/default.json").versions[version].builtin;
+        let builtinNumber = reRequire(__dirname + "/characters/default.json").versions[version].number;
 
         let cmcFightersTxt = fs.readFileSync(__dirname + "/basegame/data/fighters.txt", "utf-8").split(/\r?\n/);
         let cmcFighters = {};
-        let installed = require(__dirname + "/characters/installed.json");
+        let installed = reRequire(__dirname + "/characters/installed.json");
         for (let fighter = 0; fighter in cmcFightersTxt; fighter++) {
             if (fighter != 0) {
                 let fighterDat = fs.readFileSync(__dirname + "/basegame/data/dats/" + cmcFightersTxt[fighter] + ".dat", "utf-8")
@@ -137,7 +141,7 @@ ipcMain.on("getGameSource", async (event, args) => {
             // altFighters.push(fighterData);
         }
 
-        let versions = require(__dirname + "/characters/default.json").versions;
+        let versions = reRequire(__dirname + "/characters/default.json").versions;
         fs.writeFileSync(
             __dirname + "/characters/default.json",
             JSON.stringify({
@@ -149,7 +153,7 @@ ipcMain.on("getGameSource", async (event, args) => {
         );
 
         installed.number += installed.priority.length;
-        let oldInstalled = require(__dirname + "/characters/installed.json");
+        let oldInstalled = reRequire(__dirname + "/characters/installed.json");
         let numberDifference = installed.number - oldInstalled.number;
         for (let character of installed.priority) {
             installed.characters[character].number += numberDifference;
@@ -191,7 +195,7 @@ ipcMain.on("mergeInstalledMods", async (event, args) => {
     }
 
     //TODO: for each stage
-    let installed = require(__dirname + "/characters/installed.json");
+    let installed = reRequire(__dirname + "/characters/installed.json");
     for (let character of installed.priority.toReversed()) {
         let files = [];
         fs.readdirSync(__dirname + "/characters/" + character).forEach((file) => {
@@ -208,9 +212,9 @@ ipcMain.on("mergeInstalledMods", async (event, args) => {
     fs.removeSync(__dirname + "/tmp/");
 
     //TODO: generate fighters.txt and stage.txt
-    let cmcFighters = require(__dirname + "/characters/default.json").cmc;
-    let installedFighters = require(__dirname + "/characters/installed.json");
-    let builtinNumber = require(__dirname + "/characters/default.json").versions[version].number;
+    let cmcFighters = reRequire(__dirname + "/characters/default.json").cmc;
+    let installedFighters = reRequire(__dirname + "/characters/installed.json");
+    let builtinNumber = reRequire(__dirname + "/characters/default.json").versions[version].number;
     let fightersTxt = "";
     fightersTxt += installedFighters.number - builtinNumber + "\r\n";
     for (let number = builtinNumber; number <= (installedFighters.number - installedFighters.priority.length); number++) {
@@ -242,7 +246,7 @@ ipcMain.on("mergeInstalledMods", async (event, args) => {
 });
 
 ipcMain.on("getLastMerge", async (event, args) => {
-    let date = new Date(JSON.parse(fs.readFileSync('./program/info.json')).time);//require wasn't updating
+    let date = new Date(reRequire('./program/info.json').time);//require wasn't updating
     let time = strftime("%I:%M %p %x", date);
     win.webContents.send("fromGetLastMerge", time);
 });
@@ -370,7 +374,7 @@ function installCharacter(dir) {
     }
     characterDat = fs.readFileSync(__dirname + "/characters/" + characterName + "/data/dats/" + characterName + ".dat", "utf-8").split(/\r?\n/);
     
-    let installed = require(__dirname + "/characters/installed.json");
+    let installed = reRequire(__dirname + "/characters/installed.json");
     installed.number += 1;
     let characterData = {
         "displayName": characterDat[1],
@@ -389,12 +393,12 @@ function installCharacter(dir) {
 }
 
 ipcMain.on("getInstalledCharList", (event, args) => {
-    let installed = require(__dirname + "/characters/installed.json");
+    let installed = reRequire(__dirname + "/characters/installed.json");
     win.webContents.send("fromGetInstalledCharList", installed);
 });
 
 ipcMain.on("removeCharacter", (event, args) => {
-    let installed = require(__dirname + "/characters/installed.json");
+    let installed = reRequire(__dirname + "/characters/installed.json");
     let removeNumber = installed.characters[args].number;
     delete installed.characters[args];
     installed.number -= 1;
@@ -416,7 +420,7 @@ ipcMain.on("removeCharacter", (event, args) => {
 });
 
 ipcMain.on("increaseMergePriority", (event, args) => {
-    let installed = require(__dirname + "/characters/installed.json");
+    let installed = reRequire(__dirname + "/characters/installed.json");
     let index = installed.priority.indexOf(args);
     if (index == 0) {
         return;//TODO: add alerts
@@ -447,8 +451,8 @@ ipcMain.on("getCSS", (event, args) => {
     for (let line = 0; line < cssFile.length; line++) {
         css[line] = cssFile[line].split(" ");
     }
-    let basegame = require(__dirname + "/characters/default.json");
-    let installed = require(__dirname + "/characters/installed.json");
+    let basegame = reRequire(__dirname + "/characters/default.json");
+    let installed = reRequire(__dirname + "/characters/installed.json");
     win.webContents.send("fromGetCSS", {
         css: css,
         version: version,

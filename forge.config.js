@@ -6,7 +6,7 @@ module.exports = {
       name: '@electron-forge/maker-squirrel',
       config: {
         authors: "Inferno214221",
-        exe: "cmc-mod-manager.exe",
+        // exe: "cmc-mod-manager.exe",
         name: "cmc-mod-manager",
       },
     },
