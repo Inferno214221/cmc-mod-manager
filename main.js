@@ -18,6 +18,16 @@ const PERSIST = [
     "data/css.txt"
 ];
 
+const BLOAT = [
+    "/.png",
+    "/.txt",
+    "/.md",
+    "/gfx/.png",
+    "/gfx/.gif",
+    "/tools",
+    "/character guides"
+]
+
 const createWindow = () => {
     win = new BrowserWindow({
         width: 1120,
@@ -245,6 +255,27 @@ ipcMain.on("mergeInstalledMods", async (event, args) => {
     win.webContents.send("fromMergeInstalledMods", time);
 });
 
+ipcMain.on("removeMergedBloat", (event, args) => {
+    getAllFiles(__dirname + "/merged/").forEach(file => {
+        file = file.replace(__dirname + "/merged", "");
+        splitFile = file.split("/");
+        for (let bloat of BLOAT) {
+            let splitBloat = bloat.split("/");
+            let match = 0;
+            for (let number = 0; number < splitBloat.length; number++) {
+                if (splitFile[number] == undefined) break;
+                if (splitFile[number].includes(splitBloat[number])) {
+                    match++;
+                }
+            }
+            if (match == splitBloat.length) {
+                console.log(file);
+                fs.rmSync(__dirname + "/merged/" + file);
+            }
+        }
+    });
+});
+
 ipcMain.on("getLastMerge", async (event, args) => {
     let date = new Date(reRequire('./program/info.json').time);//require wasn't updating
     let time = strftime("%I:%M %p %x", date);
@@ -265,7 +296,7 @@ const getAllFiles = function (dirPath, arrayOfFiles) {
         }
     })
 
-    return arrayOfFiles;
+    return arrayOfFiles; actor
 }
 
 ipcMain.on("runCMC", async (event, args) => {
@@ -277,7 +308,7 @@ ipcMain.on("runCMC", async (event, args) => {
         windowsHide: true
     });
     //TODO: Catch fails e.g. merged empty
-    app.quit();
+    // app.quit();
 });
 
 ipcMain.on("saveControls", (event, args) => {

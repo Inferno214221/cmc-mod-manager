@@ -24,7 +24,7 @@ function getGameSource() {
 }
 
 this.api.receive("fromGetGameSource", (data) => {
-    alert("CMC base game installed succesfully");
+    alert("CMC base game installed succesfully");removeUselessFiles.checked
     gameSourceInstalled(data);
 });
 
@@ -36,6 +36,9 @@ this.api.receive("fromMergeInstalledMods", (data) => {
     lastMerge.innerHTML = "Last Merge: " + data;
     //2:13 PM 27/5/23
     alert("Mods merged succesfully");
+    if (removeUselessFiles.checked) {
+        this.api.send("removeMergedBloat");
+    }
 });
 
 function runCMC(path) {
