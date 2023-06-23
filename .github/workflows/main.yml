@@ -98,3 +98,4 @@ jobs:
           artifacts: "./cmc-mod-manager-windows.zip,cmc-mod-manager-deb.zip"
           tag: auto
           prerelease: true
+          makeLatest: false
