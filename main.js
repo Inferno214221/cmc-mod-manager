@@ -6,6 +6,7 @@ const childProcess = require("child_process");
 require('array.prototype.move');
 const extract = require('extract-zip');
 const strftime = require('strftime');
+const unrar = require("node-unrar-js");
 var win;
 var version = getGameVersion(__dirname + "/basegame/");
 
@@ -245,6 +246,12 @@ ipcMain.on("mergeInstalledMods", async (event, args) => {
         "ascii"
     );
 
+    let miscInstalled = reRequire(__dirname + "/misc/installed.json");
+    miscInstalled.misc.forEach((mod) => {
+        console.log(mod);
+        fs.copySync(__dirname + "/misc/" + mod, __dirname + "/merged/", { overwrite: true });
+    });
+
     let date = new Date();
     let time = strftime("%I:%M %p %x", date);
     fs.writeFileSync(
@@ -258,9 +265,9 @@ ipcMain.on("mergeInstalledMods", async (event, args) => {
 ipcMain.on("removeMergedBloat", (event, args) => {
     getAllFiles(__dirname + "/merged/").forEach(file => {
         file = file.replace(__dirname + "/merged", "");
-        splitFile = file.split("/");
+        splitFile = file.split('\\').pop().split('/').pop();
         for (let bloat of BLOAT) {
-            let splitBloat = bloat.split("/");
+            let splitBloat = bloat.split('\\').pop().split('/').pop();
             let match = 0;
             for (let number = 0; number < splitBloat.length; number++) {
                 if (splitFile[number] == undefined) break;
@@ -375,14 +382,44 @@ ipcMain.on("installCharacterZip", async (event, args) => {
         if (file.canceled === true) {
             return;//TODO: add alerts
         }
-        let dir = __dirname + "/characters/_temp"
-        await extract(file.filePaths[0], {
-            dir: dir,
-            defaultDirMode: 0o777,
-            defaultFileMode: 0o777,
-        });
+        let dir = __dirname + "/characters/_temp";
+        let modName = "";
+        let fileP = file.filePaths[0];
+        let fileName = fileP.split('\\').pop().split('/').pop().split(".");
+        fileName.pop();
+        modName = fileName[0];
+        dir = dir + "/" + modName;
+        switch (fileP.split(".").pop().toLowerCase()) {
+            case "zip":
+                await extract(fileP, {
+                    dir: dir,
+                    defaultDirMode: 0o777,
+                    defaultFileMode: 0o777,
+                });
+                break;
+            case "rar"://TODO: Error handling
+                let buf = Uint8Array.from(fs.readFileSync(fileP)).buffer;
+                let extractor = await unrar.createExtractorFromData({ data: buf });
+                const extracted = extractor.extract();
+                const files = [...extracted.files];
+                files.forEach(fileE => {// Make All Folders First
+                    if (fileE.fileHeader.flags.directory) {
+                        fs.ensureDirSync(dir + "/" + fileE.fileHeader.name);
+                    }
+                });
+                files.forEach(fileE => {// Make All Folders First
+                    if (!fileE.fileHeader.flags.directory) {
+                        fs.writeFileSync(dir + "/" + fileE.fileHeader.name, Buffer.from(fileE.extraction));
+                    }
+                });
+                break;
+            case "7z":
+            default:
+                return;
+                break;
+        }
         await installCharacter(dir);
-        fs.removeSync(dir);
+        fs.removeSync(__dirname + "/characters/_temp");
     });
 });
 
@@ -391,9 +428,6 @@ function installCharacter(dir) {
         return;//TODO: add alerts
     }
     let characterName = fs.readdirSync(dir + "/fighter/")[0].split(".")[0];
-
-    // let characterDir = dir.filePaths[0].split("/")
-    // characterDir = characterDir[characterDir.length - 1];
 
     fs.copySync(dir, __dirname + "/characters/" + characterName, { overwrite: true });
     //FIXME: if it overwrites a directory it will cause issue later
@@ -464,6 +498,118 @@ ipcMain.on("increaseMergePriority", (event, args) => {
         "utf-8"
     );
     win.webContents.send("fromIncreaseMergePriority", installed);
+});
+
+ipcMain.on("openModFolder", (event, args) => {
+    shell.openPath(__dirname + "/misc/" + args);
+});
+
+ipcMain.on("installMod", async (event, args) => {
+    dialog.showOpenDialog(win, {
+        properties: ["openDirectory"]
+    }).then(dir => {
+        if (dir.canceled === true) {
+            return;//TODO: add alerts
+        }
+        installMod(dir.filePaths[0]);
+    });
+});
+
+ipcMain.on("installModZip", async (event, args) => {
+    dialog.showOpenDialog(win, {
+        properties: ["openFile"]
+    }).then(async (file) => {
+        if (file.canceled === true) {
+            return;//TODO: add alerts
+        }
+        let dir = __dirname + "/misc/_temp";
+        let fileP = file.filePaths[0];
+        let fileName = fileP.split('\\').pop().split('/').pop().split(".");
+        fileName.pop();
+        modName = fileName[0];
+        dir = dir + "/" + modName;
+        switch (fileP.split(".").pop().toLowerCase()) {
+            case "zip":
+                await extract(fileP, {
+                    dir: dir,
+                    defaultDirMode: 0o777,
+                    defaultFileMode: 0o777,
+                });
+                break;
+            case "rar"://TODO: Error handling
+                let buf = Uint8Array.from(fs.readFileSync(fileP)).buffer;
+                let extractor = await unrar.createExtractorFromData({ data: buf });
+                const extracted = extractor.extract();
+                const files = [...extracted.files];
+                files.forEach(fileE => {// Make All Folders First
+                    if (fileE.fileHeader.flags.directory) {
+                        fs.ensureDirSync(dir + "/" + fileE.fileHeader.name);
+                    }
+                });
+                files.forEach(fileE => {// Make All Folders First
+                    if (!fileE.fileHeader.flags.directory) {
+                        fs.writeFileSync(dir + "/" + fileE.fileHeader.name, Buffer.from(fileE.extraction));
+                    }
+                });
+                break;
+            case "7z":
+            default:
+                return;
+                break;
+        }
+        await installMod(dir, modName);
+        fs.removeSync(__dirname + "/misc/_temp");
+    });
+});
+
+function installMod(dir, modName) {
+    // let modName = dir.split('\\').pop().split('/').pop();
+    console.log(modName);
+
+    fs.copySync(dir, __dirname + "/misc/" + modName, { overwrite: true });
+    
+    let installed = reRequire(__dirname + "/misc/installed.json");
+    installed.misc.push(modName);
+    fs.writeFileSync(
+        __dirname + "/misc/installed.json",
+        JSON.stringify(installed, null, 4),
+        "utf-8"
+    );
+
+    win.webContents.send("fromInstallMod", installed);
+}
+
+ipcMain.on("getInstalledModList", (event, args) => {
+    let installed = reRequire(__dirname + "/misc/installed.json");
+    win.webContents.send("fromGetInstalledModList", installed);
+});
+
+ipcMain.on("removeMod", (event, args) => {//TODO:
+    let installed = reRequire(__dirname + "/misc/installed.json");
+    installed.misc = installed.misc.filter(mod => mod != args);
+    fs.removeSync(__dirname + "/misc/" + args);
+    fs.writeFileSync(
+        __dirname + "/misc/installed.json",
+        JSON.stringify(installed, null, 4),
+        "utf-8"
+    );
+    win.webContents.send("fromRemoveMod", installed);
+});
+
+ipcMain.on("increaseModMergePriority", (event, args) => {//TODO:
+    let installed = reRequire(__dirname + "/misc/installed.json");
+    let index = installed.misc.indexOf(args);
+    if (index == 0) {
+        return;//TODO: add alerts
+    }
+    installed.misc.move(index, index - 1);
+    //TODO: error handling eg outside of range
+    fs.writeFileSync(
+        __dirname + "/misc/installed.json",
+        JSON.stringify(installed, null, 4),
+        "utf-8"
+    );
+    win.webContents.send("fromIncreaseModMergePriority", installed);
 });
 
 ipcMain.on("getCSS", (event, args) => {

@@ -35,6 +35,7 @@ When installing characters, it is likely that some mods will not work properly u
 - [x] Open installed character's directory
 - [x] Change character merge priority
 - [x] Delete instructions txt file on merge
+- [x] RAR support - no errors
 - [x] Alerts
 - [ ] Removing characters on the css causes a locked icon to appear
 - [ ] Errors
@@ -80,7 +81,8 @@ When installing characters, it is likely that some mods will not work properly u
 - [ ] Alerts
 - [ ] Errors
 ### Miscellanious Mods (Priority: 4)
-- [ ] Add option to import other types of mods e.g. obama cube / ui changes
+- [x] Add option to import other types of mods e.g. obama cube / ui changes
+- [x] RAR support - no errors
 - [ ] Alerts
 - [ ] Errors
 ## Usage

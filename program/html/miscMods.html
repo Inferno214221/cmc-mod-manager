@@ -57,8 +57,19 @@
         </ul>
     </nav>
     <section>
-        E
+        <fieldset>
+            <legend>Installation</legend>
+            <button type="button" onclick="installMod()">Install Mod From Directory</button>
+            <button type="button" onclick="installModZip()">Install Mod From Archive</button>
+        </fieldset>
+        <fieldset>
+            <legend>Installed Mods</legend>
+            <table id="modTable">
+            </table>
+        </fieldset>
     </section>
+    <script src="../js/miscMods.js">
+    </script>
 </body>
 
 </html>
