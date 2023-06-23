@@ -12,6 +12,7 @@ body {
 .mugIcon {
     width: 62px;
     height: 62px;
+    object-fit: cover;
 }
 
 .hiddenName {
@@ -29,6 +30,7 @@ body {
 .icon {
     height: 35px;
     width: 35px;
+    object-fit: cover;
 }
 
 .cssSquare {
@@ -96,4 +98,11 @@ select {
 #hiddenCharactersCell {
     overflow: hidden;
     overflow-x: scroll;
+}
+
+#characterTable {
+    table-layout: fixed;
+    width: 100vw;
+    margin-left: -20px;
+    margin-top: -5px;
 }
