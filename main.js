@@ -248,7 +248,6 @@ ipcMain.on("mergeInstalledMods", async (event, args) => {
 
     let miscInstalled = reRequire(__dirname + "/misc/installed.json");
     miscInstalled.misc.forEach((mod) => {
-        console.log(mod);
         fs.copySync(__dirname + "/misc/" + mod, __dirname + "/merged/", { overwrite: true });
     });
 
@@ -276,7 +275,6 @@ ipcMain.on("removeMergedBloat", (event, args) => {
                 }
             }
             if (match == splitBloat.length) {
-                console.log(file);
                 fs.rmSync(__dirname + "/merged/" + file);
             }
         }
@@ -371,7 +369,8 @@ ipcMain.on("installCharacter", async (event, args) => {
         if (dir.canceled === true) {
             return;//TODO: add alerts
         }
-        installCharacter(dir.filePaths[0]);
+        let modName = dir.filePaths[0].split('\\').pop().split('/').pop();
+        installCharacter(dir.filePaths[0], modName);
     });
 });
 
@@ -511,7 +510,8 @@ ipcMain.on("installMod", async (event, args) => {
         if (dir.canceled === true) {
             return;//TODO: add alerts
         }
-        installMod(dir.filePaths[0]);
+        let modName = dir.filePaths[0].split('\\').pop().split('/').pop();
+        installMod(dir.filePaths[0], modName);
     });
 });
 
@@ -563,9 +563,6 @@ ipcMain.on("installModZip", async (event, args) => {
 });
 
 function installMod(dir, modName) {
-    // let modName = dir.split('\\').pop().split('/').pop();
-    console.log(modName);
-
     fs.copySync(dir, __dirname + "/misc/" + modName, { overwrite: true });
     
     let installed = reRequire(__dirname + "/misc/installed.json");

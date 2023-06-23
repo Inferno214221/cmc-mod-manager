@@ -25,7 +25,7 @@ this.api.receive("fromRemoveMod", (installed) => {
     listMods(installed);
 });
 
-function increaseMergePriority(mod) {
+function increaseModMergePriority(mod) {
     this.api.send("increaseModMergePriority", mod);
 }
 
