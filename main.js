@@ -479,6 +479,19 @@ ipcMain.on("removeCharacter", (event, args) => {
         JSON.stringify(installed, null, 4),
         "utf-8"
     );
+
+    // NOTE: Bad practice, as although it is unlikely a remove character is wanted in the css, changes are not saved when a character is removed
+    // let cssFile;
+    // try {
+    //     // cssFile = fs.readFileSync(__dirname + "/merged/data/css.txt", "utf-8").split(/\r?\n/);
+    //     cssFile = fs.readFileSync(__dirname + "/merged/data/css.txt", "ascii");
+    // } catch (error) {
+    //     win.webContents.send("fromRemoveCharacter", installed);
+    // }
+    // if (cssFile == undefined) win.webContents.send("fromRemoveCharacter", installed);
+
+    // cssFile.replace(new RegExp(('0000' + removeNumber).slice(-4), 'g'), "0000");
+
     win.webContents.send("fromRemoveCharacter", installed);
 });
 

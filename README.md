@@ -37,7 +37,6 @@ When installing characters, it is likely that some mods will not work properly u
 - [x] Delete instructions txt file on merge
 - [x] RAR support - no errors
 - [x] Alerts
-- [ ] Removing characters on the css causes a locked icon to appear
 - [ ] Errors
 ### Character Selection Screen (Priority: 3)
 - [x] Display the CSS
@@ -51,6 +50,7 @@ When installing characters, it is likely that some mods will not work properly u
 - [x] Drag and Drop
 - [x] Replace characters
 - [x] Change the number of rows & columns
+- [x] Uninstalled characters are removed when the css is updated to prevent locked icons
 - [x] Alerts
 - [ ] Errors
 ### Alts (Priority: 5)

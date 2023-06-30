@@ -109,9 +109,9 @@ function updateCSSProfiles() {
 }
 
 this.api.receive("fromUpdateCSSProfiles", (profiles) => {
-    let options = ""
+    let options = "";
     for (let profile of profiles) {
-        profile = profile.slice(0, -4)
+        profile = profile.slice(0, -4);
         options += '<option value="' + profile + '">' + profile + '</option>\n';
     }
     CSSLoadName.innerHTML = options;
@@ -163,12 +163,14 @@ function makeTables(css, allChars) {
                 for (let e of Object.keys(allChars)) {
                     if (allChars[e].number == css[y][x]) {
                         character = e;
-                        delete hidden[e];//Only one copy of each
+                        delete hidden[e];
                         break;
                     }
                 }
                 if (character === undefined) {
+                    //NOTE: resets all css values not in the list of characters
                     output += "<td class=\"cssSquare\" id=\'{ \"x\": " + x + ", \"y\": " + y + " }\' draggable=\"false\" ondragover=\"event.preventDefault();\" ondrop=\"onDropOnCSS(event);\"><image class=\"icon\" src=\"../images/empty.png\" alt=\" \" /></td>";
+                    css[y][x] = "0000";
                 } else {
                     output += "<td class=\"cssSquare hoverText\" id=\"" + character + "\">\n\
                     <div id=\'{ \"x\": " + x + ", \"y\": " + y + " }\' draggable=\"true\" ondragover=\"event.preventDefault();\" ondragstart=\"onDragStartCSS(event);\" ondrop=\"onDropOnCSS(event);\">\n\
