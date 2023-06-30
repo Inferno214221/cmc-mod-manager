@@ -221,8 +221,6 @@ ipcMain.on("mergeInstalledMods", async (event, args) => {
         });
     }
     fs.removeSync(__dirname + "/tmp/");
-
-    //TODO: generate fighters.txt and stage.txt
     let cmcFighters = reRequire(__dirname + "/characters/default.json").cmc;
     let installedFighters = reRequire(__dirname + "/characters/installed.json");
     let builtinNumber = reRequire(__dirname + "/characters/default.json").versions[version].number;
@@ -237,7 +235,8 @@ ipcMain.on("mergeInstalledMods", async (event, args) => {
         }
     }
     
-    for (let fighter of installedFighters.priority) {
+    let installedList = Object.keys(installedFighters.characters).toSorted((a, b) => (a.number > b.number ? 1 : -1));
+    for (let fighter of installedList) {// not installedFighters.priority because css numbers are not related to priority
         fightersTxt += fighter + "\r\n";
     }
     fs.writeFileSync(
