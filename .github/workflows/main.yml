@@ -45,8 +45,10 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-      - run: npm i
-      - run: npm run make -- --platform linux --targets @electron-forge/maker-deb
+      - name: Install Node Dependencies
+        run: npm i
+      - name: Electron Forge Build
+        run: npm run make -- --platform linux --targets @electron-forge/maker-deb
       - name: Zip Output
         uses: thedoctor0/zip-release@0.7.1
         with:
