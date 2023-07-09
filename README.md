@@ -6,11 +6,10 @@ This project is a WIP mod manager for Super Smash Brothers Crusade CMC+. (Aimed 
 - [x] [CMC+ v7.1.1](https://gamebanana.com/mods/50383)
 - [x] [CMC+ Open Build](https://discord.gg/kAbEBkx5Y4)
 - [ ] [CMC+ v8](https://youtu.be/VCl5DMRHYbM)
-- [ ] [SSBC- v2.1](https://gamebanana.com/mods/417588)
 ## Install
 I haven't compiled this yet as it is currently unfinished, although when finished it will support Windows and Linux.
 ## Features (WIP)
-This mod manager works by storing a copy of the basegame and all installed mods seperatly and then merging them in the designated order.
+This mod manager works by storing a copy of the basegame and all installed mods separately and then merging them in the designated order.
 
 When installing characters, it is likely that some mods will not work properly unless they are in the correct format. Mods should be able to be copied straight into the CMC folder to install manually.
 ### Main Page (Priority: 1)
@@ -22,11 +21,11 @@ When installing characters, it is likely that some mods will not work properly u
 - [x] Determine imported game's version
 - [x] Update last merge time
 - [x] Persist: contols, settings, record, favourite character, css
+- [x] Remove unessecary files
 - [x] Make fighters.txt on export
 - [ ] Make stages.txt & others on export
 - [x] Alerts
 - [ ] Errors
-- [ ] Remove unessecary files? /tools, /data/*.dat if CMC
 ### Character Manager (Priority: 2)
 - [x] Install characters from a folder (very picky)
 - [x] Install characters from a zip (extract, install folder, delete)
@@ -36,7 +35,6 @@ When installing characters, it is likely that some mods will not work properly u
 - [x] Change character merge priority
 - [x] Delete instructions txt file on merge
 - [x] RAR support - no errors
-- [x] Alerts
 - [ ] Errors
 ### Character Selection Screen (Priority: 3)
 - [x] Display the CSS
@@ -51,19 +49,19 @@ When installing characters, it is likely that some mods will not work properly u
 - [x] Replace characters
 - [x] Change the number of rows & columns
 - [x] Uninstalled characters are removed when the css is updated to prevent locked icons
-- [x] Alerts
+- [ ] Alerts
 - [ ] Errors
-### Alts (Priority: 5)
+### Alts (Priority: 7)
 - [ ] IDFK how I should deal with alts
 - [ ] Alerts
 - [ ] Errors
-### Stage Manager (Priority: 6)
+### Stage Manager (Priority: 5)
 - [ ] Install stages from a folder
 - [ ] Install stages from a zip (extract, install folder, delete)
 - [ ] Manage stage merge priority
 - [ ] Alerts
 - [ ] Errors
-### Stage Selection Screen (Priority: 7)
+### Stage Selection Screen (Priority: 6)
 - [ ] Display the SSS w/ pages
 - [ ] Display unincluded stages
 - [ ] Add stages to SSS
@@ -81,9 +79,8 @@ When installing characters, it is likely that some mods will not work properly u
 - [ ] Alerts
 - [ ] Errors
 ### Miscellanious Mods (Priority: 4)
-- [x] Add option to import other types of mods e.g. obama cube / ui changes
+- [x] Add option to import other types of mods e.g. ui changes / music
 - [x] RAR support - no errors
-- [ ] Alerts
 - [ ] Errors
 ## Usage
 E
