@@ -195,7 +195,7 @@ function makeTables(css, allChars) {
         character = character.name
         output += 
         "<td class=\"hoverText\">\n\
-            <div draggable=\"true\" ondragover=\"event.preventDefault();\" ondragstart=\"onDragStartHidden(event);\" ondrop=\"onDropOnHidden(event);\" id=\"" + character + "\">\n\
+            <div draggable=\"true\" ondragstart=\"onDragStartHidden(event);\" id=\"" + character + "\" class=\"mug\">\n\
                 <image draggable=\"false\" class=\"mugIcon\" src=\"../../merged/gfx/mugs/" + character + ".png\" onerror=\"this.onerror=null; this.src='../images/missing.png'\" alt=\"\" />\n\
                 <div class=\"hiddenName\">" + allChars[character].displayName + "</div>\n\
             </div>\n\

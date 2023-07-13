@@ -4,9 +4,8 @@ body {
     overflow-x: hidden;
 }
 
-.mug {
-    padding: 0px 5px;
-    height: 62px;
+.hoverText {
+    float: left;
 }
 
 .mugIcon {
@@ -105,4 +104,9 @@ select {
     width: 100vw;
     margin-left: -20px;
     margin-top: -5px;
+}
+
+#hiddenCharactersTable {
+    min-width: 100%;
+    min-height: 100px;
 }

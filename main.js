@@ -235,7 +235,8 @@ ipcMain.on("mergeInstalledMods", async (event, args) => {
         }
     }
     
-    let installedList = Object.keys(installedFighters.characters).toSorted((a, b) => (a.number > b.number ? 1 : -1));
+    let installedList = Object.keys(installedFighters.characters).toSorted((a, b) => (installedFighters.characters[a].number > installedFighters.characters[b].number ? 1 : -1));
+    console.log(installedList);
     for (let fighter of installedList) {// not installedFighters.priority because css numbers are not related to priority
         fightersTxt += fighter + "\r\n";
     }
@@ -281,7 +282,7 @@ ipcMain.on("removeMergedBloat", (event, args) => {
 });
 
 ipcMain.on("getLastMerge", async (event, args) => {
-    let date = new Date(reRequire('./program/info.json').time);//require wasn't updating
+    let date = new Date(reRequire(__dirname + "/program/info.json").time);//require wasn't updating
     let time = strftime("%I:%M %p %x", date);
     win.webContents.send("fromGetLastMerge", time);
 });
@@ -300,7 +301,7 @@ const getAllFiles = function (dirPath, arrayOfFiles) {
         }
     })
 
-    return arrayOfFiles; actor
+    return arrayOfFiles;
 }
 
 ipcMain.on("runCMC", async (event, args) => {
@@ -649,16 +650,12 @@ ipcMain.on("getCSS", (event, args) => {
 
 ipcMain.on("writeCSS", (event, css) => {
     let maxY = css.length;
-    // if (css[maxY - 1] == ['']) {
-    //     maxY--;
-    // }
-    //FIXME: merge -> mod css -> launch -> mod css -> prints undefined on the last line
     let maxX = css[0].length;
     let output = "";
 
     for (let y = 0; y < maxY; y++) {
         for (let x = 0; x < maxX; x++) {
-            output += css[y][x] + (x == maxX - 1 ? /*(y == maxY - 1 ? " " : */"\r\n"/*)*/ : " ");
+            output += css[y][x] + (x == maxX - 1 ? "\r\n"  : " ");
         }
     }
     // output += " ";

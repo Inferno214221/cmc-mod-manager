@@ -89,7 +89,7 @@
                         <label for="reverseSort">Reverse</label>
                         <input type="checkbox" id="showAll" name="showAll" onchange="resort()">
                         <label for="showAll">Show All Characters</label>
-                        <table id="hiddenCharactersTable">
+                        <table id="hiddenCharactersTable" ondragover="event.preventDefault();" ondrop="onDropOnHidden(event);">
                         </table>
                     </fieldset>
                 </td>
