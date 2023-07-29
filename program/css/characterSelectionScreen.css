@@ -4,8 +4,13 @@ body {
     overflow-x: hidden;
 }
 
-.hoverText {
+/* .hoverText {
     float: left;
+} */
+
+.mug {
+    padding: 0px 5px;
+    height: 62px;
 }
 
 .mugIcon {
@@ -20,6 +25,13 @@ body {
     width: 62px;
     word-wrap: break-word;
     overflow: hidden;
+    white-space: normal;
+}
+
+.hiddenCharacter {
+    display: inline-block;
+    /* float: left; */
+    max-width: 62px;
 }
 
 .addButton {
@@ -97,6 +109,7 @@ select {
 #hiddenCharactersCell {
     overflow: hidden;
     overflow-x: scroll;
+    white-space: nowrap;
 }
 
 #characterTable {

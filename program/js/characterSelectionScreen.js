@@ -156,29 +156,30 @@ function makeTables(css, allChars) {
 
     hidden = Object.assign({}, allChars);
     for (let y = 0; y < maxY; y++) {
-        output += "<tr>\n\
-            <th class=\"cssSquare\">"+ (y + 1) + "</th>\n";
+        output += "<tr>\n<th class=\"cssSquare\">"+ (y + 1) + "</th>\n";
         for (let x = 0; x < maxX; x++) {
             let character;
-                for (let e of Object.keys(allChars)) {
-                    if (allChars[e].number == css[y][x]) {
-                        character = e;
-                        delete hidden[e];
-                        break;
-                    }
+            for (let e of Object.keys(allChars)) {
+                if (allChars[e].number == css[y][x]) {
+                    character = e;
+                    delete hidden[e];
+                    break;
                 }
-                if (character === undefined) {
-                    //NOTE: resets all css values not in the list of characters
-                    output += "<td class=\"cssSquare\" id=\'{ \"x\": " + x + ", \"y\": " + y + " }\' draggable=\"false\" ondragover=\"event.preventDefault();\" ondrop=\"onDropOnCSS(event);\"><image class=\"icon\" src=\"../images/empty.png\" alt=\" \" /></td>";
-                    css[y][x] = "0000";
-                } else {
-                    output += "<td class=\"cssSquare hoverText\" id=\"" + character + "\">\n\
-                    <div id=\'{ \"x\": " + x + ", \"y\": " + y + " }\' draggable=\"true\" ondragover=\"event.preventDefault();\" ondragstart=\"onDragStartCSS(event);\" ondrop=\"onDropOnCSS(event);\">\n\
-                        <image draggable=\"false\" class=\"icon\" src=\"../../merged/gfx/mugs/" + character + ".png\" onerror=\"this.onerror=null; this.src='../images/missing.png'\" alt=\" \" />\n\
-                        <div class=\"cssName\">" + allChars[character].displayName + "</div>\n\
-                    </div>\n\
-                    <span class=\"tooltipText\">" + allChars[character].displayName + "</span></td>";
-                }
+            }
+            if (character === undefined) {
+                //NOTE: resets all css values not in the list of characters
+                output += "<td class=\"cssSquare\" id=\'{ \"x\": " + x + ", \"y\": " + y + " }\' draggable=\"false\" ondragover=\"event.preventDefault();\" ondrop=\"onDropOnCSS(event);\"><image class=\"icon\" src=\"../images/empty.png\" alt=\" \" /></td>";
+                css[y][x] = "0000";
+            } else {
+                output += "\
+<td class=\"cssSquare hoverText\" id=\"" + character + "\">\n\
+    <div id=\'{ \"x\": " + x + ", \"y\": " + y + " }\' draggable=\"true\" ondragover=\"event.preventDefault();\" ondragstart=\"onDragStartCSS(event);\" ondrop=\"onDropOnCSS(event);\">\n\
+        <image draggable=\"false\" class=\"icon\" src=\"../../merged/gfx/mugs/" + character + ".png\" onerror=\"this.onerror=null; this.src='../images/missing.png'\" alt=\" \" />\n\
+        <div class=\"cssName\">" + allChars[character].displayName + "</div>\n\
+    </div>\n\
+    <span class=\"tooltipText\">" + allChars[character].displayName + "</span>\n\
+</td>";
+            }
         }
         output += "</tr>\n";
     }
@@ -190,11 +191,11 @@ function makeTables(css, allChars) {
         sorted.reverse();
     }
 
-    output += "<tr>"
+    output += "<tr>\n"
     for (let character of sorted) {
         character = character.name
         output += 
-        "<td class=\"hoverText\">\n\
+        "<td class=\"hoverText hiddenCharacter\">\n\
             <div draggable=\"true\" ondragstart=\"onDragStartHidden(event);\" id=\"" + character + "\" class=\"mug\">\n\
                 <image draggable=\"false\" class=\"mugIcon\" src=\"../../merged/gfx/mugs/" + character + ".png\" onerror=\"this.onerror=null; this.src='../images/missing.png'\" alt=\"\" />\n\
                 <div class=\"hiddenName\">" + allChars[character].displayName + "</div>\n\

@@ -26,6 +26,7 @@ function getGameSource() {
 this.api.receive("fromGetGameSource", (data) => {
     alert("CMC base game installed succesfully");removeUselessFiles.checked
     gameSourceInstalled(data);
+    mergeInstalledMods();
 });
 
 function mergeInstalledMods() {
