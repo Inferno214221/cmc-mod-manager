@@ -53,13 +53,13 @@ jobs:
         uses: thedoctor0/zip-release@0.7.1
         with:
           type: 'zip'
-          filename: 'cmc-mod-manager-deb.zip'
+          filename: 'cmc-mod-manager-linux.zip'
           path: './out/cmcmodmanager-linux-x64'
       - name: Upload Zip For Release
         uses: actions/upload-artifact@v3.1.2
         with:
-          name: deb
-          path: './cmc-mod-manager-deb.zip'
+          name: linux
+          path: './cmc-mod-manager-linux.zip'
 
   make-release:
     runs-on: ubuntu-latest
@@ -75,10 +75,10 @@ jobs:
         with:
           name: windows
           
-      - name: Retrieve Debian Build Output 
+      - name: Retrieve Linux Build Output 
         uses: actions/download-artifact@v3
         with:
-          name: deb
+          name: linux
           
       - run: ls -l
       
@@ -97,7 +97,7 @@ jobs:
       - name: Make A Release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "./cmc-mod-manager-windows.zip,cmc-mod-manager-deb.zip"
+          artifacts: "./cmc-mod-manager-windows.zip,cmc-mod-manager-linux.zip"
           tag: auto
           prerelease: true
           makeLatest: false
