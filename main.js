@@ -90,7 +90,7 @@ ipcMain.on("getGameSource", async (event, args) => {
         
         fs.copySync(dir.filePaths[0], __dirname + "/basegame/", { overwrite: true });
         fs.copyFileSync(__dirname + "/basegame/controls.ini", __dirname + "/profiles/controls/default.ini");
-        fs.copyFileSync(__dirname + "/basegame/data/css.txt", __dirname + "/profiles/css/default.txt");
+        // fs.copyFileSync(__dirname + "/basegame/data/css.txt", __dirname + "/profiles/css/default.txt");
         version = getGameVersion(__dirname + "/basegame/");
 
         let builtinFighters = reRequire(__dirname + "/characters/default.json").versions[version].builtin;
@@ -370,8 +370,8 @@ ipcMain.on("installCharacter", async (event, args) => {
         if (dir.canceled === true) {
             return;//TODO: add alerts
         }
-        let modName = dir.filePaths[0].split('\\').pop().split('/').pop();
-        installCharacter(dir.filePaths[0], modName);
+        // let modName = dir.filePaths[0].split('\\').pop().split('/').pop();
+        installCharacter(dir.filePaths[0]);
     });
 });
 
@@ -681,7 +681,6 @@ ipcMain.on("writeCSS", (event, css) => {
         // if (version == "CMC+ v8.exe") {
         //     output += " ";
         // }
-        console.log(output + "E");
 
         fs.writeFileSync(
             __dirname + "/merged/data/" + file,

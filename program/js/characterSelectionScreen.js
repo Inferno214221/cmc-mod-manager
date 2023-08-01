@@ -198,7 +198,7 @@ function makeTables(css, allChars) {
         sorted.reverse();
     }
 
-    output += "<tr>\n"
+    output += "<tr draggable=\"false\">\n"
     for (let character of sorted) {
         character = character.name
         output += 

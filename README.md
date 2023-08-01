@@ -1,20 +1,15 @@
 # CMC Mod Manager
+Usage of this mod manager will 'spoil' the hidden characters as they are displayed in the program without the locked icon.
 ## What
 This project is a WIP mod manager for Super Smash Brothers Crusade CMC+. It allows for the installation and management of mods through a GUI.
-### NOTE:
-Usage of this mod manger will 'spoil' the hidden characters as they are displayed in the program without the locked icon.
 ### Supported Versions
-- [ ] [CMC+ v8](https://gamebanana.com/mods/50383)
+- [x] [CMC+ v8](https://gamebanana.com/mods/50383)
 - [x] [CMC+ v7.1.1](https://gamebanana.com/mods/50383)
 - [x] [CMC+ Open Build](https://discord.gg/kAbEBkx5Y4)
 ## Why
 CMC+ has good modding support and modding the game currently isn't that hard why use a mod manager? The main reason I developed this mod manager is for the CSS (Character Selection Screen) editor. Although it is certainly possible, adding characters to the CSS by hand annoyed me because of the need to find character numbers and names (if you are removing unknown characters). CMC Mod Manager allows you to add, swap or remove characters to/from the CSS (and soon the SSS) with drag and drop.
 
-<details>
-  <summary>Character Selection Screen Editor (Contains Locked Character Spoilers)</summary>
-
-  ![CSS Editor](./CSS.png)
-</details>
+![CSS Editor](./CSS.png)
 
 ## Installation
 Go [here](https://github.com/Inferno214221/CMCModManager/releases/latest) to install the latest release of CMC Mod Manager for your operating system.
@@ -31,15 +26,17 @@ Install [Asahi Linux](https://asahilinux.org/), then proceed with the Linux inst
 #### NOTE:
 The above statement is double reverse sarcastic.
 ## Usage
+Please ensure that the game has been run once to create all the necessary files.
+
 After installing CMC Mod Manager the first step is to import the basegame. Under the 'Home' tab select 'Import Basegame' and select the folder with CMC's exe in it. After pressing OK, the mod manager will make a copy of the game in its own directory, which might take a while. Afterwards, you can delete the previous copy and only use the mod manager's if you'd like to save space. When importing the basegame or merging mods on Windows, it is very likely that you will receive a warning that the program is not responding. Please ignore this and let it run anyway.
 
 To install character mods, switch to the 'Character Manager' tab and select 'Install from Directory' or 'Install From Archive'. Any characters that you want to install should be formatted correctly so that all of the files in the mod's directory would be copied into the game's without modification (e.g. no separate folders for different game versions). After installing any mod, remember to 'Merge All Mods' from the 'Home' tab.
 
 The 'Character Selection Screen' tab can be used after merging to modify which characters are available to choose from on the selection screen by dragging and dropping characters between the CSS grid and the list underneath.
 ## It's not working!
-Please insure that all mods that are installed are in the correct format and that the program has been use correctly. If a breakage occured installing a mod, try removing it via the mod manager, or manually in the `installed.json` file and deleteing the manager's copy of the mod's folder.
+Please ensure that all mods that are installed are in the correct format and that the program is the latest version (check GitHub / GB). If a breakage occurred installing a mod, try removing it via the mod manager, or manually in the `installed.json` file and deleting the manager's copy of the mod's folder.
 
-If none of these options are fixing the problem please submit and issue on github with information about what went wrong and when. (Check that no one else has the same issue first.)
+If none of these options are fixing the problem please submit an issue on GitHub with information about what went wrong and when. (Check that no one else has the same issue first.)
 ## Notes
 This is my first time using Electron and therefore the code is a bit of a mess sorry. Also, I am not very good at designing GUIs so this one might be unintuitive. Feel free to provide suggestions for interface improvements although be warned they may be declined.
 ## Progress
