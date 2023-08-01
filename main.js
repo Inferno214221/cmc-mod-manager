@@ -16,7 +16,8 @@ const PERSIST = [
     "data/cmc_stuff.bin",
     "data/records.bin",
     "data/stats/general.bin",
-    "data/css.txt"
+    "data/css.txt",
+    "data/css"
 ];
 
 const BLOAT = [
@@ -594,7 +595,7 @@ ipcMain.on("getInstalledModList", (event, args) => {
     win.webContents.send("fromGetInstalledModList", installed);
 });
 
-ipcMain.on("removeMod", (event, args) => {//TODO:
+ipcMain.on("removeMod", (event, args) => {
     let installed = reRequire(__dirname + "/misc/installed.json");
     installed.misc = installed.misc.filter(mod => mod != args);
     fs.removeSync(__dirname + "/misc/" + args);
@@ -606,7 +607,7 @@ ipcMain.on("removeMod", (event, args) => {//TODO:
     win.webContents.send("fromRemoveMod", installed);
 });
 
-ipcMain.on("increaseModMergePriority", (event, args) => {//TODO:
+ipcMain.on("increaseModMergePriority", (event, args) => {
     let installed = reRequire(__dirname + "/misc/installed.json");
     let index = installed.misc.indexOf(args);
     if (index == 0) {
@@ -623,21 +624,35 @@ ipcMain.on("increaseModMergePriority", (event, args) => {//TODO:
 });
 
 ipcMain.on("getCSS", (event, args) => {
-    let cssFile;
-    try {
-        // cssFile = fs.readFileSync(__dirname + "/merged/data/css.txt", "utf-8").split(/\r?\n/);
-        cssFile = fs.readFileSync(__dirname + "/merged/data/css.txt", "ascii").split(/\r?\n/);
-    } catch (error) {
-        if (error.code == "ENOENT") {
-            win.webContents.send("errorGetCSS");
+    let cssFiles = [];
+    if (version == "CMC+ v8.exe") {
+        cssFiles = getAllFiles(__dirname + "/merged/data/css/");
+    }
+    cssFiles.push(__dirname + "/merged/data/css.txt");
+    var css = {};
+    cssFiles.forEach((file) => {
+        let cssFile;
+        try {
+            // cssFile = fs.readFileSync(__dirname + "/merged/data/css.txt", "utf-8").split(/\r?\n/);
+            cssFile = fs.readFileSync(file, "ascii").split(/\r?\n/);
+        } catch (error) {
+            if (error.code == "ENOENT") {
+                win.webContents.send("errorGetCSS");
+            }
         }
-        return;
-    }
-    if (cssFile == undefined) return;
-    let css = [];
-    for (let line = 0; line < cssFile.length; line++) {
-        css[line] = cssFile[line].split(" ");
-    }
+        if (cssFile != undefined) {
+            let cssName = "";
+            if (file == __dirname + "/merged/data/css.txt") {
+                cssName = "css.txt";
+            } else {
+                cssName = "css/" + file.split('\\').pop().split('/').pop();
+            }
+            css[cssName] = [];
+            for (let line = 0; line < cssFile.length; line++) {
+                css[cssName].push(cssFile[line].split(" "));
+            }
+        }
+    });
     let basegame = reRequire(__dirname + "/characters/default.json");
     let installed = reRequire(__dirname + "/characters/installed.json");
     win.webContents.send("fromGetCSS", {
@@ -649,20 +664,29 @@ ipcMain.on("getCSS", (event, args) => {
 });
 
 ipcMain.on("writeCSS", (event, css) => {
-    let maxY = css.length;
-    let maxX = css[0].length;
-    let output = "";
+    Object.keys(css).forEach((file) => {
+        let maxY = css[file].length;
+        let maxX = css[file][0].length;
+        let output = "";
 
-    for (let y = 0; y < maxY; y++) {
-        for (let x = 0; x < maxX; x++) {
-            output += css[y][x] + (x == maxX - 1 ? "\r\n" : " ");
+        for (let y = 0; y < maxY; y++) {
+            for (let x = 0; x < maxX; x++) {
+                if (version == "CMC+ v8.exe" && y == maxY - 1) {
+                    output += css[file][y][x] + " ";
+                } else {
+                    output += css[file][y][x] + (x == maxX - 1 ? "\r\n" : " ");
+                }
+            }
         }
-    }
-    // output += " ";
+        // if (version == "CMC+ v8.exe") {
+        //     output += " ";
+        // }
+        console.log(output + "E");
 
-    fs.writeFileSync(
-        __dirname + "/merged/data/css.txt",
-        output,
-        "ascii"
-    );
+        fs.writeFileSync(
+            __dirname + "/merged/data/" + file,
+            output,
+            "ascii"
+        );
+    });
 });

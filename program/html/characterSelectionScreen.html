@@ -57,6 +57,15 @@
         </ul>
     </nav>
     <section id="mainSection">
+        <fieldset>
+            <legend>Character Selection Page</legend>
+            <button type="button" onclick="getCSSPage(-1)"><</button>
+            <input type="text" value="default" id="CSSPageName" onfocus="inputFocused('CSSPageName')" onblur="inputBlurred('CSSPageName')" readonly="true"/>
+            <button type="button" onclick="getCSSPage(1)">></button>
+            <!-- TODO: -->
+            <!-- <button type="button" onclick="">+</button>
+            <button type="button" onclick="">-</button> -->
+        </fieldset>
         <table id="characterTable">
             <tr>
                 <td id="characterSelectionCell">
@@ -127,6 +136,8 @@
                             </tr>
                         </table>
                     </fieldset>
+                </td>
+                <td class="column">
                     <fieldset>
                         <legend>Franchise</legend>
                         <select id="franchiseSelect" onfocus="inputFocused('franchiseSelect')" onblur="inputBlurred('franchiseSelect')">
@@ -136,7 +147,7 @@
                         <button type="button" onclick="removeFranchise()">Remove Entire Franchise</button>
                     </fieldset>
                 </td>
-                <td class="column">
+                <!-- <td class="column">
                     <fieldset>
                         <legend>CSS Profiles</legend>
                         <div class="cssProfiles">
@@ -154,7 +165,7 @@
                             </select>
                         </div>
                     </fieldset>
-                </td>
+                </td> -->
             </tr>
         </table>
     </section>

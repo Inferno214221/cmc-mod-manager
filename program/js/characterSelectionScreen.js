@@ -1,4 +1,4 @@
-var css, basegame, installed, hidden, version;
+var css, basegame, installed, hidden, version, currentPage;
 getCSS();
 updateCSSProfiles();
 
@@ -27,11 +27,11 @@ function findCSS(character) {
     let number = ('0000' + allChars[character].number).slice(-4);
     let coords;
 
-    let maxX = css[0].length;
-    let maxY = css.length;
+    let maxX = css[currentPage][0].length;
+    let maxY = css[currentPage].length;
     for (let y = 0; y < maxY; y++) {
         for (let x = 0; x < maxX; x++) {
-            if (css[y][x] == number) {
+            if (css[currentPage][y][x] == number) {
                 coords = {
                     x: x,
                     y: y
@@ -128,10 +128,12 @@ this.api.receive("errorGetCSS", () => {
 this.api.receive("fromGetCSS", (data) => {
     css = data.css;
     // let maxY = css.length;
-    for (let y in css) {
-        if (css[y][0] == "") {
-            // delete css[y];
-            css.splice(y, 1);
+    for (let page of Object.keys(css)) {
+        for (let y in css[page]) {
+            if (css[page][y][0] == "") {
+                // delete css[y];
+                css[page].splice(y, 1);
+            }
         }
     }
     console.log(css);
@@ -140,12 +142,17 @@ this.api.receive("fromGetCSS", (data) => {
     version = data.version;
     let allChars = Object.assign({}, basegame.versions[version].builtin, basegame.cmc, installed.characters);
     console.log(allChars);
+    if (css["css.txt"] == undefined) {
+        return;//selection screen
+    }
+    currentPage = "css.txt";
+    CSSPageName.value = currentPage;
     makeTables(css, allChars);
 });
 
 function makeTables(css, allChars) {
-    let maxX = css[0].length;
-    let maxY = css.length;
+    let maxX = css[currentPage][0].length;
+    let maxY = css[currentPage].length;
 
     let output = "<tr>\n\
         <th class=\"cssSquare\"></th>\n";
@@ -160,7 +167,7 @@ function makeTables(css, allChars) {
         for (let x = 0; x < maxX; x++) {
             let character;
             for (let e of Object.keys(allChars)) {
-                if (allChars[e].number == css[y][x]) {
+                if (allChars[e].number == css[currentPage][y][x]) {
                     character = e;
                     delete hidden[e];
                     break;
@@ -169,7 +176,7 @@ function makeTables(css, allChars) {
             if (character === undefined) {
                 //NOTE: resets all css values not in the list of characters
                 output += "<td class=\"cssSquare\" id=\'{ \"x\": " + x + ", \"y\": " + y + " }\' draggable=\"false\" ondragover=\"event.preventDefault();\" ondrop=\"onDropOnCSS(event);\"><image class=\"icon\" src=\"../images/empty.png\" alt=\" \" /></td>";
-                css[y][x] = "0000";
+                css[currentPage][y][x] = "0000";
             } else {
                 output += "\
 <td class=\"cssSquare hoverText\" id=\"" + character + "\">\n\
@@ -230,20 +237,20 @@ function makeTables(css, allChars) {
 function hideCharacter() {
     yInput.value = parseInt(yInput.value);
     xInput.value = parseInt(xInput.value);
-    if ((css[yInput.value] == undefined) || (css[yInput.value][xInput.value] == undefined)) {
+    if ((css[currentPage][yInput.value] == undefined) || (css[currentPage][yInput.value][xInput.value] == undefined)) {
         return;//TODO: error
     }
     removeCharacter(xInput.value, yInput.value);
 }
 
 function removeCharacter(x, y) {
-    let characterNumber = css[y][x];
+    let characterNumber = css[currentPage][y][x];
     if (characterNumber === "0000") {
         return;//TODO: alert
     }
 
     let allChars = Object.assign({}, basegame.versions[version].builtin, basegame.cmc, installed.characters);
-    css[y][x] = "0000";
+    css[currentPage][y][x] = "0000";
     let character;
     for (let e of Object.keys(allChars)) {
         if (allChars[e].number == characterNumber) {
@@ -263,7 +270,7 @@ function removeCharacter(x, y) {
 function addCharacter(character) {
     yInput.value = parseInt(yInput.value);
     xInput.value = parseInt(xInput.value);
-    if ((css[yInput.value] == undefined) || (css[yInput.value][xInput.value] == undefined)) {
+    if ((css[currentPage][yInput.value] == undefined) || (css[currentPage][yInput.value][xInput.value] == undefined)) {
         return;//TODO: error
     }
 
@@ -271,7 +278,7 @@ function addCharacter(character) {
 }
 
 function addCharacterE(character, x, y) {
-    let characterNumber = css[y][x];
+    let characterNumber = css[currentPage][y][x];
     if (characterNumber !== "0000") {
         return;//TODO: alert
     }
@@ -279,7 +286,7 @@ function addCharacterE(character, x, y) {
     if (allChars[character] == undefined) {
         return;//TODO: error
     }
-    css[y][x] = ('0000' + allChars[character].number).slice(-4);
+    css[currentPage][y][x] = ('0000' + allChars[character].number).slice(-4);
     delete hidden[character];
     makeTables(css, allChars);
     this.api.send("writeCSS", css);
@@ -310,14 +317,14 @@ function removeFranchise() {
     for (character of Object.keys(allChars)) {
         // console.log(character, allChars[character]);
         if (allChars[character].franchise == franchiseSelect.value) {
-            let maxX = css[0].length;
-            let maxY = css.length;
+            let maxX = css[currentPage][0].length;
+            let maxY = css[currentPage].length;
 
             for (let y = 0; y < maxY; y++) {
                 for (let x = 0; x < maxX; x++) {
-                    if (('0000' + allChars[character].number).slice(-4) == css[y][x]) {
-                        let characterNumber = css[y][x];
-                        css[y][x] = "0000";
+                    if (('0000' + allChars[character].number).slice(-4) == css[currentPage][y][x]) {
+                        let characterNumber = css[currentPage][y][x];
+                        css[currentPage][y][x] = "0000";
                         let add;
                         for (let e of Object.keys(allChars)) {
                             if (allChars[e].number == characterNumber) {
@@ -339,35 +346,35 @@ function removeFranchise() {
 }
 
 function addRow() {
-    let maxX = css[0].length;
+    let maxX = css[currentPage][0].length;
     let allChars = Object.assign({}, basegame.versions[version].builtin, basegame.cmc, installed.characters);
     
     let output = [];
     for (let x = 0; x < maxX; x++) {
         output.push("0000");
     }
-    css.push(output);
+    css[currentPage].push(output);
 
     makeTables(css, allChars);
     this.api.send("writeCSS", css);
 }
 
 function removeRow() {
-    if (css.length < 2) return;
+    if (css[currentPage].length < 2) return;
     let allChars = Object.assign({}, basegame.versions[version].builtin, basegame.cmc, installed.characters);
 
-    css.pop();
+    css[currentPage].pop();
 
     makeTables(css, allChars);
     this.api.send("writeCSS", css);
 }
 
 function addColumn() {
-    let maxY = css.length;
+    let maxY = css[currentPage].length;
     let allChars = Object.assign({}, basegame.versions[version].builtin, basegame.cmc, installed.characters);
 
     for (let y = 0; y < maxY; y++) {
-        css[y].push("0000");
+        css[currentPage][y].push("0000");
     }
 
     makeTables(css, allChars);
@@ -375,14 +382,25 @@ function addColumn() {
 }
 
 function removeColumn() {
-    if (css[0].length < 2) return;
-    let maxY = css.length;
+    if (css[currentPage][0].length < 2) return;
+    let maxY = css[currentPage].length;
     let allChars = Object.assign({}, basegame.versions[version].builtin, basegame.cmc, installed.characters);
 
     for (let y = 0; y < maxY; y++) {
-        css[y].pop();
+        css[currentPage][y].pop();
     }
 
     makeTables(css, allChars);
     this.api.send("writeCSS", css);
+}
+
+function getCSSPage(offset) {
+    let pages = Object.keys(css);
+    let index = pages.indexOf(currentPage) + offset;
+    if (index < 0) index = pages.length - 1;
+    if (index > pages.length - 1) index = 0;
+    currentPage = pages[index];
+    CSSPageName.value = currentPage;
+    let allChars = Object.assign({}, basegame.versions[version].builtin, basegame.cmc, installed.characters);
+    makeTables(css, allChars);
 }
