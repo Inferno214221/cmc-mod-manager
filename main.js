@@ -356,11 +356,11 @@ function updateCSSProfiles () {
 }
 
 ipcMain.on("openFolder", (event, args) => {
-    shell.openPath(__dirname + args);
+    shell.openPath(path.join(__dirname + args));
 });
 
 ipcMain.on("openCharacterFolder", (event, args) => {
-    shell.openPath(__dirname + "/characters/" + args);
+    shell.openPath(path.join(__dirname + "/characters/" + args));
 });
 
 ipcMain.on("installCharacter", async (event, args) => {
@@ -424,6 +424,9 @@ ipcMain.on("installCharacterZip", async (event, args) => {
 });
 
 function installCharacter(dir) {
+    if (!fs.existsSync(dir + "/fighter/")) {
+        dir += "/" + dir.split('\\').pop().split('/').pop();
+    }
     if (!fs.existsSync(dir + "/fighter/")) {
         return;//TODO: add alerts
     }
