@@ -341,6 +341,15 @@
                 }
             },
             "number": 0
+        },
+        "CMC+ v8.exe": {
+            "builtin": {
+                "random": {
+                    "displayName": "?",
+                    "number": 9999
+                }
+            },
+            "number": 0
         }
     },
     "cmc": {

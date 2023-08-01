@@ -1,45 +1,49 @@
 # CMC Mod Manager
-
 ## What
-This project is a WIP mod manager for Super Smash Brothers Crusade CMC+. It allows for the installation and managing of mods through a gui.
+This project is a WIP mod manager for Super Smash Brothers Crusade CMC+. It allows for the installation and management of mods through a GUI.
+### NOTE:
+Usage of this mod manger will 'spoil' the hidden characters as they are displayed in the program without the locked icon.
 ### Supported Versions
 - [ ] [CMC+ v8](https://gamebanana.com/mods/50383)
 - [x] [CMC+ v7.1.1](https://gamebanana.com/mods/50383)
 - [x] [CMC+ Open Build](https://discord.gg/kAbEBkx5Y4)
 ## Why
-CMC+ has good modding support and modding the game currently isn't that hard why use a mod manager? The main reason I developed this mod manager is for the CSS (Character Selection Screen) editor. Although it is certainly possible, adding characters to the CSS by hand annoyed me because of the need to find character numbers and names (if you are removing unknown characters). CMC Mod Manager allows you to add, swap or remove chracters to/from the CSS (and soon the SSS) with drag and drop.
+CMC+ has good modding support and modding the game currently isn't that hard why use a mod manager? The main reason I developed this mod manager is for the CSS (Character Selection Screen) editor. Although it is certainly possible, adding characters to the CSS by hand annoyed me because of the need to find character numbers and names (if you are removing unknown characters). CMC Mod Manager allows you to add, swap or remove characters to/from the CSS (and soon the SSS) with drag and drop.
 
-![CSS Editor](./CSS.png)
+<details>
+  <summary>Character Selection Screen Editor (Contains Locked Character Spoilers)</summary>
+
+  ![CSS Editor](./CSS.png)
+</details>
+
 ## Installation
 Go [here](https://github.com/Inferno214221/CMCModManager/releases/latest) to install the latest release of CMC Mod Manager for your operating system.
 ### Windows
 After downloading the zip, extract it in the directory you wish to install it in and run the exe.
 #### NOTE:
-When installing the basegame, merging, installing mods or completing any other task that requires file system operations Windows will say that the program is not responding. This is Window's fault not mine, the program is actually doing what it is supposed to, just wait for it to finish. The program makes two copies of the game, one without mods and one with mods, so it will sometimes take a while (I'm running it on an M.2 and I still had this issue so please just be patient).
+When installing the basegame, merging, installing mods or completing any other task that requires file system operations Windows will say that the program is not responding. This is Window's fault, not mine, the program is actually doing what it is supposed to, just wait for it to finish. The program makes two copies of the game, one without mods and one with mods, so it will sometimes take a while (I'm running it on an M.2 and I still had this issue so please just be patient).
 ### Linux
-After downloading the zip, extract it and copy the `/out/cmcmodmanager-linux-x64/` folder to where you would like to install it, e.g. `/opt` (Feel free to rename it as well). Due to CMC+ being built for windows, the default permissions are very wierd with some directories being read only. To fix this it is very important that you run `sudo chmod 777 ./* -R` in your CMC game directory before installing it with your mod manager, otherwise the program will be unable to remove some of the files it is using.
+After downloading the zip, extract it and copy the `/out/cmcmodmanager-linux-x64/` folder to where you would like to install it, e.g. `/opt` (Feel free to rename it as well). Due to CMC+ being built for Windows, the default permissions are very weird with some directories being read-only. To fix this it is very important that you run `sudo chmod 777 ./* -R` in your CMC game directory before installing it with your mod manager, otherwise, the program will be unable to remove some of the files it is using.
 #### NOTE:
-If you are having issues running SSBC / CMC+ on Linux, use wine version 6 rather than 7 or 8 and it plays perfectly (Idk what proton version).
+If you are having issues running SSBC / CMC+ on Linux, use Wine version 6 rather than 7 or 8 and it plays perfectly (Idk what proton version).
 ### MacOS
-Install [Asahi Linux](https://asahilinux.org/), then procede with the Linux installation steps. 
+Install [Asahi Linux](https://asahilinux.org/), then proceed with the Linux installation steps. 
 #### NOTE:
 The above statement is double reverse sarcastic.
 ## Usage
-// ensure characters are correct
-## Notes
-This is my first time using Electron and therefore the code is a bit of a mess sorry.
+After installing CMC Mod Manager the first step is to import the basegame. Under the 'Home' tab select 'Import Basegame' and select the folder with CMC's exe in it. After pressing OK, the mod manager will make a copy of the game in its own directory, which might take a while. Afterwards, you can delete the previous copy and only use the mod manager's if you'd like to save space. When importing the basegame or merging mods on Windows, it is very likely that you will receive a warning that the program is not responding. Please ignore this and let it run anyway.
+
+To install character mods, switch to the 'Character Manager' tab and select 'Install from Directory' or 'Install From Archive'. Any characters that you want to install should be formatted correctly so that all of the files in the mod's directory would be copied into the game's without modification (e.g. no separate folders for different game versions). After installing any mod, remember to 'Merge All Mods' from the 'Home' tab.
+
+The 'Character Selection Screen' tab can be used after merging to modify which characters are available to choose from on the selection screen by dragging and dropping characters between the CSS grid and the list underneath.
 ## It's not working!
-// if characters are correct
-// manual fix
-// github bug report
+Please insure that all mods that are installed are in the correct format and that the program has been use correctly. If a breakage occured installing a mod, try removing it via the mod manager, or manually in the `installed.json` file and deleteing the manager's copy of the mod's folder.
 
-///////////////////
-## Features (WIP)
-This mod manager works by storing a copy of the basegame and all installed mods separately and then merging them in the designated order.
-
-When installing characters, it is likely that some mods will not work properly unless they are in the correct format. Mods should be able to be copied straight into the CMC folder to install manually.
+If none of these options are fixing the problem please submit and issue on github with information about what went wrong and when. (Check that no one else has the same issue first.)
+## Notes
+This is my first time using Electron and therefore the code is a bit of a mess sorry. Also, I am not very good at designing GUIs so this one might be unintuitive. Feel free to provide suggestions for interface improvements although be warned they may be declined.
 ## Progress
-### Main Page (Priority: 1)
+### Main Page
 - [x] Install the unmodified version of CMC
 - [x] Merge installed characters
 - [x] Open basegame and merged directories in local file manager
@@ -53,7 +57,7 @@ When installing characters, it is likely that some mods will not work properly u
 - [ ] Make stages.txt & others on export
 - [x] Alerts
 - [ ] Errors
-### Character Manager (Priority: 2)
+### Character Manager
 - [x] Install characters from a folder (very picky)
 - [x] Install characters from a zip (extract, install folder, delete)
 - [x] List installed mod characters
@@ -63,7 +67,7 @@ When installing characters, it is likely that some mods will not work properly u
 - [x] Delete instructions txt file on merge
 - [x] RAR support - no errors
 - [ ] Errors
-### Character Selection Screen (Priority: 3)
+### Character Selection Screen (Priority: 1)
 - [x] Display the CSS
 - [x] Display unincluded characters (not alts)
 - [x] Add characters to CSS
@@ -75,20 +79,23 @@ When installing characters, it is likely that some mods will not work properly u
 - [x] Drag and Drop
 - [x] Replace characters
 - [x] Change the number of rows & columns
-- [x] Uninstalled characters are removed when the css is updated to prevent locked icons
+- [x] Uninstalled characters are removed
+- [ ] Switch CSS Pages
+- [ ] Add CSS Pages
+- [ ] Edit Game Settings to change displayed list
 - [ ] Alerts
 - [ ] Errors
-### Alts (Priority: 7)
+### Alts (Priority: 5)
 - [ ] IDFK how I should deal with alts
 - [ ] Alerts
 - [ ] Errors
-### Stage Manager (Priority: 5)
+### Stage Manager (Priority: 4)
 - [ ] Install stages from a folder
 - [ ] Install stages from a zip (extract, install folder, delete)
 - [ ] Manage stage merge priority
 - [ ] Alerts
 - [ ] Errors
-### Stage Selection Screen (Priority: 6)
+### Stage Selection Screen (Priority: 4)
 - [ ] Display the SSS w/ pages
 - [ ] Display unincluded stages
 - [ ] Add stages to SSS
@@ -100,12 +107,15 @@ When installing characters, it is likely that some mods will not work properly u
 - [ ] Add pages
 - [ ] Alerts
 - [ ] Errors
-### Items (Priority: 8?)
+### Items (Priority: 6)
 - [ ] Install item mods - Not many mods & idk if it works with CMC+ v7
 - [ ] Remove item mods
 - [ ] Alerts
 - [ ] Errors
-### Miscellanious Mods (Priority: 4)
+### Miscellanious Mods (Priority: 3)
 - [x] Add option to import other types of mods e.g. ui changes / music
 - [x] RAR support - no errors
 - [ ] Errors
+### Mod Tools (Priority: 2)
+- [ ] CMC+ v7 dat to v8 dat
+- [ ] Character Extractor
