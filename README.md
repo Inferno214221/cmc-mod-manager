@@ -63,6 +63,7 @@ This is my first time using Electron and therefore the code is a bit of a mess s
 - [x] Change character merge priority
 - [x] Delete instructions txt file on merge
 - [x] RAR support - no errors
+- [x] Installed v7 Characters Can Be Converted To v8
 - [ ] Errors
 ### Character Selection Screen (Priority: 1)
 - [x] Display the CSS
@@ -77,7 +78,7 @@ This is my first time using Electron and therefore the code is a bit of a mess s
 - [x] Replace characters
 - [x] Change the number of rows & columns
 - [x] Uninstalled characters are removed
-- [ ] Switch CSS Pages
+- [x] Switch CSS Pages
 - [ ] Add CSS Pages
 - [ ] Edit Game Settings to change displayed list
 - [ ] Alerts
@@ -114,5 +115,4 @@ This is my first time using Electron and therefore the code is a bit of a mess s
 - [x] RAR support - no errors
 - [ ] Errors
 ### Mod Tools (Priority: 2)
-- [ ] CMC+ v7 dat to v8 dat
 - [ ] Character Extractor

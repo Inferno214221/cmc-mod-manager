@@ -460,7 +460,6 @@ function installCharacter(dir, convertFormat) {
     if (convertFormat && !characterDat[4].includes("---Classic Home Stages Below---")) {
         characterDat.splice(4, 1, "---Classic Home Stages Below---", "1", "battlefield", "---Random Datas---", "0", "---Palettes Number---");
         characterDat.splice(11, 0, "---From Here is Individual Palettes data---");
-        console.log(characterDat);
         let characterDatTxt = "";
         characterDat.forEach((line) => {
             characterDatTxt += line + "\r\n";
@@ -598,6 +597,9 @@ ipcMain.on("installModZip", async (event, args) => {
 });
 
 function installMod(dir, modName) {
+    if (fs.existsSync(dir + "/" + dir.split('\\').pop().split('/').pop())) {
+        dir += "/" + dir.split('\\').pop().split('/').pop();
+    }
     fs.copySync(dir, __dirname + "/misc/" + modName, { overwrite: true });
     
     let installed = reRequire(__dirname + "/misc/installed.json");
