@@ -371,7 +371,7 @@ ipcMain.on("installCharacter", async (event, args) => {
             return;//TODO: add alerts
         }
         // let modName = dir.filePaths[0].split('\\').pop().split('/').pop();
-        installCharacter(dir.filePaths[0]);
+        installCharacter(dir.filePaths[0], args);
     });
 });
 
@@ -418,12 +418,12 @@ ipcMain.on("installCharacterZip", async (event, args) => {
                 return;
                 break;
         }
-        await installCharacter(dir);
+        await installCharacter(dir, args);
         fs.removeSync(__dirname + "/characters/_temp");
     });
 });
 
-function installCharacter(dir) {
+function installCharacter(dir, convertFormat) {
     if (!fs.existsSync(dir + "/fighter/")) {
         dir += "/" + dir.split('\\').pop().split('/').pop();
     }
@@ -457,12 +457,30 @@ function installCharacter(dir) {
         "utf-8"
     );
 
+    if (convertFormat && !characterDat[4].includes("---Classic Home Stages Below---")) {
+        characterDat.splice(4, 1, "---Classic Home Stages Below---", "1", "battlefield", "---Random Datas---", "0", "---Palettes Number---");
+        characterDat.splice(11, 0, "---From Here is Individual Palettes data---");
+        console.log(characterDat);
+        let characterDatTxt = "";
+        characterDat.forEach((line) => {
+            characterDatTxt += line + "\r\n";
+        });
+        fs.writeFileSync(
+            __dirname + "/characters/" + characterName + "/data/dats/" + characterName + ".dat",
+            characterDatTxt,
+            "ascii"
+        );
+    }
+
     win.webContents.send("fromInstallCharacter", installed);
 }
 
 ipcMain.on("getInstalledCharList", (event, args) => {
     let installed = reRequire(__dirname + "/characters/installed.json");
-    win.webContents.send("fromGetInstalledCharList", installed);
+    win.webContents.send("fromGetInstalledCharList", {
+        installed: installed,
+        version: version,
+    });
 });
 
 ipcMain.on("removeCharacter", (event, args) => {

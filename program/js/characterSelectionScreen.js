@@ -146,7 +146,7 @@ this.api.receive("fromGetCSS", (data) => {
         return;//selection screen
     }
     currentPage = "css.txt";
-    CSSPageName.value = currentPage;
+    CSSPageName.value = "css";
     makeTables(css, allChars);
 });
 
@@ -400,7 +400,7 @@ function getCSSPage(offset) {
     if (index < 0) index = pages.length - 1;
     if (index > pages.length - 1) index = 0;
     currentPage = pages[index];
-    CSSPageName.value = currentPage;
+    CSSPageName.value = currentPage.replace(".txt", "");
     let allChars = Object.assign({}, basegame.versions[version].builtin, basegame.cmc, installed.characters);
     makeTables(css, allChars);
 }

@@ -1,16 +1,21 @@
 // On Page Load
+var version;
 this.api.send("getInstalledCharList");
 
-this.api.receive("fromGetInstalledCharList", (installed) => {
-    listCharacters(installed);
+this.api.receive("fromGetInstalledCharList", (data) => {
+    version = data.version;
+    if (version != "CMC+ v8.exe") {
+        cmc8.innerHTML = "";
+    }
+    listCharacters(data.installed);
 });
 
 function installCharacter() {
-    this.api.send("installCharacter");
+    this.api.send("installCharacter", (version == "CMC+ v8.exe" && convertFormat.checked));
 }
 
 function installCharacterZip() {
-    this.api.send("installCharacterZip");
+    this.api.send("installCharacterZip", (version == "CMC+ v8.exe" && convertFormat.checked));
 }
 
 this.api.receive("fromInstallCharacter", (installed) => {
