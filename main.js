@@ -17,7 +17,9 @@ const PERSIST = [
     "data/records.bin",
     "data/stats/general.bin",
     "data/css.txt",
-    "data/css"
+    "data/css",
+    "data/unlock.bin",
+    "data/GAME_SETTINGS.txt"//FIXME:
 ];
 
 const BLOAT = [
