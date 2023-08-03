@@ -1,36 +1,37 @@
 // General
-function new_openDir(dir) {
-    this.api.send("new_openDir", dir);
+function openDir(dir) {
+    this.api.send("openDir", dir);
 }
 
-this.api.receive("new_throwError", (error) => {
+this.api.receive("throwError", (error) => {
     alert("An Error Occured: " + error);
 });
 
-// On Page Load
-new_checkGameInstalled();
-
-function new_checkGameInstalled() {
-    this.api.send("new_checkGameInstalled");
+// Index
+function checkGameInstalled() {
+    this.api.send("checkGameInstalled");
 }
 
-this.api.receive("new_from_checkGameInstalled", (installed) => {
-    new_writeGameInstalled(installed);
+this.api.receive("from_checkGameInstalled", (installed) => {
+    writeGameInstalled(installed);
 });
 
-function new_writeGameInstalled(installed) {
+function writeGameInstalled(installed) {
     gameSource.innerHTML = "CMC: " + (installed ? "Installed" : "Not Installed");
 }
 
-function new_importUnmodded() {
-    this.api.send("new_importUnmodded");
+function importUnmodded() {
+    this.api.send("importUnmodded");
 }
 
-this.api.receive("new_from_importUnmodded", () => {
+this.api.receive("from_importUnmodded", () => {
     alert("CMC base game installed succesfully");
-    new_writeGameInstalled(true);
+    writeGameInstalled(true);
 });
 
-function new_runGame() {
-    this.api.send("new_runGame");
+function runGame() {
+    this.api.send("runGame");
 }
+
+// On Page Load
+checkGameInstalled();

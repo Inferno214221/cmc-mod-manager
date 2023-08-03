@@ -44,7 +44,7 @@ const CHARACTER_FILES = [
     "fighter/<fighter>",
     "gfx/abust/<fighter>.png",
     "gfx/bust/<fighter>.png",
-    "gfx/bust/<fighter>_*.png",
+    "gfx/bust/<fighter>_<palette>.png",
     "gfx/cbust/<fighter>.png",
     "gfx/mbust/<fighter>.png",
     "gfx/tbust/<fighter>__*.png",
@@ -52,9 +52,9 @@ const CHARACTER_FILES = [
     "gfx/hudicon/<series>.png",
     "gfx/name/<fighter>.png",
     "gfx/portrait/<fighter>.png",
-    "gfx/portrait/<fighter>_*.png",
+    "gfx/portrait/<fighter>_<palette>.png",
     "gfx/portrait_new/<fighter>.png",
-    "gfx/portrait_new/<fighter>_*.png",
+    "gfx/portrait_new/<fighter>_<palette>.png",
     "gfx/seriesicon/<series>.png",
     "gfx/stock/<fighter>.png",
     "music/versus/<fighter>_*.<audio>",
@@ -103,7 +103,7 @@ app.on('window-all-closed', () => {
 
 // General
 
-ipcMain.on("new_openDir", (event, dir) => {
+ipcMain.on("openDir", (event, dir) => {
     shell.openPath(path.join(__dirname, dir));
 });
 
@@ -133,13 +133,42 @@ const getAllFiles = function (dirPath, arrayOfFiles) {
     return arrayOfFiles;
 }
 
+function getCharacters() {
+    let fighters = [];
+    let fightersTxt = fs.readFileSync(path.join(__dirname, "cmc", "data", "fighters.txt"), "ascii").split(/\r?\n/);
+    fightersTxt.shift();
+    fightersTxt.forEach((fighter) => {
+        if (fs.existsSync(path.join(__dirname, "cmc", "data", "dats", fighter + ".dat"))) {
+            let fighterDat = fs.readFileSync(path.join(__dirname, "cmc", "data", "dats", fighter + ".dat"), "ascii").split(/\r?\n/);
+            fighters.push({
+                name: fighter,
+                displayName: fighterDat[1],
+                series: fighterDat[3],
+            });
+        } else {
+            //TODO: throw error?
+        }
+    });
+    return fighters;
+}
+
+function appendCharacter(character) {
+    let characters = getCharacters();
+    let output = (characters.length + 1) + "\r\n";
+    characters.forEach((character) => {
+        output += character.name + "\r\n";
+    });
+    output += character + "\r\n";
+    fs.writeFileSync(path.join(__dirname, "cmc", "data", "fighters.txt"), output, "ascii");
+}
+
 // Index
 
-ipcMain.on("new_checkGameInstalled", (event, args) => {
-    win.webContents.send("new_from_checkGameInstalled", version != null);
+ipcMain.on("checkGameInstalled", (event, args) => {
+    win.webContents.send("from_checkGameInstalled", version != null);
 });
 
-ipcMain.on("new_importUnmodded", (event, args) => {
+ipcMain.on("importUnmodded", (event, args) => {
     dialog.showOpenDialog(win, {
         properties: ["openDirectory"]
     }).then(dir => {
@@ -159,16 +188,169 @@ ipcMain.on("new_importUnmodded", (event, args) => {
         fs.copySync(dir.filePaths[0], path.join(__dirname, "cmc"), { overwrite: true });
         version = getGameVersion(path.join(__dirname, "cmc"));
 
-        win.webContents.send("new_from_importUnmodded", true);
+        win.webContents.send("from_importUnmodded", true);
     });
 });
 
-ipcMain.on("new_runGame", (event, args) => {
+ipcMain.on("runGame", (event, args) => {
     childProcess.execFile(path.join(__dirname, "cmc", version + ".exe"), {
         cwd: path.join(__dirname, "cmc"),
         windowsHide: true
     });
 });
+
+// Characters
+
+ipcMain.on("getCharacterList", (event, args) => {
+    win.webContents.send("from_getCharacterList", getCharacters());
+});
+
+ipcMain.on("installCharacterDir", (event, args) => {
+    dialog.showOpenDialog(win, {
+        properties: ["openDirectory"]
+    }).then(dir => {
+        if (dir.canceled === true) {
+            return;
+        }
+        installCharacter(dir.filePaths[0], args);
+    });
+});
+
+ipcMain.on("installCharacterArch", (event, args) => {
+    dialog.showOpenDialog(win, {
+        properties: ["openFile"]
+    }).then(async (file) => {
+        if (file.canceled === true) {
+            return;
+        }
+        let filePath = file.filePaths[0];
+        let modName = path.parse(filePath).name;
+        let dir = path.join(__dirname + "_temp");
+        dir = dir + "/" + modName;
+        switch (path.parse(filePath).ext.toLowerCase()) {
+            case "zip":
+                await extract(filePath, {
+                    dir: dir,
+                    defaultDirMode: 0o777,
+                    defaultFileMode: 0o777,
+                });
+                break;
+            case "rar"://TODO: Error handling
+                let buf = Uint8Array.from(fs.readFileSync(filePath)).buffer;
+                let extractor = await unrar.createExtractorFromData({ data: buf });
+                const extracted = extractor.extract();
+                const files = [...extracted.files];
+                files.forEach(fileE => {// Make All Folders First
+                    if (fileE.fileHeader.flags.directory) {
+                        fs.ensureDirSync(path.join(dir, fileE.fileHeader.name));
+                    }
+                });
+                files.forEach(fileE => {// Make All Folders First
+                    if (!fileE.fileHeader.flags.directory) {
+                        fs.writeFileSync(path.join(dir, + fileE.fileHeader.name), Buffer.from(fileE.extraction));
+                    }
+                });
+                break;
+            case "7z":
+            default:
+                return;
+                break;
+        }
+        await installCharacter(dir, args);
+        fs.removeSync(path.join(__dirname, "_temp"));
+    });
+});
+
+function installCharacter(dir, filteredInstall) {
+    if (!fs.existsSync(path.join(dir, "fighter"))) {
+        dir += path.join(path.parse(dir).base);
+    }
+    if (!fs.existsSync(path.join(dir, "fighter"))) {
+        win.webContents.send("throwError", "Can't find the target character's ./fighter/ directory.");
+        return;
+    }
+    let characterName = fs.readdirSync(path.join(dir, "fighter"))[0].split(".")[0];
+    if (!fs.existsSync(path.join(dir, "data", "dats", characterName + ".dat"))) {
+        win.webContents.send("throwError", "The character's dat file is not in the ./data/dats/ directory.");
+        return;
+    }
+    let characterDat = fs.readFileSync(path.join(dir, "data", "dats", characterName + ".dat"), "ascii").split(/\r?\n/);
+
+    let datMod = !characterDat[4].includes("---Classic Home Stages Below---");
+    if (datMod) {
+        characterDat.splice(4, 1, "---Classic Home Stages Below---", "1", "battlefield", "---Random Datas---", "0", "---Palettes Number---");
+        characterDat.splice(11, 0, "---From Here is Individual Palettes data---");
+        let characterDatTxt = "";
+        characterDat.forEach((line) => {
+            characterDatTxt += line + "\r\n";
+        });
+    }
+
+    if (filteredInstall) {
+        filterCharacterFiles(dir, characterName, characterDat).forEach((file) => {
+            let subDir = path.parse(file).dir;
+            fs.ensureDirSync(path.join(__dirname, "extracted", characterName, subDir));
+            if (file.includes("*")) {
+                let start = path.parse(file).base.split("*")[0].replace(subDir, "");
+                let end = path.parse(file).base.split("*")[1];
+                console.log(path.join(dir, subDir), start, end);
+                if (fs.existsSync(path.join(dir, subDir))) {
+                    let contents = fs.readdirSync(path.join(dir, subDir)).filter((i) => {
+                        return i.startsWith(start) && i.endsWith(end);
+                    });
+                    contents.forEach((found) => {
+                        fs.copySync(path.join(dir, subDir, found), path.join(__dirname, "cmc", subDir, found), {overwrite: true});
+                    });
+                }
+            } else {
+                if (fs.existsSync(path.join(dir, file))) {
+                    fs.copySync(path.join(dir, file), path.join(__dirname, "cmc", file), {overwrite: true});
+                }
+            }
+        });
+    } else {
+        fs.copySync(dir, path.join(__dirname, "cmc"), {overwrite: true});
+    }
+
+    appendCharacter(characterName);
+
+    if (datMod) {
+        fs.writeFileSync(
+            path.join(__dirname, "cmc", "data", "dats", characterName + ".dat"),
+            characterDatTxt,
+            "ascii"
+        );
+    }
+
+    win.webContents.send("from_installCharacter");
+}
+
+function filterCharacterFiles(dir, characterName, characterDat) {
+    let files = [];
+    CHARACTER_FILES.forEach((file) => {
+        let fixedFiles = [];
+        fixedFiles.push(file.replace("<fighter>", characterName).replace("<series>", characterDat[3]));
+        if (fixedFiles[0].includes("<audio>")) {
+            ["ogg", "wav", "mp3"].forEach((format) => {
+                fixedFiles.push(fixedFiles[0].replace("<audio>", format));
+            });
+            fixedFiles.shift();
+        }
+        fixedFiles.forEach((fixedFile) => {
+            if (fixedFile.includes("<palette>")) {
+                for (let p = 0; p < (parseInt(characterDat[11]) - 1); p++) {
+                    fixedFiles.push(fixedFile.replace("<palette>", p + 1));
+                }
+                fixedFiles.shift();
+            }
+        });
+
+        fixedFiles.forEach((fixed) => {
+            files.push(fixed);
+        });
+    });
+    return files;
+}
 
 ////////
 
@@ -513,57 +695,57 @@ ipcMain.on("installCharacterZip", async (event, args) => {
     });
 });
 
-function installCharacter(dir, convertFormat) {
-    if (!fs.existsSync(dir + "/fighter/")) {
-        dir += "/" + dir.split('\\').pop().split('/').pop();
-    }
-    if (!fs.existsSync(dir + "/fighter/")) {
-        win.webContents.send("throwError", "Can't find the target character's ./fighter/ directory. (439)");
-        return;
-    }
-    let characterName = fs.readdirSync(dir + "/fighter/")[0].split(".")[0];
+// function installCharacter(dir, convertFormat) {
+//     if (!fs.existsSync(dir + "/fighter/")) {
+//         dir += "/" + dir.split('\\').pop().split('/').pop();
+//     }
+//     if (!fs.existsSync(dir + "/fighter/")) {
+//         win.webContents.send("throwError", "Can't find the target character's ./fighter/ directory. (439)");
+//         return;
+//     }
+//     let characterName = fs.readdirSync(dir + "/fighter/")[0].split(".")[0];
 
-    fs.copySync(dir, __dirname + "/characters/" + characterName, { overwrite: true });
-    //FIXME: if it overwrites a directory it will cause issue later
+//     fs.copySync(dir, __dirname + "/characters/" + characterName, { overwrite: true });
+//     //FIXME: if it overwrites a directory it will cause issue later
 
-    let characterDat = [];
-    //TODO: errors on no dat
-    if (!fs.existsSync(__dirname + "/characters/" + characterName + "/data/dats/")) {
-        fs.moveSync(__dirname + "/characters/" + characterName + "/data/" + characterName + ".dat", __dirname + "/data/dats/" + characterName + ".dat", { overwrite: true });
-    }
-    characterDat = fs.readFileSync(__dirname + "/characters/" + characterName + "/data/dats/" + characterName + ".dat", "utf-8").split(/\r?\n/);
+//     let characterDat = [];
+//     //TODO: errors on no dat
+//     if (!fs.existsSync(__dirname + "/characters/" + characterName + "/data/dats/")) {
+//         fs.moveSync(__dirname + "/characters/" + characterName + "/data/" + characterName + ".dat", __dirname + "/data/dats/" + characterName + ".dat", { overwrite: true });
+//     }
+//     characterDat = fs.readFileSync(__dirname + "/characters/" + characterName + "/data/dats/" + characterName + ".dat", "utf-8").split(/\r?\n/);
     
-    let installed = reRequire(__dirname + "/characters/installed.json");
-    installed.number += 1;
-    let characterData = {
-        "displayName": characterDat[1],
-        "franchise": characterDat[3],
-        "number": installed.number
-    };
-    installed.characters[characterName] = characterData;
-    installed.priority.push(characterName);
-    fs.writeFileSync(
-        __dirname + "/characters/installed.json",
-        JSON.stringify(installed, null, 4),
-        "utf-8"
-    );
+//     let installed = reRequire(__dirname + "/characters/installed.json");
+//     installed.number += 1;
+//     let characterData = {
+//         "displayName": characterDat[1],
+//         "franchise": characterDat[3],
+//         "number": installed.number
+//     };
+//     installed.characters[characterName] = characterData;
+//     installed.priority.push(characterName);
+//     fs.writeFileSync(
+//         __dirname + "/characters/installed.json",
+//         JSON.stringify(installed, null, 4),
+//         "utf-8"
+//     );
 
-    if (convertFormat && !characterDat[4].includes("---Classic Home Stages Below---")) {
-        characterDat.splice(4, 1, "---Classic Home Stages Below---", "1", "battlefield", "---Random Datas---", "0", "---Palettes Number---");
-        characterDat.splice(11, 0, "---From Here is Individual Palettes data---");
-        let characterDatTxt = "";
-        characterDat.forEach((line) => {
-            characterDatTxt += line + "\r\n";
-        });
-        fs.writeFileSync(
-            __dirname + "/characters/" + characterName + "/data/dats/" + characterName + ".dat",
-            characterDatTxt,
-            "ascii"
-        );
-    }
+//     if (convertFormat && !characterDat[4].includes("---Classic Home Stages Below---")) {
+//         characterDat.splice(4, 1, "---Classic Home Stages Below---", "1", "battlefield", "---Random Datas---", "0", "---Palettes Number---");
+//         characterDat.splice(11, 0, "---From Here is Individual Palettes data---");
+//         let characterDatTxt = "";
+//         characterDat.forEach((line) => {
+//             characterDatTxt += line + "\r\n";
+//         });
+//         fs.writeFileSync(
+//             __dirname + "/characters/" + characterName + "/data/dats/" + characterName + ".dat",
+//             characterDatTxt,
+//             "ascii"
+//         );
+//     }
 
-    win.webContents.send("fromInstallCharacter", installed);
-}
+//     win.webContents.send("fromInstallCharacter", installed);
+// }
 
 ipcMain.on("getInstalledCharList", (event, args) => {
     let installed = reRequire(__dirname + "/characters/installed.json");

@@ -1,12 +1,73 @@
+// General
+function openDir(dir) {
+    this.api.send("openDir", dir);
+}
+
 this.api.receive("throwError", (error) => {
     alert("An Error Occured: " + error);
 });
 
+// Characters
+function getCharacterList() {
+    this.api.send("getCharacterList");
+}
+
+this.api.receive("from_getCharacterList", (data) => {
+    listCharacters(data);
+});
+
+function listCharacters(characters) {
+    let output = "";
+    for (let character in characters) {
+        output += 
+        "<tr id=\"" + character + "\">\n\
+            <td class=\"mug\"><image src=\"../../cmc/gfx/mugs/" + characters[character].name + ".png\" draggable=\"false\"/></td>\n\
+            <td>" + characters[character].displayName + "</td>\n\
+            <td><button type=\"button\" onclick=\"removeCharacter('" + character + "')\">Remove</button></td>\n\
+            <td><button type=\"button\" onclick=\"extractCharacter('" + character + "')\">Extract</button></td>\n\
+        </tr>\n"
+    };
+    characterTable.innerHTML = output;
+}
+
+function installCharacterDir() {
+    this.api.send("installCharacterDir", filteredInstall.checked);
+}
+
+function installCharacterArch() {
+    this.api.send("installCharacterArch", filteredInstall.checked);
+}
+
+this.api.receive("from_installCharacter", (data) => {
+    alert("Character installed successfully.");
+    getCharacterList();
+});
+
+function removeCharacter(id) {
+    //
+}
+
+this.api.receive("from_removeCharacter", (data) => {
+    //
+});
+
+function extractCharacter(id) {
+    //
+}
+
+this.api.receive("from_extractCharacter", (data) => {
+    //
+});
+
 // On Page Load
 var version;
-this.api.send("getInstalledCharList");
+getCharacterList();
+/*
 
-this.api.receive("fromGetInstalledCharList", (data) => {
+// On Page Load
+this.api.send("getInstalledCharacterList");
+
+this.api.receive("fromGetInstalledCharacterList", (data) => {
     version = data.version;
     if (version != "CMC+ v8.exe") {
         cmc8.innerHTML = "";
@@ -27,16 +88,16 @@ this.api.receive("fromInstallCharacter", (installed) => {
     listCharacters(installed);
 });
 
-function removeCharacter(character) {
-    this.api.send("removeCharacter", character);
+function removeCharacter(Character) {
+    this.api.send("removeCharacter", Character);
 }
 
 this.api.receive("fromRemoveCharacter", (installed) => {
     listCharacters(installed);
 });
 
-function increaseMergePriority(character) {
-    this.api.send("increaseMergePriority", character);
+function increaseMergePriority(Character) {
+    this.api.send("increaseMergePriority", Character);
 }
 
 this.api.receive("fromIncreaseMergePriority", (installed) => {
@@ -45,30 +106,30 @@ this.api.receive("fromIncreaseMergePriority", (installed) => {
 
 function listCharacters(installed) {
     let output = "";
-    installed.priority.forEach((character) => {
+    installed.priority.forEach((Character) => {
         output += 
-        "<tr id=\"" + character + "\">\n\
-            <td class=\"mug\"><image src=\"../../characters/" + character + "/gfx/mugs/" + character + ".png\" /></td>\n\
-            <td>" + installed.characters[character].displayName + "</td>\n\
-            <td><button type=\"button\" onclick=\"removeCharacter('" + character + "')\">Remove</button></td>\n\
-            <td><button type=\"button\" onclick=\"openCharacterFolder('" + character + "')\">Open Directory</button></td>\n\
-            <td><button type=\"button\" onclick=\"increaseMergePriority('" + character + "')\">Increase Merge Priority</button></td>\n\
+        "<tr id=\"" + Character + "\">\n\
+            <td class=\"mug\"><image src=\"../../Characters/" + Character + "/gfx/mugs/" + Character + ".png\" /></td>\n\
+            <td>" + installed.Characters[Character].displayName + "</td>\n\
+            <td><button type=\"button\" onclick=\"removeCharacter('" + Character + "')\">Remove</button></td>\n\
+            <td><button type=\"button\" onclick=\"openCharacterFolder('" + Character + "')\">Open Directory</button></td>\n\
+            <td><button type=\"button\" onclick=\"increaseMergePriority('" + Character + "')\">Increase Merge Priority</button></td>\n\
         </tr>\n"
     });
-    characterTable.innerHTML = output;
+    CharacterTable.innerHTML = output;
 }
 
 function extractionList(basegame) {
     let output = "";
-    basegame.forEach((character) => {
-        output += "<option value=\"" + character + "\">" + character + "</option>\n"
+    basegame.forEach((Character) => {
+        output += "<option value=\"" + Character + "\">" + Character + "</option>\n"
     });
     extractCharacterSelect.innerHTML = output;
 }
 
 function extractCharacter() {
     this.api.send("extractCharacter", {
-        character: extractCharacterSelect.value,
+        Character: extractCharacterSelect.value,
         deleteExtraction: deleteExtraction.checked,
     });
 }
@@ -77,8 +138,8 @@ this.api.receive("fromExtractCharacter", () => {
     alert("Character sucessfully extracted!");
 });
 
-function openCharacterFolder(character) {
-    this.api.send("openCharacterFolder", character);
+function openCharacterFolder(Character) {
+    this.api.send("openCharacterFolder", Character);
 }
 
 function inputFocused(element) {
@@ -91,4 +152,4 @@ function inputBlurred(element) {
 
 function openFolder(directory) {
     this.api.send("openFolder", directory);
-}
+}*/

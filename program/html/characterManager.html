@@ -59,28 +59,22 @@
     <section>
         <fieldset>
             <legend>Installation / Extraction</legend>
-            <button type="button" onclick="">Install Character From Directory</button>
-            <button type="button" onclick="">Install Character From Archive</button>
-            <button type="button" onclick="">Open Extracted Directory</button>
+            <button type="button" onclick="installCharacterDir()">Install Character From Directory</button>
+            <button type="button" onclick="installCharacterArch()">Install Character From Archive</button>
+            <button type="button" onclick="openDir('extracted')">Open Extracted Directory</button>
             <br/>
             <input type="checkbox" id="filteredInstall" name="filteredInstall" checked>
             <label for="filteredInstall">Install Only Necessary Files</label>
-            <span id="cmc8">
-                <input type="checkbox" id="convertFormat" name="convertFormat" checked>
-                <label for="convertFormat">Convert CMC+ v7 Mods To v8</label>
-            </span>
         </fieldset>
         <fieldset>
             <legend>Installed Characters</legend>
-            <table>
-                <tr id="character">
-                    <td class="mug"><image src="../../characters/character/gfx/mugs/character.png" /></td>
-                    <td>displayName</td>
-                    <td><button type="button" onclick="">Remove</button></td>
-                    <td><button type="button" onclick="">Extract</button></td>
-                </tr>
-            </table>
             <table id="characterTable">
+                <tr id="link">
+                    <td class="mug"><image src="../../cmc/gfx/mugs/link.png" /></td>
+                    <td>Link</td>
+                    <td><button type="button" onclick="removeCharacter('link')">Remove</button></td>
+                    <td><button type="button" onclick="extractCharacter('link')">Extract</button></td>
+                </tr>
             </table>
         </fieldset>
     </section>
