@@ -22,7 +22,7 @@
             <li>
                 <a href="./characterManager.html" class="tab">
                     <div class="activeTab">
-                        Character Manager
+                        Characters
                     </div>
                 </a>
             </li>
@@ -58,9 +58,13 @@
     </nav>
     <section>
         <fieldset>
-            <legend>Installation</legend>
-            <button type="button" onclick="installCharacter()">Install Character From Directory</button>
-            <button type="button" onclick="installCharacterZip()">Install Character From Archive</button>
+            <legend>Installation / Extraction</legend>
+            <button type="button" onclick="">Install Character From Directory</button>
+            <button type="button" onclick="">Install Character From Archive</button>
+            <button type="button" onclick="">Open Extracted Directory</button>
+            <br/>
+            <input type="checkbox" id="filteredInstall" name="filteredInstall" checked>
+            <label for="filteredInstall">Install Only Necessary Files</label>
             <span id="cmc8">
                 <input type="checkbox" id="convertFormat" name="convertFormat" checked>
                 <label for="convertFormat">Convert CMC+ v7 Mods To v8</label>
@@ -68,20 +72,16 @@
         </fieldset>
         <fieldset>
             <legend>Installed Characters</legend>
+            <table>
+                <tr id="character">
+                    <td class="mug"><image src="../../characters/character/gfx/mugs/character.png" /></td>
+                    <td>displayName</td>
+                    <td><button type="button" onclick="">Remove</button></td>
+                    <td><button type="button" onclick="">Extract</button></td>
+                </tr>
+            </table>
             <table id="characterTable">
             </table>
-        </fieldset>
-        <fieldset>
-            <legend>Basegame Character Extraction</legend>
-            <span>Note: Modded Characters Should Be Removed Above</span><br/>
-            <select id="extractCharacterSelect" onfocus="inputFocused('extractCharacterSelect')" onblur="inputBlurred('extractCharacterSelect')" onchange="inputBlurred('extractCharacterSelect')">
-                <option value="fighterName">fighterName</option>
-            </select>
-            <button type="button" onclick="extractCharacter()">Extract Character</button>
-            <input type="checkbox" id="deleteExtraction" name="deleteExtraction">
-            <label for="deleteExtraction">Delete Character From Basegame</label>
-            <br/>
-            <button type="button" onclick="openFolder('/extracted')">Open Extracted Directory</button>
         </fieldset>
     </section>
     <script src="../js/characterManager.js">

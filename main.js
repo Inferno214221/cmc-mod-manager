@@ -8,7 +8,11 @@ const extract = require('extract-zip');
 const strftime = require('strftime');
 const unrar = require("node-unrar-js");
 var win;
-var version = getGameVersion(__dirname + "/basegame/");
+
+const SUPPORTED_VERSIONS = [
+    "CMC+ v8",
+    "CMC Plus Open"
+];
 
 const PERSIST = [
     "controls.ini",
@@ -67,6 +71,8 @@ const CHARACTER_FILES = [
     "sticker/ultra/desc/<fighter>.txt",
 ];
 
+var version = getGameVersion(__dirname + "/cmc/");
+
 const createWindow = () => {
     win = new BrowserWindow({
         width: 1120,
@@ -95,14 +101,76 @@ app.on('window-all-closed', () => {
     app.quit();
 });
 
+// General
+
+ipcMain.on("new_openDir", (event, dir) => {
+    shell.openPath(path.join(__dirname, dir));
+});
+
 function getGameVersion(dir) {
-    for(let game of Object.keys(reRequire(__dirname + "/characters/default.json").versions)) {
-        if (fs.existsSync(dir + game)) {
+    for(let game of SUPPORTED_VERSIONS) {
+        if (fs.existsSync(path.join(dir, game + ".exe"))) {
             return game;
         }
     }
     return null;
 }
+
+const getAllFiles = function (dirPath, arrayOfFiles) {
+    files = fs.readdirSync(dirPath);
+
+    arrayOfFiles = arrayOfFiles || [];
+
+    files.forEach(function (file) {
+        if (fs.statSync(dirPath + "/" + file).isDirectory()) {
+            arrayOfFiles = getAllFiles(dirPath + "/" + file, arrayOfFiles);
+        } else {
+            // arrayOfFiles.push(path.join(__dirname, dirPath, "/", file))
+            arrayOfFiles.push(path.join(dirPath, "/", file));
+        }
+    })
+
+    return arrayOfFiles;
+}
+
+// Index
+
+ipcMain.on("new_checkGameInstalled", (event, args) => {
+    win.webContents.send("new_from_checkGameInstalled", version != null);
+});
+
+ipcMain.on("new_importUnmodded", (event, args) => {
+    dialog.showOpenDialog(win, {
+        properties: ["openDirectory"]
+    }).then(dir => {
+        if (dir.canceled === true) {
+            return;
+        }
+        if (getGameVersion(path.join(dir.filePaths[0])) == null) {
+            win.webContents.send("throwError", "No recognised .exe file in the selected directory.");
+            return;
+        }
+        //The new version has horrible permissions so give everything xwr
+        getAllFiles(dir.filePaths[0]).forEach((file) => {
+            fs.chmodSync(file, 0o777);
+        });
+        fs.emptyDirSync(path.join(__dirname, "cmc"));
+        
+        fs.copySync(dir.filePaths[0], path.join(__dirname, "cmc"), { overwrite: true });
+        version = getGameVersion(path.join(__dirname, "cmc"));
+
+        win.webContents.send("new_from_importUnmodded", true);
+    });
+});
+
+ipcMain.on("new_runGame", (event, args) => {
+    childProcess.execFile(path.join(__dirname, "cmc", version + ".exe"), {
+        cwd: path.join(__dirname, "cmc"),
+        windowsHide: true
+    });
+});
+
+////////
 
 ipcMain.on("checkGameSourceInstalled", (event, args) => {
     win.webContents.send("fromCheckGameSourceInstalled", version != null);
@@ -326,23 +394,6 @@ ipcMain.on("getLastMerge", async (event, args) => {
     let time = strftime("%I:%M %p %x", date);
     win.webContents.send("fromGetLastMerge", time);
 });
-
-const getAllFiles = function (dirPath, arrayOfFiles) {
-    files = fs.readdirSync(dirPath);
-
-    arrayOfFiles = arrayOfFiles || [];
-
-    files.forEach(function (file) {
-        if (fs.statSync(dirPath + "/" + file).isDirectory()) {
-            arrayOfFiles = getAllFiles(dirPath + "/" + file, arrayOfFiles);
-        } else {
-            // arrayOfFiles.push(path.join(__dirname, dirPath, "/", file))
-            arrayOfFiles.push(path.join(dirPath, "/", file));
-        }
-    })
-
-    return arrayOfFiles;
-}
 
 ipcMain.on("runCMC", async (event, args) => {
     dir = args.path;

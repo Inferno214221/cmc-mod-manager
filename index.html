@@ -22,7 +22,7 @@
             <li>
                 <a href="./program/html/characterManager.html" class="tab">
                     <div class="inactiveTab">
-                        Character Manager
+                        Characters
                     </div>
                 </a>
             </li>
@@ -58,42 +58,13 @@
     </nav>
     <section>
         <fieldset>
-            <legend>Basegame Game</legend>
+            <legend>CMC+</legend>
             <span id="gameSource"></span><br />
-            <table>
-                <tr>
-                    <td width="140px">
-                        <button type="button" onclick="getGameSource()">Import Basegame</button>
-                    </td>
-                    <td width="207px">
-                        <button type="button" onclick="openFolder('/basegame')">Open Unmodded Directory</button>
-                    </td>
-                    <td>
-                        <button type="button" onclick="runCMC('/basegame')">Run Unmodded Version</button>
-                    </td>
-                </tr>
-            </table>
+            <button type="button" onclick="new_importUnmodded()">Import Unmodded CMC+</button>
+            <button type="button" onclick="new_openDir('cmc')">Open CMC+ Directory</button>
+            <button type="button" onclick="new_runGame()">Run CMC+</button>
         </fieldset>
-        <fieldset>
-            <legend>Merge</legend>
-            <span id="lastMerge">Last Merge: Never</span><br />
-            <input type="checkbox" id="removeUselessFiles" name="removeUselessFiles" checked="true">
-            <label for="removeUselessFiles">Ignore Useless Files When Merging</label><br />
-            <table>
-                <tr>
-                    <td width="140px">
-                        <button type="button" onclick="mergeInstalledMods()">Merge All Mods</button>
-                    </td>
-                    <td width="207px">
-                        <button type="button" onclick="openFolder('/merged')">Open Merged Directory</button>
-                    </td>
-                    <td>
-                        <button type="button" onclick="runCMC('/merged')">Run Modded Version</button>
-                    </td>
-                </tr>
-            </table>
-        </fieldset>
-        <fieldset>
+        <!-- <fieldset>
             <legend>Controls Profiles</legend>
             <div class="controls">
                 <button type="button" onclick="saveControls()">
@@ -109,7 +80,7 @@
                     <option value="default">default</option>
                 </select>
             </div>
-        </fieldset>
+        </fieldset> -->
     </section>
     <script src="./program/js/index.js">
     </script>

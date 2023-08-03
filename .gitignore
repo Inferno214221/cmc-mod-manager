@@ -137,3 +137,5 @@ dist
 /stages/*/
 /profiles/*/*
 /gb/*
+/cmc/*
+!/cmc/cmc
