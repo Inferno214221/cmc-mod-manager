@@ -34,7 +34,7 @@ To install character mods, switch to the 'Character Manager' tab and select 'Ins
 
 The 'Character Selection Screen' tab can be used after merging to modify which characters are available to choose from on the selection screen by dragging and dropping characters between the CSS grid and the list underneath.
 
-![Usage Tutorial](./CMCModManagerTutorial.mp4)
+![Usage Tutorial](https://raw.githubusercontent.com/Inferno214221/CMCModManager/main/CMCModManagerTutorial.mp4)
 
 ## It's not working!
 Please ensure that all mods that are installed are in the correct format and that the program is the latest version (check GitHub / GB). If a breakage occurred installing a mod, try removing it via the mod manager, or manually in the `installed.json` file and deleting the manager's copy of the mod's folder.
