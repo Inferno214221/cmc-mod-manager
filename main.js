@@ -33,7 +33,37 @@ const BLOAT = [
 ];
 
 const CHARACTER_FILES = [
-    "",
+    "arcade/routes/<fighter>.txt",
+    "data/<fighter>.dat",
+    "data/dats/<fighter>.dat",
+    "fighter/<fighter>.bin",
+    "gfx/abust/<fighter>.png",
+    "gfx/bust/<fighter>.png",
+    "gfx/bust/<fighter>_*.png",
+    "gfx/cbust/<fighter>.png",
+    "gfx/mbust/<fighter>.png",
+    "gfx/tbust/<fighter>__*.png",
+    "gfx/mugs/<fighter>.png",
+    "gfx/hudicon/<series>.png",
+    "gfx/name/<fighter>.png",
+    "gfx/portrait/<fighter>.png",
+    "gfx/portrait/<fighter>_*.png",
+    "gfx/portrait_new/<fighter>.png",
+    "gfx/portrait_new/<fighter>_*.png",
+    "gfx/seriesicon/<series>.png",
+    "gfx/stock/<fighter>.png",
+    "music/versus/<fighter>_*.<audio>",
+    "music/victory/<series>.<audio>",
+    "music/victory/individual/<fighter>.<audio>",
+    "sfx/announcer/fighter/<fighter>.<audio>",
+    "sticker/common/<fighter>.png",
+    "sticker/common/desc/<fighter>.txt",
+    "sticker/rare/<fighter>.png",
+    "sticker/rare/desc/<fighter>.txt",
+    "sticker/super/<fighter>.png",
+    "sticker/super/desc/<fighter>.txt",
+    "sticker/ultra/<fighter>.png",
+    "sticker/ultra/desc/<fighter>.txt",
 ];
 
 const createWindow = () => {
@@ -487,8 +517,76 @@ ipcMain.on("getInstalledCharList", (event, args) => {
     let installed = reRequire(__dirname + "/characters/installed.json");
     win.webContents.send("fromGetInstalledCharList", {
         installed: installed,
+        basegame: Object.keys(reRequire(__dirname + "/characters/default.json").cmc),
         version: version,
     });
+});
+
+ipcMain.on("extractCharacter", (event, args) => {
+    let basegame = reRequire(__dirname + "/characters/default.json").cmc;
+    let files = [];
+    CHARACTER_FILES.forEach((file) => {
+        let fixedFiles = [];
+        fixedFiles.push(file.replace("<fighter>", args.character).replace("<series>", basegame[args.character].franchise));
+        if (fixedFiles[0].includes("<audio>")) {
+            ["ogg", "wav", "mp3"].forEach((format) => {
+                fixedFiles.push(fixedFiles[0].replace("<audio>", format));
+            });
+            fixedFiles.shift();
+        }
+        // fixedFiles.forEach((fixed) => {
+        //     if (fixed.includes("*")) {
+        //         let dir = fixed.replace(fixed.split('\\').pop().split('/').pop(), "");
+        //         let start = fixed.split("*")[0].replace(dir, "");
+        //         let end = fixed.split("*")[1];
+        //         if (fs.existsSync(__dirname + "/basegame/" + dir)) {
+        //             let contents = fs.readdirSync(__dirname + "/basegame/" + dir).filter((i) => {
+        //                 return i.replace(start, "").replace(end, "") === parseInt(i.replace(start, "").replace(end, "")).toString();
+        //             });
+        //             contents.forEach((found) => {
+        //                 fixedFiles.push(dir + found);
+        //             });
+        //         }
+        //         fixedFiles.splice(fixedFiles.indexOf(fixed), 1);// Still allows some files thru. idk why
+        //     }
+        // });
+
+        fixedFiles.forEach((fixed) => {
+            files.push(fixed);
+        });
+    });
+
+    files.forEach((file) => {
+        let dir = file.replace(file.split('\\').pop().split('/').pop(), "");
+        fs.ensureDirSync(__dirname + "/extracted/" + args.character + "/" + dir);
+        if (file.includes("*")) {
+            let start = file.split("*")[0].replace(dir, "");
+            let end = file.split("*")[1];
+            if (fs.existsSync(__dirname + "/basegame/" + dir)) {
+                let contents = fs.readdirSync(__dirname + "/basegame/" + dir).filter((i) => {
+                    return i.replace(start, "").replace(end, "") === parseInt(i.replace(start, "").replace(end, "")).toString();
+                });
+                contents.forEach((found) => {
+                    console.log(found);
+                    if (args.deleteExtraction) {
+                        fs.moveSync(__dirname + "/basegame/" + dir + found, __dirname + "/extracted/" + args.character + "/" + dir + found, {overwrite : true});
+                    } else {
+                        fs.copySync(__dirname + "/basegame/" + dir + found, __dirname + "/extracted/" + args.character + "/" + dir + found, {overwrite : true});
+                    }
+                });
+            }
+        } else {
+            if (fs.existsSync(__dirname + "/basegame/" + file)) {
+                if (args.deleteExtraction) {
+                    fs.moveSync(__dirname + "/basegame/" + file, __dirname + "/extracted/" + args.character + "/" + file, {overwrite : true});
+                } else {
+                    fs.copySync(__dirname + "/basegame/" + file, __dirname + "/extracted/" + args.character + "/" + file, {overwrite : true});
+                }
+            }
+        }
+    });
+    console.log(files);
+    win.webContents.send("fromExtractCharacter");
 });
 
 ipcMain.on("removeCharacter", (event, args) => {

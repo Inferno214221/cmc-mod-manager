@@ -53,7 +53,6 @@ function runCMC(path) {
 }
 
 function inputFocused(element) {
-    console.log("here")
     this[element].style.borderColor = "#2777ff";
 }
 

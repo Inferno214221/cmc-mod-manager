@@ -11,6 +11,7 @@ this.api.receive("fromGetInstalledCharList", (data) => {
     if (version != "CMC+ v8.exe") {
         cmc8.innerHTML = "";
     }
+    extractionList(data.basegame);
     listCharacters(data.installed);
 });
 
@@ -57,6 +58,37 @@ function listCharacters(installed) {
     characterTable.innerHTML = output;
 }
 
+function extractionList(basegame) {
+    let output = "";
+    basegame.forEach((character) => {
+        output += "<option value=\"" + character + "\">" + character + "</option>\n"
+    });
+    extractCharacterSelect.innerHTML = output;
+}
+
+function extractCharacter() {
+    this.api.send("extractCharacter", {
+        character: extractCharacterSelect.value,
+        deleteExtraction: deleteExtraction.checked,
+    });
+}
+
+this.api.receive("fromExtractCharacter", () => {
+    alert("Character sucessfully extracted!");
+});
+
 function openCharacterFolder(character) {
     this.api.send("openCharacterFolder", character);
+}
+
+function inputFocused(element) {
+    this[element].style.borderColor = "#2777ff";
+}
+
+function inputBlurred(element) {
+    this[element].style.borderColor = "black";
+}
+
+function openFolder(directory) {
+    this.api.send("openFolder", directory);
 }

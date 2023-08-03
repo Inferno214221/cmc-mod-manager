@@ -62,7 +62,7 @@
             <button type="button" onclick="installCharacter()">Install Character From Directory</button>
             <button type="button" onclick="installCharacterZip()">Install Character From Archive</button>
             <span id="cmc8">
-                <input type="checkbox" id="convertFormat" name="convertFormat" checked="true">
+                <input type="checkbox" id="convertFormat" name="convertFormat" checked>
                 <label for="convertFormat">Convert CMC+ v7 Mods To v8</label>
             </span>
         </fieldset>
@@ -70,6 +70,18 @@
             <legend>Installed Characters</legend>
             <table id="characterTable">
             </table>
+        </fieldset>
+        <fieldset>
+            <legend>Basegame Character Extraction</legend>
+            <span>Note: Modded Characters Should Be Removed Above</span><br/>
+            <select id="extractCharacterSelect" onfocus="inputFocused('extractCharacterSelect')" onblur="inputBlurred('extractCharacterSelect')" onchange="inputBlurred('extractCharacterSelect')">
+                <option value="fighterName">fighterName</option>
+            </select>
+            <button type="button" onclick="extractCharacter()">Extract Character</button>
+            <input type="checkbox" id="deleteExtraction" name="deleteExtraction">
+            <label for="deleteExtraction">Delete Character From Basegame</label>
+            <br/>
+            <button type="button" onclick="openFolder('/extracted')">Open Extracted Directory</button>
         </fieldset>
     </section>
     <script src="../js/characterManager.js">
