@@ -37,6 +37,7 @@ const CHARACTER_FILES = [
     "data/<fighter>.dat",
     "data/dats/<fighter>.dat",
     "fighter/<fighter>.bin",
+    "fighter/<fighter>",
     "gfx/abust/<fighter>.png",
     "gfx/bust/<fighter>.png",
     "gfx/bust/<fighter>_*.png",
@@ -523,33 +524,17 @@ ipcMain.on("getInstalledCharList", (event, args) => {
 });
 
 ipcMain.on("extractCharacter", (event, args) => {
-    let basegame = reRequire(__dirname + "/characters/default.json").cmc;
+    let basegame = reRequire(__dirname + "/characters/default.json");
     let files = [];
     CHARACTER_FILES.forEach((file) => {
         let fixedFiles = [];
-        fixedFiles.push(file.replace("<fighter>", args.character).replace("<series>", basegame[args.character].franchise));
+        fixedFiles.push(file.replace("<fighter>", args.character).replace("<series>", basegame.cmc[args.character].franchise));
         if (fixedFiles[0].includes("<audio>")) {
             ["ogg", "wav", "mp3"].forEach((format) => {
                 fixedFiles.push(fixedFiles[0].replace("<audio>", format));
             });
             fixedFiles.shift();
         }
-        // fixedFiles.forEach((fixed) => {
-        //     if (fixed.includes("*")) {
-        //         let dir = fixed.replace(fixed.split('\\').pop().split('/').pop(), "");
-        //         let start = fixed.split("*")[0].replace(dir, "");
-        //         let end = fixed.split("*")[1];
-        //         if (fs.existsSync(__dirname + "/basegame/" + dir)) {
-        //             let contents = fs.readdirSync(__dirname + "/basegame/" + dir).filter((i) => {
-        //                 return i.replace(start, "").replace(end, "") === parseInt(i.replace(start, "").replace(end, "")).toString();
-        //             });
-        //             contents.forEach((found) => {
-        //                 fixedFiles.push(dir + found);
-        //             });
-        //         }
-        //         fixedFiles.splice(fixedFiles.indexOf(fixed), 1);// Still allows some files thru. idk why
-        //     }
-        // });
 
         fixedFiles.forEach((fixed) => {
             files.push(fixed);
@@ -586,6 +571,32 @@ ipcMain.on("extractCharacter", (event, args) => {
         }
     });
     console.log(files);
+    if (args.deleteExtraction) {
+        let removeNumber = basegame.cmc[args.character].number;
+        delete basegame.cmc[args.character];
+        Object.keys(basegame.cmc).forEach((character) => {
+            if (basegame.cmc[character].number > removeNumber) {
+            basegame.cmc[character].number -= 1;
+            }
+        });
+        fs.writeFileSync(
+            __dirname + "/characters/default.json",
+            JSON.stringify(basegame, null, 4),
+            "utf-8"
+        );
+        let installed = reRequire(__dirname + "/characters/installed.json");
+        installed.number -= 1;
+        installed.priority.forEach((character) => {
+            if (installed.characters[character].number > removeNumber) {
+                installed.characters[character].number -= 1;
+            }
+        });
+        fs.writeFileSync(
+            __dirname + "/characters/installed.json",
+            JSON.stringify(installed, null, 4),
+            "utf-8"
+        );
+    }
     win.webContents.send("fromExtractCharacter");
 });
 
@@ -593,7 +604,6 @@ ipcMain.on("removeCharacter", (event, args) => {
     let installed = reRequire(__dirname + "/characters/installed.json");
     let removeNumber = installed.characters[args].number;
     delete installed.characters[args];
-    installed.number -= 1;
     installed.priority = installed.priority.filter((character) => {
         return character !== args;
     });
