@@ -1,3 +1,7 @@
+this.api.receive("throwError", (error) => {
+    alert("An Error Occured: " + error);
+});
+
 // On Page Load
 this.api.send("getInstalledModList");
 

@@ -33,6 +33,9 @@ After installing CMC Mod Manager the first step is to import the basegame. Under
 To install character mods, switch to the 'Character Manager' tab and select 'Install from Directory' or 'Install From Archive'. Any characters that you want to install should be formatted correctly so that all of the files in the mod's directory would be copied into the game's without modification (e.g. no separate folders for different game versions). After installing any mod, remember to 'Merge All Mods' from the 'Home' tab.
 
 The 'Character Selection Screen' tab can be used after merging to modify which characters are available to choose from on the selection screen by dragging and dropping characters between the CSS grid and the list underneath.
+
+![Usage Tutorial](./CMCModManagerTutorial.mp4)
+
 ## It's not working!
 Please ensure that all mods that are installed are in the correct format and that the program is the latest version (check GitHub / GB). If a breakage occurred installing a mod, try removing it via the mod manager, or manually in the `installed.json` file and deleting the manager's copy of the mod's folder.
 
@@ -53,7 +56,7 @@ This is my first time using Electron and therefore the code is a bit of a mess s
 - [x] Make fighters.txt on export
 - [ ] Make stages.txt & others on export
 - [x] Alerts
-- [ ] Errors
+- [x] Errors
 ### Character Manager
 - [x] Install characters from a folder (very picky)
 - [x] Install characters from a zip (extract, install folder, delete)
@@ -64,7 +67,7 @@ This is my first time using Electron and therefore the code is a bit of a mess s
 - [x] Delete instructions txt file on merge
 - [x] RAR support - no errors
 - [x] Installed v7 Characters Can Be Converted To v8
-- [ ] Errors
+- [x] Errors
 ### Character Selection Screen (Priority: 1)
 - [x] Display the CSS
 - [x] Display unincluded characters (not alts)
@@ -81,7 +84,7 @@ This is my first time using Electron and therefore the code is a bit of a mess s
 - [x] Switch CSS Pages
 - [ ] Add CSS Pages
 - [ ] Edit Game Settings to change displayed list
-- [ ] Alerts
+- [x] Alerts
 - [ ] Errors
 ### Alts (Priority: 5)
 - [ ] IDFK how I should deal with alts
@@ -113,6 +116,6 @@ This is my first time using Electron and therefore the code is a bit of a mess s
 ### Miscellanious Mods (Priority: 3)
 - [x] Add option to import other types of mods e.g. ui changes / music
 - [x] RAR support - no errors
-- [ ] Errors
+- [x] Errors
 ### Mod Tools (Priority: 2)
 - [ ] Character Extractor

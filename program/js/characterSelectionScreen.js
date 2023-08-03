@@ -1,3 +1,8 @@
+this.api.receive("throwError", (error) => {
+    alert("An Error Occured: " + error);
+});
+
+// On Page Load
 var css, basegame, installed, hidden, version, currentPage;
 getCSS();
 updateCSSProfiles();

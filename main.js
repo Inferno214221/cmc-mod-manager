@@ -30,7 +30,11 @@ const BLOAT = [
     "/gfx/.gif",
     "/tools",
     "/character guides"
-]
+];
+
+const CHARACTER_FILES = [
+    "",
+];
 
 const createWindow = () => {
     win = new BrowserWindow({
@@ -78,10 +82,11 @@ ipcMain.on("getGameSource", async (event, args) => {
         properties: ["openDirectory"]
     }).then(dir => {
         if (dir.canceled === true) {
-            return;//TODO: add alerts
+            return;
         }
         if (getGameVersion(dir.filePaths[0] + "/") == null) {
-            return;//TODO: add alerts
+            win.webContents.send("throwError", "No recognised .exe file in the selected directory. (88)");
+            return;
         }
         //The new version has horrible permissions so give everything xwr
         getAllFiles(dir.filePaths[0]).forEach((file) => {
@@ -185,7 +190,8 @@ ipcMain.on("getGameSource", async (event, args) => {
 
 ipcMain.on("mergeInstalledMods", async (event, args) => {
     if (version == null) {
-        return;//TODO: add alerts
+        win.webContents.send("throwError", "No recognised .exe file in the basegame directory. (193)");
+        return;
     }
 
     if (!fs.existsSync(__dirname + "/tmp/")) {
@@ -370,7 +376,7 @@ ipcMain.on("installCharacter", async (event, args) => {
         properties: ["openDirectory"]
     }).then(dir => {
         if (dir.canceled === true) {
-            return;//TODO: add alerts
+            return;
         }
         // let modName = dir.filePaths[0].split('\\').pop().split('/').pop();
         installCharacter(dir.filePaths[0], args);
@@ -382,7 +388,7 @@ ipcMain.on("installCharacterZip", async (event, args) => {
         properties: ["openFile"]
     }).then(async (file) => {
         if (file.canceled === true) {
-            return;//TODO: add alerts
+            return;
         }
         let dir = __dirname + "/characters/_temp";
         let modName = "";
@@ -430,7 +436,8 @@ function installCharacter(dir, convertFormat) {
         dir += "/" + dir.split('\\').pop().split('/').pop();
     }
     if (!fs.existsSync(dir + "/fighter/")) {
-        return;//TODO: add alerts
+        win.webContents.send("throwError", "Can't find the target character's ./fighter/ directory. (439)");
+        return;
     }
     let characterName = fs.readdirSync(dir + "/fighter/")[0].split(".")[0];
 
@@ -523,7 +530,7 @@ ipcMain.on("increaseMergePriority", (event, args) => {
     let installed = reRequire(__dirname + "/characters/installed.json");
     let index = installed.priority.indexOf(args);
     if (index == 0) {
-        return;//TODO: add alerts
+        return;
     }
     installed.priority.move(index, index - 1);
     //TODO: error handling eg outside of range
@@ -544,7 +551,7 @@ ipcMain.on("installMod", async (event, args) => {
         properties: ["openDirectory"]
     }).then(dir => {
         if (dir.canceled === true) {
-            return;//TODO: add alerts
+            return;
         }
         let modName = dir.filePaths[0].split('\\').pop().split('/').pop();
         installMod(dir.filePaths[0], modName);
@@ -556,7 +563,7 @@ ipcMain.on("installModZip", async (event, args) => {
         properties: ["openFile"]
     }).then(async (file) => {
         if (file.canceled === true) {
-            return;//TODO: add alerts
+            return;
         }
         let dir = __dirname + "/misc/_temp";
         let fileP = file.filePaths[0];
@@ -636,7 +643,7 @@ ipcMain.on("increaseModMergePriority", (event, args) => {
     let installed = reRequire(__dirname + "/misc/installed.json");
     let index = installed.misc.indexOf(args);
     if (index == 0) {
-        return;//TODO: add alerts
+        return;
     }
     installed.misc.move(index, index - 1);
     //TODO: error handling eg outside of range

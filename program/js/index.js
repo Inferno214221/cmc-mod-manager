@@ -1,3 +1,7 @@
+this.api.receive("throwError", (error) => {
+    alert("An Error Occured: " + error);
+});
+
 // On Page Load
 checkGameSourceInstalled();
 updateControlProfiles();
@@ -24,7 +28,7 @@ function getGameSource() {
 }
 
 this.api.receive("fromGetGameSource", (data) => {
-    alert("CMC base game installed succesfully");removeUselessFiles.checked
+    alert("CMC base game installed succesfully");
     gameSourceInstalled(data);
     mergeInstalledMods();
 });
