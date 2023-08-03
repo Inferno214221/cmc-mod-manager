@@ -18,13 +18,15 @@ After downloading the zip, extract it in the directory you wish to install it in
 #### NOTE:
 When installing the basegame, merging, installing mods or completing any other task that requires file system operations Windows will say that the program is not responding. This is Window's fault, not mine, the program is actually doing what it is supposed to, just wait for it to finish. The program makes two copies of the game, one without mods and one with mods, so it will sometimes take a while (I'm running it on an M.2 and I still had this issue so please just be patient).
 ### Linux
-After downloading the zip, extract it and copy the `/out/cmcmodmanager-linux-x64/` folder to where you would like to install it, e.g. `/opt` (Feel free to rename it as well). Due to CMC+ being built for Windows, the default permissions are very weird with some directories being read-only. To fix this it is very important that you run `sudo chmod 777 ./* -R` in your CMC game directory before installing it with your mod manager, otherwise, the program will be unable to remove some of the files it is using.
+After downloading the zip, extract it and copy the `./out/cmcmodmanager-linux-x64/` folder to where you would like to install it, e.g. `/opt` (Feel free to rename it as well). Due to CMC+ being built for Windows, the default permissions are very weird with some directories being read-only. To fix this it is very important that you run `sudo chmod 777 ./* -R` in your CMC game directory before installing it with your mod manager, otherwise, the program will be unable to remove some of the files it is using.
 #### NOTE:
 If you are having issues running SSBC / CMC+ on Linux, use Wine version 6 rather than 7 or 8 and it plays perfectly (Idk what proton version).
 ### MacOS
 Install [Asahi Linux](https://asahilinux.org/), then proceed with the Linux installation steps. 
 #### NOTE:
 The above statement is double reverse sarcastic.
+## Updating
+Extract the new copy of CMC Mod Manager under a different name to the previous copy. From the old version move the basegame, characters, extracted, merged, misc, profiles and stages directories in ./resources/app/ into the ./resources/app/ directory in the new version. Then delete the old copy.
 ## Usage
 Please ensure that the game has been run once to create all the necessary files.
 
