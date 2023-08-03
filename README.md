@@ -26,7 +26,7 @@ Install [Asahi Linux](https://asahilinux.org/), then proceed with the Linux inst
 #### NOTE:
 The above statement is double reverse sarcastic.
 ## Updating
-Extract the new copy of CMC Mod Manager under a different name to the previous copy. From the old version move the basegame, characters, extracted, merged, misc, profiles and stages directories (if they exsist) from ./resources/app/ into the ./resources/app/ directory in the new version. Then delete the old copy.
+Extract the new copy of CMC Mod Manager under a different name to the previous copy. From the old version move the `basegame`, `characters`, `extracted`, `merged`, `misc`, `profiles` and `stages` directories (if they exist) from ./resources/app/ into the ./resources/app/ directory in the new version. Then delete the old copy.
 ## Usage
 Please ensure that the game has been run once to create all the necessary files.
 
