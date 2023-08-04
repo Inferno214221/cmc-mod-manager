@@ -31,6 +31,7 @@ section {
     overflow: hidden;
     overflow-y: scroll;
     white-space: nowrap;
-    height: calc(100vh - 180px);
+    margin-top: 5px;
+    height: calc(100vh - 215px);
     white-space: nowrap;
 }

@@ -68,6 +68,14 @@
         </fieldset>
         <fieldset>
             <legend>Installed Characters</legend>
+            <span>Sorting:</span>
+                        <select id="sortingType" onfocus="inputFocused('sortingType')" onblur="inputBlurred('sortingType')" onchange="resort()">
+                            <option value="number">Internal Number</option>
+                            <option value="series">Franchise</option>
+                            <option value="sortName">Alphabetical</option>
+                        </select>
+                        <input type="checkbox" id="reverseSort" name="reverseSort" onchange="resort()">
+                        <label for="reverseSort">Reverse</label>
             <div id="characterScrollable">
                 <table id="characterTable">
                 </table>

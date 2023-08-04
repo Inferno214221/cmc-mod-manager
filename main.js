@@ -486,6 +486,7 @@ function deleteCharCSS(cssNumber) {
 }
 
 ipcMain.on("removeCharacter", (event, args) => {
+    args -= 1;
     deleteCharCSS(parseInt(args) + 1);
     let characters = getCharacters();
     let characterName = characters[args].name;
@@ -529,6 +530,7 @@ ipcMain.on("removeCharacter", (event, args) => {
 });
 
 ipcMain.on("extractCharacter", (event, args) => {
+    args -= 1;
     let characters = getCharacters();
     let characterName = characters[args].name;
     let similarName = [];

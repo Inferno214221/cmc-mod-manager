@@ -7,6 +7,14 @@ this.api.receive("throwError", (error) => {
     alert("An Error Occured: " + error);
 });
 
+function inputFocused(element) {
+    this[element].style.borderColor = "#2777ff";
+}
+
+function inputBlurred(element) {
+    this[element].style.borderColor = "black";
+}
+
 // Characters
 function getCharacterList() {
     this.api.send("getCharacterList");
@@ -18,13 +26,18 @@ this.api.receive("from_getCharacterList", (data) => {
 
 function listCharacters(characters, cmcDir) {
     let output = "";
-    for (let character in characters) {
+    sorted = sortCharacters(characters, sortingType.value);
+    if (reverseSort.checked) {
+        sorted.reverse();
+    }
+    for (let character of sorted) {
+        console.log(character);
         output += 
-        "<tr id=\"" + character + "\">\n\
-            <td class=\"mug\"><image src=\"" + cmcDir + "/gfx/mugs/" + characters[character].name + ".png\" draggable=\"false\"/></td>\n\
-            <td>" + characters[character].displayName + "</td>\n\
-            <td><button type=\"button\" onclick=\"extractCharacter('" + character + "')\">Extract</button></td>\n\
-            <td><button type=\"button\" onclick=\"removeCharacter('" + character + "')\">Remove</button></td>\n\
+        "<tr id=\"" + character.number + "\">\n\
+            <td class=\"mug\"><image src=\"" + cmcDir + "/gfx/mugs/" + character.name + ".png\" draggable=\"false\"/></td>\n\
+            <td>" + character.displayName + "</td>\n\
+            <td><button type=\"button\" onclick=\"extractCharacter('" + character.number + "')\">Extract</button></td>\n\
+            <td><button type=\"button\" onclick=\"removeCharacter('" + character.number + "')\">Remove</button></td>\n\
         </tr>\n"
     };
     characterTable.innerHTML = output;
@@ -61,6 +74,26 @@ this.api.receive("from_extractCharacter", (data) => {
     alert("Character extracted successfully.");
 });
 
+function sortCharacters(characters, sortType) {
+    let charactersSorted = [];
+    for (let character in characters) {
+        charactersSorted.push({
+            number: parseInt(character) + 1,
+            name: characters[character].name,
+            displayName: characters[character].displayName,
+            sortName: characters[character].displayName.toLowerCase(),
+            series: characters[character].series,
+        });
+    }
+    let sorted = charactersSorted.toSorted((a, b) => (a[sortType] > b[sortType] ? 1 : -1));
+    return sorted;
+}
+
+function resort() {
+    inputBlurred('sortingType');
+    getCharacterList();
+}
+
 // On Page Load
-var version;
+var characters;
 getCharacterList();
