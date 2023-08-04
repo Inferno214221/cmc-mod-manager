@@ -70,6 +70,7 @@ This is my first time using Electron and therefore the code is a bit of a mess s
 - [x] RAR support - no errors
 - [x] Installed v7 Characters Can Be Converted To v8
 - [x] Errors
+- [ ] Remove Character From Random List
 ### Character Selection Screen (Priority: 1)
 - [x] Display the CSS
 - [x] Display unincluded characters (not alts)

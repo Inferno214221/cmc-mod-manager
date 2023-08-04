@@ -32,6 +32,11 @@ function getCSS(page) {
 this.api.receive("fromGetCSS", (data) => {
     css = data.css;
     characters = data.characters;
+    characters[9998] = {
+        name: "random",
+        displayName: "?",
+        series: null,
+    };
     console.log(data.css, data.characters);
     makeTables(css, characters);
 });
@@ -54,16 +59,7 @@ function makeTables(css, characters) {
             let number = parseInt(css[y][x]);
             character = characters[number - 1];
             delete hidden[number - 1];
-            if (number == 9999) {
-                output += "\
-<td class=\"cssSquare hoverText\" id=\"9999\">\n\
-    <div id=\'{ \"x\": " + x + ", \"y\": " + y + " }\' draggable=\"true\" ondragover=\"event.preventDefault();\" ondragstart=\"onDragStartCSS(event);\" ondrop=\"onDropOnCSS(event);\">\n\
-        <image draggable=\"false\" class=\"icon\" src=\"../../cmc/gfx/mugs/random.png\" onerror=\"this.onerror=null; this.src='../images/missing.png'\" alt=\" \" />\n\
-        <div class=\"cssName\">?</div>\n\
-    </div>\n\
-    <span class=\"tooltipText\">?</span>\n\
-</td>";
-            } else if (character === undefined) {
+            if (character === undefined) {
                 //NOTE: resets all css values not in the list of characters
                 output += "<td class=\"cssSquare\" id=\'{ \"x\": " + x + ", \"y\": " + y + " }\' draggable=\"false\" ondragover=\"event.preventDefault();\" ondrop=\"onDropOnCSS(event);\"><image class=\"icon\" src=\"../images/empty.png\" alt=\" \" /></td>";
                 css[y][x] = "0000";
@@ -92,7 +88,7 @@ function makeTables(css, characters) {
     for (let character of sorted) {
         output += 
         "<td class=\"hoverText hiddenCharacter\">\n\
-            <div draggable=\"true\" ondragstart=\"onDragStartHidden(event);\" id=\"" + character.name + "\" class=\"mug\">\n\
+            <div draggable=\"true\" ondragstart=\"onDragStartHidden(event);\" id=\"" + character.number + "\" class=\"mug\">\n\
                 <image draggable=\"false\" class=\"mugIcon\" src=\"../../cmc/gfx/mugs/" + character.name + ".png\" onerror=\"this.onerror=null; this.src='../images/missing.png'\" alt=\"\" />\n\
                 <div class=\"hiddenName\">" + character.displayName + "</div>\n\
             </div>\n\
@@ -103,11 +99,16 @@ function makeTables(css, characters) {
     hiddenCharactersTable.innerHTML = output;
 
     let series = [];
-    for (let character of Object.keys(allChars)) {
-        if (!series.includes(allChars[character].series)) {
-            series.push(allChars[character].series);
+    for (let character of characters) {
+        if (character != undefined && !series.includes(character.series)) {
+            series.push(character.series);
         }
     }
+    output = "";
+    series.forEach((s) => {
+        output += "<option value=\"" + s + "\">" + s + "</option>'\n";
+    });
+    seriesSelect.innerHTML = output;
 }
 
 function sortCharacters(characters, sortType) {
@@ -120,9 +121,43 @@ function sortCharacters(characters, sortType) {
             series: characters[character].series,
         });
     }
-    console.log(charactersSorted);
     let sorted = charactersSorted.toSorted((a, b) => (a[sortType] > b[sortType] ? 1 : -1));
     return sorted;
+}
+
+function removeCharacter(x, y) {
+    let number = parseInt(css[y][x]);
+    if (number === "0000") {
+        return;
+    }
+    let character;
+    character = characters[number - 1];
+    if (character == undefined) {
+        return;//TODO: error
+    }
+    hidden[number - 1] = character;
+    css[y][x] = "0000";
+    this.api.send("writeCSS", {
+        css: css,
+        page: currentPage,
+    });
+    makeTables(css, characters);
+    return number;
+}
+
+function addCharacter(characterNumber, x, y) {
+    let replaceNumber = css[y][x];
+    if (replaceNumber !== "0000") {
+        return;//TODO: alert
+    }
+    console.log(characterNumber);
+    css[y][x] = ('0000' + characterNumber).slice(-4);
+    delete hidden[characterNumber - 1];
+    makeTables(css, characters);
+    this.api.send("writeCSS", {
+        css: css,
+        page: currentPage,
+    });
 }
 
 function getCSSPage(offset) {
@@ -139,89 +174,38 @@ function resort() {
     getCSS(currentPage);
 }
 
-// function makeTables(css, allChars) {
-//     let maxX = css[currentPage][0].length;
-//     let maxY = css[currentPage].length;
+function onDragStartCSS(ev) {
+    let coords = JSON.parse(ev.currentTarget.id);
+    ev.dataTransfer.setData("css", JSON.stringify(coords));
+}
 
-//     let output = "<tr>\n\
-//         <th class=\"cssSquare\"></th>\n";
-//     for(let i = 0; i < maxX; i++) {
-//         output += "<th class=\"cssSquare\">" + (i + 1) + "</th>\n";
-//     }
-//     output += "</tr>\n";
+function onDropOnHidden(ev) {
+    ev.preventDefault();
+    if (ev.dataTransfer.getData("css") != "") {
+        let received = JSON.parse(ev.dataTransfer.getData("css"));
+        removeCharacter(received.x, received.y);
+    }
+}
 
-//     hidden = Object.assign({}, allChars);
-//     for (let y = 0; y < maxY; y++) {
-//         output += "<tr>\n<th class=\"cssSquare\">"+ (y + 1) + "</th>\n";
-//         for (let x = 0; x < maxX; x++) {
-//             let character;
-//             for (let e of allChars) {
-//                 if (e + 1 == css[currentPage][y][x]) {
-//                     character = e;
-//                     delete hidden[e];
-//                     break;
-//                 }
-//             }
-//             if (character === undefined) {
-//                 //NOTE: resets all css values not in the list of characters
-//                 output += "<td class=\"cssSquare\" id=\'{ \"x\": " + x + ", \"y\": " + y + " }\' draggable=\"false\" ondragover=\"event.preventDefault();\" ondrop=\"onDropOnCSS(event);\"><image class=\"icon\" src=\"../images/empty.png\" alt=\" \" /></td>";
-//                 css[currentPage][y][x] = "0000";
-//             } else {
-//                 output += "\
-// <td class=\"cssSquare hoverText\" id=\"" + character + "\">\n\
-//     <div id=\'{ \"x\": " + x + ", \"y\": " + y + " }\' draggable=\"true\" ondragover=\"event.preventDefault();\" ondragstart=\"onDragStartCSS(event);\" ondrop=\"onDropOnCSS(event);\">\n\
-//         <image draggable=\"false\" class=\"icon\" src=\"../../cmc/gfx/mugs/" + allChars[character].name + ".png\" onerror=\"this.onerror=null; this.src='../images/missing.png'\" alt=\" \" />\n\
-//         <div class=\"cssName\">" + allChars[character].displayName + "</div>\n\
-//     </div>\n\
-//     <span class=\"tooltipText\">" + allChars[character].displayName + "</span>\n\
-// </td>";
-//             }
-//         }
-//         output += "</tr>\n";
-//     }
-//     characterSelectTable.innerHTML = output;
-    
-//     output = "";
-//     sorted = sortCharacters((showAll.checked ? allChars : hidden), sortingType.value);
-//     if (reverseSort.checked) {
-//         sorted.reverse();
-//     }
+function onDragStartHidden(ev) {
+    ev.dataTransfer.setData("hidden", ev.target.id);
+}
 
-//     output += "<tr draggable=\"false\">\n"
-//     for (let character of sorted) {
-//         character = character.name
-//         output += 
-//         "<td class=\"hoverText hiddenCharacter\">\n\
-//             <div draggable=\"true\" ondragstart=\"onDragStartHidden(event);\" id=\"" + character + "\" class=\"mug\">\n\
-//                 <image draggable=\"false\" class=\"mugIcon\" src=\"../../cmc/gfx/mugs/" + allChars[character].name + ".png\" onerror=\"this.onerror=null; this.src='../images/missing.png'\" alt=\"\" />\n\
-//                 <div class=\"hiddenName\">" + allChars[character].displayName + "</div>\n\
-//             </div>\n\
-//             <span class=\"tooltipText\" draggable=\"false\">" + allChars[character].displayName + "</span>\n\
-//         </td>\n";
-//         //  <button class=\"addButton\" type=\"button\" onclick=\"addCharacter('" + character + "')\">Add</button>\n\
-//     }
-//     output += "</tr>";
-//     hiddenCharactersTable.innerHTML = output;
-
-//     let seriess = [];
-//     for (let character of Object.keys(allChars)) {
-//         if (!seriess.includes(allChars[character].series)) {
-//             seriess.push(allChars[character].series);
-//         }
-//     }
-
-//     seriess.sort((a, b) => (a > b ? 1 : -1));
-//     output = "";
-//     for (series of seriess) {
-//         output += "<option value=\"" + series + "\">" + series + "</option>";
-//     }
-//     seriesSelect.innerHTML = output;
-
-//     rowNumber.innerHTML = "Rows: " + maxY;
-//     columnNumber.innerHTML = "Columns: " + maxX;
-// }
-
-// ////
+function onDropOnCSS(ev) {
+    ev.preventDefault();
+    if (ev.dataTransfer.getData("hidden") != "") {
+        let coords = JSON.parse(ev.currentTarget.id);
+        removeCharacter(coords.x, coords.y);
+        addCharacter(ev.dataTransfer.getData("hidden"), coords.x, coords.y);
+    } else if (ev.dataTransfer.getData("css") != "") {
+        let dropCoords = JSON.parse(ev.currentTarget.id);
+        let drop = removeCharacter(dropCoords.x, dropCoords.y);
+        let dragCoords = JSON.parse(ev.dataTransfer.getData("css"));
+        let drag = removeCharacter(dragCoords.x, dragCoords.y);
+        addCharacter(drop, dragCoords.x, dragCoords.y);
+        addCharacter(drag, dropCoords.x, dropCoords.y);
+    }
+}
 
 // function findCSS(character) {
 //     let allChars = Object.assign({}, basegame.versions[version].builtin, basegame.cmc, installed.characters);
@@ -247,39 +231,6 @@ function resort() {
 //     return coords;
 // }
 
-// function onDragStartCSS(ev) {
-//     let coords = JSON.parse(ev.currentTarget.id);
-//     ev.dataTransfer.setData("css", JSON.stringify(coords));
-// }
-
-// function onDropOnHidden(ev) {
-//     ev.preventDefault();
-//     if (ev.dataTransfer.getData("css") != "") {
-//         let received = JSON.parse(ev.dataTransfer.getData("css"));
-//         removeCharacter(received.x, received.y);
-//     }
-// }
-
-// function onDragStartHidden(ev) {
-//     ev.dataTransfer.setData("hidden", ev.target.id);
-// }
-
-// function onDropOnCSS(ev) {
-//     ev.preventDefault();
-//     if (ev.dataTransfer.getData("hidden") != "") {
-//         let coords = JSON.parse(ev.currentTarget.id);
-//         removeCharacter(coords.x, coords.y);
-//         addCharacterE(ev.dataTransfer.getData("hidden"), coords.x, coords.y);
-//     } else if (ev.dataTransfer.getData("css") != "") {
-//         let dropCoords = JSON.parse(ev.currentTarget.id);
-//         let drop = removeCharacter(dropCoords.x, dropCoords.y);
-//         let dragCoords = JSON.parse(ev.dataTransfer.getData("css"));
-//         let drag = removeCharacter(dragCoords.x, dragCoords.y);
-//         addCharacterE(drop, dragCoords.x, dragCoords.y);
-//         addCharacterE(drag, dropCoords.x, dropCoords.y);
-//     }
-// }
-
 // function hideCharacter() {
 //     yInput.value = parseInt(yInput.value);
 //     xInput.value = parseInt(xInput.value);
@@ -287,30 +238,6 @@ function resort() {
 //         return;//TODO: error
 //     }
 //     removeCharacter(xInput.value, yInput.value);
-// }
-
-// function removeCharacter(x, y) {
-//     let characterNumber = css[currentPage][y][x];
-//     if (characterNumber === "0000") {
-//         return;//TODO: alert
-//     }
-
-//     let allChars = Object.assign({}, basegame.versions[version].builtin, basegame.cmc, installed.characters);
-//     css[currentPage][y][x] = "0000";
-//     let character;
-//     for (let e of Object.keys(allChars)) {
-//         if (allChars[e].number == characterNumber) {
-//             character = e;
-//             break;
-//         }
-//     }
-//     if (character == undefined) {
-//         return;//TODO: error
-//     }
-//     hidden[character] = allChars[character];
-//     makeTables(css, allChars);
-//     this.api.send("writeCSS", css);
-//     return character;
 // }
 
 // function addCharacter(character) {
@@ -323,20 +250,33 @@ function resort() {
 //     addCharacterE(character, xInput.value, yInput.value);
 // }
 
-// function addCharacterE(character, x, y) {
-//     let characterNumber = css[currentPage][y][x];
-//     if (characterNumber !== "0000") {
-//         return;//TODO: alert
-//     }
-//     let allChars = Object.assign({}, basegame.versions[version].builtin, basegame.cmc, installed.characters);
-//     if (allChars[character] == undefined) {
-//         return;//TODO: error
-//     }
-//     css[currentPage][y][x] = ('0000' + allChars[character].number).slice(-4);
-//     delete hidden[character];
-//     makeTables(css, allChars);
-//     this.api.send("writeCSS", css);
-// }
+function removeSeries() {
+    series = seriesSelect.value;
+    if (series == "") {
+        return;
+    }
+    console.log(characters);
+    for (let character = 0; character < characters.length; character++) {
+        if (characters[character] == undefined) {
+            continue;
+        }
+        console.log(characters[character].series);
+        if (characters[character].series == series) {
+            console.log(characters[character]);
+            for (let y in css) {
+                for (let x in css[y]) {
+                    if (('0000' + (character + 1)).slice(-4) == css[y][x]) {
+                        removeCharacter(x, y);
+                    }
+                };
+            };
+        }
+    }
+    this.api.send("writeCSS", {
+        css: css,
+        page: currentPage,
+    });
+}
 
 // function removeFranchise() {
 //     if (franchiseSelect.value == "") {

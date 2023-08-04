@@ -143,7 +143,7 @@ function getCharacters() {
             fighters.push({
                 name: fighter,
                 displayName: fighterDat[1],
-                series: fighterDat[3],
+                series: fighterDat[3].toLowerCase(),
             });
         } else {
             //TODO: throw error?
@@ -490,6 +490,22 @@ ipcMain.on("getCSS", (event, args) => {
         css: css,
         characters: getCharacters(),
     });
+});
+
+ipcMain.on("writeCSS", (event, args) => {
+    let css = args.css;
+    let cssFile = "";
+    css.forEach((row) => {
+        row.forEach((cell) => {
+            cssFile += cell + " ";
+        });
+        cssFile = cssFile.slice(0, -1);
+        cssFile += "\r\n";
+    });
+    cssFile = cssFile.slice(0, -2);
+    cssFile += " ";
+    console.log(cssFile + "EOF");
+    fs.writeFileSync(path.join(__dirname, "cmc", "data", args.page), cssFile, "ascii");
 });
 
 ////////
@@ -1190,29 +1206,29 @@ ipcMain.on("increaseModMergePriority", (event, args) => {
 //     });
 // });
 
-ipcMain.on("writeCSS", (event, css) => {
-    Object.keys(css).forEach((file) => {
-        let maxY = css[file].length;
-        let maxX = css[file][0].length;
-        let output = "";
+// ipcMain.on("writeCSS", (event, css) => {
+//     Object.keys(css).forEach((file) => {
+//         let maxY = css[file].length;
+//         let maxX = css[file][0].length;
+//         let output = "";
 
-        for (let y = 0; y < maxY; y++) {
-            for (let x = 0; x < maxX; x++) {
-                if (version == "CMC+ v8.exe" && y == maxY - 1) {
-                    output += css[file][y][x] + " ";
-                } else {
-                    output += css[file][y][x] + (x == maxX - 1 ? "\r\n" : " ");
-                }
-            }
-        }
-        // if (version == "CMC+ v8.exe") {
-        //     output += " ";
-        // }
+//         for (let y = 0; y < maxY; y++) {
+//             for (let x = 0; x < maxX; x++) {
+//                 if (version == "CMC+ v8.exe" && y == maxY - 1) {
+//                     output += css[file][y][x] + " ";
+//                 } else {
+//                     output += css[file][y][x] + (x == maxX - 1 ? "\r\n" : " ");
+//                 }
+//             }
+//         }
+//         // if (version == "CMC+ v8.exe") {
+//         //     output += " ";
+//         // }
 
-        fs.writeFileSync(
-            __dirname + "/merged/data/" + file,
-            output,
-            "ascii"
-        );
-    });
-});
+//         fs.writeFileSync(
+//             __dirname + "/merged/data/" + file,
+//             output,
+//             "ascii"
+//         );
+//     });
+// });
