@@ -10,8 +10,7 @@ const unrar = require("node-unrar-js");
 var win;
 
 const SUPPORTED_VERSIONS = [
-    "CMC+ v8",
-    "CMC Plus Open"
+    "CMC+ v8"
 ];
 
 const PERSIST = [
@@ -343,7 +342,29 @@ function installCharacter(dir, filteredInstall) {
     win.webContents.send("from_installCharacter");
 }
 
+function deleteCharCSS(cssNumber) {
+    let pages = [];
+    pages.push("css.txt");
+    getAllFiles(path.join(__dirname, "cmc", "data", "css")).forEach((file) => {
+        pages.push(path.join("css", path.parse(file).base));
+    });
+    pages.forEach((page) => {
+        let css = getCSS(page);
+        for (let y in css) {
+            for (let x in css[y]) {
+                if (css[y][x] == ('0000' + cssNumber).slice(-4)) {
+                    css[y][x] = "0000";
+                } else if (css[y][x] >= ('0000' + cssNumber).slice(-4)) {
+                    css[y][x] = ('0000' + (parseInt(css[y][x]) - 1)).slice(-4);
+                }
+            };
+        };
+        writeCSS(css, page);
+    });
+}
+
 ipcMain.on("removeCharacter", (event, args) => {
+    deleteCharCSS(args + 1);
     let characters = getCharacters();
     let characterName = characters[args].name;
     let similarName = [];
@@ -353,7 +374,7 @@ ipcMain.on("removeCharacter", (event, args) => {
         }
     });
     let characterDat = fs.readFileSync(path.join(__dirname, "cmc", "data", "dats", characterName + ".dat"), "ascii").split(/\r?\n/);
-    filterCharacterFiles(characters[args].name, characterDat).forEach((file) => {
+    filterCharacterFiles(characters[args].name, characterDat, true).forEach((file) => {
         let subDir = path.parse(file).dir;
         if (file.includes("*")) {
             let start = path.parse(file).base.split("*")[0].replace(subDir, "");
@@ -430,7 +451,7 @@ ipcMain.on("extractCharacter", (event, args) => {
     win.webContents.send("from_removeCharacter");
 });
 
-function filterCharacterFiles(characterName, characterDat = null) {
+function filterCharacterFiles(characterName, characterDat = null, ignoreSeries = false) {
     let palettes;
     if (characterDat == null) {
         palettes = 20;
@@ -441,7 +462,11 @@ function filterCharacterFiles(characterName, characterDat = null) {
     let files = [];
     CHARACTER_FILES.forEach((file) => {
         let fixedFiles = [];
-        fixedFiles.push(file.replace("<fighter>", characterName).replace("<series>", characterDat[3]));
+        let replaced = file.replace("<fighter>", characterName);
+        if(!ignoreSeries) {
+            replaced = replaced.replace("<series>", characterDat[3]);
+        }
+        fixedFiles.push(replaced);
         if (fixedFiles[0].includes("<audio>")) {
             ["ogg", "wav", "mp3"].forEach((format) => {
                 fixedFiles.push(fixedFiles[0].replace("<audio>", format));
@@ -476,20 +501,27 @@ ipcMain.on("getPages", (event, args) => {
 });
 
 ipcMain.on("getCSS", (event, args) => {
-    let cssFile = fs.readFileSync(path.join(__dirname, "cmc", "data", args), "ascii").split(/\r?\n/);
+    win.webContents.send("fromGetCSS", {
+        css: getCSS(args),
+        characters: getCharacters(),
+    });
+});
+
+function getCSS(page) {
+    let cssFile = fs.readFileSync(path.join(__dirname, "cmc", "data", page), "ascii").split(/\r?\n/);
     let css = [];
     cssFile.forEach((line) => {
         css.push(line.split(" "))
     });
     css[css.length - 1].pop();
-    win.webContents.send("fromGetCSS", {
-        css: css,
-        characters: getCharacters(),
-    });
-});
+    return css;
+}
 
 ipcMain.on("writeCSS", (event, args) => {
-    let css = args.css;
+    writeCSS(args.css, args.page);
+});
+
+function writeCSS(css, page) {
     let cssFile = "";
     css.forEach((row) => {
         row.forEach((cell) => {
@@ -501,8 +533,8 @@ ipcMain.on("writeCSS", (event, args) => {
     cssFile = cssFile.slice(0, -2);
     cssFile += " ";
     console.log(cssFile + "EOF");
-    fs.writeFileSync(path.join(__dirname, "cmc", "data", args.page), cssFile, "ascii");
-});
+    fs.writeFileSync(path.join(__dirname, "cmc", "data", page), cssFile, "ascii");
+}
 
 // Unused
 

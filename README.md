@@ -4,8 +4,6 @@ Usage of this mod manager will 'spoil' the hidden characters as they are display
 This project is a WIP mod manager for Super Smash Brothers Crusade CMC+. It allows for the installation and management of mods through a GUI.
 ### Supported Versions
 - [x] [CMC+ v8](https://gamebanana.com/mods/50383)
-- [x] [CMC+ v7.1.1](https://gamebanana.com/mods/50383)
-- [x] [CMC+ Open Build](https://discord.gg/kAbEBkx5Y4)
 ## Why
 CMC+ has good modding support and modding the game currently isn't that hard why use a mod manager? The main reason I developed this mod manager is for the CSS (Character Selection Screen) editor. Although it is certainly possible, adding characters to the CSS by hand annoyed me because of the need to find character numbers and names (if you are removing unknown characters). CMC Mod Manager allows you to add, swap or remove characters to/from the CSS (and soon the SSS) with drag and drop.
 
@@ -49,28 +47,21 @@ This is my first time using Electron and therefore the code is a bit of a mess s
 - [x] Install the unmodified version of CMC
 - [x] Merge installed characters
 - [x] Open basegame and merged directories in local file manager
-- [x] Run both the basegame and merged version
-- [x] Save and load control profiles
+- [x] Run CMC
 - [x] Determine imported game's version
-- [x] Update last merge time
-- [x] Persist: contols, settings, record, favourite character, css
-- [x] Remove unessecary files
+- [ ] Remove unessecary files
 - [x] Make fighters.txt on export
-- [ ] Make stages.txt & others on export
 - [x] Alerts
 - [x] Errors
 ### Character Manager
 - [x] Install characters from a folder (very picky)
-- [x] Install characters from a zip (extract, install folder, delete)
-- [x] List installed mod characters
+- [x] Install characters from an archive (extract, install folder, delete)
+- [x] List installed characters
 - [x] Remove installed characters
-- [x] Open installed character's directory
-- [x] Change character merge priority
-- [x] Delete instructions txt file on merge
-- [x] RAR support - no errors
+- [ ] Delete instructions txt file on merge
+- [ ] Remove Character From Random List
 - [x] Installed v7 Characters Can Be Converted To v8
 - [x] Errors
-- [ ] Remove Character From Random List
 ### Character Selection Screen (Priority: 1)
 - [x] Display the CSS
 - [x] Display unincluded characters (not alts)
