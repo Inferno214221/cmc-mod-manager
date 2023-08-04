@@ -1,7 +1,7 @@
 # CMC Mod Manager
 Usage of this mod manager will 'spoil' the hidden characters as they are displayed in the program without the locked icon.
 ## Why 2.X.X already?
-According to [SemVer](https://semver.org/), the first digit is used to represent a Major change that is incompatable with previous versions. I am releasing version 2.0.0 because I re-wrote the entire program (excluding the interface) so that it is more logical. Rather than making two copies of the CMC+ install, differentiating between builtin and installed characters, and storing infromation about every installed mod version 2.0.0 modifies the CMC+ installation it is given (making no copies) and uses the game's storage format to allow the same operations on all characters. Because of this, version two has a different file structure. Additionally, support for versions below CMC+ v8 has been dropped in CMC Mod Manager 2.0, because of the differences in features. If a CMC+ v7 character is installed with the mod manager, it's dat file will be converted automatically (It will not have a tmug or mbust).
+According to [SemVer](https://semver.org/), the first digit is used to represent a Major change that is incompatible with previous versions. I am releasing version 2.0.0 because I re-wrote the entire program (excluding the interface) so that it is more logical. Rather than making two copies of the CMC+ install, differentiating between builtin and installed characters, and storing information about every installed mod version 2.0.0 modifies the CMC+ installation it is given (making no copies) and uses the game's storage format to allow the same operations on all characters. Because of this, version two has a different file structure. Additionally, support for versions below CMC+ v8 has been dropped in CMC Mod Manager 2.0, because of the differences in features. If a CMC+ v7 character is installed with the mod manager, it's dat file will be converted automatically (It will not have a tmug or mbust).
 ### Change Notes
  - More intuitive user interface and experience (no constant re-merging).
  - Optimised game storage (5 - 10 GB smaller as a result of making no copies of the game).
@@ -25,8 +25,6 @@ CMC+ has good modding support and modding the game currently isn't that hard why
 Go [here](https://github.com/Inferno214221/CMCModManager/releases/latest) to install the latest release of CMC Mod Manager for your operating system.
 ### Windows
 After downloading the zip, extract it in the directory you wish to install it in and run the exe.
-#### NOTE:
-When installing the basegame, merging, installing mods or completing any other task that requires file system operations Windows will say that the program is not responding. This is Window's fault, not mine, the program is actually doing what it is supposed to, just wait for it to finish. The program makes two copies of the game, one without mods and one with mods, so it will sometimes take a while (I'm running it on an M.2 and I still had this issue so please just be patient).
 ### Linux
 After downloading the zip, extract it and copy the `./out/cmcmodmanager-linux-x64/` folder to where you would like to install it, e.g. `/opt` (Feel free to rename it as well). Due to CMC+ being built for Windows, the default permissions are very weird with some directories being read-only. To fix this it is very important that you run `sudo chmod 777 ./* -R` in your CMC game directory before installing it with your mod manager, otherwise, the program will be unable to remove some of the files it is using.
 #### NOTE:
