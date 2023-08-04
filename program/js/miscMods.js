@@ -2,6 +2,20 @@ this.api.receive("throwError", (error) => {
     alert("An Error Occured: " + error);
 });
 
+// Misc Mods
+function installModDir() {
+    this.api.send("installModDir");
+}
+
+function installModArch() {
+    this.api.send("installModArch");
+}
+
+this.api.receive("from_installMod", (data) => {
+    alert("Mod installed.");
+});
+
+/*
 // On Page Load
 this.api.send("getInstalledModList");
 
@@ -53,4 +67,4 @@ function listMods(installed) {
 
 function openModFolder(mod) {
     this.api.send("openModFolder", mod);
-}
+}*/

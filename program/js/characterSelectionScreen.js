@@ -16,7 +16,6 @@ function inputBlurred(element) {
 }
 
 // Character Selection Screen
-
 function getPages() {
     this.api.send("getPages");
 }
