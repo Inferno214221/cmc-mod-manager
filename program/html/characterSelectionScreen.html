@@ -92,7 +92,7 @@
                         <select id="sortingType" onfocus="inputFocused('sortingType')" onblur="inputBlurred('sortingType')" onchange="resort()">
                             <option value="displayName">Alphabetical</option>
                             <option value="number">Internal Number</option>
-                            <option value="franchise">Franchise</option>
+                            <option value="series">Series</option>
                         </select>
                         <input type="checkbox" id="reverseSort" name="reverseSort" onchange="resort()">
                         <label for="reverseSort">Reverse</label>
@@ -140,11 +140,11 @@
                 <td class="column">
                     <fieldset>
                         <legend>Franchise</legend>
-                        <select id="franchiseSelect" onfocus="inputFocused('franchiseSelect')" onblur="inputBlurred('franchiseSelect')">
+                        <select id="seriesSelect" onfocus="inputFocused('seriesSelect')" onblur="inputBlurred('seriesSelect')">
                             <option value=""></option>
                         </select><br />
                         <!-- <button type="button" onclick="addFranchise()">Add Entire Franchise</button> -->
-                        <button type="button" onclick="removeFranchise()">Remove Entire Franchise</button>
+                        <button type="button" onclick="removeSeries()">Remove Entire Franchise</button>
                     </fieldset>
                 </td>
                 <!-- <td class="column">

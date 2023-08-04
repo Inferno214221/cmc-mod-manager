@@ -467,6 +467,31 @@ function filterCharacterFiles(characterName, characterDat = null) {
     return files;
 }
 
+// Character Selection Screen
+
+ipcMain.on("getPages", (event, args) => {
+    let pages = [];
+    pages.push("css.txt");
+    getAllFiles(path.join(__dirname, "cmc", "data", "css")).forEach((file) => {
+        pages.push(path.join("css", path.parse(file).base));
+    });
+    console.log(pages);
+    win.webContents.send("fromGetPages", pages);
+});
+
+ipcMain.on("getCSS", (event, args) => {
+    let cssFile = fs.readFileSync(path.join(__dirname, "cmc", "data", args), "ascii").split(/\r?\n/);
+    let css = [];
+    cssFile.forEach((line) => {
+        css.push(line.split(" "))
+    });
+    css[css.length - 1].pop();
+    win.webContents.send("fromGetCSS", {
+        css: css,
+        characters: getCharacters(),
+    });
+});
+
 ////////
 ////////
 ////////
@@ -1125,45 +1150,45 @@ ipcMain.on("increaseModMergePriority", (event, args) => {
     win.webContents.send("fromIncreaseModMergePriority", installed);
 });
 
-ipcMain.on("getCSS", (event, args) => {
-    let cssFiles = [];
-    if (version == "CMC+ v8.exe") {
-        cssFiles = getAllFiles(__dirname + "/merged/data/css/");
-    }
-    cssFiles.push(__dirname + "/merged/data/css.txt");
-    var css = {};
-    cssFiles.forEach((file) => {
-        let cssFile;
-        try {
-            // cssFile = fs.readFileSync(__dirname + "/merged/data/css.txt", "utf-8").split(/\r?\n/);
-            cssFile = fs.readFileSync(file, "ascii").split(/\r?\n/);
-        } catch (error) {
-            if (error.code == "ENOENT") {
-                win.webContents.send("errorGetCSS");
-            }
-        }
-        if (cssFile != undefined) {
-            let cssName = "";
-            if (file == __dirname + "/merged/data/css.txt") {
-                cssName = "css.txt";
-            } else {
-                cssName = "css/" + file.split('\\').pop().split('/').pop();
-            }
-            css[cssName] = [];
-            for (let line = 0; line < cssFile.length; line++) {
-                css[cssName].push(cssFile[line].split(" "));
-            }
-        }
-    });
-    let basegame = reRequire(__dirname + "/characters/default.json");
-    let installed = reRequire(__dirname + "/characters/installed.json");
-    win.webContents.send("fromGetCSS", {
-        css: css,
-        version: version,
-        basegame: basegame,
-        installed: installed
-    });
-});
+// ipcMain.on("getCSS", (event, args) => {
+//     let cssFiles = [];
+//     if (version == "CMC+ v8.exe") {
+//         cssFiles = getAllFiles(__dirname + "/merged/data/css/");
+//     }
+//     cssFiles.push(__dirname + "/merged/data/css.txt");
+//     var css = {};
+//     cssFiles.forEach((file) => {
+//         let cssFile;
+//         try {
+//             // cssFile = fs.readFileSync(__dirname + "/merged/data/css.txt", "utf-8").split(/\r?\n/);
+//             cssFile = fs.readFileSync(file, "ascii").split(/\r?\n/);
+//         } catch (error) {
+//             if (error.code == "ENOENT") {
+//                 win.webContents.send("errorGetCSS");
+//             }
+//         }
+//         if (cssFile != undefined) {
+//             let cssName = "";
+//             if (file == __dirname + "/merged/data/css.txt") {
+//                 cssName = "css.txt";
+//             } else {
+//                 cssName = "css/" + file.split('\\').pop().split('/').pop();
+//             }
+//             css[cssName] = [];
+//             for (let line = 0; line < cssFile.length; line++) {
+//                 css[cssName].push(cssFile[line].split(" "));
+//             }
+//         }
+//     });
+//     let basegame = reRequire(__dirname + "/characters/default.json");
+//     let installed = reRequire(__dirname + "/characters/installed.json");
+//     win.webContents.send("fromGetCSS", {
+//         css: css,
+//         version: version,
+//         basegame: basegame,
+//         installed: installed
+//     });
+// });
 
 ipcMain.on("writeCSS", (event, css) => {
     Object.keys(css).forEach((file) => {
