@@ -38,10 +38,18 @@ this.api.receive("fromGetCSS", (data) => {
         series: null,
     };
     console.log(data.css, data.characters);
-    makeTables(css, characters);
+    makeTables();
 });
 
-function makeTables(css, characters) {
+function writeCSS() {
+    makeTables();
+    this.api.send("writeCSS", {
+        css: css,
+        page: currentPage,
+    });
+}
+
+function makeTables() {
     let maxY = css.length;
     let maxX = css[0].length;
     let output = "<tr>\n\
@@ -133,31 +141,23 @@ function removeCharacter(x, y) {
     let character;
     character = characters[number - 1];
     if (character == undefined) {
-        return;//TODO: error
+        return;
     }
-    hidden[number - 1] = character;
+    // hidden[number - 1] = character;
     css[y][x] = "0000";
-    this.api.send("writeCSS", {
-        css: css,
-        page: currentPage,
-    });
-    makeTables(css, characters);
+    writeCSS();
     return number;
 }
 
 function addCharacter(characterNumber, x, y) {
     let replaceNumber = css[y][x];
     if (replaceNumber !== "0000") {
-        return;//TODO: alert
+        return;
     }
-    console.log(characterNumber);
     css[y][x] = ('0000' + characterNumber).slice(-4);
-    delete hidden[characterNumber - 1];
-    makeTables(css, characters);
-    this.api.send("writeCSS", {
-        css: css,
-        page: currentPage,
-    });
+    // delete hidden[characterNumber - 1];
+    makeTables();
+    writeCSS();
 }
 
 function getCSSPage(offset) {
@@ -207,62 +207,16 @@ function onDropOnCSS(ev) {
     }
 }
 
-// function findCSS(character) {
-//     let allChars = Object.assign({}, basegame.versions[version].builtin, basegame.cmc, installed.characters);
-//     let number = ('0000' + allChars[character].number).slice(-4);
-//     let coords;
-
-//     let maxX = css[currentPage][0].length;
-//     let maxY = css[currentPage].length;
-//     for (let y = 0; y < maxY; y++) {
-//         for (let x = 0; x < maxX; x++) {
-//             if (css[currentPage][y][x] == number) {
-//                 coords = {
-//                     x: x,
-//                     y: y
-//                 };
-//                 break;
-//             }
-//         }
-//     }
-//     if (coords == undefined) {
-//         return;//TODO: error
-//     }
-//     return coords;
-// }
-
-// function hideCharacter() {
-//     yInput.value = parseInt(yInput.value);
-//     xInput.value = parseInt(xInput.value);
-//     if ((css[currentPage][yInput.value] == undefined) || (css[currentPage][yInput.value][xInput.value] == undefined)) {
-//         return;//TODO: error
-//     }
-//     removeCharacter(xInput.value, yInput.value);
-// }
-
-// function addCharacter(character) {
-//     yInput.value = parseInt(yInput.value);
-//     xInput.value = parseInt(xInput.value);
-//     if ((css[currentPage][yInput.value] == undefined) || (css[currentPage][yInput.value][xInput.value] == undefined)) {
-//         return;//TODO: error
-//     }
-
-//     addCharacterE(character, xInput.value, yInput.value);
-// }
-
 function removeSeries() {
     series = seriesSelect.value;
     if (series == "") {
         return;
     }
-    console.log(characters);
     for (let character = 0; character < characters.length; character++) {
         if (characters[character] == undefined) {
             continue;
         }
-        console.log(characters[character].series);
         if (characters[character].series == series) {
-            console.log(characters[character]);
             for (let y in css) {
                 for (let x in css[y]) {
                     if (('0000' + (character + 1)).slice(-4) == css[y][x]) {
@@ -272,96 +226,38 @@ function removeSeries() {
             };
         }
     }
-    this.api.send("writeCSS", {
-        css: css,
-        page: currentPage,
-    });
+    writeCSS();
 }
 
-// function removeFranchise() {
-//     if (franchiseSelect.value == "") {
-//         return;//Doesn't really happen
-//     }
-//     let allChars = Object.assign({}, basegame.versions[version].builtin, basegame.cmc, installed.characters);
-//     for (character of Object.keys(allChars)) {
-//         // console.log(character, allChars[character]);
-//         if (allChars[character].franchise == franchiseSelect.value) {
-//             let maxX = css[currentPage][0].length;
-//             let maxY = css[currentPage].length;
+function addRow() {    
+    let output = [];
+    css[0].forEach((x) => {
+        output.push("0000");
+    });
+    css.push(output);
+    writeCSS();
+}
 
-//             for (let y = 0; y < maxY; y++) {
-//                 for (let x = 0; x < maxX; x++) {
-//                     if (('0000' + allChars[character].number).slice(-4) == css[currentPage][y][x]) {
-//                         let characterNumber = css[currentPage][y][x];
-//                         css[currentPage][y][x] = "0000";
-//                         let add;
-//                         for (let e of Object.keys(allChars)) {
-//                             if (allChars[e].number == characterNumber) {
-//                                 add = e;
-//                                 break;
-//                             }
-//                         }
-//                         if (add == undefined) {
-//                             return;//TODO: error
-//                         }
-//                         hidden[add] = allChars[add];
-//                     }
-//                 }
-//             }
-//         }
-//     }
-//     makeTables(css, allChars);
-//     this.api.send("writeCSS", css);
-// }
+function removeRow() {
+    if (css.length < 2) return;
+    css.pop();
+    writeCSS();
+}
 
-// function addRow() {
-//     let maxX = css[currentPage][0].length;
-//     let allChars = Object.assign({}, basegame.versions[version].builtin, basegame.cmc, installed.characters);
-    
-//     let output = [];
-//     for (let x = 0; x < maxX; x++) {
-//         output.push("0000");
-//     }
-//     css[currentPage].push(output);
+function addColumn() {
+    for (let y = 0; y < css.length; y++) {
+        css[y].push("0000");
+    }
+    writeCSS();
+}
 
-//     makeTables(css, allChars);
-//     this.api.send("writeCSS", css);
-// }
-
-// function removeRow() {
-//     if (css[currentPage].length < 2) return;
-//     let allChars = Object.assign({}, basegame.versions[version].builtin, basegame.cmc, installed.characters);
-
-//     css[currentPage].pop();
-
-//     makeTables(css, allChars);
-//     this.api.send("writeCSS", css);
-// }
-
-// function addColumn() {
-//     let maxY = css[currentPage].length;
-//     let allChars = Object.assign({}, basegame.versions[version].builtin, basegame.cmc, installed.characters);
-
-//     for (let y = 0; y < maxY; y++) {
-//         css[currentPage][y].push("0000");
-//     }
-
-//     makeTables(css, allChars);
-//     this.api.send("writeCSS", css);
-// }
-
-// function removeColumn() {
-//     if (css[currentPage][0].length < 2) return;
-//     let maxY = css[currentPage].length;
-//     let allChars = Object.assign({}, basegame.versions[version].builtin, basegame.cmc, installed.characters);
-
-//     for (let y = 0; y < maxY; y++) {
-//         css[currentPage][y].pop();
-//     }
-
-//     makeTables(css, allChars);
-//     this.api.send("writeCSS", css);
-// }
+function removeColumn() {
+    if (css[0].length < 2) return;
+    for (let y = 0; y < css.length; y++) {
+        css[y].pop();
+    }
+    writeCSS();
+}
 
 // On Page Load
 var css, characters, hidden, currentPage, pages;

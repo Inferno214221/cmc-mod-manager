@@ -25,7 +25,7 @@ function importUnmodded() {
 }
 
 this.api.receive("from_importUnmodded", () => {
-    alert("CMC base game installed succesfully");
+    alert("CMC installed succesfully");
     writeGameInstalled(true);
 });
 
