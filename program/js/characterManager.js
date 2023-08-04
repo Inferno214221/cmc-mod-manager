@@ -44,112 +44,23 @@ this.api.receive("from_installCharacter", (data) => {
 });
 
 function removeCharacter(id) {
-    //
+    this.api.send("removeCharacter", id);
+    getCharacterList();
 }
 
 this.api.receive("from_removeCharacter", (data) => {
-    //
+    alert("Character removed successfully.");
 });
 
 function extractCharacter(id) {
-    //
+    this.api.send("extractCharacter", id);
+    getCharacterList();
 }
 
 this.api.receive("from_extractCharacter", (data) => {
-    //
+    alert("Character extracted successfully.");
 });
 
 // On Page Load
 var version;
 getCharacterList();
-/*
-
-// On Page Load
-this.api.send("getInstalledCharacterList");
-
-this.api.receive("fromGetInstalledCharacterList", (data) => {
-    version = data.version;
-    if (version != "CMC+ v8.exe") {
-        cmc8.innerHTML = "";
-    }
-    extractionList(data.basegame);
-    listCharacters(data.installed);
-});
-
-function installCharacter() {
-    this.api.send("installCharacter", (version == "CMC+ v8.exe" && convertFormat.checked));
-}
-
-function installCharacterZip() {
-    this.api.send("installCharacterZip", (version == "CMC+ v8.exe" && convertFormat.checked));
-}
-
-this.api.receive("fromInstallCharacter", (installed) => {
-    listCharacters(installed);
-});
-
-function removeCharacter(Character) {
-    this.api.send("removeCharacter", Character);
-}
-
-this.api.receive("fromRemoveCharacter", (installed) => {
-    listCharacters(installed);
-});
-
-function increaseMergePriority(Character) {
-    this.api.send("increaseMergePriority", Character);
-}
-
-this.api.receive("fromIncreaseMergePriority", (installed) => {
-    listCharacters(installed);
-});
-
-function listCharacters(installed) {
-    let output = "";
-    installed.priority.forEach((Character) => {
-        output += 
-        "<tr id=\"" + Character + "\">\n\
-            <td class=\"mug\"><image src=\"../../Characters/" + Character + "/gfx/mugs/" + Character + ".png\" /></td>\n\
-            <td>" + installed.Characters[Character].displayName + "</td>\n\
-            <td><button type=\"button\" onclick=\"removeCharacter('" + Character + "')\">Remove</button></td>\n\
-            <td><button type=\"button\" onclick=\"openCharacterFolder('" + Character + "')\">Open Directory</button></td>\n\
-            <td><button type=\"button\" onclick=\"increaseMergePriority('" + Character + "')\">Increase Merge Priority</button></td>\n\
-        </tr>\n"
-    });
-    CharacterTable.innerHTML = output;
-}
-
-function extractionList(basegame) {
-    let output = "";
-    basegame.forEach((Character) => {
-        output += "<option value=\"" + Character + "\">" + Character + "</option>\n"
-    });
-    extractCharacterSelect.innerHTML = output;
-}
-
-function extractCharacter() {
-    this.api.send("extractCharacter", {
-        Character: extractCharacterSelect.value,
-        deleteExtraction: deleteExtraction.checked,
-    });
-}
-
-this.api.receive("fromExtractCharacter", () => {
-    alert("Character sucessfully extracted!");
-});
-
-function openCharacterFolder(Character) {
-    this.api.send("openCharacterFolder", Character);
-}
-
-function inputFocused(element) {
-    this[element].style.borderColor = "#2777ff";
-}
-
-function inputBlurred(element) {
-    this[element].style.borderColor = "black";
-}
-
-function openFolder(directory) {
-    this.api.send("openFolder", directory);
-}*/

@@ -152,14 +152,27 @@ function getCharacters() {
     return fighters;
 }
 
-function appendCharacter(character) {
+function appendCharacter(add) {
     let characters = getCharacters();
     let output = (characters.length + 1) + "\r\n";
     characters.forEach((character) => {
         output += character.name + "\r\n";
     });
-    output += character + "\r\n";
+    output += add + "\r\n";
     fs.writeFileSync(path.join(__dirname, "cmc", "data", "fighters.txt"), output, "ascii");
+}
+
+function dropCharacter(drop) {
+    let characters = getCharacters();
+    characters.filter((character) => {
+       return character.name != drop;
+    });
+    let output = (characters.length + 1) + "\r\n";
+    characters.forEach((character) => {
+        output += character.name + "\r\n";
+    });
+    fs.writeFileSync(path.join(__dirname, "cmc", "data", "fighters.txt"), output, "ascii");
+    //TODO: remove from css
 }
 
 // Index
@@ -183,6 +196,7 @@ ipcMain.on("importUnmodded", (event, args) => {
         getAllFiles(dir.filePaths[0]).forEach((file) => {
             fs.chmodSync(file, 0o777);
         });
+        fs.ensureDirSync(path.join(__dirname, "cmc"));
         fs.emptyDirSync(path.join(__dirname, "cmc"));
         
         fs.copySync(dir.filePaths[0], path.join(__dirname, "cmc"), { overwrite: true });
@@ -226,16 +240,17 @@ ipcMain.on("installCharacterArch", (event, args) => {
         let filePath = file.filePaths[0];
         let modName = path.parse(filePath).name;
         let dir = path.join(__dirname + "_temp");
-        dir = dir + "/" + modName;
+        dir = path.join(dir, modName);
+        console.log(path.parse(filePath).ext.toLowerCase());
         switch (path.parse(filePath).ext.toLowerCase()) {
-            case "zip":
+            case ".zip":
                 await extract(filePath, {
                     dir: dir,
                     defaultDirMode: 0o777,
                     defaultFileMode: 0o777,
                 });
                 break;
-            case "rar"://TODO: Error handling
+            case ".rar"://TODO: Error handling
                 let buf = Uint8Array.from(fs.readFileSync(filePath)).buffer;
                 let extractor = await unrar.createExtractorFromData({ data: buf });
                 const extracted = extractor.extract();
@@ -251,7 +266,7 @@ ipcMain.on("installCharacterArch", (event, args) => {
                     }
                 });
                 break;
-            case "7z":
+            case ".7z":
             default:
                 return;
                 break;
@@ -274,36 +289,42 @@ function installCharacter(dir, filteredInstall) {
         win.webContents.send("throwError", "The character's dat file is not in the ./data/dats/ directory.");
         return;
     }
+    for (let character of getCharacters()) {
+        if (character.name == characterName) {
+            win.webContents.send("throwError", "The selected character is already installed.");
+            return;
+        }
+    };
     let characterDat = fs.readFileSync(path.join(dir, "data", "dats", characterName + ".dat"), "ascii").split(/\r?\n/);
 
     let datMod = !characterDat[4].includes("---Classic Home Stages Below---");
+    let characterDatTxt = "";
     if (datMod) {
         characterDat.splice(4, 1, "---Classic Home Stages Below---", "1", "battlefield", "---Random Datas---", "0", "---Palettes Number---");
         characterDat.splice(11, 0, "---From Here is Individual Palettes data---");
-        let characterDatTxt = "";
         characterDat.forEach((line) => {
             characterDatTxt += line + "\r\n";
         });
     }
 
     if (filteredInstall) {
-        filterCharacterFiles(dir, characterName, characterDat).forEach((file) => {
+        filterCharacterFiles(characterName, characterDat).forEach((file) => {
             let subDir = path.parse(file).dir;
-            fs.ensureDirSync(path.join(__dirname, "extracted", characterName, subDir));
             if (file.includes("*")) {
                 let start = path.parse(file).base.split("*")[0].replace(subDir, "");
                 let end = path.parse(file).base.split("*")[1];
-                console.log(path.join(dir, subDir), start, end);
                 if (fs.existsSync(path.join(dir, subDir))) {
                     let contents = fs.readdirSync(path.join(dir, subDir)).filter((i) => {
                         return i.startsWith(start) && i.endsWith(end);
                     });
                     contents.forEach((found) => {
+                        console.log("Copying: " + path.join(dir, subDir, found));
                         fs.copySync(path.join(dir, subDir, found), path.join(__dirname, "cmc", subDir, found), {overwrite: true});
                     });
                 }
             } else {
                 if (fs.existsSync(path.join(dir, file))) {
+                    console.log("Copying: " + path.join(dir, file));
                     fs.copySync(path.join(dir, file), path.join(__dirname, "cmc", file), {overwrite: true});
                 }
             }
@@ -325,7 +346,101 @@ function installCharacter(dir, filteredInstall) {
     win.webContents.send("from_installCharacter");
 }
 
-function filterCharacterFiles(dir, characterName, characterDat) {
+ipcMain.on("removeCharacter", (event, args) => {
+    let characters = getCharacters();
+    let characterName = characters[args].name;
+    let similarName = [];
+    characters.forEach((character) => {
+        if (character.name != characterName && character.name.startsWith(characterName)) {
+            similarName.push(character.name);
+        }
+    });
+    let characterDat = fs.readFileSync(path.join(__dirname, "cmc", "data", "dats", characterName + ".dat"), "ascii").split(/\r?\n/);
+    filterCharacterFiles(characters[args].name, characterDat).forEach((file) => {
+        let subDir = path.parse(file).dir;
+        if (file.includes("*")) {
+            let start = path.parse(file).base.split("*")[0].replace(subDir, "");
+            let end = path.parse(file).base.split("*")[1];
+            if (fs.existsSync(path.join(__dirname, "cmc", subDir))) {
+                let contents = fs.readdirSync(path.join(__dirname, "cmc", subDir)).filter((i) => {
+                    similarName.forEach((name) => {
+                        if (i.startsWith(name)) {
+                            console.log(i + " was ignored because it belongs to " + name);
+                            return false;
+                        }
+                    });
+                    return i.startsWith(start) && i.endsWith(end);
+                });
+                contents.forEach((found) => {
+                    console.log("Removing: " + path.join(__dirname, "cmc", subDir, found));
+                    fs.removeSync(path.join(__dirname, "cmc", subDir, found));
+                });
+            }
+        } else {
+            if (fs.existsSync(path.join(__dirname, "cmc", file))) {
+                console.log("Removing: " + path.join(__dirname, "cmc", file));
+                fs.removeSync(path.join(__dirname, "cmc", file));
+            }
+        }
+    });
+    dropCharacter(characterName);
+
+    win.webContents.send("from_removeCharacter");
+});
+
+ipcMain.on("extractCharacter", (event, args) => {
+    let characters = getCharacters();
+    let characterName = characters[args].name;
+    let similarName = [];
+    characters.forEach((character) => {
+        if (character.name != characterName && character.name.startsWith(characterName)) {
+            similarName.push(character.name);
+        }
+    });
+    let characterDat = fs.readFileSync(path.join(__dirname, "cmc", "data", "dats", characterName + ".dat"), "ascii").split(/\r?\n/);
+    filterCharacterFiles(characters[args].name, characterDat).forEach((file) => {
+        let subDir = path.parse(file).dir;
+        fs.ensureDirSync(path.join(__dirname, "extracted", characterName, subDir));
+        if (file.includes("*")) {
+            let start = path.parse(file).base.split("*")[0].replace(subDir, "");
+            let end = path.parse(file).base.split("*")[1];
+            if (fs.existsSync(path.join(__dirname, "cmc", subDir))) {
+                let contents = fs.readdirSync(path.join(__dirname, "cmc", subDir)).filter((i) => {
+                    similarName.forEach((name) => {
+                        if (i.startsWith(name)) {
+                            console.log(i + " was ignored because it belongs to " + name);
+                            return false;
+                        }
+                    });
+                    return i.startsWith(start) && i.endsWith(end);
+                });
+                contents.forEach((found) => {
+                    console.log("Extracting: " + path.join(__dirname, "cmc", subDir, found));
+                    fs.copySync(path.join(__dirname, "cmc", subDir, found), path.join(__dirname, "extracted", characterName, subDir, found), {overwrite: true});
+                    fs.removeSync(path.join(__dirname, "cmc", subDir, found));
+                });
+            }
+        } else {
+            if (fs.existsSync(path.join(__dirname, "cmc", file))) {
+                console.log("Extracting: " + path.join(__dirname, "cmc", file));
+                fs.copySync(path.join(__dirname, "cmc", file), path.join(__dirname, "extracted", characterName, file), {overwrite: true});
+                fs.removeSync(path.join(__dirname, "cmc", file));
+            }
+        }
+    });
+    dropCharacter(characterName);
+
+    win.webContents.send("from_removeCharacter");
+});
+
+function filterCharacterFiles(characterName, characterDat = null) {
+    let palettes;
+    if (characterDat == null) {
+        palettes = 20;
+    } else {
+        palettes = parseInt(characterDat[11]) - 1;
+    }
+
     let files = [];
     CHARACTER_FILES.forEach((file) => {
         let fixedFiles = [];
@@ -338,7 +453,7 @@ function filterCharacterFiles(dir, characterName, characterDat) {
         }
         fixedFiles.forEach((fixedFile) => {
             if (fixedFile.includes("<palette>")) {
-                for (let p = 0; p < (parseInt(characterDat[11]) - 1); p++) {
+                for (let p = 0; p < palettes; p++) {
                     fixedFiles.push(fixedFile.replace("<palette>", p + 1));
                 }
                 fixedFiles.shift();
@@ -352,6 +467,20 @@ function filterCharacterFiles(dir, characterName, characterDat) {
     return files;
 }
 
+////////
+////////
+////////
+////////
+////////
+////////
+////////
+////////
+////////
+////////
+////////
+////////
+////////
+////////
 ////////
 
 ipcMain.on("checkGameSourceInstalled", (event, args) => {
@@ -756,116 +885,116 @@ ipcMain.on("getInstalledCharList", (event, args) => {
     });
 });
 
-ipcMain.on("extractCharacter", (event, args) => {
-    let basegame = reRequire(__dirname + "/characters/default.json");
-    let files = [];
-    CHARACTER_FILES.forEach((file) => {
-        let fixedFiles = [];
-        fixedFiles.push(file.replace("<fighter>", args.character).replace("<series>", basegame.cmc[args.character].franchise));
-        if (fixedFiles[0].includes("<audio>")) {
-            ["ogg", "wav", "mp3"].forEach((format) => {
-                fixedFiles.push(fixedFiles[0].replace("<audio>", format));
-            });
-            fixedFiles.shift();
-        }
+// ipcMain.on("extractCharacter", (event, args) => {
+//     let basegame = reRequire(__dirname + "/characters/default.json");
+//     let files = [];
+//     CHARACTER_FILES.forEach((file) => {
+//         let fixedFiles = [];
+//         fixedFiles.push(file.replace("<fighter>", args.character).replace("<series>", basegame.cmc[args.character].franchise));
+//         if (fixedFiles[0].includes("<audio>")) {
+//             ["ogg", "wav", "mp3"].forEach((format) => {
+//                 fixedFiles.push(fixedFiles[0].replace("<audio>", format));
+//             });
+//             fixedFiles.shift();
+//         }
 
-        fixedFiles.forEach((fixed) => {
-            files.push(fixed);
-        });
-    });
+//         fixedFiles.forEach((fixed) => {
+//             files.push(fixed);
+//         });
+//     });
 
-    files.forEach((file) => {
-        let dir = file.replace(file.split('\\').pop().split('/').pop(), "");
-        fs.ensureDirSync(__dirname + "/extracted/" + args.character + "/" + dir);
-        if (file.includes("*")) {
-            let start = file.split("*")[0].replace(dir, "");
-            let end = file.split("*")[1];
-            if (fs.existsSync(__dirname + "/basegame/" + dir)) {
-                let contents = fs.readdirSync(__dirname + "/basegame/" + dir).filter((i) => {
-                    return i.replace(start, "").replace(end, "") === parseInt(i.replace(start, "").replace(end, "")).toString();
-                });
-                contents.forEach((found) => {
-                    console.log(found);
-                    if (args.deleteExtraction) {
-                        fs.moveSync(__dirname + "/basegame/" + dir + found, __dirname + "/extracted/" + args.character + "/" + dir + found, {overwrite : true});
-                    } else {
-                        fs.copySync(__dirname + "/basegame/" + dir + found, __dirname + "/extracted/" + args.character + "/" + dir + found, {overwrite : true});
-                    }
-                });
-            }
-        } else {
-            if (fs.existsSync(__dirname + "/basegame/" + file)) {
-                if (args.deleteExtraction) {
-                    fs.moveSync(__dirname + "/basegame/" + file, __dirname + "/extracted/" + args.character + "/" + file, {overwrite : true});
-                } else {
-                    fs.copySync(__dirname + "/basegame/" + file, __dirname + "/extracted/" + args.character + "/" + file, {overwrite : true});
-                }
-            }
-        }
-    });
-    console.log(files);
-    if (args.deleteExtraction) {
-        let removeNumber = basegame.cmc[args.character].number;
-        delete basegame.cmc[args.character];
-        Object.keys(basegame.cmc).forEach((character) => {
-            if (basegame.cmc[character].number > removeNumber) {
-            basegame.cmc[character].number -= 1;
-            }
-        });
-        fs.writeFileSync(
-            __dirname + "/characters/default.json",
-            JSON.stringify(basegame, null, 4),
-            "utf-8"
-        );
-        let installed = reRequire(__dirname + "/characters/installed.json");
-        installed.number -= 1;
-        installed.priority.forEach((character) => {
-            if (installed.characters[character].number > removeNumber) {
-                installed.characters[character].number -= 1;
-            }
-        });
-        fs.writeFileSync(
-            __dirname + "/characters/installed.json",
-            JSON.stringify(installed, null, 4),
-            "utf-8"
-        );
-    }
-    win.webContents.send("fromExtractCharacter");
-});
+//     files.forEach((file) => {
+//         let dir = file.replace(file.split('\\').pop().split('/').pop(), "");
+//         fs.ensureDirSync(__dirname + "/extracted/" + args.character + "/" + dir);
+//         if (file.includes("*")) {
+//             let start = file.split("*")[0].replace(dir, "");
+//             let end = file.split("*")[1];
+//             if (fs.existsSync(__dirname + "/basegame/" + dir)) {
+//                 let contents = fs.readdirSync(__dirname + "/basegame/" + dir).filter((i) => {
+//                     return i.replace(start, "").replace(end, "") === parseInt(i.replace(start, "").replace(end, "")).toString();
+//                 });
+//                 contents.forEach((found) => {
+//                     console.log(found);
+//                     if (args.deleteExtraction) {
+//                         fs.moveSync(__dirname + "/basegame/" + dir + found, __dirname + "/extracted/" + args.character + "/" + dir + found, {overwrite : true});
+//                     } else {
+//                         fs.copySync(__dirname + "/basegame/" + dir + found, __dirname + "/extracted/" + args.character + "/" + dir + found, {overwrite : true});
+//                     }
+//                 });
+//             }
+//         } else {
+//             if (fs.existsSync(__dirname + "/basegame/" + file)) {
+//                 if (args.deleteExtraction) {
+//                     fs.moveSync(__dirname + "/basegame/" + file, __dirname + "/extracted/" + args.character + "/" + file, {overwrite : true});
+//                 } else {
+//                     fs.copySync(__dirname + "/basegame/" + file, __dirname + "/extracted/" + args.character + "/" + file, {overwrite : true});
+//                 }
+//             }
+//         }
+//     });
+//     console.log(files);
+//     if (args.deleteExtraction) {
+//         let removeNumber = basegame.cmc[args.character].number;
+//         delete basegame.cmc[args.character];
+//         Object.keys(basegame.cmc).forEach((character) => {
+//             if (basegame.cmc[character].number > removeNumber) {
+//             basegame.cmc[character].number -= 1;
+//             }
+//         });
+//         fs.writeFileSync(
+//             __dirname + "/characters/default.json",
+//             JSON.stringify(basegame, null, 4),
+//             "utf-8"
+//         );
+//         let installed = reRequire(__dirname + "/characters/installed.json");
+//         installed.number -= 1;
+//         installed.priority.forEach((character) => {
+//             if (installed.characters[character].number > removeNumber) {
+//                 installed.characters[character].number -= 1;
+//             }
+//         });
+//         fs.writeFileSync(
+//             __dirname + "/characters/installed.json",
+//             JSON.stringify(installed, null, 4),
+//             "utf-8"
+//         );
+//     }
+//     win.webContents.send("fromExtractCharacter");
+// });
 
-ipcMain.on("removeCharacter", (event, args) => {
-    let installed = reRequire(__dirname + "/characters/installed.json");
-    let removeNumber = installed.characters[args].number;
-    delete installed.characters[args];
-    installed.priority = installed.priority.filter((character) => {
-        return character !== args;
-    });
-    installed.priority.forEach((character) => {
-        if (installed.characters[character].number > removeNumber) {
-            installed.characters[character].number -= 1;
-        }
-    });
-    fs.removeSync(__dirname + "/characters/" + args);
-    fs.writeFileSync(
-        __dirname + "/characters/installed.json",
-        JSON.stringify(installed, null, 4),
-        "utf-8"
-    );
+// ipcMain.on("removeCharacter", (event, args) => {
+//     let installed = reRequire(__dirname + "/characters/installed.json");
+//     let removeNumber = installed.characters[args].number;
+//     delete installed.characters[args];
+//     installed.priority = installed.priority.filter((character) => {
+//         return character !== args;
+//     });
+//     installed.priority.forEach((character) => {
+//         if (installed.characters[character].number > removeNumber) {
+//             installed.characters[character].number -= 1;
+//         }
+//     });
+//     fs.removeSync(__dirname + "/characters/" + args);
+//     fs.writeFileSync(
+//         __dirname + "/characters/installed.json",
+//         JSON.stringify(installed, null, 4),
+//         "utf-8"
+//     );
 
-    // NOTE: Bad practice, as although it is unlikely a remove character is wanted in the css, changes are not saved when a character is removed
-    // let cssFile;
-    // try {
-    //     // cssFile = fs.readFileSync(__dirname + "/merged/data/css.txt", "utf-8").split(/\r?\n/);
-    //     cssFile = fs.readFileSync(__dirname + "/merged/data/css.txt", "ascii");
-    // } catch (error) {
-    //     win.webContents.send("fromRemoveCharacter", installed);
-    // }
-    // if (cssFile == undefined) win.webContents.send("fromRemoveCharacter", installed);
+//     // NOTE: Bad practice, as although it is unlikely a remove character is wanted in the css, changes are not saved when a character is removed
+//     // let cssFile;
+//     // try {
+//     //     // cssFile = fs.readFileSync(__dirname + "/merged/data/css.txt", "utf-8").split(/\r?\n/);
+//     //     cssFile = fs.readFileSync(__dirname + "/merged/data/css.txt", "ascii");
+//     // } catch (error) {
+//     //     win.webContents.send("fromRemoveCharacter", installed);
+//     // }
+//     // if (cssFile == undefined) win.webContents.send("fromRemoveCharacter", installed);
 
-    // cssFile.replace(new RegExp(('0000' + removeNumber).slice(-4), 'g'), "0000");
+//     // cssFile.replace(new RegExp(('0000' + removeNumber).slice(-4), 'g'), "0000");
 
-    win.webContents.send("fromRemoveCharacter", installed);
-});
+//     win.webContents.send("fromRemoveCharacter", installed);
+// });
 
 ipcMain.on("increaseMergePriority", (event, args) => {
     let installed = reRequire(__dirname + "/characters/installed.json");
