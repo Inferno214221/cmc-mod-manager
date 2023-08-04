@@ -68,14 +68,14 @@
         </fieldset>
         <fieldset>
             <legend>Installed Characters</legend>
-            <table id="characterTable">
-                <tr id="link">
-                    <td class="mug"><image src="../../cmc/gfx/mugs/link.png" /></td>
-                    <td>Link</td>
-                    <td><button type="button" onclick="removeCharacter('link')">Remove</button></td>
-                    <td><button type="button" onclick="extractCharacter('link')">Extract</button></td>
-                </tr>
-            </table>
+            <div style="overflow: hidden;
+            overflow-y: scroll;
+            white-space: nowrap;
+            height: calc(100vh - 180px);
+            white-space: nowrap;">
+                <table id="characterTable">
+                </table>
+            </div>
         </fieldset>
     </section>
     <script src="../js/characterManager.js">

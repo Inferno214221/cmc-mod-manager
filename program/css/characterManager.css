@@ -22,3 +22,7 @@ select {
     height: 29px;
     padding: 0px;
 }
+
+section {
+    overflow-y: hidden;
+}

@@ -85,7 +85,7 @@
                 </td>
             </tr>
             <tr>
-                <td id="hiddenCharactersCell">
+                <td>
                     <fieldset>
                         <legend>Hidden Characters</legend>
                         <span>Sorting:</span>
@@ -98,8 +98,10 @@
                         <label for="reverseSort">Reverse</label>
                         <input type="checkbox" id="showAll" name="showAll" onchange="resort()">
                         <label for="showAll">Show All Characters</label>
-                        <table id="hiddenCharactersTable" ondragover="event.preventDefault();" ondrop="onDropOnHidden(event);">
-                        </table>
+                        <div id="hiddenCharactersScrollable">
+                            <table id="hiddenCharactersTable" ondragover="event.preventDefault();" ondrop="onDropOnHidden(event);">
+                            </table>
+                        </div>
                     </fieldset>
                 </td>
             </tr>

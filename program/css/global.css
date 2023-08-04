@@ -31,6 +31,7 @@ body {
     color: var(--inf-white3);
     background-color: var(--inf-grey4);
     font-size: 11pt;
+    overflow: hidden;
 }
 
 nav {
@@ -48,6 +49,8 @@ section {
     /* position: fixed;
     top: 40px */
     margin-top: 45px;
+    overflow-y: scroll;
+    height: calc(100vh - 40px);
 }
 
 a {

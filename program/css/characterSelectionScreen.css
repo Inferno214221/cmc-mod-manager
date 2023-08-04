@@ -106,10 +106,13 @@ select {
     width: 150px;
 }
 
-#hiddenCharactersCell {
+#hiddenCharactersScrollable {
     overflow: hidden;
     overflow-x: scroll;
     white-space: nowrap;
+    width: calc(100vw - 30px);
+    white-space: nowrap;
+    padding-bottom: 10px;
 }
 
 #characterTable {
