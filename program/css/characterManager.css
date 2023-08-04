@@ -26,3 +26,11 @@ select {
 section {
     overflow-y: hidden;
 }
+
+#characterScrollable {
+    overflow: hidden;
+    overflow-y: scroll;
+    white-space: nowrap;
+    height: calc(100vh - 180px);
+    white-space: nowrap;
+}

@@ -130,13 +130,5 @@ dist
 .pnp.*
 
 # Files used for testing
-/basegame/*
-/merged/*
-/characters/*/
-/misc/*/
-/stages/*/
-/profiles/*/*
 /gb/*
-
-/cmc/*
 /extracted/*

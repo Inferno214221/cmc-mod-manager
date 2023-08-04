@@ -13,18 +13,18 @@ function getCharacterList() {
 }
 
 this.api.receive("from_getCharacterList", (data) => {
-    listCharacters(data);
+    listCharacters(data.characters, data.cmcDir);
 });
 
-function listCharacters(characters) {
+function listCharacters(characters, cmcDir) {
     let output = "";
     for (let character in characters) {
         output += 
         "<tr id=\"" + character + "\">\n\
-            <td class=\"mug\"><image src=\"../../cmc/gfx/mugs/" + characters[character].name + ".png\" draggable=\"false\"/></td>\n\
+            <td class=\"mug\"><image src=\"" + cmcDir + "/gfx/mugs/" + characters[character].name + ".png\" draggable=\"false\"/></td>\n\
             <td>" + characters[character].displayName + "</td>\n\
-            <td><button type=\"button\" onclick=\"removeCharacter('" + character + "')\">Remove</button></td>\n\
             <td><button type=\"button\" onclick=\"extractCharacter('" + character + "')\">Extract</button></td>\n\
+            <td><button type=\"button\" onclick=\"removeCharacter('" + character + "')\">Remove</button></td>\n\
         </tr>\n"
     };
     characterTable.innerHTML = output;

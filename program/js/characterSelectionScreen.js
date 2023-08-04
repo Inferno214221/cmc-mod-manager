@@ -21,7 +21,7 @@ function getPages() {
     this.api.send("getPages");
 }
 
-this.api.receive("fromGetPages", (data) => {
+this.api.receive("from_GetPages", (data) => {
     pages = data;
 });
 
@@ -29,9 +29,10 @@ function getCSS(page) {
     this.api.send("getCSS", page);
 }
 
-this.api.receive("fromGetCSS", (data) => {
+this.api.receive("from_GetCSS", (data) => {
     css = data.css;
     characters = data.characters;
+    cmcDir = data.cmcDir;
     characters[9998] = {
         name: "random",
         displayName: "?",
@@ -75,7 +76,7 @@ function makeTables() {
                 output += "\
 <td class=\"cssSquare hoverText\" id=\"" + number + "\">\n\
     <div id=\'{ \"x\": " + x + ", \"y\": " + y + " }\' draggable=\"true\" ondragover=\"event.preventDefault();\" ondragstart=\"onDragStartCSS(event);\" ondrop=\"onDropOnCSS(event);\">\n\
-        <image draggable=\"false\" class=\"icon\" src=\"../../cmc/gfx/mugs/" + characters[number - 1].name + ".png\" onerror=\"this.onerror=null; this.src='../images/missing.png'\" alt=\" \" />\n\
+        <image draggable=\"false\" class=\"icon\" src=\"" + cmcDir + "/gfx/mugs/" + characters[number - 1].name + ".png\" onerror=\"this.onerror=null; this.src='../images/missing.png'\" alt=\" \" />\n\
         <div class=\"cssName\">" + characters[number - 1].displayName + "</div>\n\
     </div>\n\
     <span class=\"tooltipText\">" + characters[number - 1].displayName + "</span>\n\
@@ -97,7 +98,7 @@ function makeTables() {
         output += 
         "<td class=\"hoverText hiddenCharacter\">\n\
             <div draggable=\"true\" ondragstart=\"onDragStartHidden(event);\" id=\"" + character.number + "\" class=\"mug\">\n\
-                <image draggable=\"false\" class=\"mugIcon\" src=\"../../cmc/gfx/mugs/" + character.name + ".png\" onerror=\"this.onerror=null; this.src='../images/missing.png'\" alt=\"\" />\n\
+                <image draggable=\"false\" class=\"mugIcon\" src=\"" + cmcDir + "/gfx/mugs/" + character.name + ".png\" onerror=\"this.onerror=null; this.src='../images/missing.png'\" alt=\"\" />\n\
                 <div class=\"hiddenName\">" + character.displayName + "</div>\n\
             </div>\n\
             <span class=\"tooltipText\" draggable=\"false\">" + character.displayName + "</span>\n\
@@ -260,7 +261,7 @@ function removeColumn() {
 }
 
 // On Page Load
-var css, characters, hidden, currentPage, pages;
+var css, characters, hidden, currentPage, pages, cmcDir;
 getPages();
 currentPage = "css.txt";
 CSSPageName.value = "css";

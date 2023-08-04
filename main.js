@@ -13,18 +13,6 @@ const SUPPORTED_VERSIONS = [
     "CMC+ v8"
 ];
 
-const PERSIST = [
-    "controls.ini",
-    "settings.ini",
-    "data/cmc_stuff.bin",
-    "data/records.bin",
-    "data/stats/general.bin",
-    "data/css.txt",
-    "data/css",
-    "data/unlock.bin",
-    "data/GAME_SETTINGS.txt"//FIXME:
-];
-
 const BLOAT = [
     "/.png",
     "/.txt",
@@ -70,7 +58,8 @@ const CHARACTER_FILES = [
     "sticker/ultra/desc/<fighter>.txt",
 ];
 
-var version = getGameVersion(__dirname + "/cmc/");
+var cmcDir = readJSON(path.join(__dirname, "program", "data.json")).dir;
+var version = getGameVersion(cmcDir);
 
 const createWindow = () => {
     win = new BrowserWindow({
@@ -87,8 +76,12 @@ const createWindow = () => {
     win.loadFile('index.html');
 }
 
-function reRequire(file) {
+function readJSON(file) {
     return JSON.parse(fs.readFileSync(file));
+}
+
+function writeJSON(file, data) {
+    fs.writeFileSync(file, JSON.stringify(data, null, 2), "utf-8");
 }
 
 app.whenReady().then(() => {
@@ -133,11 +126,11 @@ const getAllFiles = function (dirPath, arrayOfFiles) {
 
 function getCharacters() {
     let fighters = [];
-    let fightersTxt = fs.readFileSync(path.join(__dirname, "cmc", "data", "fighters.txt"), "ascii").split(/\r?\n/);
+    let fightersTxt = fs.readFileSync(path.join(cmcDir, "data", "fighters.txt"), "ascii").split(/\r?\n/);
     fightersTxt.shift();
     fightersTxt.forEach((fighter) => {
-        if (fs.existsSync(path.join(__dirname, "cmc", "data", "dats", fighter + ".dat"))) {
-            let fighterDat = fs.readFileSync(path.join(__dirname, "cmc", "data", "dats", fighter + ".dat"), "ascii").split(/\r?\n/);
+        if (fs.existsSync(path.join(cmcDir, "data", "dats", fighter + ".dat"))) {
+            let fighterDat = fs.readFileSync(path.join(cmcDir, "data", "dats", fighter + ".dat"), "ascii").split(/\r?\n/);
             fighters.push({
                 name: fighter,
                 displayName: fighterDat[1],
@@ -157,7 +150,7 @@ function appendCharacter(add) {
         output += character.name + "\r\n";
     });
     output += add + "\r\n";
-    fs.writeFileSync(path.join(__dirname, "cmc", "data", "fighters.txt"), output, "ascii");
+    fs.writeFileSync(path.join(cmcDir, "data", "fighters.txt"), output, "ascii");
 }
 
 function dropCharacter(drop) {
@@ -169,16 +162,60 @@ function dropCharacter(drop) {
     characters.forEach((character) => {
         output += character.name + "\r\n";
     });
-    fs.writeFileSync(path.join(__dirname, "cmc", "data", "fighters.txt"), output, "ascii");
+    fs.writeFileSync(path.join(cmcDir, "data", "fighters.txt"), output, "ascii");
     //TODO: remove from css
 }
 
 // Index
-ipcMain.on("checkGameInstalled", (event, args) => {
-    win.webContents.send("from_checkGameInstalled", version != null);
+// ipcMain.on("checkGameInstalled", (event, args) => {
+//     win.webContents.send("from_checkGameInstalled", version != null);
+// });
+
+// ipcMain.on("importUnmodded", (event, args) => {
+//     dialog.showOpenDialog(win, {
+//         properties: ["openDirectory"]
+//     }).then(dir => {
+//         if (dir.canceled === true) {
+//             return;
+//         }
+//         if (getGameVersion(path.join(dir.filePaths[0])) == null) {
+//             win.webContents.send("throwError", "No recognised .exe file in the selected directory.");
+//             return;
+//         }
+//         //The new version has horrible permissions so give everything xwr
+//         getAllFiles(dir.filePaths[0]).forEach((file) => {
+//             fs.chmodSync(file, 0o777);
+//         });
+//         fs.ensureDirSync(path.join(__dirname, "cmc"));
+//         fs.emptyDirSync(path.join(__dirname, "cmc"));
+        
+//         fs.copySync(dir.filePaths[0], path.join(__dirname, "cmc"), { overwrite: true });
+//         version = getGameVersion(path.join(__dirname, "cmc"));
+
+//         win.webContents.send("from_importUnmodded", true);
+//     });
+// });
+
+ipcMain.on("checkGameDir", (event, args) => {
+    let dir = cmcDir;
+    if (cmcDir == undefined || cmcDir == "" || version == null) {
+        dir = "None Selected";
+    }
+    // else {
+    //     let missing = true;
+    //     SUPPORTED_VERSIONS.forEach((game) => {
+    //         if (fs.existsSync(path.join(cmcDir, game + ".exe"))) {
+    //             missing = false;
+    //         }
+    //     });
+    //     if (missing) {
+    //         dir = "None Selected";
+    //     }
+    // }
+    win.webContents.send("from_checkGameDir", dir);
 });
 
-ipcMain.on("importUnmodded", (event, args) => {
+ipcMain.on("selectGameDir", (event, args) => {
     dialog.showOpenDialog(win, {
         properties: ["openDirectory"]
     }).then(dir => {
@@ -193,26 +230,37 @@ ipcMain.on("importUnmodded", (event, args) => {
         getAllFiles(dir.filePaths[0]).forEach((file) => {
             fs.chmodSync(file, 0o777);
         });
-        fs.ensureDirSync(path.join(__dirname, "cmc"));
-        fs.emptyDirSync(path.join(__dirname, "cmc"));
+        cmcDir = path.join(dir.filePaths[0]);
+        // fs.ensureDirSync(path.join(__dirname, "cmc"));
+        // fs.emptyDirSync(path.join(__dirname, "cmc"));
         
-        fs.copySync(dir.filePaths[0], path.join(__dirname, "cmc"), { overwrite: true });
-        version = getGameVersion(path.join(__dirname, "cmc"));
+        // fs.copySync(dir.filePaths[0], path.join(__dirname, "cmc"), { overwrite: true });
+        version = getGameVersion(cmcDir);
+        let data = readJSON(path.join(__dirname, "program", "data.json"));
+        data.dir = cmcDir;
+        writeJSON(path.join(__dirname, "program", "data.json"), data);
 
-        win.webContents.send("from_importUnmodded", true);
+        win.webContents.send("from_selectGameDir", cmcDir);
     });
 });
 
+ipcMain.on("openGameDir", (event, args) => {
+    shell.openPath(cmcDir);
+});
+
 ipcMain.on("runGame", (event, args) => {
-    childProcess.execFile(path.join(__dirname, "cmc", version + ".exe"), {
-        cwd: path.join(__dirname, "cmc"),
+    childProcess.execFile(path.join(cmcDir, version + ".exe"), {
+        cwd: cmcDir,
         windowsHide: true
     });
 });
 
 // Characters
 ipcMain.on("getCharacterList", (event, args) => {
-    win.webContents.send("from_getCharacterList", getCharacters());
+    win.webContents.send("from_getCharacterList", {
+        characters: getCharacters(),
+        cmcDir: cmcDir,
+    });
 });
 
 ipcMain.on("installCharacterDir", (event, args) => {
@@ -235,8 +283,8 @@ ipcMain.on("installCharacterArch", (event, args) => {
         }
         let filePath = file.filePaths[0];
         let modName = path.parse(filePath).name;
-        let dir = path.join(__dirname + "_temp");
-        dir = path.join(dir, modName);
+        let dir = path.join(__dirname, "_temp", modName);
+        fs.ensureDirSync(dir);
         console.log(path.parse(filePath).ext.toLowerCase());
         switch (path.parse(filePath).ext.toLowerCase()) {
             case ".zip":
@@ -274,7 +322,11 @@ ipcMain.on("installCharacterArch", (event, args) => {
 
 function installCharacter(dir, filteredInstall) {
     if (!fs.existsSync(path.join(dir, "fighter"))) {
-        dir += path.join(path.parse(dir).base);
+        console.log("Fighters directory not found in " + dir);
+        console.log(dir);
+        console.log(fs.readdirSync(dir));
+        dir = path.join(dir, path.parse(dir).base);
+        console.log(fs.readdirSync(dir));
     }
     if (!fs.existsSync(path.join(dir, "fighter"))) {
         win.webContents.send("throwError", "Can't find the target character's ./fighter/ directory.");
@@ -315,25 +367,25 @@ function installCharacter(dir, filteredInstall) {
                     });
                     contents.forEach((found) => {
                         console.log("Copying: " + path.join(dir, subDir, found));
-                        fs.copySync(path.join(dir, subDir, found), path.join(__dirname, "cmc", subDir, found), {overwrite: true});
+                        fs.copySync(path.join(dir, subDir, found), path.join(cmcDir, subDir, found), {overwrite: true});
                     });
                 }
             } else {
                 if (fs.existsSync(path.join(dir, file))) {
                     console.log("Copying: " + path.join(dir, file));
-                    fs.copySync(path.join(dir, file), path.join(__dirname, "cmc", file), {overwrite: true});
+                    fs.copySync(path.join(dir, file), path.join(cmcDir, file), {overwrite: true});
                 }
             }
         });
     } else {
-        fs.copySync(dir, path.join(__dirname, "cmc"), {overwrite: true});
+        fs.copySync(dir, path.join(cmcDir), {overwrite: true});
     }
 
     appendCharacter(characterName);
 
     if (datMod) {
         fs.writeFileSync(
-            path.join(__dirname, "cmc", "data", "dats", characterName + ".dat"),
+            path.join(cmcDir, "data", "dats", characterName + ".dat"),
             characterDatTxt,
             "ascii"
         );
@@ -345,17 +397,19 @@ function installCharacter(dir, filteredInstall) {
 function deleteCharCSS(cssNumber) {
     let pages = [];
     pages.push("css.txt");
-    getAllFiles(path.join(__dirname, "cmc", "data", "css")).forEach((file) => {
+    getAllFiles(path.join(cmcDir, "data", "css")).forEach((file) => {
         pages.push(path.join("css", path.parse(file).base));
     });
     pages.forEach((page) => {
         let css = getCSS(page);
         for (let y in css) {
             for (let x in css[y]) {
-                if (css[y][x] == ('0000' + cssNumber).slice(-4)) {
-                    css[y][x] = "0000";
-                } else if (css[y][x] >= ('0000' + cssNumber).slice(-4)) {
-                    css[y][x] = ('0000' + (parseInt(css[y][x]) - 1)).slice(-4);
+                if (css[y][x] != "9999") {
+                    if (css[y][x] == ('0000' + cssNumber).slice(-4)) {
+                        css[y][x] = "0000";
+                    } else if (css[y][x] >= ('0000' + cssNumber).slice(-4)) {
+                        css[y][x] = ('0000' + (parseInt(css[y][x]) - 1)).slice(-4);
+                    }
                 }
             };
         };
@@ -364,7 +418,7 @@ function deleteCharCSS(cssNumber) {
 }
 
 ipcMain.on("removeCharacter", (event, args) => {
-    deleteCharCSS(args + 1);
+    deleteCharCSS(parseInt(args) + 1);
     let characters = getCharacters();
     let characterName = characters[args].name;
     let similarName = [];
@@ -373,14 +427,14 @@ ipcMain.on("removeCharacter", (event, args) => {
             similarName.push(character.name);
         }
     });
-    let characterDat = fs.readFileSync(path.join(__dirname, "cmc", "data", "dats", characterName + ".dat"), "ascii").split(/\r?\n/);
+    let characterDat = fs.readFileSync(path.join(cmcDir, "data", "dats", characterName + ".dat"), "ascii").split(/\r?\n/);
     filterCharacterFiles(characters[args].name, characterDat, true).forEach((file) => {
         let subDir = path.parse(file).dir;
         if (file.includes("*")) {
             let start = path.parse(file).base.split("*")[0].replace(subDir, "");
             let end = path.parse(file).base.split("*")[1];
-            if (fs.existsSync(path.join(__dirname, "cmc", subDir))) {
-                let contents = fs.readdirSync(path.join(__dirname, "cmc", subDir)).filter((i) => {
+            if (fs.existsSync(path.join(cmcDir, subDir))) {
+                let contents = fs.readdirSync(path.join(cmcDir, subDir)).filter((i) => {
                     similarName.forEach((name) => {
                         if (i.startsWith(name)) {
                             console.log(i + " was ignored because it belongs to " + name);
@@ -390,14 +444,14 @@ ipcMain.on("removeCharacter", (event, args) => {
                     return i.startsWith(start) && i.endsWith(end);
                 });
                 contents.forEach((found) => {
-                    console.log("Removing: " + path.join(__dirname, "cmc", subDir, found));
-                    fs.removeSync(path.join(__dirname, "cmc", subDir, found));
+                    console.log("Removing: " + path.join(cmcDir, subDir, found));
+                    fs.removeSync(path.join(cmcDir, subDir, found));
                 });
             }
         } else {
-            if (fs.existsSync(path.join(__dirname, "cmc", file))) {
-                console.log("Removing: " + path.join(__dirname, "cmc", file));
-                fs.removeSync(path.join(__dirname, "cmc", file));
+            if (fs.existsSync(path.join(cmcDir, file))) {
+                console.log("Removing: " + path.join(cmcDir, file));
+                fs.removeSync(path.join(cmcDir, file));
             }
         }
     });
@@ -415,15 +469,15 @@ ipcMain.on("extractCharacter", (event, args) => {
             similarName.push(character.name);
         }
     });
-    let characterDat = fs.readFileSync(path.join(__dirname, "cmc", "data", "dats", characterName + ".dat"), "ascii").split(/\r?\n/);
+    let characterDat = fs.readFileSync(path.join(cmcDir, "data", "dats", characterName + ".dat"), "ascii").split(/\r?\n/);
     filterCharacterFiles(characters[args].name, characterDat).forEach((file) => {
         let subDir = path.parse(file).dir;
         fs.ensureDirSync(path.join(__dirname, "extracted", characterName, subDir));
         if (file.includes("*")) {
             let start = path.parse(file).base.split("*")[0].replace(subDir, "");
             let end = path.parse(file).base.split("*")[1];
-            if (fs.existsSync(path.join(__dirname, "cmc", subDir))) {
-                let contents = fs.readdirSync(path.join(__dirname, "cmc", subDir)).filter((i) => {
+            if (fs.existsSync(path.join(cmcDir, subDir))) {
+                let contents = fs.readdirSync(path.join(cmcDir, subDir)).filter((i) => {
                     similarName.forEach((name) => {
                         if (i.startsWith(name)) {
                             console.log(i + " was ignored because it belongs to " + name);
@@ -433,22 +487,20 @@ ipcMain.on("extractCharacter", (event, args) => {
                     return i.startsWith(start) && i.endsWith(end);
                 });
                 contents.forEach((found) => {
-                    console.log("Extracting: " + path.join(__dirname, "cmc", subDir, found));
-                    fs.copySync(path.join(__dirname, "cmc", subDir, found), path.join(__dirname, "extracted", characterName, subDir, found), {overwrite: true});
-                    fs.removeSync(path.join(__dirname, "cmc", subDir, found));
+                    console.log("Extracting: " + path.join(cmcDir, subDir, found));
+                    fs.copySync(path.join(cmcDir, subDir, found), path.join(__dirname, "extracted", characterName, subDir, found), {overwrite: true});
                 });
             }
         } else {
-            if (fs.existsSync(path.join(__dirname, "cmc", file))) {
-                console.log("Extracting: " + path.join(__dirname, "cmc", file));
-                fs.copySync(path.join(__dirname, "cmc", file), path.join(__dirname, "extracted", characterName, file), {overwrite: true});
-                fs.removeSync(path.join(__dirname, "cmc", file));
+            if (fs.existsSync(path.join(cmcDir, file))) {
+                console.log("Extracting: " + path.join(cmcDir, file));
+                fs.copySync(path.join(cmcDir, file), path.join(__dirname, "extracted", characterName, file), {overwrite: true});
             }
         }
     });
     dropCharacter(characterName);
 
-    win.webContents.send("from_removeCharacter");
+    win.webContents.send("from_extractCharacter");
 });
 
 function filterCharacterFiles(characterName, characterDat = null, ignoreSeries = false) {
@@ -493,22 +545,22 @@ function filterCharacterFiles(characterName, characterDat = null, ignoreSeries =
 ipcMain.on("getPages", (event, args) => {
     let pages = [];
     pages.push("css.txt");
-    getAllFiles(path.join(__dirname, "cmc", "data", "css")).forEach((file) => {
+    getAllFiles(path.join(cmcDir, "data", "css")).forEach((file) => {
         pages.push(path.join("css", path.parse(file).base));
     });
-    console.log(pages);
-    win.webContents.send("fromGetPages", pages);
+    win.webContents.send("from_GetPages", pages);
 });
 
 ipcMain.on("getCSS", (event, args) => {
-    win.webContents.send("fromGetCSS", {
+    win.webContents.send("from_GetCSS", {
         css: getCSS(args),
         characters: getCharacters(),
+        cmcDir: cmcDir,
     });
 });
 
 function getCSS(page) {
-    let cssFile = fs.readFileSync(path.join(__dirname, "cmc", "data", page), "ascii").split(/\r?\n/);
+    let cssFile = fs.readFileSync(path.join(cmcDir, "data", page), "ascii").split(/\r?\n/);
     let css = [];
     cssFile.forEach((line) => {
         css.push(line.split(" "))
@@ -533,140 +585,140 @@ function writeCSS(css, page) {
     cssFile = cssFile.slice(0, -2);
     cssFile += " ";
     console.log(cssFile + "EOF");
-    fs.writeFileSync(path.join(__dirname, "cmc", "data", page), cssFile, "ascii");
+    fs.writeFileSync(path.join(cmcDir, "data", page), cssFile, "ascii");
 }
 
 // Unused
 
-ipcMain.on("removeMergedBloat", (event, args) => {
-    getAllFiles(__dirname + "/merged/").forEach(file => {
-        file = file.replace(__dirname + "/merged", "");
-        splitFile = file.split('\\').pop().split('/').pop();
-        for (let bloat of BLOAT) {
-            let splitBloat = bloat.split('\\').pop().split('/').pop();
-            let match = 0;
-            for (let number = 0; number < splitBloat.length; number++) {
-                if (splitFile[number] == undefined) break;
-                if (splitFile[number].includes(splitBloat[number])) {
-                    match++;
-                }
-            }
-            if (match == splitBloat.length) {
-                fs.rmSync(__dirname + "/merged/" + file);
-            }
-        }
-    });
-});
+// ipcMain.on("removeMergedBloat", (event, args) => {
+//     getAllFiles(__dirname + "/merged/").forEach(file => {
+//         file = file.replace(__dirname + "/merged", "");
+//         splitFile = file.split('\\').pop().split('/').pop();
+//         for (let bloat of BLOAT) {
+//             let splitBloat = bloat.split('\\').pop().split('/').pop();
+//             let match = 0;
+//             for (let number = 0; number < splitBloat.length; number++) {
+//                 if (splitFile[number] == undefined) break;
+//                 if (splitFile[number].includes(splitBloat[number])) {
+//                     match++;
+//                 }
+//             }
+//             if (match == splitBloat.length) {
+//                 fs.rmSync(__dirname + "/merged/" + file);
+//             }
+//         }
+//     });
+// });
 
-ipcMain.on("openModFolder", (event, args) => {
-    shell.openPath(__dirname + "/misc/" + args);
-});
+// ipcMain.on("openModFolder", (event, args) => {
+//     shell.openPath(__dirname + "/misc/" + args);
+// });
 
-ipcMain.on("installMod", async (event, args) => {
-    dialog.showOpenDialog(win, {
-        properties: ["openDirectory"]
-    }).then(dir => {
-        if (dir.canceled === true) {
-            return;
-        }
-        let modName = dir.filePaths[0].split('\\').pop().split('/').pop();
-        installMod(dir.filePaths[0], modName);
-    });
-});
+// ipcMain.on("installMod", async (event, args) => {
+//     dialog.showOpenDialog(win, {
+//         properties: ["openDirectory"]
+//     }).then(dir => {
+//         if (dir.canceled === true) {
+//             return;
+//         }
+//         let modName = dir.filePaths[0].split('\\').pop().split('/').pop();
+//         installMod(dir.filePaths[0], modName);
+//     });
+// });
 
-ipcMain.on("installModZip", async (event, args) => {
-    dialog.showOpenDialog(win, {
-        properties: ["openFile"]
-    }).then(async (file) => {
-        if (file.canceled === true) {
-            return;
-        }
-        let dir = __dirname + "/misc/_temp";
-        let fileP = file.filePaths[0];
-        let fileName = fileP.split('\\').pop().split('/').pop().split(".");
-        fileName.pop();
-        modName = fileName[0];
-        dir = dir + "/" + modName;
-        switch (fileP.split(".").pop().toLowerCase()) {
-            case "zip":
-                await extract(fileP, {
-                    dir: dir,
-                    defaultDirMode: 0o777,
-                    defaultFileMode: 0o777,
-                });
-                break;
-            case "rar"://TODO: Error handling
-                let buf = Uint8Array.from(fs.readFileSync(fileP)).buffer;
-                let extractor = await unrar.createExtractorFromData({ data: buf });
-                const extracted = extractor.extract();
-                const files = [...extracted.files];
-                files.forEach(fileE => {// Make All Folders First
-                    if (fileE.fileHeader.flags.directory) {
-                        fs.ensureDirSync(dir + "/" + fileE.fileHeader.name);
-                    }
-                });
-                files.forEach(fileE => {// Make All Folders First
-                    if (!fileE.fileHeader.flags.directory) {
-                        fs.writeFileSync(dir + "/" + fileE.fileHeader.name, Buffer.from(fileE.extraction));
-                    }
-                });
-                break;
-            case "7z":
-            default:
-                return;
-                break;
-        }
-        await installMod(dir, modName);
-        fs.removeSync(__dirname + "/misc/_temp");
-    });
-});
+// ipcMain.on("installModZip", async (event, args) => {
+//     dialog.showOpenDialog(win, {
+//         properties: ["openFile"]
+//     }).then(async (file) => {
+//         if (file.canceled === true) {
+//             return;
+//         }
+//         let dir = __dirname + "/misc/_temp";
+//         let fileP = file.filePaths[0];
+//         let fileName = fileP.split('\\').pop().split('/').pop().split(".");
+//         fileName.pop();
+//         modName = fileName[0];
+//         dir = dir + "/" + modName;
+//         switch (fileP.split(".").pop().toLowerCase()) {
+//             case "zip":
+//                 await extract(fileP, {
+//                     dir: dir,
+//                     defaultDirMode: 0o777,
+//                     defaultFileMode: 0o777,
+//                 });
+//                 break;
+//             case "rar"://TODO: Error handling
+//                 let buf = Uint8Array.from(fs.readFileSync(fileP)).buffer;
+//                 let extractor = await unrar.createExtractorFromData({ data: buf });
+//                 const extracted = extractor.extract();
+//                 const files = [...extracted.files];
+//                 files.forEach(fileE => {// Make All Folders First
+//                     if (fileE.fileHeader.flags.directory) {
+//                         fs.ensureDirSync(dir + "/" + fileE.fileHeader.name);
+//                     }
+//                 });
+//                 files.forEach(fileE => {// Make All Folders First
+//                     if (!fileE.fileHeader.flags.directory) {
+//                         fs.writeFileSync(dir + "/" + fileE.fileHeader.name, Buffer.from(fileE.extraction));
+//                     }
+//                 });
+//                 break;
+//             case "7z":
+//             default:
+//                 return;
+//                 break;
+//         }
+//         await installMod(dir, modName);
+//         fs.removeSync(__dirname + "/misc/_temp");
+//     });
+// });
 
-function installMod(dir, modName) {
-    if (fs.existsSync(dir + "/" + dir.split('\\').pop().split('/').pop())) {
-        dir += "/" + dir.split('\\').pop().split('/').pop();
-    }
-    fs.copySync(dir, __dirname + "/misc/" + modName, { overwrite: true });
+// function installMod(dir, modName) {
+//     if (fs.existsSync(dir + "/" + dir.split('\\').pop().split('/').pop())) {
+//         dir += "/" + dir.split('\\').pop().split('/').pop();
+//     }
+//     fs.copySync(dir, __dirname + "/misc/" + modName, { overwrite: true });
     
-    let installed = reRequire(__dirname + "/misc/installed.json");
-    installed.misc.push(modName);
-    fs.writeFileSync(
-        __dirname + "/misc/installed.json",
-        JSON.stringify(installed, null, 4),
-        "utf-8"
-    );
+//     let installed = reRequire(__dirname + "/misc/installed.json");
+//     installed.misc.push(modName);
+//     fs.writeFileSync(
+//         __dirname + "/misc/installed.json",
+//         JSON.stringify(installed, null, 4),
+//         "utf-8"
+//     );
 
-    win.webContents.send("fromInstallMod", installed);
-}
+//     win.webContents.send("fromInstallMod", installed);
+// }
 
-ipcMain.on("getInstalledModList", (event, args) => {
-    let installed = reRequire(__dirname + "/misc/installed.json");
-    win.webContents.send("fromGetInstalledModList", installed);
-});
+// ipcMain.on("getInstalledModList", (event, args) => {
+//     let installed = reRequire(__dirname + "/misc/installed.json");
+//     win.webContents.send("fromGetInstalledModList", installed);
+// });
 
-ipcMain.on("removeMod", (event, args) => {
-    let installed = reRequire(__dirname + "/misc/installed.json");
-    installed.misc = installed.misc.filter(mod => mod != args);
-    fs.removeSync(__dirname + "/misc/" + args);
-    fs.writeFileSync(
-        __dirname + "/misc/installed.json",
-        JSON.stringify(installed, null, 4),
-        "utf-8"
-    );
-    win.webContents.send("fromRemoveMod", installed);
-});
+// ipcMain.on("removeMod", (event, args) => {
+//     let installed = reRequire(__dirname + "/misc/installed.json");
+//     installed.misc = installed.misc.filter(mod => mod != args);
+//     fs.removeSync(__dirname + "/misc/" + args);
+//     fs.writeFileSync(
+//         __dirname + "/misc/installed.json",
+//         JSON.stringify(installed, null, 4),
+//         "utf-8"
+//     );
+//     win.webContents.send("fromRemoveMod", installed);
+// });
 
-ipcMain.on("increaseModMergePriority", (event, args) => {
-    let installed = reRequire(__dirname + "/misc/installed.json");
-    let index = installed.misc.indexOf(args);
-    if (index == 0) {
-        return;
-    }
-    installed.misc.move(index, index - 1);
-    //TODO: error handling eg outside of range
-    fs.writeFileSync(
-        __dirname + "/misc/installed.json",
-        JSON.stringify(installed, null, 4),
-        "utf-8"
-    );
-    win.webContents.send("fromIncreaseModMergePriority", installed);
-});
+// ipcMain.on("increaseModMergePriority", (event, args) => {
+//     let installed = reRequire(__dirname + "/misc/installed.json");
+//     let index = installed.misc.indexOf(args);
+//     if (index == 0) {
+//         return;
+//     }
+//     installed.misc.move(index, index - 1);
+//     //TODO: error handling eg outside of range
+//     fs.writeFileSync(
+//         __dirname + "/misc/installed.json",
+//         JSON.stringify(installed, null, 4),
+//         "utf-8"
+//     );
+//     win.webContents.send("fromIncreaseModMergePriority", installed);
+// });

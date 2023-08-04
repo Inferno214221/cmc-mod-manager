@@ -59,7 +59,7 @@ This is my first time using Electron and therefore the code is a bit of a mess s
 - [x] List installed characters
 - [x] Remove installed characters
 - [ ] Delete instructions txt file on merge
-- [ ] Remove Character From Random List
+- [ ] Option to remove Character From Random List
 - [x] Installed v7 Characters Can Be Converted To v8
 - [x] Errors
 ### Character Selection Screen (Priority: 1)
