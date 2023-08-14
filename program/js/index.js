@@ -58,5 +58,15 @@ function runGame() {
     this.api.send("runGame");
 }
 
+function setupOneClick() {
+    this.api.send("setupOneClick");
+}
+
+this.api.receive("from_setupOneClick", (success) => {
+    if (!success) {
+        alert("Failed to associate URI.");
+    }
+});
+
 // On Page Load
 checkGameDir();

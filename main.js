@@ -323,6 +323,10 @@ function installMod(dir) {
     win.webContents.send("from_installMod");
 }
 
+ipcMain.on("setupOneClick", (event, dir) => {
+    win.webContents.send("from_setupOneClick", app.setAsDefaultProtocolClient("cmcmm"));
+});
+
 // Characters
 ipcMain.on("getCharacterList", (event, args) => {
     win.webContents.send("from_getCharacterList", {
@@ -394,12 +398,12 @@ function installCharacter(dir, filteredInstall) {
         console.log(dir);
         console.log(fs.readdirSync(dir));
         dir = path.join(dir, path.parse(dir).base);
-        console.log(fs.readdirSync(dir));
     }
     if (!fs.existsSync(path.join(dir, "fighter"))) {
         win.webContents.send("throwError", "Can't find the target character's ./fighter/ directory.");
         return;
     }
+    console.log(fs.readdirSync(dir));
     let characterName = fs.readdirSync(path.join(dir, "fighter"))[0].split(".")[0];
     if (!fs.existsSync(path.join(dir, "data", "dats", characterName + ".dat"))) {
         win.webContents.send("throwError", "The character's dat file is not in the ./data/dats/ directory.");
