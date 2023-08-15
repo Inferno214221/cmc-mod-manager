@@ -1,6 +1,6 @@
 name: Build With Electron Forge
 run-name: Build With Electron Forge
-on: [push]
+on: [push, workflow_dispatch]
 
 jobs:
   windows-build:
