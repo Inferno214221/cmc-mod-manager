@@ -72,7 +72,7 @@ const createWindow = () => {
         },
         autoHideMenuBar: true
     });
-
+    console.log(process.argv);
     win.loadFile('index.html');
 }
 
