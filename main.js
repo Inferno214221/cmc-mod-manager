@@ -98,6 +98,12 @@ ipcMain.on("openDir", (event, dir) => {
     shell.openPath(path.join(__dirname, dir));
 });
 
+ipcMain.on("throwGameDir", (event, dir) => {
+    if (cmcDir == undefined || cmcDir == "" || version == null) {
+        win.webContents.send("from_throwGameDir");
+    }
+});
+
 function getGameVersion(dir) {
     for(let game of SUPPORTED_VERSIONS) {
         if (fs.existsSync(path.join(dir, game + ".exe"))) {
@@ -254,74 +260,6 @@ ipcMain.on("runGame", (event, args) => {
         windowsHide: true
     });
 });
-
-ipcMain.on("installModDir", (event, args) => {
-    dialog.showOpenDialog(win, {
-        properties: ["openDirectory"]
-    }).then(dir => {
-        if (dir.canceled === true) {
-            return;
-        }
-        installMod(dir.filePaths[0]);
-    });
-});
-
-ipcMain.on("installModArch", (event, args) => {
-    dialog.showOpenDialog(win, {
-        properties: ["openFile"]
-    }).then(async (file) => {
-        if (file.canceled === true) {
-            return;
-        }
-        let filePath = file.filePaths[0];
-        let modName = path.parse(filePath).name;
-        let dir = path.join(__dirname, "_temp", modName);
-        fs.ensureDirSync(dir);
-        console.log(path.parse(filePath).ext.toLowerCase());
-        switch (path.parse(filePath).ext.toLowerCase()) {
-            case ".zip":
-                await extract(filePath, {
-                    dir: dir,
-                    defaultDirMode: 0o777,
-                    defaultFileMode: 0o777,
-                });
-                break;
-            case ".rar"://TODO: Error handling
-                let buf = Uint8Array.from(fs.readFileSync(filePath)).buffer;
-                let extractor = await unrar.createExtractorFromData({ data: buf });
-                const extracted = extractor.extract();
-                const files = [...extracted.files];
-                files.forEach(fileE => {// Make All Folders First
-                    if (fileE.fileHeader.flags.directory) {
-                        fs.ensureDirSync(path.join(dir, fileE.fileHeader.name));
-                    }
-                });
-                files.forEach(fileE => {// Make All Folders First
-                    if (!fileE.fileHeader.flags.directory) {
-                        fs.writeFileSync(path.join(dir, + fileE.fileHeader.name), Buffer.from(fileE.extraction));
-                    }
-                });
-                break;
-            case ".7z":
-            default:
-                return;
-                break;
-        }
-        await installMod(dir);
-        fs.removeSync(path.join(__dirname, "_temp"));
-    });
-});
-
-function installMod(dir) {
-    if (fs.existsSync(path.join(dir, path.parse(dir).base))) {
-        console.log("Duplicate folder detected");
-        dir = path.join(dir, path.parse(dir).base);
-    }
-
-    fs.copySync(dir, path.join(cmcDir), {overwrite: true});
-
-    win.webContents.send("from_installMod");
-}
 
 ipcMain.on("setupOneClick", (event, dir) => {
     win.webContents.send("from_setupOneClick", app.setAsDefaultProtocolClient("cmcmm"));
@@ -660,6 +598,75 @@ function writeCSS(css, page) {
     cssFile += " ";
     console.log(cssFile + "EOF");
     fs.writeFileSync(path.join(cmcDir, "data", page), cssFile, "ascii");
+}
+
+// Misc
+ipcMain.on("installModDir", (event, args) => {
+    dialog.showOpenDialog(win, {
+        properties: ["openDirectory"]
+    }).then(dir => {
+        if (dir.canceled === true) {
+            return;
+        }
+        installMod(dir.filePaths[0]);
+    });
+});
+
+ipcMain.on("installModArch", (event, args) => {
+    dialog.showOpenDialog(win, {
+        properties: ["openFile"]
+    }).then(async (file) => {
+        if (file.canceled === true) {
+            return;
+        }
+        let filePath = file.filePaths[0];
+        let modName = path.parse(filePath).name;
+        let dir = path.join(__dirname, "_temp", modName);
+        fs.ensureDirSync(dir);
+        console.log(path.parse(filePath).ext.toLowerCase());
+        switch (path.parse(filePath).ext.toLowerCase()) {
+            case ".zip":
+                await extract(filePath, {
+                    dir: dir,
+                    defaultDirMode: 0o777,
+                    defaultFileMode: 0o777,
+                });
+                break;
+            case ".rar"://TODO: Error handling
+                let buf = Uint8Array.from(fs.readFileSync(filePath)).buffer;
+                let extractor = await unrar.createExtractorFromData({ data: buf });
+                const extracted = extractor.extract();
+                const files = [...extracted.files];
+                files.forEach(fileE => {// Make All Folders First
+                    if (fileE.fileHeader.flags.directory) {
+                        fs.ensureDirSync(path.join(dir, fileE.fileHeader.name));
+                    }
+                });
+                files.forEach(fileE => {// Make All Folders First
+                    if (!fileE.fileHeader.flags.directory) {
+                        fs.writeFileSync(path.join(dir, + fileE.fileHeader.name), Buffer.from(fileE.extraction));
+                    }
+                });
+                break;
+            case ".7z":
+            default:
+                return;
+                break;
+        }
+        await installMod(dir);
+        fs.removeSync(path.join(__dirname, "_temp"));
+    });
+});
+
+function installMod(dir) {
+    if (fs.existsSync(path.join(dir, path.parse(dir).base))) {
+        console.log("Duplicate folder detected");
+        dir = path.join(dir, path.parse(dir).base);
+    }
+
+    fs.copySync(dir, path.join(cmcDir), {overwrite: true});
+
+    win.webContents.send("from_installMod");
 }
 
 // Unused

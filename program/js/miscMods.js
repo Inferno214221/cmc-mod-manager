@@ -1,3 +1,10 @@
+// General
+this.api.send("throwGameDir");
+this.api.receive("from_throwGameDir", (error) => {
+    alert("Please select your CMC+ directory first!");
+    window.location = "../../index.html";
+});
+
 this.api.receive("throwError", (error) => {
     alert("An Error Occured: " + error);
 });
