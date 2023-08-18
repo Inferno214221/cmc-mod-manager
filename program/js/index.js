@@ -1,3 +1,13 @@
+// Global Functions
+this.api.receive("from_oneClickStart", (e) => {
+    alert("Download started.");
+});
+
+this.api.receive("from_oneClickFinish", (e) => {
+    alert("Download finished. Installing.");
+    window.location = "./program/html/characterManager.html";
+});
+
 // General
 function openDir(dir) {
     this.api.send("openDir", dir);
@@ -63,7 +73,9 @@ function setupOneClick() {
 }
 
 this.api.receive("from_setupOneClick", (success) => {
-    if (!success) {
+    if (success) {
+        alert("URI associated.");
+    } else {
         alert("Failed to associate URI.");
     }
 });

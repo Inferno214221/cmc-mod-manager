@@ -1,6 +1,7 @@
 const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron');
 const path = require("path");
-// const fs = require("fs");
+const https = require("https");
+const request = require("request");
 const fs = require("fs-extra");
 const childProcess = require("child_process");
 require('array.prototype.move');
@@ -60,6 +61,8 @@ const CHARACTER_FILES = [
 
 var cmcDir = readJSON(path.join(__dirname, "program", "data.json")).dir;
 var version = getGameVersion(cmcDir);
+var foundUri = process.argv.find((arg) => arg.startsWith("cmcmm://"));
+handleUri();
 
 const createWindow = () => {
     win = new BrowserWindow({
@@ -72,8 +75,23 @@ const createWindow = () => {
         },
         autoHideMenuBar: true
     });
-    console.log(process.argv);
+    
     win.loadFile('index.html');
+}
+
+if (!app.requestSingleInstanceLock()) {
+    app.quit();
+    return;
+} else {
+    app.on("second-instance", (e, argv) => {
+        foundUri = argv.find((arg) => arg.startsWith("cmcmm://"));
+    });
+    if (win) {
+        if (win.isMinimized()) {
+            win.restore();
+        }
+        window.focus();
+    }
 }
 
 function readJSON(file) {
@@ -128,6 +146,39 @@ const getAllFiles = function (dirPath, arrayOfFiles) {
     })
 
     return arrayOfFiles;
+}
+
+function handleUri() {
+    if (foundUri == undefined) return;
+    console.log(foundUri);
+    foundUrl = foundUri.replace("cmcmm://", "");
+    fs.ensureDirSync(__dirname, "_temp");
+    request.get({
+        url: foundUrl,
+    }).on("error", function(error) {
+        console.log(error);
+        return; //TODO: Alerts
+    }).on("response", function(res) {
+        console.log(res);
+        let file = "download." + res.headers['content-type'].split('/')[1];
+        downloadUrl = res.request.uri.href;
+        https.get(downloadUrl, (res1) => {
+            let filePath = path.join(__dirname, "_temp", file);
+            fs.ensureFileSync(filePath);
+            let writeStream = fs.createWriteStream(filePath);
+            win.webContents.send("from_oneClickStart");
+
+            res1.pipe(writeStream);
+          
+            writeStream.on("finish", () => {
+                writeStream.close();
+                win.webContents.send("from_oneClickFinish");
+                installCharacterArch(filePath, true).then(() => {
+                    fs.removeSync(path.join(__dirname, "_temp"));
+                });
+            });
+        });
+    });
 }
 
 function getCharacters() {
@@ -291,58 +342,60 @@ ipcMain.on("installCharacterArch", (event, args) => {
         if (file.canceled === true) {
             return;
         }
-        let filePath = file.filePaths[0];
-        let modName = path.parse(filePath).name;
-        let dir = path.join(__dirname, "_temp", modName);
-        fs.ensureDirSync(dir);
-        console.log(path.parse(filePath).ext.toLowerCase());
-        switch (path.parse(filePath).ext.toLowerCase()) {
-            case ".zip":
-                await extract(filePath, {
-                    dir: dir,
-                    defaultDirMode: 0o777,
-                    defaultFileMode: 0o777,
-                });
-                break;
-            case ".rar"://TODO: Error handling
-                let buf = Uint8Array.from(fs.readFileSync(filePath)).buffer;
-                let extractor = await unrar.createExtractorFromData({ data: buf });
-                const extracted = extractor.extract();
-                const files = [...extracted.files];
-                files.forEach(fileE => {// Make All Folders First
-                    if (fileE.fileHeader.flags.directory) {
-                        fs.ensureDirSync(path.join(dir, fileE.fileHeader.name));
-                    }
-                });
-                files.forEach(fileE => {// Make All Folders First
-                    if (!fileE.fileHeader.flags.directory) {
-                        fs.writeFileSync(path.join(dir, + fileE.fileHeader.name), Buffer.from(fileE.extraction));
-                    }
-                });
-                break;
-            case ".7z":
-            default:
-                return;
-                break;
-        }
-        await installCharacter(dir, args);
-        fs.removeSync(path.join(__dirname, "_temp"));
+        await installCharacterArch(file.filePaths[0]);
+        // fs.removeSync(path.join(__dirname, "_temp"));
     });
 });
+
+async function installCharacterArch(filePath, args) {
+    let modName = path.parse(filePath).name;
+    let dir = path.join(__dirname, "_temp", modName);
+    fs.ensureDirSync(dir);
+    console.log(path.parse(filePath).ext.toLowerCase());
+    switch (path.parse(filePath).ext.toLowerCase()) {
+        case ".zip":
+            await extract(filePath, {
+                dir: dir,
+                defaultDirMode: 0o777,
+                defaultFileMode: 0o777,
+            });
+            break;
+        case ".rar"://TODO: Error handling
+            let buf = Uint8Array.from(fs.readFileSync(filePath)).buffer;
+            let extractor = await unrar.createExtractorFromData({ data: buf });
+            const extracted = extractor.extract();
+            const files = [...extracted.files];
+            files.forEach(fileE => {// Make All Folders First
+                if (fileE.fileHeader.flags.directory) {
+                    fs.ensureDirSync(path.join(dir, fileE.fileHeader.name));
+                }
+            });
+            files.forEach(fileE => {// Make All Folders First
+                if (!fileE.fileHeader.flags.directory) {
+                    fs.writeFileSync(path.join(dir, + fileE.fileHeader.name), Buffer.from(fileE.extraction));
+                }
+            });
+            break;
+        case ".7z":
+        default:
+            return;
+            break;
+    }
+    await installCharacter(dir, args);
+}
 
 function installCharacter(dir, filteredInstall) {
     if (!fs.existsSync(path.join(dir, "fighter"))) {
         console.log("Fighters directory not found in " + dir);
-        console.log(dir);
-        console.log(fs.readdirSync(dir));
-        dir = path.join(dir, path.parse(dir).base);
-    }
-    if (!fs.existsSync(path.join(dir, "fighter"))) {
-        win.webContents.send("throwError", "Can't find the target character's ./fighter/ directory.");
-        return;
+        // dir = path.join(dir, path.parse(dir).base);
+        let contents = fs.readdirSync(dir);
+        if (contents.length = 1) {
+            dir = path.join(dir, contents[0]);
+            console.log(dir);
+        }
     }
     console.log(fs.readdirSync(dir));
-    let characterName = fs.readdirSync(path.join(dir, "fighter"))[0].split(".")[0];
+    let characterName = fs.readdirSync(path.join(dir, "fighter")).filter((file) => { return file.endsWith(".bin") })[0].split(".")[0];
     if (!fs.existsSync(path.join(dir, "data", "dats", characterName + ".dat"))) {
         win.webContents.send("throwError", "The character's dat file is not in the ./data/dats/ directory.");
         return;
