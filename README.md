@@ -1,4 +1,6 @@
 # CMC Mod Manager
+![Downloads](https://img.shields.io/github/downloads/Inferno214221/CMCModManager/total?logo=github&logoColor=white&style=flat&label=Downloads&color=%232284F2)
+
 Usage of this mod manager will 'spoil' the hidden characters as they are displayed in the program without the locked icon.
 ## Why 2.X.X already?
 According to [SemVer](https://semver.org/), the first digit is used to represent a Major change that is incompatible with previous versions. I am releasing version 2.0.0 because I re-wrote the entire program (excluding the interface) so that it is more logical. Rather than making two copies of the CMC+ install, differentiating between builtin and installed characters, and storing information about every installed mod version 2.0.0 modifies the CMC+ installation it is given (making no copies) and uses the game's storage format to allow the same operations on all characters. Because of this, version two has a different file structure. Additionally, support for versions below CMC+ v8 has been dropped in CMC Mod Manager 2.0, because of the differences in features. If a CMC+ v7 character is installed with the mod manager, it's dat file will be converted automatically (It will not have a tmug or mbust).
