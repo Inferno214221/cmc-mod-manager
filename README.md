@@ -87,6 +87,7 @@ This is my first time using Electron and therefore the code is a bit of a mess s
 - [ ] Edit Game Settings to change displayed list
 - [x] Alerts
 - [ ] Errors
+- [ ] Fix spaces when adding rows
 ### Alts (Priority: 5)
 - [ ] IDFK how I should deal with alts
 - [ ] Alerts

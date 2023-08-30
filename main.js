@@ -11,7 +11,8 @@ const unrar = require("node-unrar-js");
 var win;
 
 const SUPPORTED_VERSIONS = [
-    "CMC+ v8"
+    "CMC_v8",
+    "CMC+ v8",
 ];
 
 const BLOAT = [
@@ -382,18 +383,30 @@ async function installCharacterArch(filePath, args) {
             break;
     }
     await installCharacter(dir, args);
+    fs.removeSync(path.join(__dirname, "_temp"));
 }
 
 function installCharacter(dir, filteredInstall) {
-    if (!fs.existsSync(path.join(dir, "fighter"))) {
+    while (!fs.existsSync(path.join(dir, "fighter"))) {
         console.log("Fighters directory not found in " + dir);
-        // dir = path.join(dir, path.parse(dir).base);
         let contents = fs.readdirSync(dir);
         if (contents.length = 1) {
             dir = path.join(dir, contents[0]);
             console.log(dir);
+        } else {
+            win.webContents.send("throwError", "Fighters directory not found in " + dir);
+            return;
         }
     }
+    // if (!fs.existsSync(path.join(dir, "fighter"))) {
+    //     console.log("Fighters directory not found in " + dir);
+    //     // dir = path.join(dir, path.parse(dir).base);
+    //     let contents = fs.readdirSync(dir);
+    //     if (contents.length = 1) {
+    //         dir = path.join(dir, contents[0]);
+    //         console.log(dir);
+    //     }
+    // }
     console.log(fs.readdirSync(dir));
     let characterName = fs.readdirSync(path.join(dir, "fighter")).filter((file) => { return file.endsWith(".bin") })[0].split(".")[0];
     if (!fs.existsSync(path.join(dir, "data", "dats", characterName + ".dat"))) {
