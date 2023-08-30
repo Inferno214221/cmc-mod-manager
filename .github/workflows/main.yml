@@ -12,25 +12,45 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+      
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
+      
       - name: Install Node Dependencies
         run: npm i
       - name: Electron Forge Build
-        run: npm run make -- --platform win32 --targets @electron-forge/maker-squirrel --arch=ia32
+        run: npm run make -- --platform win32 --targets @electron-forge/maker-squirrel
+      
       - name: Zip Output
         uses: thedoctor0/zip-release@0.7.1
         with:
           type: 'zip'
           filename: './cmc-mod-manager-windows.zip'
-          path: './out/cmcmodmanager-win32-ia32'
+          path: './out/cmcmodmanager-win32-x64'
+      
       - name: Upload Zip For Release
         uses: actions/upload-artifact@v3.1.2
         with:
           name: windows
           path: './cmc-mod-manager-windows.zip'
+      
+      - name: Electron Forge Build 32 bit
+        run: npm run make -- --platform win32 --targets @electron-forge/maker-squirrel --arch=ia32
+      
+      - name: Zip Output
+        uses: thedoctor0/zip-release@0.7.1
+        with:
+          type: 'zip'
+          filename: './cmc-mod-manager-windows-32.zip'
+          path: './out/cmcmodmanager-win32-ia32'
+      
+      - name: Upload Zip For Release
+        uses: actions/upload-artifact@v3.1.2
+        with:
+          name: windows-32
+          path: './cmc-mod-manager-windows-32.zip'
 
   ubuntu-build:
     runs-on: ubuntu-latest
@@ -41,20 +61,24 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+      
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
+      
       - name: Install Node Dependencies
         run: npm i
       - name: Electron Forge Build
         run: npm run make -- --platform linux --targets @electron-forge/maker-deb
+        
       - name: Zip Output
         uses: thedoctor0/zip-release@0.7.1
         with:
           type: 'zip'
           filename: 'cmc-mod-manager-linux.zip'
           path: './out/cmcmodmanager-linux-x64'
+        
       - name: Upload Zip For Release
         uses: actions/upload-artifact@v3.1.2
         with:
@@ -74,6 +98,10 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: windows
+      - name: Retrieve Windows Build Output
+        uses: actions/download-artifact@v3
+        with:
+          name: windows-32
           
       - name: Retrieve Linux Build Output 
         uses: actions/download-artifact@v3
@@ -97,7 +125,7 @@ jobs:
       - name: Make A Release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "./cmc-mod-manager-windows.zip,cmc-mod-manager-linux.zip"
+          artifacts: "./cmc-mod-manager-windows.zip,./cmc-mod-manager-windows-32.zip,cmc-mod-manager-linux.zip"
           tag: auto
           prerelease: true
           makeLatest: false
