@@ -19,7 +19,7 @@ jobs:
       - name: Install Node Dependencies
         run: npm i
       - name: Electron Forge Build
-        run: npm run make -- --platform win32 --targets @electron-forge/maker-squirrel
+        run: npm run make -- --platform win32 --targets @electron-forge/maker-squirrel --arch=ia32
       - name: Zip Output
         uses: thedoctor0/zip-release@0.7.1
         with:
