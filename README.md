@@ -2,17 +2,6 @@
 ![Downloads](https://img.shields.io/github/downloads/Inferno214221/CMCModManager/total?logo=github&logoColor=white&style=flat&label=Downloads&color=%232284F2)
 
 Usage of this mod manager will 'spoil' the hidden characters as they are displayed in the program without the locked icon.
-## Why 2.X.X already?
-According to [SemVer](https://semver.org/), the first digit is used to represent a Major change that is incompatible with previous versions. I am releasing version 2.0.0 because I re-wrote the entire program (excluding the interface) so that it is more logical. Rather than making two copies of the CMC+ install, differentiating between builtin and installed characters, and storing information about every installed mod version 2.0.0 modifies the CMC+ installation it is given (making no copies) and uses the game's storage format to allow the same operations on all characters. Because of this, version two has a different file structure. Additionally, support for versions below CMC+ v8 has been dropped in CMC Mod Manager 2.0, because of the differences in features. If a CMC+ v7 character is installed with the mod manager, it's dat file will be converted automatically (It will not have a tmug or mbust).
-### Change Notes
- - More intuitive user interface and experience (no constant re-merging).
- - Optimised game storage (5 - 10 GB smaller as a result of making no copies of the game).
- - The program no longer freezes (I didn't acutally fix this, it just doesn't copy the game anymore).
- - Some less important features have been removed (e.g. control profiles).
- - It is now possible to extract characters (gather all of their files) from the game.
- - It is now possible to remove any character from the game (this is why Open Build support was dropped).
- - Character installations can now be filtered to include only necessary files.
- - Errors with misc mod support can only be fixed by restoring backups (currently).
 
 ## What
 This project is a WIP mod manager for Super Smash Brothers Crusade CMC+. It allows for the installation and management of mods through a GUI.
@@ -35,6 +24,8 @@ If you are having issues running SSBC / CMC+ on Linux, use Wine version 6 rather
 Install [Asahi Linux](https://asahilinux.org/), then proceed with the Linux installation steps. 
 #### NOTE:
 The above statement is double reverse sarcastic.
+## Updating From v2.X.X To v2.X.X
+Due to the program no longer storing nearly any information, just delete the old version of CMC Mod Manager and download the new one, reselecting the directory during the first usage.
 ## Updating From v1.0.X To v2.X.X
 Copy your `merged` directory from the program's `./resources/app` directory to a location of your choosing. You may rename this folder to anything (e.g. `CMC+ v8`), it will now be your Game folder. Download and extract CMC Mod Manager 2.X.X. Follow the usage steps below but select the copy of the `merged` directory you moved as the unmodded game.
 ## Usage
