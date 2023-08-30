@@ -65,7 +65,6 @@ This is my first time using Electron and therefore the code is a bit of a mess s
 - [x] List characters
 - [x] Extract characters
 - [x] Remove characters
-- [ ] Delete instructions txt file on merge
 - [ ] Option to remove character from random list
 - [x] Installed v7 characters can be converted to v8
 - [x] Errors
@@ -87,7 +86,6 @@ This is my first time using Electron and therefore the code is a bit of a mess s
 - [ ] Edit Game Settings to change displayed list
 - [x] Alerts
 - [ ] Errors
-- [ ] Fix spaces when adding rows
 ### Alts (Priority: 5)
 - [ ] IDFK how I should deal with alts
 - [ ] Alerts

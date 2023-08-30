@@ -55,6 +55,11 @@ jobs:
   ubuntu-build:
     runs-on: ubuntu-latest
 
+    if: ${{ always() }}
+    needs: [windows-build, ubuntu-build]
+    permissions:
+      contents: write
+
     strategy:
       matrix:
         node-version: [16.x]
@@ -78,22 +83,8 @@ jobs:
           type: 'zip'
           filename: 'cmc-mod-manager-linux.zip'
           path: './out/cmcmodmanager-linux-x64'
-        
-      - name: Upload Zip For Release
-        uses: actions/upload-artifact@v3.1.2
-        with:
-          name: linux
-          path: './cmc-mod-manager-linux.zip'
 
-  make-release:
-    runs-on: ubuntu-latest
-    
-    if: ${{ always() }}
-    needs: [windows-build, ubuntu-build]
-    permissions:
-      contents: write
-    
-    steps:
+      steps:
       - name: Retrieve Windows Build Output
         uses: actions/download-artifact@v3
         with:
@@ -102,11 +93,6 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: windows-32
-          
-      - name: Retrieve Linux Build Output 
-        uses: actions/download-artifact@v3
-        with:
-          name: linux
           
       - run: ls -l
       
