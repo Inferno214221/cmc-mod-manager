@@ -25,7 +25,7 @@ Install [Asahi Linux](https://asahilinux.org/), then proceed with the Linux inst
 #### NOTE:
 The above statement is double reverse sarcastic.
 ## Updating From v2.X.X To v2.X.X
-Due to the program no longer storing nearly any information, just delete the old version of CMC Mod Manager and download the new one, reselecting the directory during the first usage.
+Due to the program no longer storing nearly any information, just delete the old version of CMC Mod Manager and download the new one, re-selecting the directory during the first usage.
 ## Updating From v1.0.X To v2.X.X
 Copy your `merged` directory from the program's `./resources/app` directory to a location of your choosing. You may rename this folder to anything (e.g. `CMC+ v8`), it will now be your Game folder. Download and extract CMC Mod Manager 2.X.X. Follow the usage steps below but select the copy of the `merged` directory you moved as the unmodded game.
 ## Usage
@@ -34,11 +34,45 @@ Please ensure that the game has been run once to create all the necessary files.
 After installing CMC Mod Manager the first step is to select your CMC+ directory. Under the 'Home' tab choose 'Select CMC+ Directory' and select the folder with `CMC+ v8.exe` in it.
 
 To install character mods, switch to the 'Character Manager' tab and select 'Install from Directory' or 'Install From Archive'. Any characters that you want to install needs to be formatted correctly so that the directory or archive you select contains the `fighter`, `data`, `gfx` directories (among others). Merging after mod installation is no longer a requirement, just add your character to the roster/s by dragging and dropping characters in the 'Character Selection Screen' tab.
-
-[Usage Tutorial (v1.0.X)](https://raw.githubusercontent.com/Inferno214221/CMCModManager/main/CMCModManagerTutorial.mp4)
-
 ## It's not working!
-Please ensure that all mods that are installed are in the correct format and that the program is the latest version (check GitHub / GB). If a breakage occurred installing a mod, try removing it via the mod manager.
+Please ensure that all mods that are installed are in the correct format and that the program is the latest version (check GitHub / GB). If a breakage occurred installing a mod, try removing it via the mod manager, verifying it's file and then re-installing with the "Install Only Necessary Files" checkbox unticked.
+## Mod Manager Support
+If you are a mod developer and would like to ensure that your mod functions correctly with the mod manager, please structure you mod with only the following files:
+```
+arcade/routes/<fighter>.txt,
+data/<fighter>.dat,
+data/dats/<fighter>.dat,
+fighter/<fighter>.bin,
+fighter/<fighter>,
+gfx/abust/<fighter>.png,
+gfx/bust/<fighter>.png,
+gfx/bust/<fighter>_<palette>.png,
+gfx/cbust/<fighter>.png,
+gfx/mbust/<fighter>.png,
+gfx/tbust/<fighter>__*.png,
+gfx/mugs/<fighter>.png,
+gfx/hudicon/<series>.png,
+gfx/name/<fighter>.png,
+gfx/portrait/<fighter>.png,
+gfx/portrait/<fighter>_<palette>.png,
+gfx/portrait_new/<fighter>.png,
+gfx/portrait_new/<fighter>_<palette>.png,
+gfx/seriesicon/<series>.png,
+gfx/stock/<fighter>.png,
+music/versus/<fighter>_*.<audio>,
+music/victory/<series>.<audio>,
+music/victory/individual/<fighter>.<audio>,
+sfx/announcer/fighter/<fighter>.<audio>,
+sticker/common/<fighter>.png,
+sticker/common/desc/<fighter>.txt,
+sticker/rare/<fighter>.png,
+sticker/rare/desc/<fighter>.txt,
+sticker/super/<fighter>.png,
+sticker/super/desc/<fighter>.txt,
+sticker/ultra/<fighter>.png,
+sticker/ultra/desc/<fighter>.txt
+```
+Additionally, please test your mod by installing via the Mod Manager's directory and archive installation options.
 ## Notes
 This is my first time using Electron and therefore the code is a bit of a mess sorry. Also, I am not very good at designing GUIs so this one might be unintuitive. Feel free to provide suggestions for interface improvements although be warned they may be declined.
 ## Progress
