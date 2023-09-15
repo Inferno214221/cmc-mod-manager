@@ -1,6 +1,4 @@
 # CMC Mod Manager
-![Downloads](https://img.shields.io/github/downloads/Inferno214221/CMCModManager/total?logo=github&logoColor=white&style=flat&label=Downloads&color=%232284F2)
-
 Usage of this mod manager will 'spoil' the hidden characters as they are displayed in the program without the locked icon.
 
 ## What
