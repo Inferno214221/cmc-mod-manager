@@ -91,6 +91,7 @@ This is my first time using Electron and therefore the code is a bit of a mess s
 - [ ] Option to remove character from random list
 - [x] Installed v7 characters can be converted to v8
 - [x] Errors
+- [ ] Ignore exsisting series icons
 ### Character Selection Screen (Priority: 1)
 - [x] Display the CSS
 - [x] Display unincluded characters (not alts)

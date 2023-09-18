@@ -373,7 +373,7 @@ async function installCharacterArch(filePath, args) {
             });
             files.forEach(fileE => {// Make All Folders First
                 if (!fileE.fileHeader.flags.directory) {
-                    fs.writeFileSync(path.join(dir, + fileE.fileHeader.name), Buffer.from(fileE.extraction));
+                    fs.writeFileSync(path.join(dir, fileE.fileHeader.name), Buffer.from(fileE.extraction));
                 }
             });
             break;
@@ -408,8 +408,9 @@ function installCharacter(dir, filteredInstall) {
     //     }
     // }
     console.log(fs.readdirSync(dir));
-    let characterName = fs.readdirSync(path.join(dir, "fighter")).filter((file) => { return file.endsWith(".bin") })[0].split(".")[0];
+    let characterName = fs.readdirSync(path.join(dir, "fighter")).filter((file) => { return file.endsWith(".bin") || !file.includes(".") })[0].split(".")[0];
     if (!fs.existsSync(path.join(dir, "data", "dats", characterName + ".dat"))) {
+        console.log(path.join(dir, "data", "dats", characterName + ".dat"))
         win.webContents.send("throwError", "The character's dat file is not in the ./data/dats/ directory.");
         return;
     }
