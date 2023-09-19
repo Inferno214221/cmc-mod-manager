@@ -221,7 +221,7 @@ function dropCharacter(drop) {
         output += character.name + "\r\n";
     });
     fs.writeFileSync(path.join(cmcDir, "data", "fighters.txt"), output, "ascii");
-    //TODO: remove from css
+    toggleRandomCharacter(true, drop);
 }
 
 // Index
@@ -322,6 +322,7 @@ ipcMain.on("getCharacterList", (event, args) => {
     win.webContents.send("from_getCharacterList", {
         characters: getCharacters(),
         cmcDir: cmcDir,
+        random: getRandomCharacters(),
     });
 });
 
@@ -620,6 +621,34 @@ function filterCharacterFiles(characterName, characterDat = null, ignoreSeries =
     return files;
 }
 
+ipcMain.on("toggleRandomCharacter", (event, data) => {
+    toggleRandomCharacter(data.excluded, data.characterName);
+});
+
+function toggleRandomCharacter(excluded, characterName) {
+    let characters = getRandomCharacters();
+    if (excluded && characters.indexOf(characterName) != -1) {// Remove from file
+        console.log("Removing " + characterName + " from fighter_lock.");
+        characters = characters.filter((character) => {
+            return character != characterName;
+        });
+    } else if (!excluded && characters.indexOf(characterName) == -1) {// Add to file
+        console.log("Adding " + characterName + " to fighter_lock.");
+        characters.push(characterName);
+    } else return;
+    let output = (characters.length + 1) + "\r\n";
+    characters.forEach((character) => {
+        output += character + "\r\n";
+    });
+    fs.writeFileSync(path.join(cmcDir, "data", "fighter_lock.txt"), output, "ascii");
+}
+
+function getRandomCharacters() {
+    let fighters = fs.readFileSync(path.join(cmcDir, "data", "fighter_lock.txt"), "ascii").split(/\r?\n/);
+    fighters.shift();
+    fighters.pop();
+    return fighters;
+}
 // Character Selection Screen
 ipcMain.on("getPages", (event, args) => {
     let pages = [];

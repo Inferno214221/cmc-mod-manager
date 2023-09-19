@@ -21,15 +21,19 @@ function getCharacterList() {
 }
 
 this.api.receive("from_getCharacterList", (data) => {
-    listCharacters(data.characters, data.cmcDir);
+    listCharacters(data.characters, data.cmcDir, data.random);
 });
 
-function listCharacters(characters, cmcDir) {
-    let output = "";
+function listCharacters(characters, cmcDir, random) {
+    let output = "<tr><th>Image</th><th>Name</th><th>Extract</th><th>Remove</th><th>Selectable Via Random</th></tr>";
     sorted = sortCharacters(characters, sortingType.value);
     if (reverseSort.checked) {
         sorted.reverse();
     }
+    sorted.forEach((character, index, array) => {
+        character.excluded = (random.indexOf(character.name) == -1);
+        array[index] = character;
+    });
     for (let character of sorted) {
         console.log(character);
         output += 
@@ -38,7 +42,9 @@ function listCharacters(characters, cmcDir) {
             <td>" + character.displayName + "</td>\n\
             <td><button type=\"button\" onclick=\"extractCharacter('" + character.number + "')\">Extract</button></td>\n\
             <td><button type=\"button\" onclick=\"removeCharacter('" + character.number + "')\">Remove</button></td>\n\
+            <td><input type=\"checkbox\" name=\"" + character.name + "\"" + (character.excluded ? " checked" : "") + " onclick=\"toggleRandomCharacter(this, '" + character.name + "');\"></td>\n\
         </tr>\n"
+        //<label for=\"" + character.number + "\">Random Selection</label></td>\n\
     };
     characterTable.innerHTML = output;
 }
@@ -73,6 +79,13 @@ function extractCharacter(id) {
 this.api.receive("from_extractCharacter", (data) => {
     alert("Character extracted successfully.");
 });
+
+function toggleRandomCharacter(checkbox, characterName) {
+    this.api.send("toggleRandomCharacter", {
+        characterName: characterName,
+        excluded: checkbox.checked,
+    });
+}
 
 function sortCharacters(characters, sortType) {
     let charactersSorted = [];
