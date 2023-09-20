@@ -222,6 +222,57 @@ function dropCharacter(drop) {
     });
     fs.writeFileSync(path.join(cmcDir, "data", "fighters.txt"), output, "ascii");
     toggleRandomCharacter(true, drop);
+    removeAlts(drop);
+}
+
+function getAlts() {
+    let alts = [];
+    let altsTxt = fs.readFileSync(path.join(cmcDir, "data", "alts.txt"), "ascii").split(/\r?\n/);
+    alts.shift();
+    for(let alt = 0; alt < (altsTxt.length / 5); alt++) {
+        alts[alt] = {
+            base: altsTxt[alt*5 + 1],
+            altNum: altsTxt[alt*5 + 2],
+            alt: altsTxt[alt*5 + 3],
+            displayName: altsTxt[alt*5 + 4],
+            gameName: altsTxt[alt*5 + 5],
+        };
+    }
+    alts.pop();
+    return alts;
+}
+
+function writeAlts(alts) {
+    let output = (alts.length) + "\r\n";
+    alts.forEach((alt) => {
+        output += alt.base + "\r\n";
+        output += alt.altNum + "\r\n";
+        output += alt.alt + "\r\n";
+        output += alt.displayName + "\r\n";
+        output += alt.gameName + "\r\n";
+    });
+    fs.writeFileSync(path.join(cmcDir, "data", "alts.txt"), output, "ascii");
+}
+
+function removeAlts(characterName) {
+    console.log("Removing " + characterName + " from alts.");
+    let alts = getAlts();
+    let removed = [];
+    alts = alts.filter((alt) => {
+        if (!(alt.base == characterName || alt.alt == characterName)) {
+            return true;
+        } else if (alt.base == characterName) {
+            removed.push(alt.alt);
+        }
+        return false;
+    });// Some characters may be inacessable
+    writeAlts(alts);
+    let characters = getCharacters();
+    removed.forEach((add) => {
+        if (characters.indexOf(removed) == -1) {
+            appendCharacter(removed);
+        }
+    });
 }
 
 // Index
