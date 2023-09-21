@@ -110,17 +110,17 @@ This is my first time using Electron and therefore the code is a bit of a mess s
 - [ ] Edit Game Settings to change displayed list
 - [x] Alerts
 - [ ] Errors
-### Alts (Priority: 5)
+### Alts (Priority: 2)
 - [ ] IDFK how I should deal with alts
 - [ ] Alerts
 - [ ] Errors
-### Stage Manager (Priority: 4)
+### Stage Manager (Priority: 3)
 - [ ] Install stages from a folder
 - [ ] Install stages from a zip (extract, install folder, delete)
 - [ ] Manage stage merge priority
 - [ ] Alerts
 - [ ] Errors
-### Stage Selection Screen (Priority: 4)
+### Stage Selection Screen (Priority: 3)
 - [ ] Display the SSS w/ pages
 - [ ] Display unincluded stages
 - [ ] Add stages to SSS
@@ -132,12 +132,12 @@ This is my first time using Electron and therefore the code is a bit of a mess s
 - [ ] Add pages
 - [ ] Alerts
 - [ ] Errors
-### Items (Priority: 6)
+### Items (Priority: 5)
 - [ ] Install item mods - Not many mods & idk if it works with CMC+ v7
 - [ ] Remove item mods
 - [ ] Alerts
 - [ ] Errors
-### Miscellanious Mods (Priority: 3)
+### Miscellanious Mods (Priority: 4)
 - [x] Add option to import other types of mods e.g. ui changes / music
 - [x] RAR support - no errors
 - [ ] Remove misc mods by tracking file changes
