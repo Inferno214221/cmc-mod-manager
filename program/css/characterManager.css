@@ -35,3 +35,14 @@ section {
     height: calc(100vh - 215px);
     white-space: nowrap;
 }
+
+th {
+    position: sticky;
+    top: 0px;
+    background-color: var(--inf-grey4);
+}
+
+td {
+    max-width: 150px;
+    overflow: hidden;
+}

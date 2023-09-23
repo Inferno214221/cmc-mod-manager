@@ -254,23 +254,78 @@ function writeAlts(alts) {
     fs.writeFileSync(path.join(cmcDir, "data", "alts.txt"), output, "ascii");
 }
 
+function altsToFighters() {
+    let alts = getAlts();
+    let fighters = getCharacters();
+    alts.forEach((alt) => {
+        if (fighters.findIndex(fighter => fighter.name == alt.alt) == -1) {
+            appendCharacter(alt.alt);
+        }
+    });
+}
+
+ipcMain.on("addAlt", (event, args) => {
+    addAlt(args.base, args.alt);
+    win.webContents.send("from_addAlt");
+});
+
+function addAlt(base, alt) {
+    console.log("Adding alt: " + base + " : " + alt);
+    let alts = getAlts();
+    let altDat = fs.readFileSync(path.join(cmcDir, "data", "dats", alt + ".dat"), "ascii").split(/\r?\n/);
+    let altNum = 2;
+    alts.forEach((i) => {
+        if (i.base == base) {
+            altNum++;
+        }
+    });
+    alts.push({
+        base: base,
+        altNum: altNum,
+        alt: alt,
+        displayName: altDat[1],
+        gameName: altDat[2],
+    });
+    writeAlts(alts);
+}
+
+ipcMain.on("removeAlt", (event, args) => {
+    removeAlt(args.base, args.alt);
+    win.webContents.send("from_removeAlt");
+});
+
+function removeAlt(base, alt) {
+    console.log("Removing alt: " + base + " : " + alt);
+    removeAltE((i, removed) => {
+        if ((i.base == base || i.alt == alt)) {
+            removed.push(i.alt);
+            return false;
+        }
+        return true;
+    });
+}
+
 function removeAlts(characterName) {
     console.log("Removing " + characterName + " from alts.");
-    let alts = getAlts();
-    let removed = [];
-    alts = alts.filter((alt) => {
-        if (!(alt.base == characterName || alt.alt == characterName)) {
+    removeAltE((i, removed) => {
+        if (!(i.base == characterName || i.alt == characterName)) {
             return true;
-        } else if (alt.base == characterName) {
-            removed.push(alt.alt);
+        } else if (i.base == characterName) {
+            removed.push(i.alt);
         }
         return false;
-    });// Some characters may be inacessable
+    });
+}
+
+function removeAltE(checkFunction) {
+    let alts = getAlts();
+    let removed = [];
+    alts = alts.filter((alt) => checkFunction(alt, removed));
     writeAlts(alts);
     let characters = getCharacters();
     removed.forEach((add) => {
-        if (characters.indexOf(removed) == -1) {
-            appendCharacter(removed);
+        if (characters.findIndex(fighter => fighter.name == add) == -1) {
+            appendCharacter(add);
         }
     });
 }
@@ -370,10 +425,12 @@ ipcMain.on("setupOneClick", (event, dir) => {
 
 // Characters
 ipcMain.on("getCharacterList", (event, args) => {
+    altsToFighters();
     win.webContents.send("from_getCharacterList", {
         characters: getCharacters(),
         cmcDir: cmcDir,
         random: getRandomCharacters(),
+        alts: getAlts(),
     });
 });
 
