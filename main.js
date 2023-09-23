@@ -297,7 +297,7 @@ ipcMain.on("removeAlt", (event, args) => {
 function removeAlt(base, alt) {
     console.log("Removing alt: " + base + " : " + alt);
     removeAltE((i, removed) => {
-        if ((i.base == base || i.alt == alt)) {
+        if ((i.base == base && i.alt == alt)) {
             removed.push(i.alt);
             return false;
         }

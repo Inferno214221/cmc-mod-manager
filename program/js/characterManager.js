@@ -41,7 +41,7 @@ function listCharacters(characters, cmcDir, random, alts) {
         console.log(character);
         output += 
         "<tr id=\"" + character.number + "\">\n\
-            <td class=\"mug\"><image src=\"" + cmcDir + "/gfx/mugs/" + character.name + ".png\" draggable=\"false\"/></td>\n\
+            <td class=\"mug\"><image src=\"" + cmcDir + "/gfx/mugs/" + character.name + ".png\" draggable=\"false\" onerror=\"this.onerror=null; this.src='../images/missing.png'\" /></td>\n\
             <td>" + character.displayName + "</td>\n\
             <td><button type=\"button\" onclick=\"extractCharacter('" + character.number + "')\">Extract</button></td>\n\
             <td><button type=\"button\" onclick=\"removeCharacter('" + character.number + "')\">Remove</button></td>\n\
@@ -49,7 +49,7 @@ function listCharacters(characters, cmcDir, random, alts) {
             <td><button type=\"button\" onclick=\"selectBase('" + character.name + "')\">Select As Base</button></td>\n\
             <td><button type=\"button\" onclick=\"selectAlt('" + character.name + "')\">Select As Alt</button></td>\n";
         character.alts.forEach((alt) => {
-            output += "<td class=\"mug\"><image src=\"" + cmcDir + "/gfx/mugs/" + alt.alt + ".png\" draggable=\"false\"/></td>\n\
+            output += "<td class=\"mug\"><image src=\"" + cmcDir + "/gfx/mugs/" + alt.alt + ".png\" draggable=\"false\" onerror=\"this.onerror=null; this.src='../images/missing.png'\" /></td>\n\
             <td>" + alt.displayName + "</td>\n\
             <td><button type=\"button\" onclick=\"removeAlt('" + character.name + "', '" + alt.alt + "')\">Remove</button></td>\n";
         });
