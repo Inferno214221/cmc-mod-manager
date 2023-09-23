@@ -33,7 +33,7 @@ function listCharacters(characters, cmcDir, random, alts) {
     let altSelect = "<option value=\"\"></option>\n";
     sorted.forEach((character, index, array) => {
         character.excluded = (random.indexOf(character.name) == -1);
-        character.alts = alts.filter((alt) => alt.base == character.name);
+        character.alts = alts.filter((alt) => alt.base == character.name && alt.alt != character.name);
         array[index] = character;
         altSelect += "<option value=\"" + character.name + "\">" + character.displayName + "</option>\n";
     });
@@ -128,9 +128,8 @@ function selectAlt(characterName) {
 }
 
 function addAlt() {
-    if (!(selectedBase != undefined && selectedAlt != undefined)) {
-        return;
-    }
+    if ((selectedBase == undefined || selectedAlt == undefined)) return;
+    if (selectedBase == selectedAlt) return;
     console.log(selectedBase + selectedAlt);
     this.api.send("addAlt", {
         base: selectedBase,

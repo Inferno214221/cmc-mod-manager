@@ -244,9 +244,15 @@ function getAlts() {
 
 function writeAlts(alts) {
     let output = (alts.length) + "\r\n";
+    let altCount = {};
     alts.forEach((alt) => {
         output += alt.base + "\r\n";
-        output += alt.altNum + "\r\n";
+        if (altCount[alt.base] == undefined) {
+            altCount[alt.base] = 2;
+        } else {
+            altCount[alt.base] += 1;
+        }
+        output += altCount[alt.base] + "\r\n";
         output += alt.alt + "\r\n";
         output += alt.displayName + "\r\n";
         output += alt.gameName + "\r\n";
