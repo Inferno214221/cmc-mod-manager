@@ -149,6 +149,16 @@ function removeAlt(base, alt) {
     getCharacterList();
 }
 
+function removeAllChars() {
+    if(!confirm("All characters except for Master Hand and Fighting Sprite will be removed.\nAre you sure you want to continue?")) return;
+    this.api.send("removeAllChars");
+}
+
+this.api.receive("from_removeAllChars", () => {
+    alert("Characters removed successfully.");
+    getCharacterList();
+});
+
 // On Page Load
 var characters, selectedBase, selectedAlt;
 getCharacterList();

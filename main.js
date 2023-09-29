@@ -611,9 +611,15 @@ function deleteCharCSS(cssNumber) {
 
 ipcMain.on("removeCharacter", (event, args) => {
     args -= 1;
-    deleteCharCSS(parseInt(args) + 1);
+    removeCharacter(args);
+
+    win.webContents.send("from_removeCharacter");
+});
+
+function removeCharacter(number) {
+    deleteCharCSS(parseInt(number) + 1);
     let characters = getCharacters();
-    let characterName = characters[args].name;
+    let characterName = characters[number].name;
     let similarName = [];
     characters.forEach((character) => {
         if (character.name != characterName && character.name.startsWith(characterName)) {
@@ -621,7 +627,7 @@ ipcMain.on("removeCharacter", (event, args) => {
         }
     });
     let characterDat = fs.readFileSync(path.join(cmcDir, "data", "dats", characterName + ".dat"), "ascii").split(/\r?\n/);
-    filterCharacterFiles(characters[args].name, characterDat, true).forEach((file) => {
+    filterCharacterFiles(characters[number].name, characterDat, true).forEach((file) => {
         let subDir = path.parse(file).dir;
         if (file.includes("*")) {
             let start = path.parse(file).base.split("*")[0].replace(subDir, "");
@@ -649,9 +655,7 @@ ipcMain.on("removeCharacter", (event, args) => {
         }
     });
     dropCharacter(characterName);
-
-    win.webContents.send("from_removeCharacter");
-});
+}
 
 ipcMain.on("extractCharacter", (event, args) => {
     args -= 1;
@@ -763,6 +767,21 @@ function getRandomCharacters() {
     fighters.pop();
     return fighters;
 }
+
+ipcMain.on("removeAllChars", (event, args) => {
+    number = 0;
+    getCharacters().forEach((fighter) => {
+        if (fighter.name == "hand" || fighter.name == "sprite") {
+            number++;
+            return;
+        }
+        removeCharacter(number);
+    });
+    fs.writeFileSync(path.join(cmcDir, "data", "fighters.txt"), "2\r\nhand\r\nsprite", "ascii");
+    fs.writeFileSync(path.join(cmcDir, "data", "fighter_lock.txt"), "0", "ascii");
+    win.webContents.send("from_removeAllChars");
+});
+
 // Character Selection Screen
 ipcMain.on("getPages", (event, args) => {
     let pages = [];
