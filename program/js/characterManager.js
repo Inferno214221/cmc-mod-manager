@@ -30,12 +30,10 @@ function listCharacters(characters, cmcDir, random, alts) {
     if (reverseSort.checked) {
         sorted.reverse();
     }
-    let altSelect = "<option value=\"\"></option>\n";
     sorted.forEach((character, index, array) => {
         character.excluded = (random.indexOf(character.name) == -1);
         character.alts = alts.filter((alt) => alt.base == character.name && alt.alt != character.name);
         array[index] = character;
-        altSelect += "<option value=\"" + character.name + "\">" + character.displayName + "</option>\n";
     });
     for (let character of sorted) {
         console.log(character);

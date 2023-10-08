@@ -1,1 +1,45 @@
 @import "./global.css";
+
+.mug {
+    padding: 0px 5px;
+}
+
+select {
+    width: 150px;
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 3px;
+    background-color: var(--inf-grey5);
+    border-color: black;
+    color: inherit;
+    font-family: inherit;
+    font-size: 11pt;
+    outline: none;
+    box-shadow: 0px 1px #00000088;
+    height: 29px;
+    padding: 0px;
+}
+
+section {
+    overflow-y: hidden;
+}
+
+#stageScrollable {
+    overflow: hidden;
+    overflow-y: scroll;
+    white-space: nowrap;
+    margin-top: 5px;
+    height: calc(100vh - 215px);
+    white-space: nowrap;
+}
+
+th {
+    position: sticky;
+    top: 0px;
+    background-color: var(--inf-grey4);
+}
+
+td {
+    max-width: 150px;
+    overflow: hidden;
+}

@@ -46,6 +46,7 @@ const CHARACTER_FILES = [
     "gfx/portrait_new/<fighter>_<palette>.png",
     "gfx/seriesicon/<series>.png",
     "gfx/stock/<fighter>.png",
+    "palettes/<fighter>",
     "music/versus/<fighter>_*.<audio>",
     "music/victory/<series>.<audio>",
     "music/victory/individual/<fighter>.<audio>",
@@ -58,6 +59,14 @@ const CHARACTER_FILES = [
     "sticker/super/desc/<fighter>.txt",
     "sticker/ultra/<fighter>.png",
     "sticker/ultra/desc/<fighter>.txt",
+];
+
+const STAGE_FILES = [
+    "stage/<stage>.bin",
+    "stage/<stage>",
+    "music/stage/<stage>",
+    "gfx/stgicons/<stage>.png",
+    "gfx/stgprevs/<stage>.png",
 ];
 
 var cmcDir = readJSON(path.join(__dirname, "program", "data.json")).dir;
@@ -182,190 +191,7 @@ function handleUri() {
     });
 }
 
-function getCharacters() {
-    let fighters = [];
-    let fightersTxt = fs.readFileSync(path.join(cmcDir, "data", "fighters.txt"), "ascii").split(/\r?\n/);
-    fightersTxt.shift();
-    fightersTxt.forEach((fighter) => {
-        if (fs.existsSync(path.join(cmcDir, "data", "dats", fighter + ".dat"))) {
-            let fighterDat = fs.readFileSync(path.join(cmcDir, "data", "dats", fighter + ".dat"), "ascii").split(/\r?\n/);
-            fighters.push({
-                name: fighter,
-                displayName: fighterDat[1],
-                series: fighterDat[3].toLowerCase(),
-            });
-        } else {
-            //TODO: throw error?
-        }
-    });
-    return fighters;
-}
-
-function appendCharacter(add) {
-    let characters = getCharacters();
-    let output = (characters.length + 1) + "\r\n";
-    characters.forEach((character) => {
-        output += character.name + "\r\n";
-    });
-    output += add + "\r\n";
-    fs.writeFileSync(path.join(cmcDir, "data", "fighters.txt"), output, "ascii");
-}
-
-function dropCharacter(drop) {
-    let characters = getCharacters();
-    characters.filter((character) => {
-       return character.name != drop;
-    });
-    let output = (characters.length + 1) + "\r\n";
-    characters.forEach((character) => {
-        output += character.name + "\r\n";
-    });
-    fs.writeFileSync(path.join(cmcDir, "data", "fighters.txt"), output, "ascii");
-    toggleRandomCharacter(true, drop);
-    removeAlts(drop);
-}
-
-function getAlts() {
-    let alts = [];
-    let altsTxt = fs.readFileSync(path.join(cmcDir, "data", "alts.txt"), "ascii").split(/\r?\n/);
-    alts.shift();
-    for(let alt = 0; alt < (altsTxt.length / 5); alt++) {
-        alts[alt] = {
-            base: altsTxt[alt*5 + 1],
-            altNum: altsTxt[alt*5 + 2],
-            alt: altsTxt[alt*5 + 3],
-            displayName: altsTxt[alt*5 + 4],
-            gameName: altsTxt[alt*5 + 5],
-        };
-    }
-    alts.pop();
-    return alts;
-}
-
-function writeAlts(alts) {
-    let output = (alts.length) + "\r\n";
-    let altCount = {};
-    alts.forEach((alt) => {
-        output += alt.base + "\r\n";
-        if (altCount[alt.base] == undefined) {
-            altCount[alt.base] = 2;
-        } else {
-            altCount[alt.base] += 1;
-        }
-        output += altCount[alt.base] + "\r\n";
-        output += alt.alt + "\r\n";
-        output += alt.displayName + "\r\n";
-        output += alt.gameName + "\r\n";
-    });
-    fs.writeFileSync(path.join(cmcDir, "data", "alts.txt"), output, "ascii");
-}
-
-function altsToFighters() {
-    let alts = getAlts();
-    let fighters = getCharacters();
-    alts.forEach((alt) => {
-        if (fighters.findIndex(fighter => fighter.name == alt.alt) == -1) {
-            appendCharacter(alt.alt);
-        }
-    });
-}
-
-ipcMain.on("addAlt", (event, args) => {
-    addAlt(args.base, args.alt);
-    win.webContents.send("from_addAlt");
-});
-
-function addAlt(base, alt) {
-    console.log("Adding alt: " + base + " : " + alt);
-    let alts = getAlts();
-    let altDat = fs.readFileSync(path.join(cmcDir, "data", "dats", alt + ".dat"), "ascii").split(/\r?\n/);
-    let altNum = 2;
-    alts.forEach((i) => {
-        if (i.base == base) {
-            altNum++;
-        }
-    });
-    alts.push({
-        base: base,
-        altNum: altNum,
-        alt: alt,
-        displayName: altDat[1],
-        gameName: altDat[2],
-    });
-    writeAlts(alts);
-}
-
-ipcMain.on("removeAlt", (event, args) => {
-    removeAlt(args.base, args.alt);
-    win.webContents.send("from_removeAlt");
-});
-
-function removeAlt(base, alt) {
-    console.log("Removing alt: " + base + " : " + alt);
-    removeAltE((i, removed) => {
-        if ((i.base == base && i.alt == alt)) {
-            removed.push(i.alt);
-            return false;
-        }
-        return true;
-    });
-}
-
-function removeAlts(characterName) {
-    console.log("Removing " + characterName + " from alts.");
-    removeAltE((i, removed) => {
-        if (!(i.base == characterName || i.alt == characterName)) {
-            return true;
-        } else if (i.base == characterName) {
-            removed.push(i.alt);
-        }
-        return false;
-    });
-}
-
-function removeAltE(checkFunction) {
-    let alts = getAlts();
-    let removed = [];
-    alts = alts.filter((alt) => checkFunction(alt, removed));
-    writeAlts(alts);
-    let characters = getCharacters();
-    removed.forEach((add) => {
-        if (characters.findIndex(fighter => fighter.name == add) == -1) {
-            appendCharacter(add);
-        }
-    });
-}
-
 // Index
-// ipcMain.on("checkGameInstalled", (event, args) => {
-//     win.webContents.send("from_checkGameInstalled", version != null);
-// });
-
-// ipcMain.on("importUnmodded", (event, args) => {
-//     dialog.showOpenDialog(win, {
-//         properties: ["openDirectory"]
-//     }).then(dir => {
-//         if (dir.canceled === true) {
-//             return;
-//         }
-//         if (getGameVersion(path.join(dir.filePaths[0])) == null) {
-//             win.webContents.send("throwError", "No recognised .exe file in the selected directory.");
-//             return;
-//         }
-//         //The new version has horrible permissions so give everything xwr
-//         getAllFiles(dir.filePaths[0]).forEach((file) => {
-//             fs.chmodSync(file, 0o777);
-//         });
-//         fs.ensureDirSync(path.join(__dirname, "cmc"));
-//         fs.emptyDirSync(path.join(__dirname, "cmc"));
-        
-//         fs.copySync(dir.filePaths[0], path.join(__dirname, "cmc"), { overwrite: true });
-//         version = getGameVersion(path.join(__dirname, "cmc"));
-
-//         win.webContents.send("from_importUnmodded", true);
-//     });
-// });
-
 ipcMain.on("checkGameDir", (event, args) => {
     let dir = cmcDir;
     if (cmcDir == undefined || cmcDir == "" || version == null) {
@@ -782,6 +608,165 @@ ipcMain.on("removeAllChars", (event, args) => {
     win.webContents.send("from_removeAllChars");
 });
 
+function getCharacters() {
+    let fighters = [];
+    let fightersTxt = fs.readFileSync(path.join(cmcDir, "data", "fighters.txt"), "ascii").split(/\r?\n/);
+    fightersTxt.shift();
+    fightersTxt.forEach((fighter) => {
+        if (fs.existsSync(path.join(cmcDir, "data", "dats", fighter + ".dat"))) {
+            let fighterDat = fs.readFileSync(path.join(cmcDir, "data", "dats", fighter + ".dat"), "ascii").split(/\r?\n/);
+            fighters.push({
+                name: fighter,
+                displayName: fighterDat[1],
+                series: fighterDat[3].toLowerCase(),
+            });
+        } else {
+            //TODO: throw error?
+        }
+    });
+    return fighters;
+}
+
+function appendCharacter(add) {
+    let characters = getCharacters();
+    let output = (characters.length + 1) + "\r\n";
+    characters.forEach((character) => {
+        output += character.name + "\r\n";
+    });
+    output += add + "\r\n";
+    fs.writeFileSync(path.join(cmcDir, "data", "fighters.txt"), output, "ascii");
+}
+
+function dropCharacter(drop) {
+    let characters = getCharacters();
+    characters.filter((character) => {
+       return character.name != drop;
+    });
+    let output = (characters.length + 1) + "\r\n";
+    characters.forEach((character) => {
+        output += character.name + "\r\n";
+    });
+    fs.writeFileSync(path.join(cmcDir, "data", "fighters.txt"), output, "ascii");
+    toggleRandomCharacter(true, drop);
+    removeAlts(drop);
+}
+
+function getAlts() {
+    let alts = [];
+    let altsTxt = fs.readFileSync(path.join(cmcDir, "data", "alts.txt"), "ascii").split(/\r?\n/);
+    alts.shift();
+    for(let alt = 0; alt < (altsTxt.length / 5); alt++) {
+        alts[alt] = {
+            base: altsTxt[alt*5 + 1],
+            altNum: altsTxt[alt*5 + 2],
+            alt: altsTxt[alt*5 + 3],
+            displayName: altsTxt[alt*5 + 4],
+            gameName: altsTxt[alt*5 + 5],
+        };
+    }
+    alts.pop();
+    return alts;
+}
+
+function writeAlts(alts) {
+    let output = (alts.length) + "\r\n";
+    let altCount = {};
+    alts.forEach((alt) => {
+        output += alt.base + "\r\n";
+        if (altCount[alt.base] == undefined) {
+            altCount[alt.base] = 2;
+        } else {
+            altCount[alt.base] += 1;
+        }
+        output += altCount[alt.base] + "\r\n";
+        output += alt.alt + "\r\n";
+        output += alt.displayName + "\r\n";
+        output += alt.gameName + "\r\n";
+    });
+    fs.writeFileSync(path.join(cmcDir, "data", "alts.txt"), output, "ascii");
+}
+
+function altsToFighters() {
+    let alts = getAlts();
+    let fighters = getCharacters();
+    alts.forEach((alt) => {
+        if (fighters.findIndex(fighter => fighter.name == alt.alt) == -1) {
+            appendCharacter(alt.alt);
+        }
+    });
+}
+
+ipcMain.on("addAlt", (event, args) => {
+    addAlt(args.base, args.alt);
+    win.webContents.send("from_addAlt");
+});
+
+function addAlt(base, alt) {
+    console.log("Adding alt: " + base + " : " + alt);
+    let alts = getAlts();
+    let altDat = fs.readFileSync(path.join(cmcDir, "data", "dats", alt + ".dat"), "ascii").split(/\r?\n/);
+    let altNum = 2;
+    alts.forEach((i) => {
+        if (i.base == base) {
+            altNum++;
+        }
+    });
+    alts.push({
+        base: base,
+        altNum: altNum,
+        alt: alt,
+        displayName: altDat[1],
+        gameName: altDat[2],
+    });
+    writeAlts(alts);
+}
+
+ipcMain.on("removeAlt", (event, args) => {
+    removeAlt(args.base, args.alt);
+    win.webContents.send("from_removeAlt");
+});
+
+function removeAlt(base, alt) {
+    console.log("Removing alt: " + base + " : " + alt);
+    let alts = getAlts();
+    let removed = [];
+    alts = alts.filter((i) => {
+        if ((i.base == base && i.alt == alt)) {
+            removed.push(i.alt);
+            return false;
+        }
+        return true;
+    });
+    writeAlts(alts);
+    let characters = getCharacters();
+    removed.forEach((add) => {
+        if (characters.findIndex(fighter => fighter.name == add) == -1) {
+            appendCharacter(add);
+        }
+    });
+}
+
+function removeAlts(characterName) {
+    console.log("Removing " + characterName + " from alts.");
+    let alts = getAlts();
+    let removed = [];
+    alts = alts.filter((i) => {
+        if (!(i.base == characterName || i.alt == characterName)) {
+            return true;
+        } else if (i.base == characterName) {
+            removed.push(i.alt);
+        }
+        return false;
+    });
+    writeAlts(alts);
+    let characters = getCharacters();
+    removed.forEach((add) => {
+        if (characters.findIndex(fighter => fighter.name == add) == -1) {
+            appendCharacter(add);
+        }
+    });
+}
+
 // Character Selection Screen
 ipcMain.on("getPages", (event, args) => {
     let pages = [];
@@ -827,6 +812,205 @@ function writeCSS(css, page) {
     cssFile += " ";
     console.log(cssFile + "EOF");
     fs.writeFileSync(path.join(cmcDir, "data", page), cssFile, "ascii");
+}
+
+//Stages
+ipcMain.on("getStageList", (event, args) => {
+    altsToFighters();
+    win.webContents.send("from_getStageList", {
+        stages: getStages(),
+        cmcDir: cmcDir,
+        random: [],
+        // random: getRandomStages(),
+    });
+});
+
+function getStages() {
+    let stages = [];
+    let stagesTxt = fs.readFileSync(path.join(cmcDir, "data", "stages.txt"), "ascii").split(/\r?\n/);
+    stages.shift();
+    for(let stage = 0; stage < (stagesTxt.length / 4); stage++) {
+        stages[stage] = {
+            name: stagesTxt[stage*4 + 1],
+            displayName: stagesTxt[stage*4 + 2],
+            displaySource: stagesTxt[stage*4 + 3],
+            series: stagesTxt[stage*4 + 4],
+        };
+    }
+    stages.pop();
+    return stages;
+}
+
+function writeStages(stages) {
+    let output = (stages.length) + "\r\n";
+    stages.forEach((stage) => {
+        output += stage.name + "\r\n";
+        output += stage.displayName + "\r\n";
+        output += stage.displaySource + "\r\n";
+        output += stage.series + "\r\n";
+    });
+    fs.writeFileSync(path.join(cmcDir, "data", "stages.txt"), output, "ascii");
+}
+
+function appendStage(add) {
+    let stages = getStages();
+    stages.push({
+        name: add,
+        displayName: "",
+        displaySource: "",
+        series: "",
+    });
+    writeStages(stages);
+}
+
+function dropCharacter(drop) {
+    let characters = getCharacters();
+    characters.filter((character) => {
+       return character.name != drop;
+    });
+    let output = (characters.length + 1) + "\r\n";
+    characters.forEach((character) => {
+        output += character.name + "\r\n";
+    });
+    fs.writeFileSync(path.join(cmcDir, "data", "fighters.txt"), output, "ascii");
+    toggleRandomCharacter(true, drop);
+    removeAlts(drop);
+}
+
+ipcMain.on("installStageDir", (event, args) => {
+    dialog.showOpenDialog(win, {
+        properties: ["openDirectory"]
+    }).then(dir => {
+        if (dir.canceled === true) {
+            return;
+        }
+        installStage(dir.filePaths[0], args);
+    });
+});
+
+ipcMain.on("installStageArch", (event, args) => {
+    dialog.showOpenDialog(win, {
+        properties: ["openFile"]
+    }).then(async (file) => {
+        if (file.canceled === true) {
+            return;
+        }
+        await installStageArch(file.filePaths[0]);
+        // fs.removeSync(path.join(__dirname, "_temp"));
+    });
+});
+
+async function installStageArch(filePath, args) {
+    let modName = path.parse(filePath).name;
+    let dir = path.join(__dirname, "_temp", modName);
+    fs.ensureDirSync(dir);
+    console.log(path.parse(filePath).ext.toLowerCase());
+    switch (path.parse(filePath).ext.toLowerCase()) {
+        case ".zip":
+            await extract(filePath, {
+                dir: dir,
+                defaultDirMode: 0o777,
+                defaultFileMode: 0o777,
+            });
+            break;
+        case ".rar"://TODO: Error handling
+            let buf = Uint8Array.from(fs.readFileSync(filePath)).buffer;
+            let extractor = await unrar.createExtractorFromData({ data: buf });
+            const extracted = extractor.extract();
+            const files = [...extracted.files];
+            files.forEach(fileE => {// Make All Folders First
+                if (fileE.fileHeader.flags.directory) {
+                    fs.ensureDirSync(path.join(dir, fileE.fileHeader.name));
+                }
+            });
+            files.forEach(fileE => {// Make All Folders First
+                if (!fileE.fileHeader.flags.directory) {
+                    fs.writeFileSync(path.join(dir, fileE.fileHeader.name), Buffer.from(fileE.extraction));
+                }
+            });
+            break;
+        case ".7z":
+        default:
+            return;
+            break;
+    }
+    await installStage(dir, args);
+    fs.removeSync(path.join(__dirname, "_temp"));
+}
+
+function installStage(dir, filteredInstall) {
+    while (!fs.existsSync(path.join(dir, "stage"))) {
+        console.log("Stage directory not found in " + dir);
+        let contents = fs.readdirSync(dir);
+        if (contents.length = 1) {
+            dir = path.join(dir, contents[0]);
+            console.log(dir);
+        } else {
+            win.webContents.send("throwError", "Stage directory not found in " + dir);
+            return;
+        }
+    }
+    console.log(fs.readdirSync(dir));
+    let stageName = fs.readdirSync(path.join(dir, "stage")).filter((file) => { return file.endsWith(".bin") || !file.includes(".") })[0].split(".")[0];
+    for (let stage of getStages()) {
+        if (stage.name == stageName) {
+            win.webContents.send("throwError", "The selected stage is already installed.");
+            return;
+        }
+    };
+
+    // if (filteredInstall) {
+    //     filterStageFiles(stageName).forEach((file) => {
+    //         let subDir = path.parse(file).dir;
+    //         if (file.includes("*")) {
+    //             let start = path.parse(file).base.split("*")[0].replace(subDir, "");
+    //             let end = path.parse(file).base.split("*")[1];
+    //             if (fs.existsSync(path.join(dir, subDir))) {
+    //                 let contents = fs.readdirSync(path.join(dir, subDir)).filter((i) => {
+    //                     return i.startsWith(start) && i.endsWith(end);
+    //                 });
+    //                 contents.forEach((found) => {
+    //                     console.log("Copying: " + path.join(dir, subDir, found));
+    //                     fs.copySync(path.join(dir, subDir, found), path.join(cmcDir, subDir, found), {overwrite: true});
+    //                 });
+    //             }
+    //         } else {
+    //             if (fs.existsSync(path.join(dir, file))) {
+    //                 console.log("Copying: " + path.join(dir, file));
+    //                 fs.copySync(path.join(dir, file), path.join(cmcDir, file), {overwrite: true});
+    //             }
+    //         }
+    //     });
+    // } else {
+    //     fs.copySync(dir, path.join(cmcDir), {overwrite: true});
+    // }
+
+    let txts = fs.readdirSync(dir).filter((file) => path.parse(file).ext.toLowerCase() == ".txt");
+    console.log(txts);
+    if (txts.length == 1) {
+        if (fs.readFileSync(path.join(dir, txts[0]), "ascii").split(/\r?\n/).length == 4) {
+            console.log("here");
+        }
+    }
+
+    // appendStage(stageName);
+    win.webContents.send("from_installStage");
+}
+
+function filterStageFiles(stageName, ignoreSeries = false) {
+    let files = [];
+    STAGE_FILES.forEach((file) => {
+        let fixedFiles = [];
+        let replaced = file.replace("<stage>", stageName);
+        if(!ignoreSeries) {
+            replaced = replaced.replace("<series>", characterDat[3]);
+        }
+        fixedFiles.push(replaced);
+        fixedFiles.forEach((fixed) => {
+            files.push(fixed);
+        });
+    });
+    return files;
 }
 
 // Misc

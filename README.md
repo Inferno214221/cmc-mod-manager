@@ -57,6 +57,7 @@ gfx/portrait_new/<fighter>.png,
 gfx/portrait_new/<fighter>_<palette>.png,
 gfx/seriesicon/<series>.png,
 gfx/stock/<fighter>.png,
+palettes/<fighter>,
 music/versus/<fighter>_*.<audio>,
 music/victory/<series>.<audio>,
 music/victory/individual/<fighter>.<audio>,
@@ -80,8 +81,6 @@ This is my first time using Electron and therefore the code is a bit of a mess s
 - [x] Run CMC+
 - [ ] Remove unessecary files
 - [x] Make fighters.txt on export
-- [x] Alerts
-- [x] Errors
 ### Character Manager
 - [x] Install characters from a folder (very picky)
 - [x] Install characters from an archive (extract, install folder, delete)
@@ -91,6 +90,7 @@ This is my first time using Electron and therefore the code is a bit of a mess s
 - [x] Option to remove character from random list
 - [x] Installed v7 characters can be converted to v8
 - [x] Errors
+- [x] Alt Managment
 - [ ] Ignore exsisting series icons
 ### Character Selection Screen (Priority: 1)
 - [x] Display the CSS
@@ -108,19 +108,14 @@ This is my first time using Electron and therefore the code is a bit of a mess s
 - [x] Switch CSS Pages
 - [ ] Add CSS Pages
 - [ ] Edit Game Settings to change displayed list
-- [x] Alerts
-- [ ] Errors
-### Alts (Priority: 2)
-- [ ] IDFK how I should deal with alts
-- [ ] Alerts
-- [ ] Errors
-### Stage Manager (Priority: 3)
+### Stage Manager (Priority: 2)
 - [ ] Install stages from a folder
 - [ ] Install stages from a zip (extract, install folder, delete)
-- [ ] Manage stage merge priority
-- [ ] Alerts
-- [ ] Errors
-### Stage Selection Screen (Priority: 3)
+- [ ] List stages
+- [ ] Extract stages
+- [ ] Remove stages
+- [ ] Option to remove character from random list
+### Stage Selection Screen (Priority: 2)
 - [ ] Display the SSS w/ pages
 - [ ] Display unincluded stages
 - [ ] Add stages to SSS
@@ -132,12 +127,7 @@ This is my first time using Electron and therefore the code is a bit of a mess s
 - [ ] Add pages
 - [ ] Alerts
 - [ ] Errors
-### Items (Priority: 5)
-- [ ] Install item mods - Not many mods & idk if it works with CMC+ v7
-- [ ] Remove item mods
-- [ ] Alerts
-- [ ] Errors
-### Miscellanious Mods (Priority: 4)
+### Miscellanious Mods (Priority: 3)
 - [x] Add option to import other types of mods e.g. ui changes / music
 - [x] RAR support - no errors
 - [ ] Remove misc mods by tracking file changes

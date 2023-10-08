@@ -57,8 +57,36 @@
         </ul>
     </nav>
     <section>
-        E
+        <fieldset>
+            <legend>Installation / Extraction</legend>
+            <button type="button" onclick="installStageDir()">Install Stage From Directory</button>
+            <button type="button" onclick="installStageArch()">Install Stage From Archive</button>
+            <button type="button" onclick="openDir('extracted')">Open Extracted Directory</button>
+            <button type="button" onclick="removeAllStage()">Remove All Stages</button>
+            <br/>
+            <input type="checkbox" id="filteredInstall" name="filteredInstall" checked>
+            <label for="filteredInstall">Install Only Necessary Files</label>
+        </fieldset>
+        <fieldset>
+            <legend>Installed Stages</legend>
+            <span>Sorting:</span>
+            <select id="sortingType" onfocus="inputFocused('sortingType')" onblur="inputBlurred('sortingType')" onchange="resort()">
+                <option value="number">Internal Number</option>
+                <option value="series">Franchise</option>
+                <option value="sortName">Alphabetical</option>
+            </select>
+            <input type="checkbox" id="reverseSort" name="reverseSort" onchange="resort()">
+            <label for="reverseSort">Reverse</label>
+            <div id="stageScrollable">
+                <table id="stageTable">
+                </table>
+            </div>
+        </fieldset>
     </section>
+    <script src="../js/global.js">
+    </script>
+    <script src="../js/stageManager.js">
+    </script>
 </body>
 
 </html>
