@@ -522,8 +522,6 @@ ipcMain.on("extractCharacter", (event, args) => {
             }
         }
     });
-    dropCharacter(characterName);
-
     win.webContents.send("from_extractCharacter");
 });
 
