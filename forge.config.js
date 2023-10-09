@@ -38,10 +38,14 @@ module.exports = {
         },
     ],
     hooks: {
-        postPackage: async (forgeConfig, options) => {
+        postPackage: async (config, packageResult) => {
             const fs = require("fs-extra");
             const path = require("path");
-            fs.removeSync(path.join(options.outputPaths[0], "resources", "app", "gb"));
+            fs.removeSync(path.join(packageResult.outputPaths[0], "resources", "app", "gb"));
+            let dataFile = path.join(packageResult.outputPaths[0], "resources", "app", "program", "data.json");
+            let data = require(dataFile);
+            data.platform = packageResult.platform + "-" + packageResult.arch;
+            fs.writeFileSync(dataFile, JSON.stringify(data, null, 2), "utf-8");
         },
     },
 };
