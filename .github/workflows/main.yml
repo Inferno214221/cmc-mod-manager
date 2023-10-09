@@ -74,15 +74,23 @@ jobs:
       
       - name: Install Node Dependencies
         run: npm i
-      - name: Electron Forge Build
+      - name: Electron Forge Deb Build
         run: npm run make -- --platform linux --targets @electron-forge/maker-deb
+      - name: Move Output Zip
+        run: mv ./out/cmcmodmanager-linux-x64/ ./cmcmodmanager-linux-x64/
+      - name: Move Output Deb
+        run: mv ./out/make/deb/x64/cmc-mod-manager_1.0.0_amd64.deb ./cmc-mod-manager-linux.deb
         
       - name: Zip Output
         uses: thedoctor0/zip-release@0.7.1
         with:
           type: 'zip'
           filename: 'cmc-mod-manager-linux.zip'
-          path: './out/cmcmodmanager-linux-x64'
+          path: './cmcmodmanager-linux-x64'
+
+      - name: Attempt Electron Forge RPM Build
+        run: npm run make -- --platform linux --targets @electron-forge/maker-rpm
+      - run: ls ./out/make/rpm/x64
           
       - name: Retrieve Windows Build Output
         uses: actions/download-artifact@v3
@@ -109,7 +117,7 @@ jobs:
       - name: Make A Release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "./cmc-mod-manager-windows.zip,./cmc-mod-manager-windows-32.zip,cmc-mod-manager-linux.zip"
+          artifacts: "./cmc-mod-manager-windows.zip,./cmc-mod-manager-windows-32.zip,./cmc-mod-manager-linux.zip,./cmc-mod-manager-linux.deb"
           tag: auto
           prerelease: true
           makeLatest: false

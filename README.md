@@ -8,7 +8,7 @@ This project is a WIP mod manager for Super Smash Brothers Crusade CMC+. It allo
 ## Why
 CMC+ has good modding support and modding the game currently isn't that hard why use a mod manager? The main reason I developed this mod manager is for the CSS (Character Selection Screen) editor. Although it is certainly possible, adding characters to the CSS by hand annoyed me because of the need to find character numbers and names (if you are removing unknown characters). CMC Mod Manager allows you to add, swap or remove characters to/from the CSS (and soon the SSS) with drag and drop. Additionally it allows the installation of CMC+ v7 mods for CMC+ v8 (with varying success).
 
-![CSS Editor](./CSS.png)
+![CSS Editor](./gb/css2.png)
 
 ## Installation
 Go [here](https://github.com/Inferno214221/CMCModManager/releases/latest) to install the latest release of CMC Mod Manager for your operating system.
