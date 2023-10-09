@@ -130,5 +130,4 @@ dist
 .pnp.*
 
 # Files used for testing
-/gb/*
 /extracted/*
