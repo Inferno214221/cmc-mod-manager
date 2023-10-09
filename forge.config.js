@@ -3,7 +3,7 @@ module.exports = {
     rebuildConfig: {},
     makers: [
         {
-            name: '@electron-forge/maker-squirrel',
+            name: "@electron-forge/maker-squirrel",
             config: {
                 authors: "Inferno214221",
                 name: "cmc-mod-manager",
@@ -11,27 +11,29 @@ module.exports = {
             },
         },
         {
-            name: '@electron-forge/maker-zip',
-            platforms: ['darwin'],
+            name: "@electron-forge/maker-zip",
+            platforms: ["darwin","linux","win32"],
         },
         {
-            name: '@electron-forge/maker-deb',
+            name: "@electron-forge/maker-deb",
             config: {
                 name: "cmc-mod-manager",
                 description: "A Mod Manager For SSBC CMC+ v8 Made With Electron",
                 license: "GNU General Public License v3.0",
                 categories: ["Utility"],
                 icon: "./gb/icon.png",
+                version: "2.1.1",
             },
         },
         {
-            name: '@electron-forge/maker-rpm',
+            name: "@electron-forge/maker-rpm",
             config: {
                 name: "cmc-mod-manager",
                 description: "A Mod Manager For SSBC CMC+ v8 Made With Electron",
                 license: "GNU General Public License v3.0",
                 categories: ["Utility"],
                 icon: "./gb/icon.png",
+                version: "2.1.1",
             },
         },
     ],

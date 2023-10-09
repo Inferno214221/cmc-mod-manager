@@ -1,6 +1,6 @@
 {
-  "name": "cmcmodmanager",
-  "version": "1.0.0",
+  "name": "cmc-mod-manager",
+  "version": "2.1.1",
   "description": "A WIP Mod Manager For SSBC CMC+ v7 Made With Electron",
   "main": "main.js",
   "scripts": {
@@ -10,7 +10,7 @@
     "make": "electron-forge make"
   },
   "author": "",
-  "license": "ISC",
+  "license": "GPL-3.0",
   "devDependencies": {
     "@electron-forge/cli": "^6.1.1",
     "@electron-forge/maker-deb": "^6.1.1",

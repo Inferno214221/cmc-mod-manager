@@ -6,7 +6,7 @@ const fs = require("fs-extra");
 const childProcess = require("child_process");
 require('array.prototype.move');
 const extract = require('extract-zip');
-const strftime = require('strftime');
+// const strftime = require('strftime');
 const unrar = require("node-unrar-js");
 var win;
 
