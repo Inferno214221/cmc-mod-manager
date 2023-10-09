@@ -87,6 +87,7 @@ const createWindow = () => {
     });
     
     win.loadFile('index.html');
+    checkUpdates();
 }
 
 if (!app.requestSingleInstanceLock()) {
@@ -102,6 +103,74 @@ if (!app.requestSingleInstanceLock()) {
         }
         window.focus();
     }
+}
+
+function checkUpdates() {
+    https.get("https://api.github.com/repos/Inferno214221/CMCModManager/releases/latest", {
+        headers: {
+            "Accept": "application/vnd.github.v3+json",
+            "User-Agent": "CMC-Mod-Manager",
+        }
+    }, (res) => {
+        res.setEncoding('utf8');
+        let result = "";
+        res.on('data', (data) => {
+            result += data;
+        });
+        res.on('end', () => {
+            result = JSON.parse(result);
+            if (result.tag_name != "v" + app.getVersion()) {
+                dialog.showMessageBox({
+                    message: "Update required: This update will be installed automatically, \
+please do not close the program. When finished, the program will close and need to be \
+launched again manually.",
+                });
+                console.log("Update required.");
+                downloadUpdate(result.tag_name);
+                // downloadUpdate("auto"); //FOR TESTS
+            } else {
+                console.log("No update required.");
+            }
+        });
+    }).on("error", function(error) {
+        console.log(error);
+        return;
+    });
+}
+
+function downloadUpdate(tag) {
+    console.log("Downloading update.");
+    let request = require("request");
+    let platform = readJSON(path.join(__dirname, "program", "data.json")).platform;
+    let filePath = path.join(__dirname, "update.zip");
+    request("https://github.com/Inferno214221/CMCModManager/releases/download/"
+    + tag + "/cmc-mod-manager-" + platform + ".zip")
+    .pipe(fs.createWriteStream(filePath))
+    .on("close", function () {
+        console.log("Downloaded sucessfully.");
+        fs.ensureDirSync(path.join(__dirname, "update"));
+        fs.emptyDirSync(path.join(__dirname, "update"));
+        extract(filePath, {
+            dir: path.join(__dirname, "update"),
+        }).then(() => {
+            console.log("Extracted.");
+            installUpdate(platform);
+        });
+    });
+}
+
+function installUpdate(platform) {
+    console.log("Installing update, please don't close the program.");
+    if (platform == "linux-x64") {
+        fs.copySync(path.join(__dirname, "update", "cmc-mod-manager-linux-x64", "resources", "app"), path.join(__dirname), {overwrite: true});
+        //), path.join(__dirname, "..", "..")
+    } else {
+        fs.copySync(path.join(__dirname, "update", "resources", "app"), path.join(__dirname), {overwrite: true});
+    }
+    fs.removeSync(path.join(__dirname, "update.zip"));
+    fs.removeSync(path.join(__dirname, "update"));
+    console.log("Update installed.");
+    app.quit();
 }
 
 function readJSON(file) {

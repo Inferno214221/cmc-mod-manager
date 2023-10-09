@@ -72,10 +72,6 @@ jobs:
         run: mv ./out/make/deb/x64/cmc-mod-manager_2.1.1_amd64.deb ./cmc-mod-manager-linux.deb
       - name: Move Output Rpm
         run: mv ./out/make/rpm/x64/cmc-mod-manager-2.1.1-1.x86_64.rpm ./cmc-mod-manager-linux.rpm
-
-      - name: Attempt Electron Forge RPM Build
-        run: npm run make -- --platform linux --targets @electron-forge/maker-rpm
-      - run: ls ./out/make/rpm/x64
           
       - name: Retrieve Windows Build Output
         uses: actions/download-artifact@v3
