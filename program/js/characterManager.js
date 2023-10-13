@@ -66,7 +66,7 @@ function installCharacterArch() {
 }
 
 this.api.receive("from_installCharacter", (data) => {
-    alert("Character installed successfully.");
+    alert("Character " + (data ? "updated" : "installed") + " successfully.");
     getCharacterList();
 });
 

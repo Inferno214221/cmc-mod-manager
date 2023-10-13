@@ -21,8 +21,6 @@ https://inferno214221.com/dev/cmc-mod-manager/
 - [x] Installed v7 characters can be converted to v8
 - [x] Errors
 - [x] Alt Managment
-- [ ] Update files of existing characters when trying to install
-- [ ] Ignore exsisting series icons
 ## Character Selection Screen (Priority: 1)
 - [x] Display the CSS
 - [x] Display unincluded characters (not alts)
@@ -49,7 +47,7 @@ https://inferno214221.com/dev/cmc-mod-manager/
 - [ ] List stages
 - [ ] Extract stages
 - [ ] Remove stages
-- [ ] Option to remove character from random list
+- [ ] Option to remove stages from random list
 ## Stage Selection Screen (Priority: 2)
 - [ ] Display the SSS w/ pages
 - [ ] Display unincluded stages

@@ -452,12 +452,12 @@ function installCharacter(dir, filteredInstall) {
         win.webContents.send("throwError", "The character's dat file is not in the ./data/dats/ directory.");
         return;
     }
-    for (let character of getCharacters()) {
-        if (character.name == characterName) {
-            win.webContents.send("throwError", "The selected character is already installed.");
-            return;
-        }
-    };
+    // for (let character of getCharacters()) {
+    //     if (character.name == characterName) {
+    //         win.webContents.send("throwError", "The selected character is already installed.");
+    //         return;
+    //     }
+    // }
     let characterDat = fs.readFileSync(path.join(dir, "data", "dats", characterName + ".dat"), "ascii").split(/\r?\n/);
 
     let datMod = !characterDat[4].startsWith("-");
@@ -488,15 +488,13 @@ function installCharacter(dir, filteredInstall) {
             } else {
                 if (fs.existsSync(path.join(dir, file))) {
                     console.log("Copying: " + path.join(dir, file));
-                    fs.copySync(path.join(dir, file), path.join(cmcDir, file), {overwrite: true});
+                    fs.copySync(path.join(dir, file), path.join(cmcDir, file), {overwrite: !file.startsWith("gfx/seriesicon/")});
                 }
             }
         });
     } else {
         fs.copySync(dir, path.join(cmcDir), {overwrite: true});
     }
-
-    appendCharacter(characterName);
 
     if (datMod) {
         fs.writeFileSync(
@@ -506,7 +504,14 @@ function installCharacter(dir, filteredInstall) {
         );
     }
 
-    win.webContents.send("from_installCharacter");
+    if (getCharacters().filter((character) => character.name == characterName).length == 0) {
+        appendCharacter(characterName);
+        console.log("Character installed.");
+        win.webContents.send("from_installCharacter", false);
+    } else {
+        console.log("Character updated.");
+        win.webContents.send("from_installCharacter", true);
+    }
 }
 
 function deleteCharCSS(cssNumber) {
