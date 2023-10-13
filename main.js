@@ -69,6 +69,7 @@ const STAGE_FILES = [
 ];
 
 var cmcDir = readJSON(path.join(__dirname, "program", "data.json")).dir;
+var sourceDir;
 var version = getGameVersion(cmcDir);
 var foundUri = process.argv.find((arg) => arg.startsWith("cmcmm://"));
 handleUri();
@@ -587,23 +588,28 @@ function removeCharacter(number) {
 
 ipcMain.on("extractCharacter", (event, args) => {
     args -= 1;
-    let characters = getCharacters();
-    let characterName = characters[args].name;
+    extractCharacter(args);
+    win.webContents.send("from_extractCharacter");
+});
+
+function extractCharacter(characterNumber, dir = cmcDir) {
+    let characters = getCharacters(dir);
+    let characterName = characters[characterNumber].name;
     let similarName = [];
     characters.forEach((character) => {
         if (character.name != characterName && character.name.startsWith(characterName)) {
             similarName.push(character.name);
         }
     });
-    let characterDat = fs.readFileSync(path.join(cmcDir, "data", "dats", characterName + ".dat"), "ascii").split(/\r?\n/);
-    filterCharacterFiles(characters[args].name, characterDat).forEach((file) => {
+    let characterDat = fs.readFileSync(path.join(dir, "data", "dats", characterName + ".dat"), "ascii").split(/\r?\n/);
+    filterCharacterFiles(characters[characterNumber].name, characterDat).forEach((file) => {
         let subDir = path.parse(file).dir;
         fs.ensureDirSync(path.join(__dirname, "extracted", characterName, subDir));
         if (file.includes("*")) {
             let start = path.parse(file).base.split("*")[0].replace(subDir, "");
             let end = path.parse(file).base.split("*")[1];
-            if (fs.existsSync(path.join(cmcDir, subDir))) {
-                let contents = fs.readdirSync(path.join(cmcDir, subDir)).filter((i) => {
+            if (fs.existsSync(path.join(dir, subDir))) {
+                let contents = fs.readdirSync(path.join(dir, subDir)).filter((i) => {
                     similarName.forEach((name) => {
                         if (i.startsWith(name)) {
                             console.log(i + " was ignored because it belongs to " + name);
@@ -613,19 +619,19 @@ ipcMain.on("extractCharacter", (event, args) => {
                     return i.startsWith(start) && i.endsWith(end);
                 });
                 contents.forEach((found) => {
-                    console.log("Extracting: " + path.join(cmcDir, subDir, found));
-                    fs.copySync(path.join(cmcDir, subDir, found), path.join(__dirname, "extracted", characterName, subDir, found), {overwrite: true});
+                    console.log("Extracting: " + path.join(dir, subDir, found));
+                    fs.copySync(path.join(dir, subDir, found), path.join(__dirname, "extracted", characterName, subDir, found), {overwrite: true});
                 });
             }
         } else {
-            if (fs.existsSync(path.join(cmcDir, file))) {
-                console.log("Extracting: " + path.join(cmcDir, file));
-                fs.copySync(path.join(cmcDir, file), path.join(__dirname, "extracted", characterName, file), {overwrite: true});
+            if (fs.existsSync(path.join(dir, file))) {
+                console.log("Extracting: " + path.join(dir, file));
+                fs.copySync(path.join(dir, file), path.join(__dirname, "extracted", characterName, file), {overwrite: true});
             }
         }
     });
-    win.webContents.send("from_extractCharacter");
-});
+    return path.join(__dirname, "extracted", characterName);
+}
 
 function filterCharacterFiles(characterName, characterDat = null, ignoreSeries = false) {
     let palettes;
@@ -714,16 +720,16 @@ ipcMain.on("removeAllChars", (event, args) => {
     win.webContents.send("from_removeAllChars");
 });
 
-function getCharacters() {
+function getCharacters(dir = cmcDir) {
     let fighters = [];
-    let fightersTxt = fs.readFileSync(path.join(cmcDir, "data", "fighters.txt"), "ascii").split(/\r?\n/);
+    let fightersTxt = fs.readFileSync(path.join(dir, "data", "fighters.txt"), "ascii").split(/\r?\n/);
     fightersTxt.shift();
     fightersTxt.forEach((fighter) => {
-        if (fs.existsSync(path.join(cmcDir, "data", "dats", fighter + ".dat"))) {
-            let fighterDat = fs.readFileSync(path.join(cmcDir, "data", "dats", fighter + ".dat"), "ascii").split(/\r?\n/);
+        if (fs.existsSync(path.join(dir, "data", "dats", fighter + ".dat"))) {
+            let fighterDat = fs.readFileSync(path.join(dir, "data", "dats", fighter + ".dat"), "ascii").split(/\r?\n/);
             fighters.push({
                 name: fighter,
-                displayName: fighterDat[0],
+                displayName: fighterDat[1],
                 series: fighterDat[3].toLowerCase(),
             });
         } else {
@@ -757,9 +763,10 @@ function dropCharacter(drop) {
     removeAlts(drop);
 }
 
-function getAlts() {
+function getAlts(otherDir = null) {
+    let dir = otherDir || cmcDir;
     let alts = [];
-    let altsTxt = fs.readFileSync(path.join(cmcDir, "data", "alts.txt"), "ascii").split(/\r?\n/);
+    let altsTxt = fs.readFileSync(path.join(dir, "data", "alts.txt"), "ascii").split(/\r?\n/);
     alts.shift();
     for(let alt = 0; alt < (altsTxt.length / 5); alt++) {
         alts[alt] = {
@@ -821,7 +828,7 @@ function addAlt(base, alt) {
         base: base,
         altNum: altNum,
         alt: alt,
-        displayName: altDat[0],
+        displayName: altDat[1],
         gameName: altDat[2],
     });
     writeAlts(alts);
@@ -1118,6 +1125,68 @@ function filterStageFiles(stageName, ignoreSeries = false) {
     });
     return files;
 }
+
+// Port Characters
+ipcMain.on("checkSourceDir", (event, args) => {
+    let dir = sourceDir;
+    if (sourceDir == undefined || sourceDir == "" || version == null) {
+        dir = "None Selected";
+    }
+    win.webContents.send("from_checkSourceDir", dir);
+});
+
+ipcMain.on("selectSourceDir", (event, args) => {
+    dialog.showOpenDialog(win, {
+        properties: ["openDirectory"]
+    }).then(dir => {
+        if (dir.canceled === true) {
+            return;
+        }
+        if (!fs.existsSync(path.join(dir.filePaths[0], "fighter"))) {
+            win.webContents.send("throwError", "No fighter directory found within the selected directory.");
+            return;
+        }
+        getAllFiles(dir.filePaths[0]).forEach((file) => {
+            fs.chmodSync(file, 0o777);
+        });
+        sourceDir = path.join(dir.filePaths[0]);
+
+        win.webContents.send("from_selectSourceDir", sourceDir);
+    });
+});
+
+ipcMain.on("openSourceDir", (event, args) => {
+    shell.openPath(sourceDir);
+});
+
+ipcMain.on("getCharacterListSource", (event, args) => {
+    console.log(sourceDir);
+    let characters = getCharacters(sourceDir);
+    getAlts(sourceDir).forEach((character) => {
+        let characterSeries = "";
+        if (fs.existsSync(path.join(sourceDir, "data", "dats", character.alt + ".dat"))) {
+            characterSeries = fs.readFileSync(path.join(sourceDir, "data", "dats", character.alt + ".dat"), "ascii").split(/\r?\n/)[3].toLowerCase();
+        }
+        characters.push({
+            name: character.alt,
+            displayName: character.displayName,
+            series: characterSeries,
+        });
+    });
+    win.webContents.send("from_getCharacterListSource", {
+        characters: characters,
+        sourceDir: sourceDir,
+    });
+});
+
+ipcMain.on("extractCharacterSource", (event, args) => {
+    args -= 1;
+    win.webContents.send("from_extractCharacterSource", extractCharacter(args, sourceDir));
+});
+
+ipcMain.on("installCharacterSource", (event, args) => {
+    installCharacter(args.dir, args.filtered);
+});
 
 // Misc
 ipcMain.on("installModDir", (event, args) => {

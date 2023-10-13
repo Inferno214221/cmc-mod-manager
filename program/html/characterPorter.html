@@ -3,9 +3,9 @@
 
 <head>
     <meta charset="utf-8">
-    <title>CMC Mod Manager | Character Manager</title>
+    <title>CMC Mod Manager | Port Characters</title>
 	<link rel="icon" href="">
-    <link rel="stylesheet" type="text/css" href="../css/characterManager.css">
+    <link rel="stylesheet" type="text/css" href="../css/characterPorter.css">
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Ubuntu">
 </head>
 
@@ -21,7 +21,7 @@
             </li>
             <li>
                 <a href="./characterManager.html" class="tab">
-                    <div class="activeTab">
+                    <div class="inactiveTab">
                         Characters
                     </div>
                 </a>
@@ -35,7 +35,7 @@
             </li>
             <li>
                 <a href="./characterPorter.html" class="tab">
-                    <div class="inactiveTab">
+                    <div class="activeTab">
                         Port Characters
                     </div>
                 </a>
@@ -65,17 +65,16 @@
     </nav>
     <section>
         <fieldset>
-            <legend>Installation / Extraction</legend>
-            <button type="button" onclick="installCharacterDir()">Install Character From Directory</button>
-            <button type="button" onclick="installCharacterArch()">Install Character From Archive</button>
-            <button type="button" onclick="openDir('extracted')">Open Extracted Directory</button>
-            <button type="button" onclick="removeAllChars()">Remove All Characters</button>
+            <legend>Source Selection</legend>
+            <span id="sourceSpan">Source Directory: None Selected</span><br />
+            <button type="button" onclick="selectSourceDir()">Select Source Directory</button>
+            <button type="button" onclick="openSourceDir()">Open Source Directory</button>
             <br/>
             <input type="checkbox" id="filteredInstall" name="filteredInstall" checked>
             <label for="filteredInstall">Install Only Necessary Files</label>
         </fieldset>
         <fieldset>
-            <legend>Installed Characters</legend>
+            <legend>Found Characters</legend>
             <span>Sorting:</span>
             <select id="sortingType" onfocus="inputFocused('sortingType')" onblur="inputBlurred('sortingType')" onchange="resort()">
                 <option value="number">Internal Number</option>
@@ -92,7 +91,7 @@
     </section>
     <script src="../js/global.js">
     </script>
-    <script src="../js/characterManager.js">
+    <script src="../js/characterPorter.js">
     </script>
 </body>
 
