@@ -6,7 +6,6 @@ const fs = require("fs-extra");
 const childProcess = require("child_process");
 require('array.prototype.move');
 const extract = require('extract-zip');
-// const strftime = require('strftime');
 const unrar = require("node-unrar-js");
 var win;
 
@@ -106,20 +105,39 @@ if (!app.requestSingleInstanceLock()) {
 }
 
 function checkUpdates() {
-    https.get("https://api.github.com/repos/Inferno214221/CMCModManager/releases/latest", {
+    https.get("https://api.github.com/repos/Inferno214221/cmc-mod-manager/releases/latest", {
         headers: {
             "Accept": "application/vnd.github.v3+json",
             "User-Agent": "CMC-Mod-Manager",
         }
     }, (res) => {
-        res.setEncoding('utf8');
+        res.setEncoding("utf8");
         let result = "";
-        res.on('data', (data) => {
+        res.on("data", (data) => {
             result += data;
         });
-        res.on('end', () => {
+        res.on("end", () => {
             result = JSON.parse(result);
-            if (result.tag_name != "v" + app.getVersion()) {
+            let latest = result.tag_name.replace("v", "").split(".");
+            let current = app.getVersion().split(".");
+            // if (result.tag_name != "v" + app.getVersion()) {
+            console.log(latest, current);
+            if (
+                result != undefined && (
+                    (
+                        parseInt(latest[0]) > parseInt(current[0])
+                    ) ||
+                    (
+                        parseInt(latest[0]) == parseInt(current[0]) &&
+                        parseInt(latest[1]) > parseInt(current[1])
+                    ) ||
+                    (
+                        parseInt(latest[0]) == parseInt(current[0]) &&
+                        parseInt(latest[1]) == parseInt(current[1]) &&
+                        parseInt(latest[2]) > parseInt(current[2])
+                    )
+                )
+            ) {
                 dialog.showMessageBox({
                     message: "Update required: This update will be installed automatically, \
 please do not close the program. When finished, the program will close and need to be \
@@ -143,7 +161,7 @@ function downloadUpdate(tag) {
     let request = require("request");
     let platform = readJSON(path.join(__dirname, "program", "data.json")).platform;
     let filePath = path.join(__dirname, "update.zip");
-    request("https://github.com/Inferno214221/CMCModManager/releases/download/"
+    request("https://github.com/Inferno214221/cmc-mod-manager/releases/download/"
     + tag + "/cmc-mod-manager-" + platform + ".zip")
     .pipe(fs.createWriteStream(filePath))
     .on("close", function () {
@@ -225,6 +243,16 @@ const getAllFiles = function (dirPath, arrayOfFiles) {
     })
 
     return arrayOfFiles;
+}
+
+function getAllIndexesWhere(arr, check) {
+    var indexes = [], i;
+    for(i = 0; i < arr.length; i++) {
+        if (check(arr[i])) {
+            indexes.push(i);
+        }
+    }
+    return indexes;
 }
 
 function handleUri() {
@@ -432,7 +460,7 @@ function installCharacter(dir, filteredInstall) {
     };
     let characterDat = fs.readFileSync(path.join(dir, "data", "dats", characterName + ".dat"), "ascii").split(/\r?\n/);
 
-    let datMod = !characterDat[4].includes("---Classic Home Stages Below---");
+    let datMod = !characterDat[4].startsWith("-");
     let characterDatTxt = "";
     if (datMod) {
         characterDat.splice(4, 1, "---Classic Home Stages Below---", "1", "battlefield", "---Random Datas---", "0", "---Palettes Number---");
@@ -597,10 +625,16 @@ ipcMain.on("extractCharacter", (event, args) => {
 function filterCharacterFiles(characterName, characterDat = null, ignoreSeries = false) {
     let palettes;
     if (characterDat == null) {
-        palettes = 20;
+        palettes = 30;
     } else {
-        palettes = parseInt(characterDat[11]) - 1;
+        let filtered = getAllIndexesWhere(characterDat, (line) => {
+            return line.startsWith("-");
+        });
+        if (filtered[2] != undefined) {
+            palettes = parseInt(characterDat[parseInt(filtered[2]) + 1]) - 1;
+        }
     }
+    console.log(palettes);
 
     let files = [];
     CHARACTER_FILES.forEach((file) => {
@@ -684,7 +718,7 @@ function getCharacters() {
             let fighterDat = fs.readFileSync(path.join(cmcDir, "data", "dats", fighter + ".dat"), "ascii").split(/\r?\n/);
             fighters.push({
                 name: fighter,
-                displayName: fighterDat[1],
+                displayName: fighterDat[0],
                 series: fighterDat[3].toLowerCase(),
             });
         } else {
@@ -782,7 +816,7 @@ function addAlt(base, alt) {
         base: base,
         altNum: altNum,
         alt: alt,
-        displayName: altDat[1],
+        displayName: altDat[0],
         gameName: altDat[2],
     });
     writeAlts(alts);

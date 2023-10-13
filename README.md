@@ -6,7 +6,10 @@ https://inferno214221.com/dev/cmc-mod-manager/
 - [x] Select the CMC+ directory
 - [x] Open CMC+ directory in local file manager
 - [x] Run CMC+
+- [x] Automatic updates
+- [ ] Browser extension and manual one click implementation
 - [ ] Remove unessecary files
+- [ ] Context menu
 - [x] Make fighters.txt on export
 ## Character Manager
 - [x] Install characters from a folder (very picky)
@@ -18,6 +21,7 @@ https://inferno214221.com/dev/cmc-mod-manager/
 - [x] Installed v7 characters can be converted to v8
 - [x] Errors
 - [x] Alt Managment
+- [ ] Update files of existing characters when trying to install
 - [ ] Ignore exsisting series icons
 ## Character Selection Screen (Priority: 1)
 - [x] Display the CSS
@@ -34,8 +38,12 @@ https://inferno214221.com/dev/cmc-mod-manager/
 - [x] Uninstalled characters are removed
 - [x] Switch CSS Pages
 - [ ] Add CSS Pages
+- [ ] Issues with 500~550 characters
 - [ ] Edit Game Settings to change displayed list
-## Stage Manager (Priority: 2)
+### Character Port-er
+- [ ] Select another copy of the game
+- [ ] Extract and install characters from other copy
+### Stage Manager (Priority: 2)
 - [ ] Install stages from a folder
 - [ ] Install stages from a zip (extract, install folder, delete)
 - [ ] List stages
