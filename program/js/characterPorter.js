@@ -25,14 +25,16 @@ this.api.receive("from_checkSourceDir", (dir) => {
 });
 
 function writeSourceLocation(dir) {
-    sourceSpan.innerHTML = "Source Directory: " + dir;
+    sourceSpan.innerHTML = dir;
     if (dir != "None Selected") {
         getCharacterList();
     }
 }
 
 function openSourceDir() {
-    this.api.send("openSourceDir");
+    if (sourceSpan.innerHTML != "None Selected") {
+        this.api.send("openSourceDir");
+    }
 }
 
 function selectSourceDir() {
@@ -105,16 +107,6 @@ function resort() {
     inputBlurred('sortingType');
     getCharacterList();
 }
-
-// function removeAllChars() {
-//     if(!confirm("All characters except for Master Hand and Fighting Sprite will be removed.\nAre you sure you want to continue?")) return;
-//     this.api.send("removeAllChars");
-// }
-
-// this.api.receive("from_removeAllChars", () => {
-//     alert("Characters removed successfully.");
-//     getCharacterList();
-// });
 
 // On Page Load
 checkSourceDir();

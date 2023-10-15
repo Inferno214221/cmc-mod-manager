@@ -19,6 +19,7 @@ https://inferno214221.com/dev/cmc-mod-manager/
 - [x] Remove characters
 - [x] Option to remove character from random list
 - [x] Installed v7 characters can be converted to v8
+- [ ] Ask before updating characters
 - [x] Errors
 - [x] Alt Managment
 ## Character Selection Screen (Priority: 1)
@@ -39,8 +40,10 @@ https://inferno214221.com/dev/cmc-mod-manager/
 - [ ] Issues with 500~550 characters
 - [ ] Edit Game Settings to change displayed list
 ### Character Port-er
-- [ ] Select another copy of the game
-- [ ] Extract and install characters from other copy
+- [x] Select another copy of the game
+- [x] Extract and install characters from other copy
+- [ ] Install all
+- [ ] Builtin v7
 ### Stage Manager (Priority: 2)
 - [ ] Install stages from a folder
 - [ ] Install stages from a zip (extract, install folder, delete)

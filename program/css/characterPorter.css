@@ -1,1 +1,10 @@
 @import "./characterManager.css";
+
+#characterScrollable {
+    overflow: hidden;
+    overflow-y: scroll;
+    white-space: nowrap;
+    margin-top: 5px;
+    height: calc(100vh - 230px);
+    white-space: nowrap;
+}

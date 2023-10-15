@@ -14,6 +14,18 @@ const SUPPORTED_VERSIONS = [
     "CMC+ v8",
 ];
 
+const PORT_SUPPORTED_VERSIONS = [
+    "CMC_v8",
+    "CMC+ v8",
+    "CMC+ v7",
+    "CMC Plus Open",
+    "Crusade Minus 2.4",
+    "Crusade Minus 2.3",
+    "Crusade Minus 2.2",
+    "Crusade Minus 2.1",
+    "Crusade Minus 2.0",
+];
+
 const BLOAT = [
     "/.png",
     "/.txt",
@@ -197,7 +209,7 @@ function readJSON(file) {
 }
 
 function writeJSON(file, data) {
-    fs.writeFileSync(file, JSON.stringify(data, null, 2), "utf-8");
+    fs.writeFileSync(file, JSON.stringify(data, null, 4), "utf-8");
 }
 
 app.whenReady().then(() => {
@@ -220,8 +232,8 @@ ipcMain.on("throwGameDir", (event, dir) => {
     }
 });
 
-function getGameVersion(dir) {
-    for(let game of SUPPORTED_VERSIONS) {
+function getGameVersion(dir, list = SUPPORTED_VERSIONS) {
+    for (let game of list) {
         if (fs.existsSync(path.join(dir, game + ".exe"))) {
             return game;
         }
@@ -592,8 +604,8 @@ ipcMain.on("extractCharacter", (event, args) => {
     win.webContents.send("from_extractCharacter");
 });
 
-function extractCharacter(characterNumber, dir = cmcDir) {
-    let characters = getCharacters(dir);
+function extractCharacter(characterNumber, dir = cmcDir, isV7 = false) {
+    let characters = getCharacters(dir, isV7);
     let characterName = characters[characterNumber].name;
     let similarName = [];
     characters.forEach((character) => {
@@ -601,6 +613,14 @@ function extractCharacter(characterNumber, dir = cmcDir) {
             similarName.push(character.name);
         }
     });
+    if (isV7) {
+        let characterDat = fs.readFileSync(path.join(dir, "data", "dats", characterName + ".dat"), "ascii").split(/\r?\n/);
+        characterDat[0] = characters[characterNumber].displayName;
+        characterDat[1] = characters[characterNumber].displayName;
+        characterDat[2] = characters[characterNumber].displayName;
+        characterDat[3] = characters[characterNumber].series;
+        fs.writeFileSync(path.join(dir, "data", "dats", characterName + ".dat"), characterDat.join("\r\n"), "ascii");
+    }
     let characterDat = fs.readFileSync(path.join(dir, "data", "dats", characterName + ".dat"), "ascii").split(/\r?\n/);
     filterCharacterFiles(characters[characterNumber].name, characterDat).forEach((file) => {
         let subDir = path.parse(file).dir;
@@ -720,8 +740,11 @@ ipcMain.on("removeAllChars", (event, args) => {
     win.webContents.send("from_removeAllChars");
 });
 
-function getCharacters(dir = cmcDir) {
+function getCharacters(dir = cmcDir, isV7 = false) {
     let fighters = [];
+    if (isV7) {
+        fighters = readJSON(path.join(__dirname, "program", "v7.json"));
+    }
     let fightersTxt = fs.readFileSync(path.join(dir, "data", "fighters.txt"), "ascii").split(/\r?\n/);
     fightersTxt.shift();
     fightersTxt.forEach((fighter) => {
@@ -739,17 +762,17 @@ function getCharacters(dir = cmcDir) {
     return fighters;
 }
 
-function appendCharacter(add) {
-    let characters = getCharacters();
+function appendCharacter(add, dir = cmcDir) {
+    let characters = getCharacters(dir);
     let output = (characters.length + 1) + "\r\n";
     characters.forEach((character) => {
         output += character.name + "\r\n";
     });
     output += add + "\r\n";
-    fs.writeFileSync(path.join(cmcDir, "data", "fighters.txt"), output, "ascii");
+    fs.writeFileSync(path.join(dir, "data", "fighters.txt"), output, "ascii");
 }
 
-function dropCharacter(drop) {
+function dropCharacter(drop, dir = cmcDir) {
     let characters = getCharacters();
     characters.filter((character) => {
        return character.name != drop;
@@ -758,13 +781,12 @@ function dropCharacter(drop) {
     characters.forEach((character) => {
         output += character.name + "\r\n";
     });
-    fs.writeFileSync(path.join(cmcDir, "data", "fighters.txt"), output, "ascii");
+    fs.writeFileSync(path.join(dir, "data", "fighters.txt"), output, "ascii");
     toggleRandomCharacter(true, drop);
     removeAlts(drop);
 }
 
-function getAlts(otherDir = null) {
-    let dir = otherDir || cmcDir;
+function getAlts(dir = cmcDir) {
     let alts = [];
     let altsTxt = fs.readFileSync(path.join(dir, "data", "alts.txt"), "ascii").split(/\r?\n/);
     alts.shift();
@@ -799,12 +821,12 @@ function writeAlts(alts) {
     fs.writeFileSync(path.join(cmcDir, "data", "alts.txt"), output, "ascii");
 }
 
-function altsToFighters() {
-    let alts = getAlts();
-    let fighters = getCharacters();
+function altsToFighters(dir = cmcDir) {
+    let alts = getAlts(dir);
+    let fighters = getCharacters(dir);
     alts.forEach((alt) => {
         if (fighters.findIndex(fighter => fighter.name == alt.alt) == -1) {
-            appendCharacter(alt.alt);
+            appendCharacter(alt.alt, dir);
         }
     });
 }
@@ -929,7 +951,6 @@ function writeCSS(css, page) {
 
 //Stages
 ipcMain.on("getStageList", (event, args) => {
-    altsToFighters();
     win.webContents.send("from_getStageList", {
         stages: getStages(),
         cmcDir: cmcDir,
@@ -976,19 +997,19 @@ function appendStage(add) {
     writeStages(stages);
 }
 
-function dropCharacter(drop) {
-    let characters = getCharacters();
-    characters.filter((character) => {
-       return character.name != drop;
-    });
-    let output = (characters.length + 1) + "\r\n";
-    characters.forEach((character) => {
-        output += character.name + "\r\n";
-    });
-    fs.writeFileSync(path.join(cmcDir, "data", "fighters.txt"), output, "ascii");
-    toggleRandomCharacter(true, drop);
-    removeAlts(drop);
-}
+// function dropCharacter(drop) {
+//     let characters = getCharacters();
+//     characters.filter((character) => {
+//        return character.name != drop;
+//     });
+//     let output = (characters.length + 1) + "\r\n";
+//     characters.forEach((character) => {
+//         output += character.name + "\r\n";
+//     });
+//     fs.writeFileSync(path.join(cmcDir, "data", "fighters.txt"), output, "ascii");
+//     toggleRandomCharacter(true, drop);
+//     removeAlts(drop);
+// }
 
 ipcMain.on("installStageDir", (event, args) => {
     dialog.showOpenDialog(win, {
@@ -1142,10 +1163,14 @@ ipcMain.on("selectSourceDir", (event, args) => {
         if (dir.canceled === true) {
             return;
         }
-        if (!fs.existsSync(path.join(dir.filePaths[0], "fighter"))) {
-            win.webContents.send("throwError", "No fighter directory found within the selected directory.");
+        if (getGameVersion(path.join(dir.filePaths[0]), PORT_SUPPORTED_VERSIONS) == null) {
+            win.webContents.send("throwError", "No recognised .exe file in the selected directory.");
             return;
         }
+        // if (!fs.existsSync(path.join(dir.filePaths[0], "fighter"))) {
+        //     win.webContents.send("throwError", "No fighter directory found within the selected directory.");
+        //     return;
+        // }
         getAllFiles(dir.filePaths[0]).forEach((file) => {
             fs.chmodSync(file, 0o777);
         });
@@ -1160,19 +1185,8 @@ ipcMain.on("openSourceDir", (event, args) => {
 });
 
 ipcMain.on("getCharacterListSource", (event, args) => {
-    console.log(sourceDir);
-    let characters = getCharacters(sourceDir);
-    getAlts(sourceDir).forEach((character) => {
-        let characterSeries = "";
-        if (fs.existsSync(path.join(sourceDir, "data", "dats", character.alt + ".dat"))) {
-            characterSeries = fs.readFileSync(path.join(sourceDir, "data", "dats", character.alt + ".dat"), "ascii").split(/\r?\n/)[3].toLowerCase();
-        }
-        characters.push({
-            name: character.alt,
-            displayName: character.displayName,
-            series: characterSeries,
-        });
-    });
+    altsToFighters(sourceDir);
+    let characters = getCharacters(sourceDir, getGameVersion(sourceDir, PORT_SUPPORTED_VERSIONS) == "CMC+ v7");
     win.webContents.send("from_getCharacterListSource", {
         characters: characters,
         sourceDir: sourceDir,
@@ -1181,7 +1195,7 @@ ipcMain.on("getCharacterListSource", (event, args) => {
 
 ipcMain.on("extractCharacterSource", (event, args) => {
     args -= 1;
-    win.webContents.send("from_extractCharacterSource", extractCharacter(args, sourceDir));
+    win.webContents.send("from_extractCharacterSource", extractCharacter(args, sourceDir, getGameVersion(sourceDir, PORT_SUPPORTED_VERSIONS) == "CMC+ v7"));
 });
 
 ipcMain.on("installCharacterSource", (event, args) => {

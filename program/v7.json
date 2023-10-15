@@ -1,0 +1,326 @@
+[
+    {
+        "name": "mario",
+        "displayName": "Mario",
+        "series": "mario"
+    },
+    {
+        "name": "pika",
+        "displayName": "Pikachu",
+        "series": "pokemon"
+    },
+    {
+        "name": "ryu",
+        "displayName": "Ryu",
+        "series": "sf"
+    },
+    {
+        "name": "tails_cake",
+        "displayName": "Tails",
+        "series": "sonic"
+    },
+    {
+        "name": "luigi",
+        "displayName": "Luigi",
+        "series": "mario"
+    },
+    {
+        "name": "falco",
+        "displayName": "Falco",
+        "series": "starfox"
+    },
+    {
+        "name": "gooey",
+        "displayName": "Gooey",
+        "series": "kiby"
+    },
+    {
+        "name": "purin",
+        "displayName": "Jigglypuff",
+        "series": "pokemon"
+    },
+    {
+        "name": "samus",
+        "displayName": "Samus",
+        "series": "metroid"
+    },
+    {
+        "name": "lucario",
+        "displayName": "Lucario",
+        "series": "pokemon"
+    },
+    {
+        "name": "snivy",
+        "displayName": "Snivy",
+        "series": "pokemon"
+    },
+    {
+        "name": "sonic",
+        "displayName": "Sonic",
+        "series": "sonic"
+    },
+    {
+        "name": "chunli",
+        "displayName": "Chun-Li",
+        "series": "sf"
+    },
+    {
+        "name": "goku",
+        "displayName": "Goku",
+        "series": "dbz"
+    },
+    {
+        "name": "mrgw",
+        "displayName": "Game & Watch",
+        "series": "gw"
+    },
+    {
+        "name": "marth",
+        "displayName": "Marth",
+        "series": "fe"
+    },
+    {
+        "name": "link",
+        "displayName": "Link",
+        "series": "zelda"
+    },
+    {
+        "name": "snake",
+        "displayName": "Snake",
+        "series": "mg"
+    },
+    {
+        "name": "peach",
+        "displayName": "Peach",
+        "series": "mario"
+    },
+    {
+        "name": "wario",
+        "displayName": "Wario",
+        "series": "wario"
+    },
+    {
+        "name": "mega",
+        "displayName": "Megaman",
+        "series": "megaman"
+    },
+    {
+        "name": "yoshi",
+        "displayName": "Yoshi",
+        "series": "mario"
+    },
+    {
+        "name": "falcon",
+        "displayName": "Captain Falcon",
+        "series": "fzero"
+    },
+    {
+        "name": "wright",
+        "displayName": "Pheonix Wright",
+        "series": "attorney"
+    },
+    {
+        "name": "ridley",
+        "displayName": "Ridley",
+        "series": "metroid"
+    },
+    {
+        "name": "porky",
+        "displayName": "Pork Minch",
+        "series": "mother"
+    },
+    {
+        "name": "dhd",
+        "displayName": "Duck Hunt Duo",
+        "series": "dhunt"
+    },
+    {
+        "name": "bomber",
+        "displayName": "Bomberman",
+        "series": "bomber"
+    },
+    {
+        "name": "geno",
+        "displayName": "Geno",
+        "series": "opm"
+    },
+    {
+        "name": "metaknight",
+        "displayName": "Meta Knight",
+        "series": "kirby"
+    },
+    {
+        "name": "saki",
+        "displayName": "Saki Amamiya",
+        "series": "sin"
+    },
+    {
+        "name": "waluigi",
+        "displayName": "Waluigi",
+        "series": "mario"
+    },
+    {
+        "name": "fox",
+        "displayName": "Fox",
+        "series": "starfox"
+    },
+    {
+        "name": "clink",
+        "displayName": "Toon Link",
+        "series": "zelda"
+    },
+    {
+        "name": "lucas",
+        "displayName": "Lucas",
+        "series": "mother"
+    },
+    {
+        "name": "ristar",
+        "displayName": "Ristar",
+        "series": "ristar"
+    },
+    {
+        "name": "ness",
+        "displayName": "Ness",
+        "series": "mother"
+    },
+    {
+        "name": "mew2",
+        "displayName": "Mewtwo",
+        "series": "pokemon"
+    },
+    {
+        "name": "krystal",
+        "displayName": "Krystal",
+        "series": "starfox"
+    },
+    {
+        "name": "dk",
+        "displayName": "Donkey Kong",
+        "series": "mario"
+    },
+    {
+        "name": "rayman",
+        "displayName": "Rayman",
+        "series": "rayman"
+    },
+    {
+        "name": "mach",
+        "displayName": "Mach Rider",
+        "series": "machrider"
+    },
+    {
+        "name": "shadow",
+        "displayName": "Shadow",
+        "series": "sonic"
+    },
+    {
+        "name": "knux",
+        "displayName": "Knuckles",
+        "series": "sonic"
+    },
+    {
+        "name": "kirby",
+        "displayName": "Kirby",
+        "series": "kirby"
+    },
+    {
+        "name": "toad",
+        "displayName": "Toad",
+        "series": "mario"
+    },
+    {
+        "name": "ganon",
+        "displayName": "Ganondorf",
+        "series": "zelda"
+    },
+    {
+        "name": "climbers",
+        "displayName": "Ice Climbers",
+        "series": "ic"
+    },
+    {
+        "name": "rob",
+        "displayName": "R.O.B.",
+        "series": "rob"
+    },
+    {
+        "name": "ashley",
+        "displayName": "Ashley",
+        "series": "wario"
+    },
+    {
+        "name": "petey",
+        "displayName": "Petey Piranha",
+        "series": "mario"
+    },
+    {
+        "name": "pacman",
+        "displayName": "Pacman",
+        "series": "pacman"
+    },
+    {
+        "name": "bowser",
+        "displayName": "Bowser",
+        "series": "mario"
+    },
+    {
+        "name": "olimar",
+        "displayName": "Olimar",
+        "series": "pikmin"
+    },
+    {
+        "name": "tingle",
+        "displayName": "Tingle",
+        "series": "zelda"
+    },
+    {
+        "name": "mac",
+        "displayName": "Little Mac",
+        "series": "pnchout"
+    },
+    {
+        "name": "crash",
+        "displayName": "Crash",
+        "series": "crashbandicoot"
+    },
+    {
+        "name": "klonoa",
+        "displayName": "Klonoa",
+        "series": "klonoa"
+    },
+    {
+        "name": "pichu",
+        "displayName": "Pichu",
+        "series": "pokemon"
+    },
+    {
+        "name": "_",
+        "displayName": "Fighting Sprite"
+    },
+    {
+        "name": "hand",
+        "displayName": "Master Hand (Boss)",
+        "series": "ssb"
+    },
+    {
+        "name": "drmario",
+        "displayName": "Dr. Mario",
+        "series": "mario"
+    },
+    {
+        "name": "shantae",
+        "displayName": "Shantae",
+        "series": "shantae"
+    },
+    {
+        "name": "nega",
+        "displayName": "Nega Shantae",
+        "series": "shantae"
+    },
+    {
+        "name": "evil",
+        "displayName": "Evil Ryu",
+        "series": "sf"
+    }
+]
