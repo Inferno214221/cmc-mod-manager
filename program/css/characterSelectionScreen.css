@@ -110,7 +110,7 @@ select {
     overflow: hidden;
     overflow-x: scroll;
     white-space: nowrap;
-    width: calc(100vw - 30px);
+    width: calc(100vw - 50px);
     white-space: nowrap;
     padding-bottom: 10px;
 }

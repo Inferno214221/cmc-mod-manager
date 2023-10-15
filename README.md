@@ -41,7 +41,7 @@ https://inferno214221.com/dev/cmc-mod-manager/
 - [ ] Add CSS Pages
 - [ ] Issues with 500~550 characters
 - [ ] Edit Game Settings to change displayed list
-### Character Port-er
+### Character Porter
 - [x] Select another copy of the game
 - [x] Extract and install characters from other copy
 - [ ] Install all

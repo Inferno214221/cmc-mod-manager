@@ -64,15 +64,55 @@
         </ul>
     </nav>
     <section id="mainSection">
-        <fieldset>
-            <legend>Character Selection Page</legend>
-            <button type="button" onclick="getCSSPage(-1)"><</button>
-            <input type="text" value="default" id="CSSPageName" onfocus="inputFocused('CSSPageName')" onblur="inputBlurred('CSSPageName')" readonly="true"/>
-            <button type="button" onclick="getCSSPage(1)">></button>
-            <!-- TODO: -->
-            <!-- <button type="button" onclick="">+</button>
-            <button type="button" onclick="">-</button> -->
-        </fieldset>
+        <table>
+            <tr>
+                <td class="column">
+                    <fieldset>
+                        <legend>Character Selection Page</legend>
+                        <button type="button" onclick="getCSSPage(-1)"><</button>
+                        <input type="text" value="default" id="CSSPageName" onfocus="inputFocused('CSSPageName')" onblur="inputBlurred('CSSPageName')" readonly="true"/>
+                        <button type="button" onclick="getCSSPage(1)">></button>
+                        <!-- TODO: -->
+                        <!-- <button type="button" onclick="">+</button>
+                        <button type="button" onclick="">-</button> -->
+                    </fieldset>
+                </td>
+                <td class="column">
+                    <fieldset>
+                        <legend>Character Selection Screen Size</legend>
+                        <table>
+                            <tr>
+                                <td>
+                                    <span id="rowNumber">Rows:</span>
+                                </td>
+                                <td>
+                                    <button type="button" onclick="addRow()">+</button>
+                                    <button type="button" onclick="removeRow()">-</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span id="columnNumber">Columns:</span>
+                                </td>
+                                <td>
+                                    <button type="button" onclick="addColumn()">+</button>
+                                    <button type="button" onclick="removeColumn()">-</button>
+                                </td>
+                            </tr>
+                        </table>
+                    </fieldset>
+                </td>
+                <td class="column">
+                    <fieldset>
+                        <legend>Franchise</legend>
+                        <select id="seriesSelect" onfocus="inputFocused('seriesSelect')" onblur="inputBlurred('seriesSelect')">
+                            <option value=""></option>
+                        </select><br/>
+                        <button type="button" onclick="removeSeries()">Remove Entire Franchise</button>
+                    </fieldset>
+                </td>
+            </tr>
+        </table>
         <table id="characterTable">
             <tr>
                 <td id="characterSelectionCell">
@@ -111,70 +151,6 @@
                         </div>
                     </fieldset>
                 </td>
-            </tr>
-        </table>
-        <table>
-            <tr>
-                <td class="column">
-                    <!-- <fieldset>
-                        <legend>Location</legend>
-                        <span>X: </span><input type="text" value="0" id="xInput" onfocus="inputFocused('xInput')" onblur="inputBlurred('xInput')"/>
-                        <span>Y: </span><input type="text" value="0" id="yInput" onfocus="inputFocused('yInput')" onblur="inputBlurred('yInput')"/><br />
-                        <button type="button" onclick="hideCharacter()">Hide Characer @ Location</button>
-                    </fieldset> -->
-                    <fieldset>
-                        <legend>Character Selection Screen Size</legend>
-                        <table>
-                            <tr>
-                                <td>
-                                    <span id="rowNumber">Rows:</span>
-                                </td>
-                                <td>
-                                    <button type="button" onclick="addRow()">+</button>
-                                    <button type="button" onclick="removeRow()">-</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <span id="columnNumber">Columns:</span>
-                                </td>
-                                <td>
-                                    <button type="button" onclick="addColumn()">+</button>
-                                    <button type="button" onclick="removeColumn()">-</button>
-                                </td>
-                            </tr>
-                        </table>
-                    </fieldset>
-                </td>
-                <td class="column">
-                    <fieldset>
-                        <legend>Franchise</legend>
-                        <select id="seriesSelect" onfocus="inputFocused('seriesSelect')" onblur="inputBlurred('seriesSelect')">
-                            <option value=""></option>
-                        </select><br />
-                        <!-- <button type="button" onclick="addFranchise()">Add Entire Franchise</button> -->
-                        <button type="button" onclick="removeSeries()">Remove Entire Franchise</button>
-                    </fieldset>
-                </td>
-                <!-- <td class="column">
-                    <fieldset>
-                        <legend>CSS Profiles</legend>
-                        <div class="cssProfiles">
-                            <button type="button" onclick="saveCSS()">
-                                Save CSS Profile:
-                            </button>
-                            <input type="text" value="default" id="CSSSaveName" onfocus="inputFocused('CSSSaveName')" onblur="inputBlurred('CSSSaveName')"/>
-                        </div><br />
-                        <div class="cssProfiles">
-                            <button type="button" onclick="loadCSS()">
-                                Load CSS Profile:
-                            </button>
-                            <select id="CSSLoadName" onfocus="inputFocused('CSSLoadName')" onblur="inputBlurred('CSSLoadName')" onchange="inputBlurred('CSSLoadName')">
-                                <option value="default">default</option>
-                            </select>
-                        </div>
-                    </fieldset>
-                </td> -->
             </tr>
         </table>
     </section>
