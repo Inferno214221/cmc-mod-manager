@@ -22,7 +22,7 @@ module.exports = {
                 license: "GNU General Public License v3.0",
                 categories: ["Utility"],
                 icon: "./gb/icon.png",
-                version: "2.1.1",
+                version: "2.2.0",
             },
         },
         {
@@ -33,7 +33,7 @@ module.exports = {
                 license: "GNU General Public License v3.0",
                 categories: ["Utility"],
                 icon: "./gb/icon.png",
-                version: "2.1.1",
+                version: "2.2.0",
             },
         },
     ],
