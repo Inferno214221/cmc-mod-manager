@@ -20,10 +20,6 @@ const PORT_SUPPORTED_VERSIONS = [
     "CMC+ v7",
     "CMC Plus Open",
     "Crusade Minus 2.4",
-    "Crusade Minus 2.3",
-    "Crusade Minus 2.2",
-    "Crusade Minus 2.1",
-    "Crusade Minus 2.0",
 ];
 
 const BLOAT = [
@@ -383,7 +379,7 @@ ipcMain.on("installCharacterDir", (event, args) => {
         if (dir.canceled === true) {
             return;
         }
-        installCharacter(dir.filePaths[0], args);
+        installCharacter(dir.filePaths[0], args.filtered, args.update);
     });
 });
 
@@ -394,8 +390,7 @@ ipcMain.on("installCharacterArch", (event, args) => {
         if (file.canceled === true) {
             return;
         }
-        await installCharacterArch(file.filePaths[0]);
-        // fs.removeSync(path.join(__dirname, "_temp"));
+        await installCharacterArch(file.filePaths[0], args);
     });
 });
 
@@ -433,11 +428,11 @@ async function installCharacterArch(filePath, args) {
             return;
             break;
     }
-    await installCharacter(dir, args);
+    await installCharacter(dir, args.filtered, args.update);
     fs.removeSync(path.join(__dirname, "_temp"));
 }
 
-function installCharacter(dir, filteredInstall) {
+function installCharacter(dir, filteredInstall, updateChars) {
     while (!fs.existsSync(path.join(dir, "fighter"))) {
         console.log("Fighters directory not found in " + dir);
         let contents = fs.readdirSync(dir);
@@ -458,19 +453,20 @@ function installCharacter(dir, filteredInstall) {
     //         console.log(dir);
     //     }
     // }
-    console.log(fs.readdirSync(dir));
     let characterName = fs.readdirSync(path.join(dir, "fighter")).filter((file) => { return file.endsWith(".bin") || !file.includes(".") })[0].split(".")[0];
     if (!fs.existsSync(path.join(dir, "data", "dats", characterName + ".dat"))) {
         console.log(path.join(dir, "data", "dats", characterName + ".dat"))
         win.webContents.send("throwError", "The character's dat file is not in the ./data/dats/ directory.");
         return;
     }
-    // for (let character of getCharacters()) {
-    //     if (character.name == characterName) {
-    //         win.webContents.send("throwError", "The selected character is already installed.");
-    //         return;
-    //     }
-    // }
+    if (!updateChars) {
+        for (let character of getCharacters()) {
+            if (character.name == characterName) {
+                win.webContents.send("throwError", "The selected character is already installed.");
+                return;
+            }
+        }
+    }
     let characterDat = fs.readFileSync(path.join(dir, "data", "dats", characterName + ".dat"), "ascii").split(/\r?\n/);
 
     let datMod = !characterDat[4].startsWith("-");
@@ -730,7 +726,7 @@ ipcMain.on("removeAllChars", (event, args) => {
     number = 0;
     getCharacters().forEach((fighter) => {
         if (fighter.name == "hand" || fighter.name == "sprite") {
-            number++;
+            number++;//the original array updates so it only needs to increment to skip hand and sprite
             return;
         }
         removeCharacter(number);
@@ -1199,7 +1195,21 @@ ipcMain.on("extractCharacterSource", (event, args) => {
 });
 
 ipcMain.on("installCharacterSource", (event, args) => {
-    installCharacter(args.dir, args.filtered);
+    installCharacter(args.dir, args.filtered, args.update);
+});
+
+ipcMain.on("installAllCharsSource", (event, args) => {
+    isV7 = getGameVersion(sourceDir, PORT_SUPPORTED_VERSIONS) == "CMC+ v7";
+    number = 0;
+    getCharacters(sourceDir, isV7).forEach((fighter) => {
+        if (fighter.name == "hand" || fighter.name == "sprite") {
+            number++;
+            return;
+        }
+        extractCharacter(number, sourceDir, isV7);//installing each character ^2 times
+        installCharacter(args.dir, false, args.checked);
+    });
+    win.webContents.send("from_installAllCharsSource");
 });
 
 // Misc

@@ -80,11 +80,26 @@ this.api.receive("from_extractCharacterSource", (data) => {
     this.api.send("installCharacterSource", {
         dir: data,
         filtered: filteredInstall.checked,
+        update: updateChars.checked,
     });
 });
 
 this.api.receive("from_installCharacter", (data) => {
     alert("Character " + (data ? "updated" : "installed") + " successfully.");
+    getCharacterList();
+});
+
+function installAllChars() {
+    if (sourceSpan.innerHTML == "None Selected") return;
+    if(!confirm("All characters installed in the selected source directory will be installed or updated in the selected CMC directory (except for Master Hand and Fighting Sprite).\nAre you sure you want to continue?")) return;
+    this.api.send("installAllCharsSource", {
+        filtered: filteredInstall.checked,
+        update: updateChars.checked,
+    });
+}
+
+this.api.receive("from_installAllCharsSource", () => {
+    alert("All characters installed / updated.");
     getCharacterList();
 });
 

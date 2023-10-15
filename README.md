@@ -2,6 +2,8 @@
 https://inferno214221.com/dev/cmc-mod-manager/
 
 # Feature Progress
+- [ ] Move to async (everywhere)
+- [ ] Tidy up UI
 ## Main Page
 - [x] Select the CMC+ directory
 - [x] Open CMC+ directory in local file manager
@@ -19,10 +21,10 @@ https://inferno214221.com/dev/cmc-mod-manager/
 - [x] Remove characters
 - [x] Option to remove character from random list
 - [x] Installed v7 characters can be converted to v8
-- [ ] Ask before updating characters
+- [x] Ask before updating characters
 - [x] Errors
 - [x] Alt Managment
-## Character Selection Screen (Priority: 1)
+## Character Selection Screen
 - [x] Display the CSS
 - [x] Display unincluded characters (not alts)
 - [x] Add characters to CSS
@@ -43,15 +45,14 @@ https://inferno214221.com/dev/cmc-mod-manager/
 - [x] Select another copy of the game
 - [x] Extract and install characters from other copy
 - [ ] Install all
-- [ ] Builtin v7
-### Stage Manager (Priority: 2)
+### Stage Manager
 - [ ] Install stages from a folder
 - [ ] Install stages from a zip (extract, install folder, delete)
 - [ ] List stages
 - [ ] Extract stages
 - [ ] Remove stages
 - [ ] Option to remove stages from random list
-## Stage Selection Screen (Priority: 2)
+## Stage Selection Screen
 - [ ] Display the SSS w/ pages
 - [ ] Display unincluded stages
 - [ ] Add stages to SSS
@@ -63,8 +64,8 @@ https://inferno214221.com/dev/cmc-mod-manager/
 - [ ] Add pages
 - [ ] Alerts
 - [ ] Errors
-## Miscellanious Mods (Priority: 3)
+<!-- ## Miscellanious Mods (Priority: 3)
 - [x] Add option to import other types of mods e.g. ui changes / music
 - [x] RAR support - no errors
 - [ ] Remove misc mods by tracking file changes
-- [x] Errors
+- [x] Errors -->

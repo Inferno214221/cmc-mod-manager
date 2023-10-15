@@ -58,11 +58,17 @@ function listCharacters(characters, cmcDir, random, alts) {
 }
 
 function installCharacterDir() {
-    this.api.send("installCharacterDir", filteredInstall.checked);
+    this.api.send("installCharacterDir", {
+        filtered: filteredInstall.checked,
+        update: updateChars.checked,
+    });
 }
 
 function installCharacterArch() {
-    this.api.send("installCharacterArch", filteredInstall.checked);
+    this.api.send("installCharacterArch", {
+        filtered: filteredInstall.checked,
+        update: updateChars.checked,
+    });
 }
 
 this.api.receive("from_installCharacter", (data) => {
