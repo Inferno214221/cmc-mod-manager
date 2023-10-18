@@ -325,7 +325,7 @@ ipcMain.on("selectGameDir", (event, args) => {
             return;
         }
         if (getGameVersion(path.join(dir.filePaths[0])) == null) {
-            win.webContents.send("throwError", "No recognised .exe file in the selected directory.");
+            win.webContents.send("alert", "Failed: No recognised .exe file in the selected directory.");
             return;
         }
         //The new version has horrible permissions so give everything xwr
@@ -440,7 +440,7 @@ function installCharacter(dir, filteredInstall, updateChars) {
             dir = path.join(dir, contents[0]);
             console.log(dir);
         } else {
-            win.webContents.send("throwError", "Fighters directory not found in " + dir);
+            win.webContents.send("alert", "Failed: Fighters directory not found in " + dir);
             return;
         }
     }
@@ -456,13 +456,13 @@ function installCharacter(dir, filteredInstall, updateChars) {
     let characterName = fs.readdirSync(path.join(dir, "fighter")).filter((file) => { return file.endsWith(".bin") || !file.includes(".") })[0].split(".")[0];
     if (!fs.existsSync(path.join(dir, "data", "dats", characterName + ".dat"))) {
         console.log(path.join(dir, "data", "dats", characterName + ".dat"))
-        win.webContents.send("throwError", "The character's dat file is not in the ./data/dats/ directory.");
+        win.webContents.send("alert", "Failed: The character's dat file is not in the ./data/dats/ directory.");
         return;
     }
     if (!updateChars) {
         for (let character of getCharacters()) {
             if (character.name == characterName) {
-                win.webContents.send("throwError", "The selected character is already installed.");
+                win.webContents.send("alert", "Failed: The selected character is already installed.");
                 return;
             }
         }
@@ -1076,7 +1076,7 @@ function installStage(dir, filteredInstall) {
             dir = path.join(dir, contents[0]);
             console.log(dir);
         } else {
-            win.webContents.send("throwError", "Stage directory not found in " + dir);
+            win.webContents.send("alert", "Failed: Stage directory not found in " + dir);
             return;
         }
     }
@@ -1084,7 +1084,7 @@ function installStage(dir, filteredInstall) {
     let stageName = fs.readdirSync(path.join(dir, "stage")).filter((file) => { return file.endsWith(".bin") || !file.includes(".") })[0].split(".")[0];
     for (let stage of getStages()) {
         if (stage.name == stageName) {
-            win.webContents.send("throwError", "The selected stage is already installed.");
+            win.webContents.send("alert", "Failed: The selected stage is already installed.");
             return;
         }
     };
@@ -1160,11 +1160,11 @@ ipcMain.on("selectSourceDir", (event, args) => {
             return;
         }
         if (getGameVersion(path.join(dir.filePaths[0]), PORT_SUPPORTED_VERSIONS) == null) {
-            win.webContents.send("throwError", "No recognised .exe file in the selected directory.");
+            win.webContents.send("alert", "Failed: No recognised .exe file in the selected directory.");
             return;
         }
         // if (!fs.existsSync(path.join(dir.filePaths[0], "fighter"))) {
-        //     win.webContents.send("throwError", "No fighter directory found within the selected directory.");
+        //     win.webContents.send("alert", "Failed: No fighter directory found within the selected directory.");
         //     return;
         // }
         getAllFiles(dir.filePaths[0]).forEach((file) => {

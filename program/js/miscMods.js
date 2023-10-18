@@ -5,10 +5,6 @@ this.api.receive("from_throwGameDir", (error) => {
     window.location = "../../index.html";
 });
 
-this.api.receive("throwError", (error) => {
-    alert("An Error Occured: " + error);
-});
-
 // Misc Mods
 function installModDir() {
     this.api.send("installModDir");

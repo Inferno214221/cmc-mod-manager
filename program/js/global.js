@@ -13,3 +13,7 @@ this.api.receive("from_oneClickFinish", () => {
     alert("Download finished. Installing.");
     window.location = "./characterManager.html";
 });
+
+this.api.receive("alert", (error) => {
+    alert(error);
+});

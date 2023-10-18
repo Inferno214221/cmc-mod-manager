@@ -3,10 +3,6 @@ function openDir(dir) {
     this.api.send("openDir", dir);
 }
 
-this.api.receive("throwError", (error) => {
-    alert("An Error Occured: " + error);
-});
-
 function inputFocused(element) {
     this[element].style.borderColor = "#2777ff";
 }
