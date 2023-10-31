@@ -708,7 +708,7 @@ function toggleRandomCharacter(excluded, characterName) {
         console.log("Adding " + characterName + " to fighter_lock.");
         characters.push(characterName);
     } else return;
-    let output = (characters.length + 1) + "\r\n";
+    let output = (characters.length) + "\r\n";
     characters.forEach((character) => {
         output += character + "\r\n";
     });

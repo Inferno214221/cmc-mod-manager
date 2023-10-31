@@ -10,7 +10,7 @@
     "make": "electron-forge make"
   },
   "author": "",
-  "license": "GPL-3.0",
+  "license": "GPL-3.0-or-later",
   "devDependencies": {
     "@electron-forge/cli": "^6.1.1",
     "@electron-forge/maker-deb": "^6.1.1",

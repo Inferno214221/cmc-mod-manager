@@ -6,7 +6,7 @@ module.exports = {
             name: "@electron-forge/maker-squirrel",
             config: {
                 authors: "Inferno214221",
-                name: "cmc-mod-manager",
+                name: "CMC Mod Manager",
                 iconUrl: "https://github.com/Inferno214221/CMCModManager/blob/main/gb/cmcmm.ico",
             },
         },
@@ -17,8 +17,9 @@ module.exports = {
         {
             name: "@electron-forge/maker-deb",
             config: {
+                productName: "CMC Mod Manager",
                 name: "cmc-mod-manager",
-                description: "A Mod Manager For SSBC CMC+ v8 Made With Electron",
+                description: "A mod manager for CMC+ v8 made with Electron",
                 license: "GNU General Public License v3.0",
                 categories: ["Utility"],
                 icon: "./gb/icon.png",
@@ -28,8 +29,9 @@ module.exports = {
         {
             name: "@electron-forge/maker-rpm",
             config: {
+                productName: "CMC Mod Manager",
                 name: "cmc-mod-manager",
-                description: "A Mod Manager For SSBC CMC+ v8 Made With Electron",
+                description: "A mod manager for CMC+ v8 made with Electron",
                 license: "GNU General Public License v3.0",
                 categories: ["Utility"],
                 icon: "./gb/icon.png",
