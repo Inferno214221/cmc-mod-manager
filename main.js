@@ -1186,6 +1186,7 @@ ipcMain.on("getCharacterListSource", (event, args) => {
     win.webContents.send("from_getCharacterListSource", {
         characters: characters,
         sourceDir: sourceDir,
+        installed: getCharacters()
     });
 });
 
@@ -1195,7 +1196,7 @@ ipcMain.on("extractCharacterSource", (event, args) => {
 });
 
 ipcMain.on("installCharacterSource", (event, args) => {
-    installCharacter(args.dir, args.filtered, args.update);
+    installCharacter(args.dir, args.filtered, true);
 });
 
 ipcMain.on("installAllCharsSource", (event, args) => {
@@ -1207,7 +1208,7 @@ ipcMain.on("installAllCharsSource", (event, args) => {
             return;
         }
         extractCharacter(number, sourceDir, isV7);//installing each character ^2 times
-        installCharacter(args.dir, false, args.checked);
+        installCharacter(args.dir, false, true);
     });
     win.webContents.send("from_installAllCharsSource");
 });

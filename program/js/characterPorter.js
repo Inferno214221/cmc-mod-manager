@@ -47,22 +47,29 @@ function getCharacterList() {
 }
 
 this.api.receive("from_getCharacterListSource", (data) => {
-    listCharacters(data.characters, data.sourceDir);
+    listCharacters(data.characters, data.sourceDir, data.installed);
 });
 
-function listCharacters(characters, sourceDir) {
+function listCharacters(characters, sourceDir, installed) {
     let output = "<tr><th>Image</th><th>Name</th><th>Install</th></tr>";
     sorted = sortCharacters(characters, sortingType.value);
     if (reverseSort.checked) {
         sorted.reverse();
     }
+    
+    let installedCharacters = {};
+    installed.forEach((character) => {
+        installedCharacters[character.name] = character;
+    });
+
     for (let character of sorted) {
         console.log(character);
+        if (installedCharacters[character.name] != undefined) {}
         output += 
         "<tr id=\"" + character.number + "\">\n\
             <td class=\"mug\"><image src=\"" + sourceDir + "/gfx/mugs/" + character.name + ".png\" draggable=\"false\" onerror=\"this.onerror=null; this.src='../images/missing.png'\" /></td>\n\
             <td>" + character.displayName + "</td>\n\
-            <td><button type=\"button\" onclick=\"extractCharacter('" + character.number + "')\">Install</button></td>\n\
+            <td><button type=\"button\" onclick=\"extractCharacter('" + character.number + "')\">" + (installedCharacters[character.name] == undefined ? "Install" : "Update") + "</button></td>\n\
         </tr>\n";
     };
     characterTable.innerHTML = output;
@@ -76,7 +83,7 @@ this.api.receive("from_extractCharacterSource", (data) => {
     this.api.send("installCharacterSource", {
         dir: data,
         filtered: filteredInstall.checked,
-        update: updateChars.checked,
+        // update: updateChars.checked,
     });
 });
 
@@ -90,7 +97,7 @@ function installAllChars() {
     if(!confirm("All characters installed in the selected source directory will be installed or updated in the selected CMC directory (except for Master Hand and Fighting Sprite).\nAre you sure you want to continue?")) return;
     this.api.send("installAllCharsSource", {
         filtered: filteredInstall.checked,
-        update: updateChars.checked,
+        // update: updateChars.checked,
     });
 }
 

@@ -45,7 +45,7 @@ https://inferno214221.com/dev/cmc-mod-manager/
 - [x] Select another copy of the game
 - [x] Extract and install characters from other copy
 - [ ] Install all
-- [ ] Show whether a character is installed (sperate update button)
+- [x] Show whether a character is installed (sperate update button)
 ### Stage Manager
 - [ ] Install stages from a folder
 - [ ] Install stages from a zip (extract, install folder, delete)
