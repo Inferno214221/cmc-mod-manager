@@ -22,7 +22,7 @@ function getPages() {
     this.api.send("getPages");
 }
 
-this.api.receive("from_GetPages", (data) => {
+this.api.receive("from_getPages", (data) => {
     pages = data;
 });
 
@@ -30,7 +30,7 @@ function getCSS(page) {
     this.api.send("getCSS", page);
 }
 
-this.api.receive("from_GetCSS", (data) => {
+this.api.receive("from_getCSS", (data) => {
     css = data.css;
     characters = data.characters;
     cmcDir = data.cmcDir;

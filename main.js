@@ -76,7 +76,13 @@ const STAGE_FILES = [
     "gfx/stgprevs/<stage>.png",
 ];
 
-var cmcDir = readJSON(path.join(__dirname, "program", "data.json")).dir;
+const DATA_FILE = path.join(app.getPath("userData"), "data.json");
+if (!fs.existsSync(DATA_FILE)) {
+    writeJSON(DATA_FILE, {
+        dir: "",
+    });
+}
+var cmcDir = readJSON(DATA_FILE).dir;
 var sourceDir;
 var version = getGameVersion(cmcDir);
 var foundUri = process.argv.find((arg) => arg.startsWith("cmcmm://"));
@@ -338,9 +344,9 @@ ipcMain.on("selectGameDir", (event, args) => {
         
         // fs.copySync(dir.filePaths[0], path.join(__dirname, "cmc"), { overwrite: true });
         version = getGameVersion(cmcDir);
-        let data = readJSON(path.join(__dirname, "program", "data.json"));
+        let data = readJSON(DATA_FILE);
         data.dir = cmcDir;
-        writeJSON(path.join(__dirname, "program", "data.json"), data);
+        writeJSON(DATA_FILE, data);
 
         win.webContents.send("from_selectGameDir", cmcDir);
     });
@@ -739,7 +745,7 @@ ipcMain.on("removeAllChars", (event, args) => {
 function getCharacters(dir = cmcDir, isV7 = false) {
     let fighters = [];
     if (isV7) {
-        fighters = readJSON(path.join(__dirname, "program", "v7.json"));
+        fighters = readJSON(path.join(__dirname, "program", "data.json")).v7;
     }
     let fightersTxt = fs.readFileSync(path.join(dir, "data", "fighters.txt"), "ascii").split(/\r?\n/);
     fightersTxt.shift();
@@ -905,11 +911,11 @@ ipcMain.on("getPages", (event, args) => {
     getAllFiles(path.join(cmcDir, "data", "css")).forEach((file) => {
         pages.push(path.join("css", path.parse(file).base));
     });
-    win.webContents.send("from_GetPages", pages);
+    win.webContents.send("from_getPages", pages);
 });
 
 ipcMain.on("getCSS", (event, args) => {
-    win.webContents.send("from_GetCSS", {
+    win.webContents.send("from_getCSS", {
         css: getCSS(args),
         characters: getCharacters(),
         cmcDir: cmcDir,
@@ -1302,117 +1308,4 @@ function installMod(dir) {
 //             }
 //         }
 //     });
-// });
-
-// ipcMain.on("openModFolder", (event, args) => {
-//     shell.openPath(__dirname + "/misc/" + args);
-// });
-
-// ipcMain.on("installMod", async (event, args) => {
-//     dialog.showOpenDialog(win, {
-//         properties: ["openDirectory"]
-//     }).then(dir => {
-//         if (dir.canceled === true) {
-//             return;
-//         }
-//         let modName = dir.filePaths[0].split('\\').pop().split('/').pop();
-//         installMod(dir.filePaths[0], modName);
-//     });
-// });
-
-// ipcMain.on("installModZip", async (event, args) => {
-//     dialog.showOpenDialog(win, {
-//         properties: ["openFile"]
-//     }).then(async (file) => {
-//         if (file.canceled === true) {
-//             return;
-//         }
-//         let dir = __dirname + "/misc/_temp";
-//         let fileP = file.filePaths[0];
-//         let fileName = fileP.split('\\').pop().split('/').pop().split(".");
-//         fileName.pop();
-//         modName = fileName[0];
-//         dir = dir + "/" + modName;
-//         switch (fileP.split(".").pop().toLowerCase()) {
-//             case "zip":
-//                 await extract(fileP, {
-//                     dir: dir,
-//                     defaultDirMode: 0o777,
-//                     defaultFileMode: 0o777,
-//                 });
-//                 break;
-//             case "rar"://TODO: Error handling
-//                 let buf = Uint8Array.from(fs.readFileSync(fileP)).buffer;
-//                 let extractor = await unrar.createExtractorFromData({ data: buf });
-//                 const extracted = extractor.extract();
-//                 const files = [...extracted.files];
-//                 files.forEach(fileE => {// Make All Folders First
-//                     if (fileE.fileHeader.flags.directory) {
-//                         fs.ensureDirSync(dir + "/" + fileE.fileHeader.name);
-//                     }
-//                 });
-//                 files.forEach(fileE => {// Make All Folders First
-//                     if (!fileE.fileHeader.flags.directory) {
-//                         fs.writeFileSync(dir + "/" + fileE.fileHeader.name, Buffer.from(fileE.extraction));
-//                     }
-//                 });
-//                 break;
-//             case "7z":
-//             default:
-//                 return;
-//                 break;
-//         }
-//         await installMod(dir, modName);
-//         fs.removeSync(__dirname + "/misc/_temp");
-//     });
-// });
-
-// function installMod(dir, modName) {
-//     if (fs.existsSync(dir + "/" + dir.split('\\').pop().split('/').pop())) {
-//         dir += "/" + dir.split('\\').pop().split('/').pop();
-//     }
-//     fs.copySync(dir, __dirname + "/misc/" + modName, { overwrite: true });
-    
-//     let installed = reRequire(__dirname + "/misc/installed.json");
-//     installed.misc.push(modName);
-//     fs.writeFileSync(
-//         __dirname + "/misc/installed.json",
-//         JSON.stringify(installed, null, 4),
-//         "utf-8"
-//     );
-
-//     win.webContents.send("fromInstallMod", installed);
-// }
-
-// ipcMain.on("getInstalledModList", (event, args) => {
-//     let installed = reRequire(__dirname + "/misc/installed.json");
-//     win.webContents.send("fromGetInstalledModList", installed);
-// });
-
-// ipcMain.on("removeMod", (event, args) => {
-//     let installed = reRequire(__dirname + "/misc/installed.json");
-//     installed.misc = installed.misc.filter(mod => mod != args);
-//     fs.removeSync(__dirname + "/misc/" + args);
-//     fs.writeFileSync(
-//         __dirname + "/misc/installed.json",
-//         JSON.stringify(installed, null, 4),
-//         "utf-8"
-//     );
-//     win.webContents.send("fromRemoveMod", installed);
-// });
-
-// ipcMain.on("increaseModMergePriority", (event, args) => {
-//     let installed = reRequire(__dirname + "/misc/installed.json");
-//     let index = installed.misc.indexOf(args);
-//     if (index == 0) {
-//         return;
-//     }
-//     installed.misc.move(index, index - 1);
-//     //TODO: error handling eg outside of range
-//     fs.writeFileSync(
-//         __dirname + "/misc/installed.json",
-//         JSON.stringify(installed, null, 4),
-//         "utf-8"
-//     );
-//     win.webContents.send("fromIncreaseModMergePriority", installed);
 // });
