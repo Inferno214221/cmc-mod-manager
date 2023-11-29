@@ -14,6 +14,6 @@ this.api.receive("from_oneClickFinish", () => {
     window.location = "./characterManager.html";
 });
 
-this.api.receive("alert", (error) => {
-    alert(error);
+this.api.receive("alert", (info) => {
+    alert(info);
 });

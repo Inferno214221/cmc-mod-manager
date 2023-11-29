@@ -7,6 +7,7 @@ const childProcess = require("child_process");
 require('array.prototype.move');
 const extract = require('extract-zip');
 const unrar = require("node-unrar-js");
+const prompt = require('native-prompt')
 var win;
 
 const SUPPORTED_VERSIONS = [
@@ -74,6 +75,7 @@ const STAGE_FILES = [
     "music/stage/<stage>",
     "gfx/stgicons/<stage>.png",
     "gfx/stgprevs/<stage>.png",
+    "gfx/seriesicon/<series>.png",
 ];
 
 const DATA_FILE = path.join(app.getPath("userData"), "data.json");
@@ -369,7 +371,7 @@ ipcMain.on("setupOneClick", (event, dir) => {
 
 // Characters
 ipcMain.on("getCharacterList", (event, args) => {
-    altsToFighters();
+    // altsToFighters();
     win.webContents.send("from_getCharacterList", {
         characters: getCharacters(),
         cmcDir: cmcDir,
@@ -555,7 +557,6 @@ function deleteCharCSS(cssNumber) {
 ipcMain.on("removeCharacter", (event, args) => {
     args -= 1;
     removeCharacter(args);
-
     win.webContents.send("from_removeCharacter");
 });
 
@@ -570,7 +571,7 @@ function removeCharacter(number) {
         }
     });
     let characterDat = fs.readFileSync(path.join(cmcDir, "data", "dats", characterName + ".dat"), "ascii").split(/\r?\n/);
-    filterCharacterFiles(characters[number].name, characterDat, true).forEach((file) => {
+    filterCharacterFiles(characterName, characterDat, true).forEach((file) => {
         let subDir = path.parse(file).dir;
         if (file.includes("*")) {
             let start = path.parse(file).base.split("*")[0].replace(subDir, "");
@@ -615,16 +616,15 @@ function extractCharacter(characterNumber, dir = cmcDir, isV7 = false) {
             similarName.push(character.name);
         }
     });
+    let characterDat = fs.readFileSync(path.join(dir, "data", "dats", characterName + ".dat"), "ascii").split(/\r?\n/);
     if (isV7) {
-        let characterDat = fs.readFileSync(path.join(dir, "data", "dats", characterName + ".dat"), "ascii").split(/\r?\n/);
         characterDat[0] = characters[characterNumber].displayName;
         characterDat[1] = characters[characterNumber].displayName;
         characterDat[2] = characters[characterNumber].displayName;
         characterDat[3] = characters[characterNumber].series;
         fs.writeFileSync(path.join(dir, "data", "dats", characterName + ".dat"), characterDat.join("\r\n"), "ascii");
     }
-    let characterDat = fs.readFileSync(path.join(dir, "data", "dats", characterName + ".dat"), "ascii").split(/\r?\n/);
-    filterCharacterFiles(characters[characterNumber].name, characterDat).forEach((file) => {
+    filterCharacterFiles(characterName, characterDat).forEach((file) => {
         let subDir = path.parse(file).dir;
         fs.ensureDirSync(path.join(__dirname, "extracted", characterName, subDir));
         if (file.includes("*")) {
@@ -776,7 +776,7 @@ function appendCharacter(add, dir = cmcDir) {
 
 function dropCharacter(drop, dir = cmcDir) {
     let characters = getCharacters();
-    characters.filter((character) => {
+    characters = characters.filter((character) => {
        return character.name != drop;
     });
     let output = (characters.length + 1) + "\r\n";
@@ -961,9 +961,9 @@ ipcMain.on("getStageList", (event, args) => {
     });
 });
 
-function getStages() {
+function getStages(dir = cmcDir) {
     let stages = [];
-    let stagesTxt = fs.readFileSync(path.join(cmcDir, "data", "stages.txt"), "ascii").split(/\r?\n/);
+    let stagesTxt = fs.readFileSync(path.join(dir, "data", "stages.txt"), "ascii").split(/\r?\n/);
     stages.shift();
     for(let stage = 0; stage < (stagesTxt.length / 4); stage++) {
         stages[stage] = {
@@ -990,28 +990,18 @@ function writeStages(stages) {
 
 function appendStage(add) {
     let stages = getStages();
-    stages.push({
-        name: add,
-        displayName: "",
-        displaySource: "",
-        series: "",
-    });
+    stages.push(add);
     writeStages(stages);
 }
 
-// function dropCharacter(drop) {
-//     let characters = getCharacters();
-//     characters.filter((character) => {
-//        return character.name != drop;
-//     });
-//     let output = (characters.length + 1) + "\r\n";
-//     characters.forEach((character) => {
-//         output += character.name + "\r\n";
-//     });
-//     fs.writeFileSync(path.join(cmcDir, "data", "fighters.txt"), output, "ascii");
-//     toggleRandomCharacter(true, drop);
-//     removeAlts(drop);
-// }
+function dropStage(drop) {
+    let stages = getStages();
+    stages = stages.filter((stage) => {
+       return stage.name != drop;
+    });
+    writeStages(stages);
+    // toggleRandomCharacter(true, drop);
+}
 
 ipcMain.on("installStageDir", (event, args) => {
     dialog.showOpenDialog(win, {
@@ -1095,51 +1085,82 @@ function installStage(dir, filteredInstall) {
         }
     };
 
-    // if (filteredInstall) {
-    //     filterStageFiles(stageName).forEach((file) => {
-    //         let subDir = path.parse(file).dir;
-    //         if (file.includes("*")) {
-    //             let start = path.parse(file).base.split("*")[0].replace(subDir, "");
-    //             let end = path.parse(file).base.split("*")[1];
-    //             if (fs.existsSync(path.join(dir, subDir))) {
-    //                 let contents = fs.readdirSync(path.join(dir, subDir)).filter((i) => {
-    //                     return i.startsWith(start) && i.endsWith(end);
-    //                 });
-    //                 contents.forEach((found) => {
-    //                     console.log("Copying: " + path.join(dir, subDir, found));
-    //                     fs.copySync(path.join(dir, subDir, found), path.join(cmcDir, subDir, found), {overwrite: true});
-    //                 });
-    //             }
-    //         } else {
-    //             if (fs.existsSync(path.join(dir, file))) {
-    //                 console.log("Copying: " + path.join(dir, file));
-    //                 fs.copySync(path.join(dir, file), path.join(cmcDir, file), {overwrite: true});
-    //             }
-    //         }
-    //     });
-    // } else {
-    //     fs.copySync(dir, path.join(cmcDir), {overwrite: true});
-    // }
+    installStageInfo(stageName, dir, filteredInstall);
+}
 
-    let txts = fs.readdirSync(dir).filter((file) => path.parse(file).ext.toLowerCase() == ".txt");
-    console.log(txts);
-    if (txts.length == 1) {
-        if (fs.readFileSync(path.join(dir, txts[0]), "ascii").split(/\r?\n/).length == 4) {
-            console.log("here");
-        }
+async function installStageInfo(stageName, dir, filteredInstall) {
+    let displayName = await prompt("", "Stage display name:\n\
+(This is the name that will be displayed on the Stage Selection Screen)");
+    if (displayName) {
+        console.log(displayName);
+    } else {
+        win.webContents.send("alert", "Stage not installed: no display name provided.");
+        return;
     }
+    let displaySource = await prompt("", "Stage display source:\n\
+(This is the name of the source the stage is from (e.g. game name) that will be displayed on the Stage Selection Screen)");
+    if (displaySource) {
+        console.log(displaySource);
+    } else {
+        win.webContents.send("alert", "Stage not installed: no display source provided.");
+        return;
+    }
+    series = await prompt("", "Stage series name (seriesicon):\n\
+(This is the name of the series icon to use for the stage. It should be short and in all lowercase)");
+    if (series) {
+        series = series.toLowerCase();
+        console.log(series);
+    } else {
+        win.webContents.send("alert", "Stage not installed: no series name provided.");
+        return;
+    }
+    let stage = {
+        name: stageName,
+        displayName: displayName,
+        displaySource: displaySource,
+        series: series,
+    };
 
-    // appendStage(stageName);
+    installStageFiles(stage, dir, filteredInstall);
+}
+
+function installStageFiles(stage, dir, filteredInstall) {
+    if (filteredInstall) {
+        filterStageFiles(stage.name, stage.series).forEach((file) => {
+            let subDir = path.parse(file).dir;
+            if (file.includes("*")) {
+                let start = path.parse(file).base.split("*")[0].replace(subDir, "");
+                let end = path.parse(file).base.split("*")[1];
+                if (fs.existsSync(path.join(dir, subDir))) {
+                    let contents = fs.readdirSync(path.join(dir, subDir)).filter((i) => {
+                        return i.startsWith(start) && i.endsWith(end);
+                    });
+                    contents.forEach((found) => {
+                        console.log("Copying: " + path.join(dir, subDir, found));
+                        fs.copySync(path.join(dir, subDir, found), path.join(cmcDir, subDir, found), {overwrite: true});
+                    });
+                }
+            } else {
+                if (fs.existsSync(path.join(dir, file))) {
+                    console.log("Copying: " + path.join(dir, file));
+                    fs.copySync(path.join(dir, file), path.join(cmcDir, file), {overwrite: true});
+                }
+            }
+        });
+    } else {
+        fs.copySync(dir, path.join(cmcDir), {overwrite: true});
+    }
+    appendStage(stage);
     win.webContents.send("from_installStage");
 }
 
-function filterStageFiles(stageName, ignoreSeries = false) {
+function filterStageFiles(stageName, stageSeries = null) {
     let files = [];
     STAGE_FILES.forEach((file) => {
         let fixedFiles = [];
         let replaced = file.replace("<stage>", stageName);
-        if(!ignoreSeries) {
-            replaced = replaced.replace("<series>", characterDat[3]);
+        if (stageSeries) {
+            replaced = replaced.replace("<series>", stageSeries);
         }
         fixedFiles.push(replaced);
         fixedFiles.forEach((fixed) => {
@@ -1147,6 +1168,106 @@ function filterStageFiles(stageName, ignoreSeries = false) {
         });
     });
     return files;
+}
+
+ipcMain.on("removeStage", (event, args) => {
+    args -= 1;
+    removeStage(args);
+    win.webContents.send("from_removeStage");
+});
+
+function removeStage(number) {
+    // deleteStageSSS(parseInt(number) + 1); TODO:
+    let stages = getStages();
+    let stageName = stages[number].name;
+    let similarName = [];
+    stages.forEach((stage) => {
+        if (stage.name != stageName && stage.name.startsWith(stageName)) {
+            similarName.push(stage.name);
+        }
+    });
+    filterStageFiles(stageName).forEach((file) => {
+        let subDir = path.parse(file).dir;
+        if (file.includes("*")) {
+            let start = path.parse(file).base.split("*")[0].replace(subDir, "");
+            let end = path.parse(file).base.split("*")[1];
+            if (fs.existsSync(path.join(cmcDir, subDir))) {
+                let contents = fs.readdirSync(path.join(cmcDir, subDir)).filter((i) => {
+                    similarName.forEach((name) => {
+                        if (i.startsWith(name)) {
+                            console.log(i + " was ignored because it belongs to " + name);
+                            return false;
+                        }
+                    });
+                    return i.startsWith(start) && i.endsWith(end);
+                });
+                contents.forEach((found) => {
+                    console.log("Removing: " + path.join(cmcDir, subDir, found));
+                    fs.removeSync(path.join(cmcDir, subDir, found));
+                });
+            }
+        } else {
+            if (fs.existsSync(path.join(cmcDir, file))) {
+                console.log("Removing: " + path.join(cmcDir, file));
+                fs.removeSync(path.join(cmcDir, file));
+            }
+        }
+    });
+    dropStage(stageName);
+}
+
+ipcMain.on("extractStage", (event, args) => {
+    args -= 1;
+    extractStage(args);
+    win.webContents.send("from_extractStage");
+});
+
+function extractStage(stageNumber, dir = cmcDir, isV7 = false) {//TODO: v7 support for porting
+    let stages = getStages(dir);//getStages(dir, isV7);
+    let stageName = stages[stageNumber].name;
+    let similarName = [];
+    stages.forEach((stage) => {
+        if (stage.name != stageName && stage.name.startsWith(stageName)) {
+            similarName.push(stage.name);
+        }
+    });
+    // if (isV7) {
+    //     let characterDat = fs.readFileSync(path.join(dir, "data", "dats", characterName + ".dat"), "ascii").split(/\r?\n/);
+    //     characterDat[0] = characters[characterNumber].displayName;
+    //     characterDat[1] = characters[characterNumber].displayName;
+    //     characterDat[2] = characters[characterNumber].displayName;
+    //     characterDat[3] = characters[characterNumber].series;
+    //     fs.writeFileSync(path.join(dir, "data", "dats", characterName + ".dat"), characterDat.join("\r\n"), "ascii");
+    // }
+    filterStageFiles(stageName, stages[stageNumber].series).forEach((file) => {
+        let subDir = path.parse(file).dir;
+        fs.ensureDirSync(path.join(__dirname, "extracted", stageName, subDir));
+        if (file.includes("*")) {
+            let start = path.parse(file).base.split("*")[0].replace(subDir, "");
+            let end = path.parse(file).base.split("*")[1];
+            if (fs.existsSync(path.join(dir, subDir))) {
+                let contents = fs.readdirSync(path.join(dir, subDir)).filter((i) => {
+                    similarName.forEach((name) => {
+                        if (i.startsWith(name)) {
+                            console.log(i + " was ignored because it belongs to " + name);
+                            return false;
+                        }
+                    });
+                    return i.startsWith(start) && i.endsWith(end);
+                });
+                contents.forEach((found) => {
+                    console.log("Extracting: " + path.join(dir, subDir, found));
+                    fs.copySync(path.join(dir, subDir, found), path.join(__dirname, "extracted", stageName, subDir, found), {overwrite: true});
+                });
+            }
+        } else {
+            if (fs.existsSync(path.join(dir, file))) {
+                console.log("Extracting: " + path.join(dir, file));
+                fs.copySync(path.join(dir, file), path.join(__dirname, "extracted", stageName, file), {overwrite: true});
+            }
+        }
+    });
+    return path.join(__dirname, "extracted", stageName);
 }
 
 // Port Characters
@@ -1187,7 +1308,7 @@ ipcMain.on("openSourceDir", (event, args) => {
 });
 
 ipcMain.on("getCharacterListSource", (event, args) => {
-    altsToFighters(sourceDir);
+    // altsToFighters(sourceDir);
     let characters = getCharacters(sourceDir, getGameVersion(sourceDir, PORT_SUPPORTED_VERSIONS) == "CMC+ v7");
     win.webContents.send("from_getCharacterListSource", {
         characters: characters,
@@ -1205,7 +1326,7 @@ ipcMain.on("installCharacterSource", (event, args) => {
     installCharacter(args.dir, args.filtered, true);
 });
 
-ipcMain.on("installAllCharsSource", (event, args) => {
+ipcMain.on("installAllCharsSource", (event, args) => {//TODO:
     isV7 = getGameVersion(sourceDir, PORT_SUPPORTED_VERSIONS) == "CMC+ v7";
     number = 0;
     getCharacters(sourceDir, isV7).forEach((fighter) => {

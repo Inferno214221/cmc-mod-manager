@@ -47,11 +47,13 @@ https://inferno214221.com/dev/cmc-mod-manager/
 - [ ] Install all
 - [x] Show whether a character is installed (sperate update button)
 ### Stage Manager
-- [ ] Install stages from a folder
-- [ ] Install stages from a zip (extract, install folder, delete)
-- [ ] List stages
-- [ ] Extract stages
-- [ ] Remove stages
+- [x] Install stages from a folder
+- [x] Install stages from a zip (extract, install folder, delete)
+- [x] List stages
+- [x] Extract stages
+- [x] Remove stages
+- [ ] Fix SSS after removal
+- [ ] Remove all stages
 - [ ] Option to remove stages from random list
 ## Stage Selection Screen
 - [ ] Display the SSS w/ pages
