@@ -3,6 +3,7 @@ https://inferno214221.com/dev/cmc-mod-manager/
 
 # Feature Progress
 - [ ] Move to async (everywhere)
+- [ ] Re organise code with OOP
 - [ ] Tidy up UI
 ## Main Page
 - [x] Select the CMC+ directory
@@ -52,18 +53,17 @@ https://inferno214221.com/dev/cmc-mod-manager/
 - [x] List stages
 - [x] Extract stages
 - [x] Remove stages
-- [ ] Fix SSS after removal
+- [x] Fix SSS after removal
 - [ ] Remove all stages
 - [ ] Option to remove stages from random list
 ## Stage Selection Screen
-- [ ] Display the SSS w/ pages
-- [ ] Display unincluded stages
-- [ ] Add stages to SSS
-- [ ] Remove from the SSS
-- [ ] Sort hidden stages
-- [ ] Export SSS
-- [ ] Save / load layouts
-- [ ] Change the number of rows & columns
+- [x] Display the SSS w/ pages
+- [x] Display unincluded stages
+- [x] Add stages to SSS
+- [x] Remove from the SSS
+- [x] Sort hidden stages
+- [x] Export SSS
+- [x] Change the number of rows & columns
 - [ ] Add pages
 - [ ] Alerts
 - [ ] Errors

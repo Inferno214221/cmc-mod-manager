@@ -43,7 +43,7 @@
             <li>
                 <a href="./stageManager.html" class="tab">
                     <div class="inactiveTab">
-                        Stage Manager
+                        Stages
                     </div>
                 </a>
             </li>
@@ -63,9 +63,76 @@
             </li> -->
         </ul>
     </nav>
-    <section>
-        E
+    <section id="mainSection">
+        <table>
+            <tr>
+                <td class="column">
+                    <fieldset>
+                        <legend>Stage Selection Page</legend>
+                        <button type="button" onclick="getSSSPage(-1)"><</button>
+                        <input type="text" value="default" id="SSSPageName" onfocus="inputFocused('SSSPageName')" onblur="inputBlurred('SSSPageName')" readonly="true"/>
+                        <button type="button" onclick="getSSSPage(1)">></button>
+                        <!-- TODO: -->
+                        <!-- <button type="button" onclick="">+</button>
+                        <button type="button" onclick="">-</button> -->
+                    </fieldset>
+                </td>
+                <td class="column">
+                    <fieldset>
+                        <legend>Franchise</legend>
+                        <select id="seriesSelect" onfocus="inputFocused('seriesSelect')" onblur="inputBlurred('seriesSelect')">
+                            <option value=""></option>
+                        </select><br/>
+                        <button type="button" onclick="removeSeries()">Hide Entire Franchise</button>
+                    </fieldset>
+                </td>
+            </tr>
+        </table>
+        <table id="stageTable">
+            <tr>
+                <td id="stageSelectionCell">
+                    <fieldset>
+                        <legend>Stage Selection Screen</legend>
+                        <table id="stageSelectTable">
+                            <tr>
+                                <th class="sssSquare"></th>
+                                <th class="sssSquare">0</th>
+                            </tr>
+                            <tr>
+                                <th class="sssSquare">0</th>
+                                <td class="sssSquare" id="none"><image class="icon" /></td>
+                            </tr>
+                        </table>
+                    </fieldset>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <fieldset>
+                        <legend>Hidden Stages</legend>
+                        <span>Sorting:</span>
+                        <select id="sortingType" onfocus="inputFocused('sortingType')" onblur="inputBlurred('sortingType')" onchange="resort()">
+                            <option value="number">Internal Number</option>
+                            <option value="series">Franchise</option>
+                            <option value="displayName">Alphabetical</option>
+                        </select>
+                        <input type="checkbox" id="reverseSort" name="reverseSort" onchange="resort()">
+                        <label for="reverseSort">Reverse</label>
+                        <input type="checkbox" id="showAll" name="showAll" onchange="resort()">
+                        <label for="showAll">Show All Stages</label>
+                        <div id="hiddenStagesScrollable">
+                            <table id="hiddenStagesTable" ondragover="event.preventDefault();" ondrop="onDropOnHidden(event);">
+                            </table>
+                        </div>
+                    </fieldset>
+                </td>
+            </tr>
+        </table>
     </section>
+    <script src="../js/global.js">
+    </script>
+    <script src="../js/stageSelectionScreen.js">
+    </script>
 </body>
 
 </html>

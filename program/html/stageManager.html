@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>CMC Mod Manager | Stage Manager</title>
+    <title>CMC Mod Manager | Stages</title>
 	<link rel="icon" href="">
     <link rel="stylesheet" type="text/css" href="../css/stageManager.css">
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Ubuntu">
@@ -43,7 +43,7 @@
             <li>
                 <a href="./stageManager.html" class="tab">
                     <div class="activeTab">
-                        Stage Manager
+                        Stages
                     </div>
                 </a>
             </li>
@@ -69,12 +69,14 @@
             <button type="button" onclick="installStageDir()">Install Stage From Directory</button>
             <button type="button" onclick="installStageArch()">Install Stage From Archive</button>
             <button type="button" onclick="openDir('extracted')">Open Extracted Directory</button>
-            <button type="button" onclick="removeAllStage()">Remove All Stages</button>
+            <!-- <button type="button" onclick="removeAllStage()">Remove All Stages</button> -->
             <br/>
             <input type="checkbox" id="filteredInstall" name="filteredInstall" checked>
             <label for="filteredInstall">Install Only Necessary Files</label>
             <br/>
-            <span>Note: Because of the format of stage mods for CMC, you will be prompted for additional information after the mod is selected.</span>
+            <span>Installation Note: Because of the format of stage mods for CMC, you will be prompted for additional information after the mod is selected.</span>
+            <br/>
+            <span>Removal Note: Some stages are requried by challenges and their removal may lead to breakages.</span>
         </fieldset>
         <fieldset>
             <legend>Installed Stages</legend>

@@ -102,10 +102,10 @@ function resort() {
     getStageList();
 }
 
-function removeAllStages() {
-    if(!confirm("All stages except for Master Hand and Fighting Sprite will be removed.\nAre you sure you want to continue?")) return;
-    this.api.send("removeAllStages");
-}
+// function removeAllStages() {
+//     if(!confirm("All stages except for Master Hand and Fighting Sprite will be removed.\nAre you sure you want to continue?")) return;
+//     this.api.send("removeAllStages");
+// }
 
 this.api.receive("from_removeAllStages", () => {
     alert("Stages removed successfully.");

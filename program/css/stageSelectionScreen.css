@@ -1,1 +1,132 @@
 @import "./global.css";
+
+body {
+    overflow-x: hidden;
+}
+
+/* .hoverText {
+    float: left;
+} */
+
+.mug {
+    padding: 0px 5px;
+    height: 62px;
+}
+
+.mugIcon {
+    width: 62px;
+    height: 62px;
+    object-fit: cover;
+}
+
+.hiddenName {
+    font-size: 11pt;
+    height: 26pt;
+    width: 62px;
+    word-wrap: break-word;
+    overflow: hidden;
+    white-space: normal;
+}
+
+.hiddenStage {
+    display: inline-block;
+    /* float: left; */
+    max-width: 62px;
+}
+
+.addButton {
+    width: 62px;
+}
+
+.icon {
+    height: 62px;
+    width: 62px;
+    object-fit: cover;
+}
+
+.sssSquare {
+    padding: 1px;
+    /* height: 37px; */
+    width: 37px;
+}
+
+.sssName {
+    position: relative;
+    font-size: 8pt;
+    width: 35px;
+    height: 8pt;
+    word-wrap: break-word;
+    overflow: hidden;
+    text-align: center;
+}
+
+input[type=text],
+select {
+    width: 100px;
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 3px;
+    background-color: var(--inf-grey5);
+    border-color: black;
+    color: inherit;
+    font-family: inherit;
+    font-size: 11pt;
+    outline: none;
+    box-shadow: 0px 1px #00000088;
+}
+
+input[type=text] {
+    height: 27px;
+    padding: 0px 5px;
+}
+
+select {
+    height: 29px;
+    padding: 0px;
+}
+
+.sssProfiles {
+    display: inline;
+}
+
+.column {
+    /* width: 400px;
+    display: inline; */
+    vertical-align: top;
+}
+
+#xInput,
+#yInput {
+    width: 50px;
+    margin-right: 5px;
+}
+
+#sortingType {
+    margin-bottom: 10px;
+    width: 150px;
+}
+
+#hiddenStagesScrollable {
+    overflow: hidden;
+    overflow-x: scroll;
+    white-space: nowrap;
+    width: calc(100vw - 50px);
+    white-space: nowrap;
+    padding-bottom: 10px;
+}
+
+#stageTable {
+    table-layout: fixed;
+    width: 100vw;
+    margin-left: -20px;
+    margin-top: -5px;
+}
+
+#hiddenStagesTable {
+    min-width: 100%;
+    min-height: 100px;
+}
+
+#SSSPageName {
+    width: 150px;
+}

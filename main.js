@@ -926,7 +926,7 @@ function getCSS(page) {
     let cssFile = fs.readFileSync(path.join(cmcDir, "data", page), "ascii").split(/\r?\n/);
     let css = [];
     cssFile.forEach((line) => {
-        css.push(line.split(" "))
+        css.push(line.split(" "));
     });
     css[css.length - 1].pop();
     return css;
@@ -951,7 +951,7 @@ function writeCSS(css, page) {
     fs.writeFileSync(path.join(cmcDir, "data", page), cssFile, "ascii");
 }
 
-//Stages
+// Stages
 ipcMain.on("getStageList", (event, args) => {
     win.webContents.send("from_getStageList", {
         stages: getStages(),
@@ -1177,7 +1177,7 @@ ipcMain.on("removeStage", (event, args) => {
 });
 
 function removeStage(number) {
-    // deleteStageSSS(parseInt(number) + 1); TODO:
+    deleteStageSSS(parseInt(number) + 1);
     let stages = getStages();
     let stageName = stages[number].name;
     let similarName = [];
@@ -1268,6 +1268,75 @@ function extractStage(stageNumber, dir = cmcDir, isV7 = false) {//TODO: v7 suppo
         }
     });
     return path.join(__dirname, "extracted", stageName);
+}
+
+// Stage Selection Screen
+ipcMain.on("getSSS", (event, args) => {
+    console.log(args);
+    win.webContents.send("from_getSSS", {
+        sss: getSSS()[args],
+        stages: getStages(),
+        cmcDir: cmcDir,
+    });
+});
+
+function getSSS() {
+    let sssFile = fs.readFileSync(path.join(cmcDir, "data", "sss.txt"), "ascii").split(/\r?\n/);
+    let sss = {};
+    sssFile.shift();
+    let page;
+    sssFile.forEach((line) => {
+        if (isNaN(line.split(" ")[0])) {
+            page = line;
+            sss[page] = [];
+        } else {
+            sss[page].push(line.split(" ").filter(num => num != ""));
+        }
+    });
+    // console.log(sss);
+    return sss;
+}
+
+ipcMain.on("getSSSPages", (event, args) => {
+    win.webContents.send("from_getSSSPages", Object.keys(getSSS()));
+});
+
+ipcMain.on("writeSSS", (event, args) => {
+    let sss = getSSS();
+    sss[args.page] = args.sss;
+    writeSSS(sss);
+});
+
+function writeSSS(sss) {
+    let sssFile = Object.keys(sss).length + "\r\n";
+    Object.keys(sss).forEach((page) => {
+        sssFile += page + "\r\n";
+        sss[page].forEach((row) => {
+            sssFile += row.join(" ") + "\r\n";
+        });
+    });
+    sssFile = sssFile.slice(0, -2);
+    console.log(sssFile + "EOF");
+    fs.writeFileSync(path.join(cmcDir, "data", "sss.txt"), sssFile, "ascii");
+}
+
+function deleteStageSSS(sssNumber) {
+    let sss = getSSS();
+    Object.keys(sss).forEach((page) => {
+        for (let y in sss[page]) {
+            for (let x in sss[page][y]) {
+                if (sss[page][y][x] != "9999") {
+                    if (sss[page][y][x] == ('0000' + sssNumber).slice(-4)) {
+                        sss[page][y][x] = "0000";
+                    } else if (sss[page][y][x] >= ('0000' + sssNumber).slice(-4)) {
+                        sss[page][y][x] = ('0000' + (parseInt(sss[page][y][x]) - 1)).slice(-4);
+                    }
+                }
+            };
+        };
+    });
+    console.log(sss);
+    writeSSS(sss);
 }
 
 // Port Characters
