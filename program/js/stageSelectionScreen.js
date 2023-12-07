@@ -81,7 +81,7 @@ function makeTables() {
                 output += "\
 <td class=\"sssSquare hoverText\" id=\"" + number + "\">\n\
     <div id=\'{ \"x\": " + x + ", \"y\": " + y + " }\' draggable=\"true\" ondragover=\"event.preventDefault();\" ondragstart=\"onDragStartSSS(event);\" ondrop=\"onDropOnSSS(event);\">\n\
-        <image draggable=\"false\" class=\"icon\" src=\"" + cmcDir + "/gfx/stgicons/" + stages[number - 1].name + ".png\" onerror=\"this.onerror=null; this.src='" + cmcDir + "/gfx/stgicons/empty.png'\" alt=\" \" />\n\
+        <image draggable=\"false\" class=\"icon\" src=\"" + cmcDir + "/gfx/stgicons/" + stages[number - 1].name + ".png\" onerror=\"this.onerror=null; this.src='" + cmcDir.replaceAll("\\", "\\\\")  + "/gfx/stgicons/empty.png'\" alt=\" \" />\n\
         <div class=\"sssName\">" + stages[number - 1].displayName + "</div>\n\
     </div>\n\
     <span class=\"tooltipText\">" + stages[number - 1].displayName + "</span>\n\
@@ -103,7 +103,7 @@ function makeTables() {
         output += 
         "<td class=\"hoverText hiddenStage\">\n\
             <div draggable=\"true\" ondragstart=\"onDragStartHidden(event);\" id=\"" + stage.number + "\" class=\"mug\">\n\
-                <image draggable=\"false\" class=\"mugIcon\" src=\"" + cmcDir + "/gfx/stgicons/" + stage.name + ".png\" onerror=\"this.onerror=null; this.src='" + cmcDir + "/gfx/stgicons/empty.png'\" alt=\"\" />\n\
+                <image draggable=\"false\" class=\"mugIcon\" src=\"" + cmcDir + "/gfx/stgicons/" + stage.name + ".png\" onerror=\"this.onerror=null; this.src='" + cmcDir.replaceAll("\\", "\\\\")  + "/gfx/stgicons/empty.png'\" alt=\"\" />\n\
                 <div class=\"hiddenName\">" + stage.displayName + "</div>\n\
             </div>\n\
             <span class=\"tooltipText\" draggable=\"false\">" + stage.displayName + "</span>\n\

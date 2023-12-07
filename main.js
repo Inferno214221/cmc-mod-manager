@@ -956,7 +956,6 @@ ipcMain.on("getStageList", (event, args) => {
     win.webContents.send("from_getStageList", {
         stages: getStages(),
         cmcDir: cmcDir,
-        random: [],
         // random: getRandomStages(),
     });
 });

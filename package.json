@@ -1,6 +1,6 @@
 {
   "name": "cmc-mod-manager",
-  "version": "2.2.1",
+  "version": "2.3.0",
   "description": "A Mod Manager For SSBC CMC+ v8 Made With Electron",
   "main": "main.js",
   "scripts": {
