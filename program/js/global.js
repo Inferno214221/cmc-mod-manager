@@ -17,3 +17,20 @@ this.api.receive("from_oneClickFinish", () => {
 this.api.receive("alert", (info) => {
     alert(info);
 });
+
+function selectGameDir() {
+    this.api.send("selectGameDir");
+}
+
+this.api.receive("from_selectGameDir", (dir) => {
+    alert("CMC directory set successfully.");
+    writeGameLocation(dir);
+});
+
+function openGameDir() {
+    this.api.send("openGameDir");
+}
+
+function runGame() {
+    this.api.send("runGame");
+}

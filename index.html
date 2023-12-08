@@ -11,57 +11,89 @@
 
 <body>
     <nav>
-        <ul id="navBar">
-            <li>
-                <a href="./index.html" class="tab">
-                    <div class="activeTab">
-                        Home
-                    </div>
-                </a>
-            </li>
-            <li>
-                <a href="./program/html/characterManager.html" class="tab">
-                    <div class="inactiveTab">
-                        Characters
-                    </div>
-                </a>
-            </li>
-            <li>
-                <a href="./program/html/characterSelectionScreen.html" class="tab">
-                    <div class="inactiveTab">
-                        Character Selection Screen
-                    </div>
-                </a>
-            </li>
-            <li>
-                <a href="./program/html/characterPorter.html" class="tab">
-                    <div class="inactiveTab">
-                        Port Characters
-                    </div>
-                </a>
-            </li>
-            <li>
-                <a href="./program/html/stageManager.html" class="tab">
-                    <div class="inactiveTab">
-                        Stages
-                    </div>
-                </a>
-            </li>
-            <li>
-                <a href="./program/html/stageSelectionScreen.html" class="tab">
-                    <div class="inactiveTab">
-                        Stage Selection Screen
-                    </div>
-                </a>
-            </li>
-            <!-- <li>
-                <a href="./program/html/miscMods.html" class="tab">
-                    <div class="inactiveTab">
-                        Misc. Mods
-                    </div>
-                </a>
-            </li> -->
-        </ul>
+        <div class="activeTab hoverText">
+            <button class="navButton" onclick="location.href='./index.html'">
+                <span class="matIcon navIcon">home</span>
+            </button>
+            <div class="navTooltip">
+                <span>Home</span>
+            </div>
+        </div>
+        <hr>
+        <div class="hoverText">
+            <button class="navButton" onclick="location.href='./program/html/characterManager.html'">
+                <span class="matIcon navIcon">person</span>
+            </button>
+            <div class="navTooltip">
+                <span>Characters</span>
+            </div>
+        </div>
+        <div class="hoverText">
+            <button class="navButton" onclick="location.href='./program/html/characterSelectionScreen.html'">
+                <span class="matIcon navIcon">pan_tool_alt</span>
+            </button>
+            <div class="navTooltip">
+                <span>Character Selection Screen</span>
+            </div>
+        </div>
+        <div class="hoverText">
+            <button class="navButton" onclick="location.href='./program/html/characterPorter.html'">
+                <span class="matIcon navIcon">add_moderator</span>
+            </button>
+            <div class="navTooltip">
+                <span>Port Characters</span>
+            </div>
+        </div>
+        <hr>
+        <div class="hoverText">
+            <button class="navButton" onclick="location.href='./program/html/stageManager.html'">
+                <span class="matIcon navIcon">terrain</span>
+            </button>
+            <div class="navTooltip">
+                <span>Stages</span>
+            </div>
+        </div>
+        <div class="hoverText">
+            <button class="navButton" onclick="location.href='./program/html/stageSelectionScreen.html'">
+                <span class="matIcon navIcon">pan_tool_alt</span>
+            </button>
+            <div class="navTooltip">
+                <span>Stage Selection Screen</span>
+            </div>
+        </div>
+        <!-- <div class="hoverText">
+            <button class="navButton" onclick="location.href='./program/html/stagePorter.html'">
+                <span class="navIcon">add_moderator</span>
+            </button>
+            <div class="navTooltip">
+                <span>Port Stages</span>
+            </div>
+        </div> -->
+        <div style="flex-grow: 1;"></div>
+        <div class="hoverText">
+            <button class="navButton" onclick="selectGameDir()">
+                <span class="matIcon navIcon">health_and_safety</span>
+            </button>
+            <div class="navTooltip">
+                <span>Change CMC+ Directory</span>
+            </div>
+        </div>
+        <div class="hoverText">
+            <button class="navButton" onclick="openGameDir()">
+                <span class="matIcon navIcon">folder</span>
+            </button>
+            <div class="navTooltip">
+                <span>Open CMC+ Directory</span>
+            </div>
+        </div>
+        <div class="hoverText">
+            <button class="navButton" onclick="runGame()">
+                <span class="matIcon navIcon">play_circle</span>
+            </button>
+            <div class="navTooltip">
+                <span>Run CMC+</span>
+            </div>
+        </div>
     </nav>
     <section>
         <fieldset>
@@ -76,6 +108,8 @@
             <button type="button" onclick="setupOneClick()">Set Up One Click Installation</button>
         </fieldset> -->
     </section>
+    <script src="./program/js/global.js">
+    </script>
     <script src="./program/js/index.js">
     </script>
 </body>
