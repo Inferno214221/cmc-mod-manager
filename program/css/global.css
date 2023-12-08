@@ -208,7 +208,7 @@ label {
 }
 
 .hoverText:click .tooltipText,
-.hoverText:hover .navTooltip {
+.hoverText:click .navTooltip {
     visibility: visible;
 }
 

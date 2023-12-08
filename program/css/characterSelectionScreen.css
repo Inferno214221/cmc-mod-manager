@@ -110,7 +110,7 @@ select {
     overflow: hidden;
     overflow-x: scroll;
     white-space: nowrap;
-    width: calc(100vw - 50px);
+    width: calc(100vw - 60px);
     white-space: nowrap;
     padding-bottom: 10px;
 }
@@ -129,4 +129,97 @@ select {
 
 #CSSPageName {
     width: 150px;
+}
+
+section {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+#pageDiv,
+#hiddenDiv {
+    height: min-content;
+    background-color: var(--inf-grey4);
+    z-index: 1;
+    padding: 5px;
+}
+
+#cssDiv {
+    flex-grow: 1;
+    min-height: 0px;
+    padding: 5px;
+}
+
+.center {
+    margin-left: auto;
+    margin-right: auto;
+    width: fit-content;
+}
+
+#cssWrapper {
+    overflow: scroll;
+    white-space: nowrap;
+    width: 100%;
+    height: 100%;
+    white-space: nowrap;
+}
+
+hr {
+    border-color: var(--inf-grey2);
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 5px;
+    margin: 5px 0px;
+}
+
+.toggleIcon {
+    font-size: 30px;
+    color: var(--inf-white3);
+}
+
+.toggleIcon:hover {
+    color: var(--inf-white2);
+}
+
+.verticalInline {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.hoverText:hover .uiTooltip {
+    visibility: visible;
+}
+
+.hoverText:click .uiTooltip {
+    visibility: visible;
+}
+
+.uiTooltip:hover,
+.uiTooltip:hover span {
+    visibility: hidden;
+    z-index: -1;
+}
+
+.uiTooltip {
+    visibility: hidden;
+    position: absolute;
+    z-index: 1;
+    display: inline;
+    margin: 0px;
+    margin-top: -10px;
+    margin-left: 2px;
+    padding: 0px;
+    height: 50px;
+    display: inline-flex;
+    align-items: center;
+}
+
+.uiTooltip span {
+    color: white;
+    font-size: 15px;
+    font-weight: bold;
+    background-color: var(--inf-grey1);
+    border-radius: 10px;
+    padding: 5px 10px;
 }
