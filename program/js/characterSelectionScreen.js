@@ -24,10 +24,21 @@ function getPages() {
 
 this.api.receive("from_getPages", (data) => {
     pages = data;
+    writePages();
 });
 
 function getCSS(page) {
+    currentPage = page;
     this.api.send("getCSS", page);
+    writePages();
+}
+
+function writePages() {
+    let output = "";
+    pages.forEach((page) => {
+        output += "<button type=\"button\" onclick=\"getCSS('" + page + "')\"" + (page == currentPage ? "class=\"activePage\"" : "class=\"inactivePage\"") + ">" + page.replace(".txt", "").replace("css/", "") + "</button>";
+    });
+    pagesContainer.innerHTML = output;
 }
 
 this.api.receive("from_getCSS", (data) => {
@@ -108,17 +119,17 @@ function makeTables() {
     output += "</tr>";
     hiddenCharactersTable.innerHTML = output;
 
-    let series = [];
-    for (let character of characters) {
-        if (character != undefined && !series.includes(character.series)) {
-            series.push(character.series);
-        }
-    }
-    output = "";
-    series.forEach((s) => {
-        output += "<option value=\"" + s + "\">" + s + "</option>'\n";
-    });
-    seriesSelect.innerHTML = output;
+    // let series = [];
+    // for (let character of characters) {
+    //     if (character != undefined && !series.includes(character.series)) {
+    //         series.push(character.series);
+    //     }
+    // }
+    // output = "";
+    // series.forEach((s) => {
+    //     output += "<option value=\"" + s + "\">" + s + "</option>'\n";
+    // });
+    // seriesSelect.innerHTML = output;
 }
 
 function sortCharacters(characters, sortType) {
@@ -162,14 +173,14 @@ function addCharacter(characterNumber, x, y) {
     writeCSS();
 }
 
-function getCSSPage(offset) {
-    let index = pages.indexOf(currentPage) + offset;
-    if (index < 0) index = pages.length - 1;
-    if (index > pages.length - 1) index = 0;
-    currentPage = pages[index];
-    CSSPageName.value = currentPage.replace(".txt", "");
-    getCSS(currentPage);
-}
+// function getCSSPage(offset) {
+//     let index = pages.indexOf(currentPage) + offset;
+//     if (index < 0) index = pages.length - 1;
+//     if (index > pages.length - 1) index = 0;
+//     currentPage = pages[index];
+//     CSSPageName.value = currentPage.replace(".txt", "");
+//     getCSS(currentPage);
+// }
 
 function resort() {
     inputBlurred('sortingType');
@@ -209,27 +220,27 @@ function onDropOnCSS(ev) {
     }
 }
 
-function removeSeries() {
-    series = seriesSelect.value;
-    if (series == "") {
-        return;
-    }
-    for (let character = 0; character < characters.length; character++) {
-        if (characters[character] == undefined) {
-            continue;
-        }
-        if (characters[character].series == series) {
-            for (let y in css) {
-                for (let x in css[y]) {
-                    if (('0000' + (character + 1)).slice(-4) == css[y][x]) {
-                        removeCharacter(x, y);
-                    }
-                };
-            };
-        }
-    }
-    writeCSS();
-}
+// function removeSeries() {
+//     series = seriesSelect.value;
+//     if (series == "") {
+//         return;
+//     }
+//     for (let character = 0; character < characters.length; character++) {
+//         if (characters[character] == undefined) {
+//             continue;
+//         }
+//         if (characters[character].series == series) {
+//             for (let y in css) {
+//                 for (let x in css[y]) {
+//                     if (('0000' + (character + 1)).slice(-4) == css[y][x]) {
+//                         removeCharacter(x, y);
+//                     }
+//                 };
+//             };
+//         }
+//     }
+//     writeCSS();
+// }
 
 function addRow() {    
     let output = [];
@@ -265,5 +276,5 @@ function removeColumn() {
 var css, characters, hidden, currentPage, pages, cmcDir;
 getPages();
 currentPage = "css.txt";
-CSSPageName.value = "css";
+// CSSPageName.value = "css";
 getCSS(currentPage);

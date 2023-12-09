@@ -7,7 +7,7 @@ const childProcess = require("child_process");
 require('array.prototype.move');
 const extract = require('extract-zip');
 const unrar = require("node-unrar-js");
-const prompt = require('native-prompt')
+const prompt = require('native-prompt');
 var win;
 
 const SUPPORTED_VERSIONS = [
@@ -273,10 +273,13 @@ function getAllIndexesWhere(arr, check) {
 }
 
 function handleUri() {
+    if (cmcDir == undefined || cmcDir == "" || version == null) return;
     if (foundUri == undefined) return;
     console.log(foundUri);
-    foundUrl = foundUri.replace("cmcmm://", "");
-    fs.ensureDirSync(__dirname, "_temp");
+    foundUri = foundUri.replace("cmcmm://", "");
+    let foundUrl = foundUri.split(",")[0];
+    fs.ensureDirSync(path.join(__dirname, "_temp"));
+    fs.emptyDirSync(path.join(__dirname, "_temp"));
     request.get({
         url: foundUrl,
     }).on("error", function(error) {
@@ -296,13 +299,81 @@ function handleUri() {
           
             writeStream.on("finish", () => {
                 writeStream.close();
-                win.webContents.send("from_oneClickFinish");
-                installCharacterArch(filePath, true).then(() => {
-                    fs.removeSync(path.join(__dirname, "_temp"));
-                });
+                console.log("Installing mod of unknown type.", filePath);
+                installModArch(filePath);
             });
         });
     });
+}
+
+async function installModArch(filePath) {
+    let modName = path.parse(filePath).name;
+    let dir = path.join(__dirname, "_temp", modName);
+    fs.ensureDirSync(dir);
+    console.log(path.parse(filePath).ext.toLowerCase());
+    switch (path.parse(filePath).ext.toLowerCase()) {
+        case ".zip":
+            await extract(filePath, {
+                dir: dir,
+                defaultDirMode: 0o777,
+                defaultFileMode: 0o777,
+            });
+            break;
+        case ".rar"://TODO: Error handling
+            let buf = Uint8Array.from(fs.readFileSync(filePath)).buffer;
+            let extractor = await unrar.createExtractorFromData({ data: buf });
+            const extracted = extractor.extract();
+            const files = [...extracted.files];
+            files.forEach(fileE => {// Make All Folders First
+                if (fileE.fileHeader.flags.directory) {
+                    fs.ensureDirSync(path.join(dir, fileE.fileHeader.name));
+                }
+            });
+            files.forEach(fileE => {// Make All Folders First
+                if (!fileE.fileHeader.flags.directory) {
+                    fs.writeFileSync(path.join(dir, fileE.fileHeader.name), Buffer.from(fileE.extraction));
+                }
+            });
+            break;
+        case ".7z":
+        default:
+            return;
+            break;
+    }
+    searchDir = dir.repeat(1);
+    while (!fs.existsSync(path.join(searchDir, "fighter"))) {
+        console.log("Fighters directory not found in " + searchDir);
+        let contents = fs.readdirSync(searchDir);
+        if (contents.length == 1) {
+            searchDir = path.join(searchDir, contents[0]);
+            console.log(searchDir);
+        } else {
+            break;
+        }
+    }
+    if (fs.existsSync(path.join(searchDir, "fighter"))) {
+        win.webContents.send("alert", "Character mod detected. Installing.");
+        win.loadFile("./program/html/characterManager.html");
+        installCharacter(dir, true, true);
+    } else {
+        searchDir = dir.repeat(1);
+        while (!fs.existsSync(path.join(searchDir, "stage"))) {
+            console.log("Stage directory not found in " + searchDir);
+            let contents = fs.readdirSync(searchDir);
+            if (contents.length == 1) {
+                searchDir = path.join(searchDir, contents[0]);
+                console.log(searchDir);
+            } else {
+                break;
+            }
+        }
+        if (fs.existsSync(path.join(searchDir, "stage"))) {
+            win.webContents.send("alert", "Stage mod detected. Installing.");
+            win.loadFile("./program/html/stageManager.html");
+            installStage(dir, true);
+        }
+    }
+    fs.removeSync(path.join(__dirname, "_temp"));
 }
 
 // Index
@@ -444,7 +515,7 @@ function installCharacter(dir, filteredInstall, updateChars) {
     while (!fs.existsSync(path.join(dir, "fighter"))) {
         console.log("Fighters directory not found in " + dir);
         let contents = fs.readdirSync(dir);
-        if (contents.length = 1) {
+        if (contents.length == 1) {
             dir = path.join(dir, contents[0]);
             console.log(dir);
         } else {
@@ -456,7 +527,7 @@ function installCharacter(dir, filteredInstall, updateChars) {
     //     console.log("Fighters directory not found in " + dir);
     //     // dir = path.join(dir, path.parse(dir).base);
     //     let contents = fs.readdirSync(dir);
-    //     if (contents.length = 1) {
+    //     if (contents.length == 1) {
     //         dir = path.join(dir, contents[0]);
     //         console.log(dir);
     //     }
@@ -1067,7 +1138,7 @@ function installStage(dir, filteredInstall) {
     while (!fs.existsSync(path.join(dir, "stage"))) {
         console.log("Stage directory not found in " + dir);
         let contents = fs.readdirSync(dir);
-        if (contents.length = 1) {
+        if (contents.length == 1) {
             dir = path.join(dir, contents[0]);
             console.log(dir);
         } else {

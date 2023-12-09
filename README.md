@@ -44,8 +44,9 @@ https://inferno214221.com/dev/cmc-mod-manager/
 - [ ] Edit Game Settings to change displayed list
 
 - [ ] Fix tooltips
-- [ ] Update page selection method
 - [ ] Add search box
+- [ ] CSS size changing
+- [ ] Filter pages or read GAME_SETTINGS
 ### Character Porter
 - [x] Select another copy of the game
 - [x] Extract and install characters from other copy

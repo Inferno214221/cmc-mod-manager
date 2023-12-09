@@ -89,11 +89,15 @@
     </nav>
     <section>
         <div id="pageDiv">
-            <div class="center"> 
+            <div id="pagesScrollable">
+                <div class="center" id="pagesContainer">
+                </div>
+            </div>
+            <!-- <div class="center">
                 <button type="button" onclick="getCSSPage(-1)">&lt;</button>
                 <input type="text" value="default" id="CSSPageName" onfocus="inputFocused('CSSPageName')" onblur="inputBlurred('CSSPageName')" readonly="true"/>
                 <button type="button" onclick="getCSSPage(1)">&gt;</button>
-            </div>
+            </div> -->
         </div>
         <hr>
         <div id="cssDiv">
@@ -115,7 +119,7 @@
         <hr>
         <div id="hiddenDiv">
             <div class="center">
-                <label for="showAll" class="hoverText">
+                <span class="hoverText">
                     <select id="sortingType" onfocus="inputFocused('sortingType')" onblur="inputBlurred('sortingType')" onchange="resort()" style="display: inline-block;">
                         <option value="number">Internal Number</option>
                         <option value="series">Franchise</option>
@@ -124,7 +128,7 @@
                     <div class="uiTooltip">
                         <span>Sorting Method</span>
                     </div>
-                </label>
+                </span>
                 
                 <input type="checkbox" hidden="true" id="reverseSort" name="reverseSort" onchange="resort();
                     reverseIcon.innerText = reverseSort.checked ? 'west' : 'east';
@@ -146,6 +150,8 @@
                         <span>Showing Only Hidden Characters</span>
                     </div>
                 </label>
+
+                <input type="text" placeholder="Search">
             </div>
             <div id="hiddenCharactersScrollable">
                 <table id="hiddenCharactersTable" ondragover="event.preventDefault();" ondrop="onDropOnHidden(event);">
