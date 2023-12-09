@@ -26,9 +26,10 @@
  * ```
  */
 
-import './index.css';
+// import './ui/home/home.css';
 
-console.log('👋 This message is being logged by "renderer.js", included via webpack');
+// console.log('👋 This message is being logged by "renderer.js", included via webpack');
 
 // Add this to the end of the existing file
-import './app.tsx';
+import * as home from "./ui/home/home";
+home.navigate();

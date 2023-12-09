@@ -19,11 +19,12 @@ const config: ForgeConfig = {
         new AutoUnpackNativesPlugin({}),
         new WebpackPlugin({
             mainConfig,
+            devContentSecurityPolicy: "default-src 'self' https://fonts.gstatic.com 'unsafe-inline' 'unsafe-eval'",
             renderer: {
                 config: rendererConfig,
                 entryPoints: [
                     {
-                        html: './src/index.html',
+                        html: './src/ui/home/home.html',
                         js: './src/renderer.ts',
                         name: 'main_window',
                         preload: {
