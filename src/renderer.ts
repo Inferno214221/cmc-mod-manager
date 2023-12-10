@@ -31,5 +31,6 @@
 // console.log('👋 This message is being logged by "renderer.js", included via webpack');
 
 // Add this to the end of the existing file
-import * as home from "./ui/home/home";
-home.navigate();
+// import * as home from "./ui/home/home";
+// home.navigate();
+import './ui/global/app';
