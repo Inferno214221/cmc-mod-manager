@@ -112,46 +112,48 @@
                 </td>
             </tr>
         </table>
-        <table id="stageTable">
-            <tr>
-                <td id="stageSelectionCell">
-                    <fieldset>
-                        <legend>Stage Selection Screen</legend>
-                        <table id="stageSelectTable">
-                            <tr>
-                                <th class="sssSquare"></th>
-                                <th class="sssSquare">0</th>
-                            </tr>
-                            <tr>
-                                <th class="sssSquare">0</th>
-                                <td class="sssSquare" id="none"><image class="icon" /></td>
-                            </tr>
-                        </table>
-                    </fieldset>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <fieldset>
-                        <legend>Hidden Stages</legend>
-                        <span>Sorting:</span>
-                        <select id="sortingType" onfocus="inputFocused('sortingType')" onblur="inputBlurred('sortingType')" onchange="resort()">
-                            <option value="number">Internal Number</option>
-                            <option value="series">Franchise</option>
-                            <option value="displayName">Alphabetical</option>
-                        </select>
-                        <input type="checkbox" id="reverseSort" name="reverseSort" onchange="resort()">
-                        <label for="reverseSort">Reverse</label>
-                        <input type="checkbox" id="showAll" name="showAll" onchange="resort()">
-                        <label for="showAll">Show All Stages</label>
-                        <div id="hiddenStagesScrollable">
-                            <table id="hiddenStagesTable" ondragover="event.preventDefault();" ondrop="onDropOnHidden(event);">
+        <div id="stageTable">
+            <table>
+                <tr>
+                    <td id="stageSelectionCell">
+                        <fieldset>
+                            <legend>Stage Selection Screen</legend>
+                            <table id="stageSelectTable">
+                                <tr>
+                                    <th class="sssSquare"></th>
+                                    <th class="sssSquare">0</th>
+                                </tr>
+                                <tr>
+                                    <th class="sssSquare">0</th>
+                                    <td class="sssSquare" id="none"><image class="icon" /></td>
+                                </tr>
                             </table>
-                        </div>
-                    </fieldset>
-                </td>
-            </tr>
-        </table>
+                        </fieldset>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <fieldset>
+                            <legend>Hidden Stages</legend>
+                            <span>Sorting:</span>
+                            <select id="sortingType" onfocus="inputFocused('sortingType')" onblur="inputBlurred('sortingType')" onchange="resort()">
+                                <option value="number">Internal Number</option>
+                                <option value="series">Franchise</option>
+                                <option value="displayName">Alphabetical</option>
+                            </select>
+                            <input type="checkbox" id="reverseSort" name="reverseSort" onchange="resort()">
+                            <label for="reverseSort">Reverse</label>
+                            <input type="checkbox" id="showAll" name="showAll" onchange="resort()">
+                            <label for="showAll">Show All Stages</label>
+                            <div id="hiddenStagesScrollable">
+                                <table id="hiddenStagesTable" ondragover="event.preventDefault();" ondrop="onDropOnHidden(event);">
+                                </table>
+                            </div>
+                        </fieldset>
+                    </td>
+                </tr>
+            </table>
+        </div>
     </section>
     <script src="../js/global.js">
     </script>

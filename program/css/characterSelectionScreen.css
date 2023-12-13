@@ -46,8 +46,10 @@ body {
 
 .cssSquare {
     padding: 1px;
-    /* height: 37px; */
+    height: 37px;
     width: 37px;
+    min-width: 37px;
+    position: relative;
 }
 
 .cssName {
@@ -108,7 +110,7 @@ select {
 
 #hiddenCharactersScrollable {
     overflow: hidden;
-    overflow-x: auto;
+    overflow-x: scroll;
     white-space: nowrap;
     width: calc(100vw - 60px);
     padding-bottom: 10px;
@@ -192,21 +194,31 @@ hr {
     vertical-align: middle;
 }
 
-.hoverText:hover .uiTooltip {
+.hoverText:hover .uiTooltip,
+.hoverText:hover .cssTooltip,
+.hoverText:hover .hiddenCharactersTooltip {
     visibility: visible;
 }
 
-.hoverText:click .uiTooltip {
+.hoverText:click .uiTooltip,
+.hoverText:click .cssTooltip,
+.hoverText:click .hiddenCharactersTooltip {
     visibility: visible;
 }
 
 .uiTooltip:hover,
-.uiTooltip:hover span {
+.uiTooltip:hover span,
+.cssTooltip:hover,
+.cssTooltip:hover span,
+.hiddenCharactersTooltip:hover,
+.hiddenCharactersTooltip:hover span {
     visibility: hidden;
     z-index: -1;
 }
 
-.uiTooltip {
+.uiTooltip,
+.cssTooltip,
+.hiddenCharactersTooltip {
     visibility: hidden;
     position: absolute;
     z-index: 1;
@@ -216,17 +228,30 @@ hr {
     margin-left: 2px;
     padding: 0px;
     height: 50px;
+    width: max-content;
     display: inline-flex;
     align-items: center;
 }
 
-.uiTooltip span {
+.uiTooltip span,
+.cssTooltip span,
+.hiddenCharactersTooltip span {
     color: white;
     font-size: 15px;
     font-weight: bold;
     background-color: var(--inf-grey1);
     border-radius: 10px;
     padding: 5px 10px;
+}
+
+.hoverText {
+    position: relative;
+}
+
+.cssTooltip {
+    top: 38px;
+    margin: 0px;
+    margin-left: -5px;
 }
 
 .activePage,
@@ -251,4 +276,41 @@ hr {
 
 .inactivePage:hover {
     background-color: var(--inf-grey3);
+}
+
+.modColumn {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 37px;
+    height: calc(100% - 10px);
+    margin-top: 10px;
+    padding-left: 3px;
+    padding-right: 4px;
+}
+
+.modRow {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: calc(100% - 10px);
+    height: 37px;
+    margin-left: 10px;
+    padding-top: 3px;
+    padding-bottom: 4px;
+}
+
+.modRow span,
+.modColumn span {
+    font-size: 30px;
+}
+
+.columnTooltip {
+    margin-top: -21px;
+    margin-left: 37px;
+}
+
+.rowTooltip {
+    margin-top: -21px;
+    margin-left: calc(100%);
 }

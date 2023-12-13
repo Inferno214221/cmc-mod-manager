@@ -1,7 +1,7 @@
 @import "./global.css";
 
-body {
-    overflow-x: hidden;
+section {
+    overflow: hidden;
 }
 
 /* .hoverText {
@@ -116,9 +116,11 @@ select {
 }
 
 #stageTable {
-    table-layout: fixed;
-    width: 100vw;
-    margin-left: -20px;
+    overflow: scroll;
+    height: calc(100vh - 115px);
+    width: calc(100vw - 60px);
+    /* table-layout: fixed; */
+    margin-left: 5px;
     margin-top: -5px;
 }
 

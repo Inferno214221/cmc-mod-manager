@@ -25,6 +25,8 @@ function getPages() {
 this.api.receive("from_getPages", (data) => {
     pages = data;
     writePages();
+    currentPage = "css.txt";
+    getCSS(currentPage);
 });
 
 function getCSS(page) {
@@ -70,7 +72,24 @@ function makeTables() {
     for(let i = 0; i < maxX; i++) {
         output += "<th class=\"cssSquare\">" + (i + 1) + "</th>\n";
     }
-    output += "</tr>\n";
+    output += "\
+<td class=\"cssSquare hoverText\" rowspan=\"" + (maxY + 1) + "\">\n\
+    <button type=\"button\" onclick=\"removeColumn()\" class=\"modColumn\">\n\
+        <span class=\"matIcon\">remove</span>\n\
+    </button>\n\
+    <div class=\"uiTooltip columnTooltip\">\n\
+        <span>Remove Column</span>\n\
+    </div>\n\
+</td>\n\
+<td class=\"cssSquare hoverText\" rowspan=\"" + (maxY + 1) + "\">\n\
+    <button type=\"button\" onclick=\"addColumn()\" class=\"modColumn\">\n\
+        <span class=\"matIcon\">add</span>\n\
+    </button>\n\
+    <div class=\"uiTooltip columnTooltip\">\n\
+        <span>Add Column</span>\n\
+    </div>\n\
+</td>\n\
+</tr>\n";
 
     hidden = Object.assign({}, characters);
     for (let y = 0; y < maxY; y++) {
@@ -91,16 +110,39 @@ function makeTables() {
         <image draggable=\"false\" class=\"icon\" src=\"" + cmcDir + "/gfx/mugs/" + characters[number - 1].name + ".png\" onerror=\"this.onerror=null; this.src='../images/missing.png'\" alt=\" \" />\n\
         <div class=\"cssName\">" + characters[number - 1].displayName + "</div>\n\
     </div>\n\
-    <span class=\"tooltipText\">" + characters[number - 1].displayName + "</span>\n\
+    <div class=\"cssTooltip\" draggable=\"false\">\n\
+        <span>" + characters[number - 1].displayName + "</span>\n\
+    </div>\n\
 </td>";
             }
         }
         output += "</tr>\n";
     }
+    output += "\
+<tr>\n\
+    <td class=\"cssSquare hoverText\" colspan=\"" + (maxX + 1) + "\">\
+        <button type=\"button\" onclick=\"removeRow()\" class=\"modRow\">\n\
+            <span class=\"matIcon\">remove</span>\n\
+        </button>\n\
+        <div class=\"uiTooltip rowTooltip\">\n\
+            <span>Remove Row</span>\n\
+        </div>\n\
+    </td>\n\
+</tr>\n\
+<tr>\n\
+    <td class=\"cssSquare hoverText\" colspan=\"" + (maxX + 1) + "\">\
+        <button type=\"button\" onclick=\"addRow()\" class=\"modRow\">\n\
+            <span class=\"matIcon\">add</span>\n\
+        </button>\n\
+        <div class=\"uiTooltip rowTooltip\">\n\
+            <span>Add Row</span>\n\
+        </div>\n\
+    </td>\n\
+</tr>";
     characterSelectTable.innerHTML = output;
 
     output = "";
-    sorted = sortCharacters((showAll.checked ? characters : hidden), sortingType.value);
+    sorted = sortCharacters((showAll.checked ? characters : hidden), sortingType.value, characterSearch.value.toLowerCase());
     if (reverseSort.checked) {
         sorted.reverse();
     }
@@ -113,7 +155,9 @@ function makeTables() {
                 <image draggable=\"false\" class=\"mugIcon\" src=\"" + cmcDir + "/gfx/mugs/" + character.name + ".png\" onerror=\"this.onerror=null; this.src='../images/missing.png'\" alt=\"\" />\n\
                 <div class=\"hiddenName\">" + character.displayName + "</div>\n\
             </div>\n\
-            <span class=\"tooltipText\" draggable=\"false\">" + character.displayName + "</span>\n\
+            <div class=\"hiddenCharactersTooltip\" draggable=\"false\">\n\
+                <span>" + character.displayName + "</span>\n\
+            </div>\n\
         </td>\n";
     }
     output += "</tr>";
@@ -132,15 +176,28 @@ function makeTables() {
     // seriesSelect.innerHTML = output;
 }
 
-function sortCharacters(characters, sortType) {
+function sortCharacters(characters, sortType, search) {
     let charactersSorted = [];
-    for (let character in characters) {
-        charactersSorted.push({
-            number: parseInt(character) + 1,
-            name: characters[character].name,
-            displayName: characters[character].displayName,
-            series: characters[character].series,
-        });
+    if (search == "") {
+        for (let character in characters) {
+            charactersSorted.push({
+                number: parseInt(character) + 1,
+                name: characters[character].name,
+                displayName: characters[character].displayName,
+                series: characters[character].series,
+            });
+        }
+    } else {
+        for (let character in characters) {
+            if (characters[character].displayName.toLowerCase().includes(search)) {
+                charactersSorted.push({
+                    number: parseInt(character) + 1,
+                    name: characters[character].name,
+                    displayName: characters[character].displayName,
+                    series: characters[character].series,
+                });
+            }
+        }
     }
     let sorted = charactersSorted.toSorted((a, b) => (a[sortType] > b[sortType] ? 1 : -1));
     return sorted;
@@ -183,7 +240,7 @@ function addCharacter(characterNumber, x, y) {
 // }
 
 function resort() {
-    inputBlurred('sortingType');
+    inputBlurred("sortingType");
     getCSS(currentPage);
 }
 
@@ -275,6 +332,3 @@ function removeColumn() {
 // On Page Load
 var css, characters, hidden, currentPage, pages, cmcDir;
 getPages();
-currentPage = "css.txt";
-// CSSPageName.value = "css";
-getCSS(currentPage);

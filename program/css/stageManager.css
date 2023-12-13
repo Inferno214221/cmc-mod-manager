@@ -21,15 +21,15 @@ select {
 }
 
 section {
-    overflow-y: hidden;
+    overflow: hidden;
 }
 
 #stageScrollable {
-    overflow: hidden;
-    overflow-y: scroll;
+    overflow: auto;
     white-space: nowrap;
     margin-top: 5px;
-    height: calc(100vh - 215px);
+    height: calc(100vh - 205px);
+    width: calc(100vw - 75px);
     white-space: nowrap;
 }
 

@@ -40,12 +40,8 @@ https://inferno214221.com/dev/cmc-mod-manager/
 - [x] Uninstalled characters are removed
 - [x] Switch CSS Pages
 - [ ] Add CSS Pages
-- [ ] Issues with 500~550 characters
 - [ ] Edit Game Settings to change displayed list
 
-- [ ] Fix tooltips
-- [ ] Add search box
-- [ ] CSS size changing
 - [ ] Filter pages or read GAME_SETTINGS
 ### Character Porter
 - [x] Select another copy of the game
@@ -72,6 +68,7 @@ https://inferno214221.com/dev/cmc-mod-manager/
 - [ ] Add pages
 - [ ] Alerts
 - [ ] Errors
+- [ ] Identify pages by length not isNaN
 <!-- ## Miscellanious Mods (Priority: 3)
 - [x] Add option to import other types of mods e.g. ui changes / music
 - [x] RAR support - no errors

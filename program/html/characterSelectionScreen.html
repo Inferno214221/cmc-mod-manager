@@ -151,7 +151,12 @@
                     </div>
                 </label>
 
-                <input type="text" placeholder="Search">
+                <span class="hoverText">
+                    <input type="text" placeholder="Search" id="characterSearch" oninput="resort()">
+                    <div class="uiTooltip">
+                        <span>Search For Characters</span>
+                    </div>
+                </span>
             </div>
             <div id="hiddenCharactersScrollable">
                 <table id="hiddenCharactersTable" ondragover="event.preventDefault();" ondrop="onDropOnHidden(event);">
