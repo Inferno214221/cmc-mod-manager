@@ -25,6 +25,7 @@
     "extract-zip": "^2.0.1",
     "fs": "^0.0.1-security",
     "fs-extra": "^11.1.1",
+    "ini": "^4.1.1",
     "native-prompt": "^2.1.4",
     "request": "^2.88.2",
     "strftime": "^0.10.2",

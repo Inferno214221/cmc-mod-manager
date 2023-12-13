@@ -4,10 +4,11 @@ const https = require("https");
 const request = require("request");
 const fs = require("fs-extra");
 const childProcess = require("child_process");
-require('array.prototype.move');
-const extract = require('extract-zip');
+require("array.prototype.move");
+const extract = require("extract-zip");
 const unrar = require("node-unrar-js");
-const prompt = require('native-prompt');
+const prompt = require("native-prompt");
+const ini = require("ini");
 var win;
 
 const SUPPORTED_VERSIONS = [
@@ -977,11 +978,23 @@ function removeAlts(characterName) {
 
 // Character Selection Screen
 ipcMain.on("getPages", (event, args) => {
+    // let pages = [];
+    // pages.push("css.txt");
+    // getAllFiles(path.join(cmcDir, "data", "css")).forEach((file) => {
+    //     pages.push(path.join("css", path.parse(file).base));
+    // });
+    // console.log(pages);
+
     let pages = [];
-    pages.push("css.txt");
-    getAllFiles(path.join(cmcDir, "data", "css")).forEach((file) => {
-        pages.push(path.join("css", path.parse(file).base));
-    });
+    let gameSettings = ini.parse(fs.readFileSync(path.join(cmcDir, "data", "GAME_SETTINGS.txt"), "ascii"));
+    for (let number = 1; number <= parseInt(gameSettings["global.css_custom_number"]); number++) {
+        pages.push({
+            name: gameSettings["global.css_custom_name[" + number + "]"].replaceAll("\"", ""),
+            path: gameSettings["global.css_custom[" + number + "]"].replaceAll("\"", "")
+        });
+    }
+    console.log(pages);
+
     win.webContents.send("from_getPages", pages);
 });
 

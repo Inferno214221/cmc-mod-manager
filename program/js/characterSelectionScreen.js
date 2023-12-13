@@ -25,20 +25,23 @@ function getPages() {
 this.api.receive("from_getPages", (data) => {
     pages = data;
     writePages();
-    currentPage = "css.txt";
+    currentPage = pages[0];
     getCSS(currentPage);
 });
 
 function getCSS(page) {
+    if (typeof page == "string") {
+        page = pages.filter((e) => e.path == page)[0];
+    }
     currentPage = page;
-    this.api.send("getCSS", page);
+    this.api.send("getCSS", page.path);
     writePages();
 }
 
 function writePages() {
     let output = "";
     pages.forEach((page) => {
-        output += "<button type=\"button\" onclick=\"getCSS('" + page + "')\"" + (page == currentPage ? "class=\"activePage\"" : "class=\"inactivePage\"") + ">" + page.replace(".txt", "").replace("css/", "") + "</button>";
+        output += "<button type=\"button\" onclick=\"getCSS('" + page.path + "')\"" + (page == currentPage ? "class=\"activePage\"" : "class=\"inactivePage\"") + ">" + page.name + "</button>";
     });
     pagesContainer.innerHTML = output;
 }
