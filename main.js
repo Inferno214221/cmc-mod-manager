@@ -79,6 +79,12 @@ const STAGE_FILES = [
     "gfx/seriesicon/<series>.png",
 ];
 
+const BLANK_CSS = "\
+0000 0000 0000 0000 0000 0000 0000\r\n\
+0000 0000 0000 0000 0000 0000 0000\r\n\
+0000 0000 0000 0000 0000 0000 0000\r\n\
+0000 0000 0000 0000 0000 0000 0000 ";
+
 const DATA_FILE = path.join(app.getPath("userData"), "data.json");
 if (!fs.existsSync(DATA_FILE)) {
     writeJSON(DATA_FILE, {
@@ -978,6 +984,10 @@ function removeAlts(characterName) {
 
 // Character Selection Screen
 ipcMain.on("getPages", (event, args) => {
+    win.webContents.send("from_getPages", getPages());
+});
+
+function getPages() {
     // let pages = [];
     // pages.push("css.txt");
     // getAllFiles(path.join(cmcDir, "data", "css")).forEach((file) => {
@@ -993,10 +1003,8 @@ ipcMain.on("getPages", (event, args) => {
             path: gameSettings["global.css_custom[" + number + "]"].replaceAll("\"", "")
         });
     }
-    console.log(pages);
-
-    win.webContents.send("from_getPages", pages);
-});
+    return pages;
+}
 
 ipcMain.on("getCSS", (event, args) => {
     win.webContents.send("from_getCSS", {
@@ -1034,6 +1042,50 @@ function writeCSS(css, page) {
     console.log(cssFile + "EOF");
     fs.writeFileSync(path.join(cmcDir, "data", page), cssFile, "ascii");
 }
+
+ipcMain.on("deletePage", (event, pagePath) => {
+    let pages = getPages().filter((page) => page.path != pagePath);
+    writePages(pages);
+    fs.rmSync(path.join(cmcDir, "data", pagePath));
+    win.webContents.send("from_deletePage");
+});
+
+function writePages(pages) {
+    // let gameSettings = ini.parse(fs.readFileSync(path.join(cmcDir, "data", "GAME_SETTINGS.txt"), "ascii"));
+    let number = pages.length;
+    let gameSettingsFile = fs.readFileSync(path.join(cmcDir, "data", "GAME_SETTINGS.txt"), "ascii").split(/\r?\n/);
+    let lines = gameSettingsFile.length;
+    for (let line = 0; line < lines; line++) {
+        if (gameSettingsFile[line].startsWith("global.css_custom_number")) {
+            gameSettingsFile[line] = "global.css_custom_number = " + number + ";";
+        } else if (gameSettingsFile[line].startsWith("global.css_custom[") || gameSettingsFile[line].startsWith("global.css_custom_name[")) {
+            gameSettingsFile.splice(line, 1);
+            line--; lines--;
+        }
+    }
+
+    for (let page = 1; page <= number; page++) {
+        gameSettingsFile.push("global.css_custom[" + page + "] = \"" + pages[page - 1].path + "\";");
+        gameSettingsFile.push("global.css_custom_name[" + page + "] = \"" + pages[page - 1].name + "\";");
+    };
+    // gameSettingsFile.forEach((line) => {
+    //     console.log(line);
+    // });
+    fs.writeFileSync(path.join(cmcDir, "data", "GAME_SETTINGS.txt"), gameSettingsFile.join("\r\n"), "ascii");
+}
+
+ipcMain.on("addPage", (event, pageName) => {
+    let pagePath = "css/" + pageName.replaceAll(/[\\/:*?\"<>|]/g,"-") + ".txt";
+    let pages = getPages();
+    fs.createFileSync(path.join(cmcDir, "data", pagePath));
+    fs.writeFileSync(path.join(cmcDir, "data", pagePath), BLANK_CSS, "ascii");
+    pages.push({
+        name: pageName,
+        path: pagePath
+    });
+    writePages(pages);
+    win.webContents.send("from_addPage");
+});
 
 // Stages
 ipcMain.on("getStageList", (event, args) => {

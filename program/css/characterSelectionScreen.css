@@ -256,26 +256,49 @@ hr {
 
 .activePage,
 .inactivePage {
-    margin-left: 5px;
-    margin-right: 5px;
+    width: fit-content;
+    padding: 5px 0px 10px;
+    display: inline;
+}
+
+.activePage:hover:not(:has(.pageDelete:hover)),
+.inactivePage:hover:not(:has(.pageDelete:hover)),
+.activePage:hover:not(:has(.pageDelete:hover)) button,
+.inactivePage:hover:not(:has(.pageDelete:hover)) button {
+    background-color: var(--inf-grey3);
+}
+
+.activePage button,
+.inactivePage button {
+    border: none;
+    box-shadow: none;
+    background-color: var(--inf-grey4);
+}
+
+.activePage button:not(.pageDelete),
+.inactivePage button:not(.pageDelete) {
+    border-radius: 0px;
+}
+
+.pageSelect {
+    padding: 5px 0px 5px 10px;
+}
+
+.pageDelete {
+    padding: 5px;
+    border-radius: 3px;
+}
+
+.pageDelete span {
+    font-size: 18px;
+}
+
+.pageDelete:hover {
+    background-color: var(--inf-grey3);
 }
 
 .activePage {
-    background-color: var(--inf-grey5);
-}
-
-.inactivePage {
-    background-color: var(--inf-grey4);
-    border: none;
-    box-shadow: none;
-}
-
-.activePage:hover {
-    background-color: var(--inf-grey5);
-}
-
-.inactivePage:hover {
-    background-color: var(--inf-grey3);
+    border-bottom: 2px solid var(--inf-blue1);
 }
 
 .modColumn {

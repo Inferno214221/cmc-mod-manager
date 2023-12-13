@@ -91,6 +91,24 @@
         <div id="pageDiv">
             <div id="pagesScrollable">
                 <div class="center" id="pagesContainer">
+                    <div class="activePage">
+                        <button type="button" onclick="getCSS('css.txt')" class="pageSelect verticalInline">Smaller</button>
+                        <button type="button" class="pageDelete">
+                            <span class="matIcon verticalInline">delete</span>
+                        </button>
+                    </div>
+                    <div class="inactivePage">
+                        <button type="button" onclick="getCSS('css/Extended.txt')" class="pageSelect verticalInline">Extended</button>
+                        <button type="button" class="pageDelete">
+                            <span class="matIcon verticalInline">delete</span>
+                        </button>
+                    </div>
+                    <div class="inactivePage">
+                        <input type="text" placeholder="Page Name" class="verticalInline">
+                        <button type="button" class="pageDelete">
+                            <span class="matIcon verticalInline">add</span>
+                        </button>
+                    </div>
                 </div>
             </div>
             <!-- <div class="center">

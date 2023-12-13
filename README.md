@@ -39,10 +39,8 @@ https://inferno214221.com/dev/cmc-mod-manager/
 - [x] Change the number of rows & columns
 - [x] Uninstalled characters are removed
 - [x] Switch CSS Pages
-- [ ] Add CSS Pages
-- [ ] Edit Game Settings to change displayed list
-
-- [ ] Filter pages or read GAME_SETTINGS
+- [x] Add / Remove CSS Pages
+- [x] Edit Game Settings to change displayed list
 ### Character Porter
 - [x] Select another copy of the game
 - [x] Extract and install characters from other copy

@@ -38,11 +38,54 @@ function getCSS(page) {
     writePages();
 }
 
+function deletePage(pagePath) {
+    if (!confirm("Are you sure you want to delete this CSS page? It cannot be recovered.")) return;
+    this.api.send("deletePage", pagePath);
+}
+
+this.api.receive("from_deletePage", () => {
+    getPages();
+});
+
+function addPage() {
+    if (pageName.value == "") {
+        alert("Please enter a name first.");
+        return;
+    }
+    if (pages.filter((page) =>
+        (page.name == pageName.value || page.path.replace("css/", "").replace(".txt", "") == pageName.value.replaceAll(/[\\/:*?\"<>|]/g,"-")) && page.path != "css.txt"
+    ).length > 0) {
+        alert("A page with the same name / path already exists.");
+        return;
+    }
+    console.log(pageName.value);
+    this.api.send("addPage", pageName.value);
+}
+
+this.api.receive("from_addPage", () => {
+    getPages();
+});
+
 function writePages() {
     let output = "";
     pages.forEach((page) => {
-        output += "<button type=\"button\" onclick=\"getCSS('" + page.path + "')\"" + (page == currentPage ? "class=\"activePage\"" : "class=\"inactivePage\"") + ">" + page.name + "</button>";
-    });
+        output += "\
+<div " + (page == currentPage ? "class=\"activePage\"" : "class=\"inactivePage\"") + ">\n\
+    <button type=\"button\" onclick=\"getCSS('" + page.path + "')\" class=\"pageSelect verticalInline\">" +
+        page.name.replaceAll("<", "&lt;").replaceAll(">", "&gt;") +
+    "</button>\n\
+    <button type=\"button\" onclick=\"deletePage('" + page.path + "')\" class=\"pageDelete\">\n\
+        <span class=\"matIcon verticalInline\">delete</span>\n\
+    </button>\n\
+</div>";
+        });
+        output += "\
+<div class=\"inactivePage\">\n\
+    <input type=\"text\" placeholder=\"Page Name\" class=\"verticalInline\" id=\"pageName\">\n\
+    <button type=\"button\" onclick=\"addPage()\" class=\"pageDelete\">\n\
+        <span class=\"matIcon verticalInline\">add</span>\n\
+    </button>\n\
+</div>";
     pagesContainer.innerHTML = output;
 }
 
@@ -63,7 +106,7 @@ function writeCSS() {
     makeTables();
     this.api.send("writeCSS", {
         css: css,
-        page: currentPage,
+        page: currentPage.path,
     });
 }
 
@@ -232,15 +275,6 @@ function addCharacter(characterNumber, x, y) {
     makeTables();
     writeCSS();
 }
-
-// function getCSSPage(offset) {
-//     let index = pages.indexOf(currentPage) + offset;
-//     if (index < 0) index = pages.length - 1;
-//     if (index > pages.length - 1) index = 0;
-//     currentPage = pages[index];
-//     CSSPageName.value = currentPage.replace(".txt", "");
-//     getCSS(currentPage);
-// }
 
 function resort() {
     inputBlurred("sortingType");
