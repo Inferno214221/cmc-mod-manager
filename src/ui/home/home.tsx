@@ -1,4 +1,4 @@
-import './home.css';
+import "./home.css";
 
 export default function TabHome() {
     return (

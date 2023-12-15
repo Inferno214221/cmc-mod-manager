@@ -1,6 +1,11 @@
 import { ipcRenderer } from "electron"
 
 export default {
-    getGameVersion: (...args: [dir: string, list: string[]]) => ipcRenderer.invoke('getGameVersion', args),
-    getGameDir: () => ipcRenderer.invoke('getGameDir'),
+    getGameDir: () => ipcRenderer.invoke("getGameDir"),
+    getGameVersion: (...args: [dir?: string, list?: string[]]) =>
+        ipcRenderer.invoke("getGameVersion", args),
+    isValidGameDir: (...args: [dir?: string]) => ipcRenderer.invoke("isValidGameDir", args),
+    selectGameDir: () => ipcRenderer.invoke("selectGameDir"),
+    openDir: (...args: [dir: string]) => ipcRenderer.invoke("openDir", args),
+    runGame: (...args: [dir?: string]) => ipcRenderer.invoke("runGame", args),
 }

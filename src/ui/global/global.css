@@ -99,6 +99,9 @@ nav hr {
     word-wrap: normal;
     white-space: nowrap;
     direction: ltr;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 .nav-icon {

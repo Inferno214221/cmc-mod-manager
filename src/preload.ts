@@ -2,6 +2,6 @@
 // https://www.electronjs.org/docs/latest/tutorial/process-model#preload-scripts
 
 import { contextBridge } from "electron";
-import api from './api';
+import api from "./api";
 
 contextBridge.exposeInMainWorld("api", api);
