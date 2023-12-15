@@ -2,6 +2,11 @@ import './home.css';
 
 export default function TabHome() {
     return (
-        <h1>e</h1>
+        <>
+            <section>
+                I don't know what to put on this page.
+            </section>
+            {/* <script>????</script> */}
+        </>
     );
 }

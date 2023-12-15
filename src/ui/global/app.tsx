@@ -1,99 +1,137 @@
 import { createRoot } from 'react-dom/client';
 import './global.css';
-import TabHome from '../home/home';
-import TabCharacters from '../characters/characters';
+import TabInfoHome from '../home/home';
+import TabInfoCharacters from '../characters/characters';
 
-interface Tab {
+interface TabInfo {
     name: string,
     displayName: string,
     icon: string,
     element: JSX.Element
 }
-const HOME: Tab = {
+const HOME: TabInfo = {
     name: 'home',
     displayName: 'Home',
     icon: 'home',
-    element: <TabHome/>
+    element: <TabInfoHome/>
 };
-const CHARACTERS: Tab = {
+const CHARACTERS: TabInfo = {
     name: 'characters',
     displayName: 'Characters',
     icon: 'groups',
-    element: <TabCharacters/>
+    element: <TabInfoCharacters/>
 };
-const CHARACTER_SELECTION_SCREEN: Tab = {
+const CHARACTER_SELECTION_SCREEN: TabInfo = {
     name: 'characterSelectionScreen',
     displayName: 'Character Selection Screen',
     icon: 'pan_tool_alt',
-    element: <TabHome/>
+    element: <TabInfoHome/>
 };
-const PORT_CHARACTERS: Tab = {
+const PORT_CHARACTERS: TabInfo = {
     name: 'portCharacters',
     displayName: 'Port Characters',
     icon: 'reduce_capacity',
-    element: <TabHome/>
+    element: <TabInfoHome/>
 };
-const STAGES: Tab = {
+const STAGES: TabInfo = {
     name: 'stages',
     displayName: 'Stages',
     icon: 'terrain',
-    element: <TabHome/>
+    element: <TabInfoHome/>
 };
-const STAGE_SELECTION_SCREEN: Tab = {
+const STAGE_SELECTION_SCREEN: TabInfo = {
     name: 'stageSelectionScreen',
     displayName: 'Stage Selection Screen',
     icon: 'location_pin',
-    element: <TabHome/>
+    element: <TabInfoHome/>
 };
-const DOWNLOADS: Tab = {
+const DOWNLOADS: TabInfo = {
     name: 'downloads',
     displayName: 'Downloads',
     icon: 'download',
-    element: <TabHome/>
+    element: <TabInfoHome/>
 };
 
-let activeTab: Tab;
+interface NavButtonInfo {
+    displayName: string,
+    icon: string,
+    function: VoidFunction
+}
+const CHANGE_DIR: NavButtonInfo = {
+    displayName: 'Change CMC+ Directory',
+    icon: 'policy',
+    function: () => {console.log('AAA')}
+};
+const OPEN_DIR: NavButtonInfo = {
+    displayName: 'Open CMC+ Directory',
+    icon: 'folder',
+    function: () => {console.log('AAA')}
+};
+const RUN_GAME: NavButtonInfo = {
+    displayName: 'Run CMC+',
+    icon: 'play_circle',
+    function: () => {console.log('AAA')}
+};
 
-const root = createRoot(document.body);
-switchTabs(HOME);
+let activeTabInfo: TabInfo;
 
-function switchTabs(tab: Tab) {
-    activeTab = tab;
+function switchTabInfos(tab: TabInfo): void {
+    activeTabInfo = tab;
     root.render(
-        <div>
+        <>
             <Nav/>
             {tab.element}
-        </div>
+        </>
     );
     document.title = 'CMC Mod Manager | ' + tab.displayName;
 }
 
-function Nav() {
+function Nav(): JSX.Element {
     return (
         <nav>
-            <NavOption info={HOME}/>
+            <NavTabInfo info={HOME}/>
             <hr/>
-            <NavOption info={CHARACTERS}/>
-            <NavOption info={CHARACTER_SELECTION_SCREEN}/>
-            <NavOption info={PORT_CHARACTERS}/>
+            <NavTabInfo info={CHARACTERS}/>
+            <NavTabInfo info={CHARACTER_SELECTION_SCREEN}/>
+            <NavTabInfo info={PORT_CHARACTERS}/>
             <hr/>
-            <NavOption info={STAGES}/>
-            <NavOption info={STAGE_SELECTION_SCREEN}/>
+            <NavTabInfo info={STAGES}/>
+            <NavTabInfo info={STAGE_SELECTION_SCREEN}/>
             <hr/>
-            <NavOption info={DOWNLOADS}/>
+            <NavTabInfo info={DOWNLOADS}/>
+            <div className={'flex-fill'}/>
+            <NavButton info={CHANGE_DIR}/>
+            <NavButton info={OPEN_DIR}/>
+            <NavButton info={RUN_GAME}/>
         </nav>
-    )
+    );
 }
 
-function NavOption({info}: {info: Tab}) {
+function NavTabInfo({info}: {info: TabInfo}): JSX.Element {
     return (
-        <div className={(activeTab == info ? 'activeTab ' : '') + 'hoverText'}>
-            <button className={'navButton'} onClick={() => {switchTabs(info)}}>
-                <span className={'matIcon navIcon'}>{info.icon}</span>
+        <div className={(activeTabInfo == info ? 'active-tab ' : '') + 'hover-text'}>
+            <button className={'nav-click'} onClick={() => {switchTabInfos(info);}}>
+                <span className={'mat-icon nav-icon'}>{info.icon}</span>
             </button>
-            <div className={'navTooltip'}>
+            <div className={'nav-tooltip'}>
                 <span>{info.displayName}</span>
             </div>
         </div>
-    )
+    );
 }
+
+function NavButton({info}: {info: NavButtonInfo}): JSX.Element {
+    return (
+        <div className={'hover-text'}>
+            <button className={'nav-click'} onClick={() => {info.function()}}>
+                <span className={'mat-icon nav-icon'}>{info.icon}</span>
+            </button>
+            <div className={'nav-tooltip'}>
+                <span>{info.displayName}</span>
+            </div>
+        </div>
+    );
+}
+
+const root = createRoot(document.body);
+switchTabInfos(HOME);

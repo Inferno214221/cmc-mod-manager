@@ -56,6 +56,18 @@ section {
     top: 0px;
     left: 50px;
     width: calc(100% - 50px);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+hr {
+    border-color: var(--inf-grey2);
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 5px;
+    margin: 5px 0px;
 }
 
 nav hr {
@@ -76,7 +88,7 @@ nav hr {
     src: url(https://fonts.gstatic.com/s/materialicons/v140/flUhRq6tzZclQEJ-Vdg-IuiaDsNc.woff2) format('woff2');
 }
 
-.matIcon {
+.mat-icon {
     font-family: 'Material Icons';
     font-weight: normal;
     font-style: normal;
@@ -89,14 +101,14 @@ nav hr {
     direction: ltr;
 }
 
-.navIcon {
+.nav-icon {
     font-size: 30px;
     width: 100%;
     height: 100%;
     color: var(--inf-white2);
 }
 
-.navButton {
+.nav-click {
     position: relative;
     background-color: var(--inf-grey1);
     width: 30px;
@@ -107,16 +119,16 @@ nav hr {
     box-shadow: none;
 }
 
-.navButton:hover .navIcon {
+.nav-click:hover .nav-icon {
     background-color: var(--inf-grey1);
     color: var(--inf-white3);
 }
 
-.activeTab {
+.active-tab {
     border-left: 2px solid var(--inf-blue1);
 }
 
-.activeTab .navButton {
+.active-tab .nav-click {
     margin-left: 8px;
 }
 
@@ -189,7 +201,7 @@ label {
     color: white;
 }
 
-.tooltipText {
+.tooltip-text {
     visibility: hidden;
     position: absolute;
     z-index: 1;
@@ -202,17 +214,17 @@ label {
     margin-top: 0;
 }
 
-.hoverText:hover .tooltipText,
-.hoverText:hover .navTooltip {
+.hover-text:hover .tooltip-text,
+.hover-text:hover .nav-tooltip {
     visibility: visible;
 }
 
-.hoverText:click .tooltipText,
-.hoverText:click .navTooltip {
+.hover-text:click .tooltip-text,
+.hover-text:click .nav-tooltip {
     visibility: visible;
 }
 
-.navTooltip {
+.nav-tooltip {
     visibility: hidden;
     position: absolute;
     z-index: 1;
@@ -224,11 +236,21 @@ label {
     align-items: center;
 }
 
-.navTooltip span {
+.nav-tooltip span {
     color: white;
     font-size: 15px;
     font-weight: bold;
     background-color: var(--inf-grey1);
     border-radius: 10px;
     padding: 5px 10px;
+}
+
+.flex-fill {
+    flex-grow: 1;
+}
+
+.center {
+    margin-left: auto;
+    margin-right: auto;
+    width: fit-content;
 }
