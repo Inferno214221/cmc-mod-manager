@@ -33,6 +33,7 @@
         "@stylistic/ts/quotes": ["error", "double"],
         "@stylistic/ts/space-before-function-paren": ["error", { "anonymous": "always", "named": "never", "asyncArrow": "always" }],
         "@stylistic/ts/type-annotation-spacing": ["error"],
-        "@stylistic/jsx/jsx-curly-spacing": ["error", { "when": "always" }]
+        "@stylistic/jsx/jsx-curly-spacing": ["error", { "when": "always" }],
+        "@typescript-eslint/no-explicit-any": "off"
     }
 }

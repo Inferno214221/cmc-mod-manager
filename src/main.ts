@@ -77,6 +77,9 @@ function createHandlers() {
     ipcMain.handle("runGame",
         (event, args: Parameters<typeof runGame>) => runGame(...args)
     );
+    ipcMain.handle("openExternal",
+        (event, args: Parameters<typeof shell.openExternal>) => shell.openExternal(...args)
+    );
 }
 
 const SUPPORTED_VERSIONS: string[] = [
@@ -90,6 +93,7 @@ if (!fs.existsSync(DATA_FILE)) {
         dir: "",
     });
 }
+
 let gameDir: string = readJSON(DATA_FILE).dir;
 
 function readJSON(file: string): any {
@@ -160,7 +164,6 @@ async function openDir(dir: string): Promise<void> {
 }
 
 async function runGame(dir: string = gameDir): Promise<void> {
-    console.log(path.join(dir, await getGameVersion(gameDir) + ".exe"));
     execFile(path.join(dir, await getGameVersion(gameDir) + ".exe"), {
         cwd: dir,
         windowsHide: true

@@ -1,1 +1,75 @@
 @import "../global/global.css";
+
+#about-div,
+#game-select-div {
+    height: min-content;
+    background-color: var(--inf-grey4);
+    z-index: 1;
+    padding: 5px;
+}
+
+#tabs-div {
+    flex-grow: 1;
+    min-height: 0px;
+    padding: 5px;
+    margin-top: 5px;
+}
+
+#cmcmm-icon {
+    height: 60px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+#pfp {
+    height: 40px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+h1,
+h2 {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+h1 {
+    font-size: 24px;
+    margin: 0px 0px 0px 5px;
+}
+
+h2 {
+    font-size: 20px;
+    margin: 0px 0px 0px 10px;
+}
+
+#about-div div.center {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.external-wrapper {
+    display: inline-block;
+    vertical-align: middle;
+    height: min-content;
+    width: min-content;
+    margin: 5px;
+}
+
+.external-button {
+    height: min-content;
+    width: min-content;
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+    margin: 0px;
+    padding: 0px;
+}
+
+.external-img {
+    height: 40px;
+}
+
+#gb {
+    image-rendering: pixelated;
+}
