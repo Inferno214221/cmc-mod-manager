@@ -292,3 +292,18 @@ label {
     visibility: hidden;
     z-index: -1;
 }
+
+input[type=text] {
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 3px;
+    background-color: var(--inf-grey5);
+    border-color: black;
+    color: inherit;
+    font-family: inherit;
+    font-size: 11pt;
+    outline: none;
+    box-shadow: 0px 1px #00000088;
+    height: 29px;
+    padding: 0px 5px;
+}

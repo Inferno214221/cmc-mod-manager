@@ -128,6 +128,9 @@ async function getGameVersion(
     dir: string = gameDir,
     list: string[] = SUPPORTED_VERSIONS
 ): Promise<string | null> {
+    if (dir == null) {
+        return null;
+    }
     for (const game of list) {
         if (fs.existsSync(path.join(dir, game + ".exe"))) {
             return game;
@@ -137,7 +140,7 @@ async function getGameVersion(
 }
 
 async function isValidGameDir(dir: string = gameDir): Promise<boolean> {
-    return !(dir == "" || getGameVersion(dir) == null);
+    return (dir != null && await getGameVersion(dir) != null);
 }
 
 async function selectGameDir(): Promise<string | null> {
@@ -147,7 +150,7 @@ async function selectGameDir(): Promise<string | null> {
     if (dir.canceled == true) {
         return null;
     }
-    if (isValidGameDir(dir.filePaths[0])) {
+    if (!await isValidGameDir(dir.filePaths[0])) {
         //TODO: inform the user
         return null;
     }
@@ -156,6 +159,9 @@ async function selectGameDir(): Promise<string | null> {
         fs.chmod(file, 0o777);
     });
     gameDir = dir.filePaths[0];
+    const data: any = readJSON(DATA_FILE);
+    data.dir = gameDir;
+    writeJSON(DATA_FILE, data);
     return gameDir;
 }
 

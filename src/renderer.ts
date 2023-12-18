@@ -33,4 +33,5 @@
 // Add this to the end of the existing file
 // import * as home from "./ui/home/home";
 // home.navigate();
-import "./ui/global/app";
+import { render } from "./ui/global/app";
+render();
