@@ -12,7 +12,7 @@
 <body>
     <nav>
         <div class="hoverText">
-            <button class="navButton" onclick="location.href='../../index.html'">
+            <button type="button" class="navButton" onclick="location.href='../../index.html'">
                 <span class="matIcon navIcon">home</span>
             </button>
             <div class="navTooltip">
@@ -21,7 +21,7 @@
         </div>
         <hr>
         <div class="activeTab hoverText">
-            <button class="navButton" onclick="location.href='./characterManager.html'">
+            <button type="button" class="navButton" onclick="location.href='./characterManager.html'">
                 <span class="matIcon navIcon">groups</span>
             </button>
             <div class="navTooltip">
@@ -29,7 +29,7 @@
             </div>
         </div>
         <div class="hoverText">
-            <button class="navButton" onclick="location.href='./characterSelectionScreen.html'">
+            <button type="button" class="navButton" onclick="location.href='./characterSelectionScreen.html'">
                 <span class="matIcon navIcon">pan_tool_alt</span>
             </button>
             <div class="navTooltip">
@@ -37,7 +37,7 @@
             </div>
         </div>
         <div class="hoverText">
-            <button class="navButton" onclick="location.href='./characterPorter.html'">
+            <button type="button" class="navButton" onclick="location.href='./characterPorter.html'">
                 <span class="matIcon navIcon">reduce_capacity</span>
             </button>
             <div class="navTooltip">
@@ -46,7 +46,7 @@
         </div>
         <hr>
         <div class="hoverText">
-            <button class="navButton" onclick="location.href='./stageManager.html'">
+            <button type="button" class="navButton" onclick="location.href='./stageManager.html'">
                 <span class="matIcon navIcon">terrain</span>
             </button>
             <div class="navTooltip">
@@ -54,7 +54,7 @@
             </div>
         </div>
         <div class="hoverText">
-            <button class="navButton" onclick="location.href='./stageSelectionScreen.html'">
+            <button type="button" class="navButton" onclick="location.href='./stageSelectionScreen.html'">
                 <span class="matIcon navIcon">location_pin</span>
             </button>
             <div class="navTooltip">
@@ -63,7 +63,7 @@
         </div>
         <div style="flex-grow: 1;"></div>
         <div class="hoverText">
-            <button class="navButton" onclick="selectGameDir()">
+            <button type="button" class="navButton" onclick="selectGameDir()">
                 <span class="matIcon navIcon">policy</span>
             </button>
             <div class="navTooltip">
@@ -71,7 +71,7 @@
             </div>
         </div>
         <div class="hoverText">
-            <button class="navButton" onclick="openGameDir()">
+            <button type="button" class="navButton" onclick="openGameDir()">
                 <span class="matIcon navIcon">folder</span>
             </button>
             <div class="navTooltip">
@@ -79,7 +79,7 @@
             </div>
         </div>
         <div class="hoverText">
-            <button class="navButton" onclick="runGame()">
+            <button type="button" class="navButton" onclick="runGame()">
                 <span class="matIcon navIcon">play_circle</span>
             </button>
             <div class="navTooltip">
@@ -88,7 +88,111 @@
         </div>
     </nav>
     <section>
-        <fieldset>
+        <div id="characterDiv">
+            <div class="center">
+                <span class="hoverText">
+                    <input type="text" placeholder="Search" id="characterSearch" oninput="resort()">
+                    <div class="uiTooltip">
+                        <span>Search For Characters</span>
+                    </div>
+                </span>
+
+                <span class="hoverText">
+                    <select id="sortingType" onfocus="inputFocused('sortingType')" onblur="inputBlurred('sortingType')" onchange="resort()" style="display: inline-block;">
+                        <option value="number">Internal Number</option>
+                        <option value="series">Franchise</option>
+                        <option value="displayName">Alphabetical</option>
+                    </select>
+                    <div class="uiTooltip">
+                        <span>Sorting Method</span>
+                    </div>
+                </span>
+                
+                <input type="checkbox" hidden="true" id="reverseSort" name="reverseSort" onchange="resort();
+                    reverseIcon.innerText = reverseSort.checked ? 'north' : 'south';
+                    reverseIcon.nextElementSibling.innerHTML = reverseSort.checked ? '<span>Sorted Direction: Backwards</span>' : '<span>Sorted Direction: Forwards</span>';
+                ">
+                <label for="reverseSort" class="verticalInline hoverText">
+                    <span class="matIcon toggleIcon" id="reverseIcon">south</span>
+                    <div class="uiTooltip">
+                        <span>Sorted Direction: Forwards</span>
+                    </div>
+                </label>
+            </div>
+            <div id="characterScrollable">
+                <table id="characterTable">
+                </table>
+            </div>
+        </div>
+        <hr>
+        <div id="buttonDiv">
+            <div class="center">
+                <div class="verticalInline hoverText actionWrapper">
+                    <button type="button" class="actionButton" onclick="installCharacterDir()">
+                        <span class="matIcon toggleIcon">folder</span>
+                    </button>
+                    <div class="uiTooltip">
+                        <span>Install Character From Directory</span>
+                    </div>
+                </div>
+
+                <div class="verticalInline hoverText actionWrapper">
+                    <button type="button" class="actionButton" onclick="installCharacterArch()">
+                        <span class="matIcon toggleIcon">folder_zip</span>
+                    </button>
+                    <div class="uiTooltip">
+                        <span>Install Character From Archive</span>
+                    </div>
+                </div>
+
+                <div class="verticalInline hoverText actionWrapper">
+                    <button type="button" class="actionButton" onclick="openDir('extracted')">
+                        <span class="matIcon toggleIcon">drive_file_move</span>
+                    </button>
+                    <div class="uiTooltip">
+                        <span>Open Extraction Directory</span>
+                    </div>
+                </div>
+
+                <div class="verticalInline hoverText actionWrapper">
+                    <button type="button" class="actionButton" onclick="removeAllChars()">
+                        <span class="matIcon toggleIcon">delete_sweep</span>
+                    </button>
+                    <div class="uiTooltip">
+                        <span>Remove All Characters</span>
+                    </div>
+                </div>
+
+                <hr class="vr">
+
+                <input type="checkbox" hidden="true" id="filteredInstall" name="filteredInstall" checked onchange="resort();
+                    filteredIcon.innerText = filteredInstall.checked ? 'filter_alt' : 'filter_alt_off';
+                    filteredSpan.innerHTML = filteredInstall.checked ? '<span>Installation: Only Necessary Files</span>' : '<span>Installation: All Files</span>';
+                ">
+                <div class="verticalInline hoverText actionWrapper">
+                    <label for="filteredInstall">
+                        <span class="matIcon toggleIcon" id="filteredIcon">filter_alt</span>
+                    </label>
+                    <div class="uiTooltip" id="filteredSpan">
+                        <span>Installation: Only Necessary Files</span>
+                    </div>
+                </div>
+
+                <input type="checkbox" hidden="true" id="updateChars" name="updateChars" onchange="resort();
+                    updateIcon.innerText = updateChars.checked ? 'sync' : 'sync_disabled';
+                    updateSpan.innerHTML = updateChars.checked ? '<span>Existing Characters: Update</span>' : '<span>Existing Characters: Abort</span>';
+                ">
+                <div class="verticalInline hoverText actionWrapper">
+                    <label for="updateChars">
+                        <span class="matIcon toggleIcon" id="updateIcon">sync_disabled</span>
+                    </label>
+                    <div class="uiTooltip" id="updateSpan">
+                        <span>Existing Characters: Abort</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- <fieldset>
             <legend>Installation / Extraction</legend>
             <button type="button" onclick="installCharacterDir()">Install Character From Directory</button>
             <button type="button" onclick="installCharacterArch()">Install Character From Archive</button>
@@ -114,7 +218,7 @@
                 <table id="characterTable">
                 </table>
             </div>
-        </fieldset>
+        </fieldset> -->
     </section>
     <script src="../js/global.js">
     </script>

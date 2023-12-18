@@ -41,6 +41,8 @@ https://inferno214221.com/dev/cmc-mod-manager/
 - [x] Switch CSS Pages
 - [x] Add / Remove CSS Pages
 - [x] Edit Game Settings to change displayed list
+
+- [ ] Fix lower UI tooltips
 ### Character Porter
 - [x] Select another copy of the game
 - [x] Extract and install characters from other copy

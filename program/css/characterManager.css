@@ -4,6 +4,7 @@
     padding: 0px 5px;
 }
 
+input[type=text],
 select {
     width: 150px;
     border-width: 1px;
@@ -21,15 +22,122 @@ select {
 }
 
 section {
-    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+input[type=text] {
+    height: 27px;
+    padding: 0px 5px;
+    width: 150px;
+}
+
+#characterDiv {
+    flex-grow: 1;
+    min-height: 0px;
+    padding: 5px;
+    margin-top: 5px;
+}
+
+#buttonDiv {
+    height: min-content;
+    background-color: var(--inf-grey4);
+    z-index: 1;
+    padding: 5px;
+}
+
+.center {
+    margin-left: auto;
+    margin-right: auto;
+    width: fit-content;
+}
+
+.toggleIcon {
+    font-size: 30px;
+    color: var(--inf-white3);
+}
+
+.toggleIcon:hover {
+    color: var(--inf-white2);
+}
+
+.verticalInline {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.hoverText:hover .uiTooltip {
+    visibility: visible;
+}
+
+.hoverText:click .uiTooltip {
+    visibility: visible;
+}
+
+.uiTooltip:hover,
+.uiTooltip:hover span {
+    visibility: hidden;
+    z-index: -1;
+}
+
+.uiTooltip {
+    visibility: hidden;
+    position: absolute;
+    z-index: 1;
+    display: inline;
+    margin: 0px;
+    margin-top: -10px;
+    margin-left: 2px;
+    padding: 0px;
+    height: 100%;
+    width: max-content;
+    display: inline-flex;
+    align-items: center;
+}
+
+.uiTooltip span {
+    color: white;
+    font-size: 15px;
+    font-weight: bold;
+    background-color: var(--inf-grey1);
+    border-radius: 10px;
+    padding: 5px 10px;
+}
+
+.hoverText {
+    position: relative;
+}
+
+.actionButton {
+    position: relative;
+    background-color: var(--inf-grey4);
+    /* width: 30px;
+    height: 30px; */
+    border-style: none;
+    padding: 0px;
+    box-shadow: none;
+    height: min-content;
+    width: min-content;
+}
+
+.actionWrapper {
+    padding: 0px;
+    height: min-content;
+    margin: 0px 5px;
+}
+
+.actionWrapper button .toggleIcon,
+.actionWrapper label .toggleIcon {
+    font-size: 50px;
 }
 
 #characterScrollable {
     overflow: auto;
     white-space: nowrap;
     margin-top: 5px;
-    height: calc(100vh - 170px);
-    width: calc(100vw - 75px);
+    height: calc(100vh - 135px);
+    width: calc(100vw - 60px);
     white-space: nowrap;
 }
 

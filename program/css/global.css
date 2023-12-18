@@ -58,6 +58,26 @@ section {
     width: calc(100% - 50px);
 }
 
+hr {
+    border-color: var(--inf-grey2);
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 5px;
+    margin: 5px 0px;
+}
+
+hr.vr {
+    /* border-color: var(--inf-grey2);
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 5px;
+    margin: 5px 0px; */
+    display: inline;
+    width: 1px;
+    border-width: 1px;
+    margin: 0px 5px;
+}
+
 nav hr {
     border-color: var(--inf-grey3);
     border-width: 1px;
@@ -87,6 +107,9 @@ nav hr {
     word-wrap: normal;
     white-space: nowrap;
     direction: ltr;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 .navIcon {

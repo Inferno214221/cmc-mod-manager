@@ -22,7 +22,8 @@ this.api.receive("from_getCharacterList", (data) => {
 
 function listCharacters(characters, cmcDir, random, alts) {
     let output = "<tr><th>Image</th><th>Name</th><th>Extract</th><th>Remove</th><th>Random Selection</th><th>Base For Alt</th><th>Alt For Base</th><th>Alts</th></tr>";
-    sorted = sortCharacters(characters, sortingType.value);
+    // let output = "";
+    sorted = sortCharacters(characters, sortingType.value, characterSearch.value.toLowerCase());
     if (reverseSort.checked) {
         sorted.reverse();
     }
@@ -97,16 +98,28 @@ function toggleRandomCharacter(checkbox, characterName) {
     });
 }
 
-function sortCharacters(characters, sortType) {
+function sortCharacters(characters, sortType, search) {
     let charactersSorted = [];
-    for (let character in characters) {
-        charactersSorted.push({
-            number: parseInt(character) + 1,
-            name: characters[character].name,
-            displayName: characters[character].displayName,
-            sortName: characters[character].displayName.toLowerCase(),
-            series: characters[character].series,
-        });
+    if (search == "") {
+        for (let character in characters) {
+            charactersSorted.push({
+                number: parseInt(character) + 1,
+                name: characters[character].name,
+                displayName: characters[character].displayName,
+                series: characters[character].series,
+            });
+        }
+    } else {
+        for (let character in characters) {
+            if (characters[character].displayName.toLowerCase().includes(search)) {
+                charactersSorted.push({
+                    number: parseInt(character) + 1,
+                    name: characters[character].name,
+                    displayName: characters[character].displayName,
+                    series: characters[character].series,
+                });
+            }
+        }
     }
     let sorted = charactersSorted.toSorted((a, b) => (a[sortType] > b[sortType] ? 1 : -1));
     return sorted;
