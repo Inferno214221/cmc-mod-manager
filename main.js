@@ -94,7 +94,7 @@ if (!fs.existsSync(DATA_FILE)) {
 var cmcDir = readJSON(DATA_FILE).dir;
 var sourceDir;
 var version = getGameVersion(cmcDir);
-var foundUri = process.argv.find((arg) => arg.startsWith("cmcmm://"));
+var foundUri = process.argv.find((arg) => arg.startsWith("cmcmm:"));
 handleUri();
 
 const createWindow = () => {
@@ -115,10 +115,12 @@ const createWindow = () => {
 
 if (!app.requestSingleInstanceLock()) {
     app.quit();
+    console.log("No App Single Instance Lock");
     return;
 } else {
     app.on("second-instance", (e, argv) => {
-        foundUri = argv.find((arg) => arg.startsWith("cmcmm://"));
+        foundUri = argv.find((arg) => arg.startsWith("cmcmm:"));
+        handleUri();
     });
     if (win) {
         if (win.isMinimized()) {
@@ -280,10 +282,11 @@ function getAllIndexesWhere(arr, check) {
 }
 
 function handleUri() {
+    console.log(cmcDir, foundUri);
     if (cmcDir == undefined || cmcDir == "" || version == null) return;
     if (foundUri == undefined) return;
     console.log(foundUri);
-    foundUri = foundUri.replace("cmcmm://", "");
+    foundUri = foundUri.replace("cmcmm:", "");
     let foundUrl = foundUri.split(",")[0];
     fs.ensureDirSync(path.join(__dirname, "_temp"));
     fs.emptyDirSync(path.join(__dirname, "_temp"));
@@ -294,7 +297,21 @@ function handleUri() {
         return; //TODO: Alerts
     }).on("response", function(res) {
         console.log(res);
-        let file = "download." + res.headers['content-type'].split('/')[1];
+        console.log(res.headers['content-type'].split('/'));
+        let file = "download.";
+        switch (res.headers['content-type'].split('/')[1]) {
+            case "zip":
+                file += "zip";
+                break;
+            case "rar":
+            case "x-rar-compressed":
+                file += "rar";
+                break;
+            default:
+                win.webContents.send("alert", "Unsupported File Type.");
+                return;
+        }
+        // let file = "download." + res.headers['content-type'].split('/')[1];
         downloadUrl = res.request.uri.href;
         https.get(downloadUrl, (res1) => {
             let filePath = path.join(__dirname, "_temp", file);

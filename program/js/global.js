@@ -6,13 +6,13 @@ this.api.receive("from_throwGameDir", (error) => {
 });
 
 this.api.receive("from_oneClickStart", () => {
-    alert("Download started.");
+    alert("Download started. Please wait for it to finish before initialising another.");
 });
 
-this.api.receive("from_oneClickFinish", () => {
-    alert("Download finished. Installing.");
-    window.location = "./characterManager.html";
-});
+// this.api.receive("from_oneClickFinish", () => {
+//     alert("Download finished. Installing.");
+//     window.location = "./characterManager.html";
+// });
 
 this.api.receive("alert", (info) => {
     alert(info);

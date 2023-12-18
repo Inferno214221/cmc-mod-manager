@@ -1,12 +1,12 @@
 // Global Functions
-this.api.receive("from_oneClickStart", (e) => {
-    alert("Download started.");
+this.api.receive("from_oneClickStart", () => {
+    alert("Download started. Please wait for it to finish before initialising another.");
 });
 
-this.api.receive("from_oneClickFinish", (e) => {
-    alert("Download finished. Installing.");
-    window.location = "./program/html/characterManager.html";
-});
+// this.api.receive("from_oneClickFinish", (e) => {
+//     alert("Download finished. Installing.");
+//     window.location = "./program/html/characterManager.html";
+// });
 
 // General
 function openDir(dir) {
