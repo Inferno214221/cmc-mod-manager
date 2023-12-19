@@ -33,85 +33,94 @@ export default function TabHome(): JSX.Element {
     return (
         <>
             <section>
-                <div id={"about-div"}>
-                    <div className={"center margin-vertical"}>
-                        <img src={cmcmm} id={"cmcmm-icon"} draggable={false}/>
-                        <h1>CMC Mod Manager</h1>
-                    </div>
-                    <div className={"center margin-vertical"}>
-                        <img src={pfp} id={"pfp"} draggable={false}/>
-                        <h2>By Inferno214221</h2>
-                    </div>
-                    <div className={"center margin-vertical"}>
-                        <ExternalLinkImage
-                            icon={gh}
-                            tooltip={"GitHub"}
-                            location={"https://github.com/Inferno214221/cmc-mod-manager"}
-                            id={"gh"}
-                        />
-                        <ExternalLinkImage
-                            icon={gb}
-                            tooltip={"GameBanana"}
-                            location={"https://gamebanana.com/tools/14136"}
-                            id={"gb"}
-                        />
-                        <ExternalLinkImage
-                            icon={pfp}
-                            tooltip={"Home Page"}
-                            location={"https://inferno214221.com/cmc-mod-manager"}
-                            id={"homepage"}
-                        />
-                    </div>
-                    <div className={"center"}>
-                        <button onClick={() => {
-                            alert(LICENSE)
-                        }}>Show License (GPLv3)</button>
-                    </div>
-                </div>
-                <hr/>
-                <div id={"game-select-div"}>
-                    <GameDirectoryActions/>
-                </div>
-                <hr/>
-                <div id={"tabs-div"}>
-                    <div id={"tabs-scrollable"}>
+                <div id={"about-div"} className={"vertical-outer-div"}>
+                    <div className={"vertical-inner-div"}>
+                        <div className={"center margin-vertical"}>
+                            <img src={cmcmm} id={"cmcmm-icon"} draggable={false}/>
+                            <h1>CMC Mod Manager</h1>
+                        </div>
+                        <div className={"center"} id={"by-div"}>
+                            <h2>By</h2>
+                        </div>
+                        <div className={"center margin-vertical"}>
+                            <img src={pfp} id={"pfp"} draggable={false}/>
+                            <h2>Inferno214221</h2>
+                        </div>
+                        <div className={"center margin-vertical"}>
+                            <ExternalLinkImage
+                                icon={cmcmm}
+                                tooltip={"Home Page"}
+                                location={"https://inferno214221.com/cmc-mod-manager"}
+                                id={"homepage"}
+                            />
+                            <ExternalLinkImage
+                                icon={gh}
+                                tooltip={"GitHub"}
+                                location={"https://github.com/Inferno214221/cmc-mod-manager"}
+                                id={"gh"}
+                            />
+                            <ExternalLinkImage
+                                icon={gb}
+                                tooltip={"GameBanana"}
+                                location={"https://gamebanana.com/tools/14136"}
+                                id={"gb"}
+                            />
+                        </div>
                         <div className={"center"}>
-                            <TabButton
-                                icon={"groups"}
-                                title={"Characters"}
-                                desc={"Install, extract or delete characters from CMC+."}
-                                tab={CHARACTERS}
-                            />
-                            <TabButton
-                                icon={"pan_tool_alt"}
-                                title={"Character Selection Screen"}
-                                desc={"Modify CMC+'s character selection screen."}
-                                tab={CHARACTER_SELECTION_SCREEN}
-                            />
-                            <TabButton
-                                icon={"reduce_capacity"}
-                                title={"Port Characters"}
-                                desc={"Install characters from another version of CMC+."}
-                                tab={PORT_CHARACTERS}
-                            />
-                            <TabButton
-                                icon={"terrain"}
-                                title={"Stages"}
-                                desc={"Install, extract or delete stages from CMC+."}
-                                tab={STAGES}
-                            />
-                            <TabButton
-                                icon={"location_pin"}
-                                title={"Stage Selection Screen"}
-                                desc={"Modify CMC+'s stage selection screen."}
-                                tab={STAGE_SELECTION_SCREEN}
-                            />
-                            {/* <TabButton
-                                icon={"download"}
-                                title={"Downloads"}
-                                desc={"View current downloads."}
-                                location={"e"}
-                            /> */}
+                            <button onClick={() => {
+                                alert(LICENSE)
+                            }}>Show License (GPLv3)</button>
+                        </div>
+                    </div>
+                </div>
+                <hr/>
+                <div id={"game-select-div"} className={"vertical-outer-div"}>
+                    <div className={"vertical-inner-div"}>
+                        <GameDirectoryActions/>
+                    </div>
+                </div>
+                <hr/>
+                <div id={"tabs-div"} className={"vertical-outer-div"}>
+                    <div className={"vertical-inner-div"}>
+                        <div id={"tabs-scrollable"}>
+                            <div className={"center"}>
+                                <TabButton
+                                    icon={"groups"}
+                                    title={"Characters"}
+                                    desc={"Install, extract or delete characters from CMC+."}
+                                    tab={CHARACTERS}
+                                />
+                                <TabButton
+                                    icon={"pan_tool_alt"}
+                                    title={"Character Selection Screen"}
+                                    desc={"Modify CMC+'s character selection screen."}
+                                    tab={CHARACTER_SELECTION_SCREEN}
+                                />
+                                <TabButton
+                                    icon={"reduce_capacity"}
+                                    title={"Port Characters"}
+                                    desc={"Install characters from another version of CMC+."}
+                                    tab={PORT_CHARACTERS}
+                                />
+                                <TabButton
+                                    icon={"terrain"}
+                                    title={"Stages"}
+                                    desc={"Install, extract or delete stages from CMC+."}
+                                    tab={STAGES}
+                                />
+                                <TabButton
+                                    icon={"location_pin"}
+                                    title={"Stage Selection Screen"}
+                                    desc={"Modify CMC+'s stage selection screen."}
+                                    tab={STAGE_SELECTION_SCREEN}
+                                />
+                                {/* <TabButton
+                                    icon={"download"}
+                                    title={"Downloads"}
+                                    desc={"View current downloads."}
+                                    location={"e"}
+                                /> */}
+                            </div>
                         </div>
                     </div>
                 </div>

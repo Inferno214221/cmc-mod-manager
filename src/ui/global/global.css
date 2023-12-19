@@ -204,50 +204,6 @@ label {
     color: white;
 }
 
-.tooltip-text {
-    visibility: hidden;
-    position: absolute;
-    z-index: 1;
-    color: white;
-    font-size: 12px;
-    background-color: black;
-    border-radius: 10px;
-    padding: 10px 15px 10px 15px;
-    margin-left: -5px;
-    margin-top: 0;
-}
-
-.hover-text:hover .tooltip-text,
-.hover-text:hover .nav-tooltip {
-    visibility: visible;
-}
-
-.hover-text:click .tooltip-text,
-.hover-text:click .nav-tooltip {
-    visibility: visible;
-}
-
-.nav-tooltip {
-    visibility: hidden;
-    position: absolute;
-    z-index: 1;
-    display: inline;
-    margin: 0px;
-    padding: 0px;
-    height: 50px;
-    display: inline-flex;
-    align-items: center;
-}
-
-.nav-tooltip span {
-    color: white;
-    font-size: 15px;
-    font-weight: bold;
-    background-color: var(--inf-grey1);
-    border-radius: 10px;
-    padding: 5px 10px;
-}
-
 .flex-fill {
     flex-grow: 1;
 }
@@ -267,7 +223,6 @@ label {
     position: absolute;
     top: 0px;
     z-index: 1;
-    display: inline;
     padding: 0px;
     height: 100%;
     width: max-content;

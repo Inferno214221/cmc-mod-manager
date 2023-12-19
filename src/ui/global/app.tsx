@@ -124,11 +124,11 @@ export function Nav(): JSX.Element {
 
 export function NavTab({ info }: { info: TabInfo }): JSX.Element {
     return (
-        <div className={(activeTabInfo == info ? "active-tab " : "") + "hover-text"}>
+        <div className={(activeTabInfo == info ? "active-tab " : "") + "tooltip-wrapper"}>
             <button className={"nav-click"} onClick={() => {switchTabs(info);}}>
                 <span className={"mat-icon nav-icon"}>{info.icon}</span>
             </button>
-            <div className={"nav-tooltip"}>
+            <div className={"tooltip"}>
                 <span>{info.displayName}</span>
             </div>
         </div>
@@ -137,11 +137,11 @@ export function NavTab({ info }: { info: TabInfo }): JSX.Element {
 
 export function NavButton({ info }: { info: NavButtonInfo }): JSX.Element {
     return (
-        <div className={"hover-text"}>
+        <div className={"tooltip-wrapper"}>
             <button className={"nav-click"} onClick={() => {info.function()}}>
                 <span className={"mat-icon nav-icon"}>{info.icon}</span>
             </button>
-            <div className={"nav-tooltip"}>
+            <div className={"tooltip"}>
                 <span>{info.displayName}</span>
             </div>
         </div>
