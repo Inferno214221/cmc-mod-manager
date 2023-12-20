@@ -1,28 +1,34 @@
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction } from "react";
 import "./icon-button.css";
 
 export default function ToggleIconButton({
-    defaultState,
+    // defaultState,
+    checked,
     trueIcon,
     trueTooltip,
     falseIcon,
     falseTooltip,
-    iconSize
+    iconSize,
+    setter
 }: {
-    defaultState: boolean,
+    // defaultState: boolean,
+    checked: boolean,
     trueIcon: string,
     trueTooltip: string,
     falseIcon: string,
     falseTooltip: string,
-    iconSize: string
+    iconSize: string,
+    setter: Dispatch<SetStateAction<boolean>>
 }): JSX.Element {
-    const [checked, setChecked]:
-    [boolean, Dispatch<SetStateAction<boolean>>]
-    = useState(defaultState);
+    // const [checked, setChecked]:
+    // [boolean, Dispatch<SetStateAction<boolean>>]
+    // = useState(defaultState);
     return (
         <div className={"icon-button-wrapper"}>
             <button  className={"icon-button"} onClick={() => {
-                setChecked((checked) => !checked)
+                // setChecked((checked) => !checked);
+                // onClick(checked);
+                setter((state: boolean) => !state);
             }}>
                 <span className={"mat-icon button-icon"} style={{ fontSize: iconSize }}>
                     {checked ? trueIcon : falseIcon}

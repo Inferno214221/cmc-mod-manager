@@ -1,28 +1,19 @@
+import { Dispatch, SetStateAction, useState } from "react";
 import "./characters.css";
 import ToggleIconButton from "../global/icon-button/toggle-icon-button";
 import IconButton from "../global/icon-button/icon-button";
 
-export default function TabCharacters() {
+export default function TabCharacters(): JSX.Element {
+    const [filterInstallation, setFilterInstallation]:
+    [boolean, Dispatch<SetStateAction<boolean>>]
+    = useState(true);
+    const [updateCharacters, setUpdateCharacters]:
+    [boolean, Dispatch<SetStateAction<boolean>>]
+    = useState(false);
     return (
         <>
             <section>
-                <div id={"sort-div"}>
-                    <div className={"center"}>
-                        <ToggleIconButton
-                            defaultState={false}
-                            trueIcon={"north"}
-                            trueTooltip={"Sorted Direction: Backwards"}
-                            falseIcon={"south"}
-                            falseTooltip={"Sorted Direction: Forwards"}
-                            iconSize={"30px"}
-                        />
-                    </div>
-                </div>
-                <div id={"character-div"}>
-                    <div className={"center"}>
-                        E
-                    </div>
-                </div>
+                <CharacterList/>
                 <hr/>
                 <div id={"button-div"}>
                     <div className={"center"}>
@@ -52,24 +43,94 @@ export default function TabCharacters() {
                         />
                         {/* <vr/> */}
                         <ToggleIconButton
-                            defaultState={true}
+                            checked={filterInstallation}
                             trueIcon={"filter_alt"}
                             trueTooltip={"Installation: Only Necessary Files"}
                             falseIcon={"filter_alt_off"}
                             falseTooltip={"Installation: All Files"}
                             iconSize={"50px"}
+                            setter={setFilterInstallation}
                         />
                         <ToggleIconButton
-                            defaultState={false}
+                            checked={updateCharacters}
                             trueIcon={"sync"}
                             trueTooltip={"Existing Characters: Update"}
                             falseIcon={"sync_disabled"}
                             falseTooltip={"Existing Characters: Abort"}
                             iconSize={"50px"}
+                            setter={setUpdateCharacters}
                         />
                     </div>
                 </div>
             </section>
+        </>
+    );
+}
+
+function CharacterList(): JSX.Element {
+    const [searchValue, setSearchValue]:
+    [string, Dispatch<SetStateAction<string>>]
+    = useState("");
+    const [sortType, setSortType]:
+    [string, Dispatch<SetStateAction<string>>]
+    = useState("number");
+    const [reverseSort, setReverseSort]:
+    [boolean, Dispatch<SetStateAction<boolean>>]
+    = useState(false);
+    return (
+        <>
+            <div id={"sort-div"}>
+                <div className={"center"}>
+                    <div className={"tooltip-wrapper inline-sort-options"}>
+                        <input
+                            type={"text"}
+                            placeholder={"Search"}
+                            // id={"characterSearch"}
+                            onInput={(event: any) => {
+                                setSearchValue(event.target.value);
+                                console.log(searchValue, sortType, reverseSort);
+                            }}
+                        />
+                        <div className={"tooltip"}>
+                            <span>Search For Characters</span>
+                        </div>
+                    </div>
+                    <div className={"tooltip-wrapper inline-sort-options"}>
+                        <select
+                            id="sort-type-select"
+                            onChange={(event: any) => {
+                                setSortType(event.target.value);
+                            }}
+                        >
+                            <option value="number">Internal Number</option>
+                            <option value="series">Franchise</option>
+                            <option value="displayName">Alphabetical</option>
+                        </select>
+                        <div className={"tooltip"}>
+                            <span>Sorting Method</span>
+                        </div>
+                    </div>
+                    <div className={"inline-sort-options"}>
+                        <ToggleIconButton
+                            // defaultState={false}
+                            checked={reverseSort}
+                            trueIcon={"north"}
+                            trueTooltip={"Sorted Direction: Backwards"}
+                            falseIcon={"south"}
+                            falseTooltip={"Sorted Direction: Forwards"}
+                            iconSize={"30px"}
+                            setter={setReverseSort}
+                            // onClick={(state: boolean) => {
+                            //     setReverseSort(state);
+                            // }}
+                        />
+                    </div>
+                </div>
+            </div>
+            <div id={"character-div"}>
+                <div className={"center"}>
+                </div>        
+            </div>
         </>
     );
 }

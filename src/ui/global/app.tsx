@@ -6,7 +6,7 @@ import TabCharacters from "../characters/characters";
 let root: Root;
 let activeTabInfo: TabInfo;
 
-export function render() {
+export function render(): void {
     root = createRoot(document.body);
     switchTabs(HOME);
 }

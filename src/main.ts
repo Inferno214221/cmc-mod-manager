@@ -62,7 +62,7 @@ app.on("activate", () => {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
 
-function createHandlers() {
+function createHandlers(): void {
     ipcMain.handle("getGameDir", getGameDir);
     ipcMain.handle("getGameVersion",
         (event, args: Parameters<typeof getGameVersion>) => getGameVersion(...args)
@@ -104,7 +104,7 @@ function writeJSON(file: string, data: object): void {
     fs.writeFileSync(file, JSON.stringify(data, null, 4), "utf-8");
 }
 
-function getAllFiles(dirPath: string, arrayOfFiles?: string[]) {
+function getAllFiles(dirPath: string, arrayOfFiles?: string[]): string[] {
     const files = fs.readdirSync(dirPath);
 
     arrayOfFiles = arrayOfFiles || [];

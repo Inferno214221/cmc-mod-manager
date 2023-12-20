@@ -158,7 +158,7 @@ function GameDirectoryActions(): JSX.Element {
     const [cmcDir, setCmcDir]:
     [string, Dispatch<SetStateAction<string>>]
     = useState("None Selected");
-    async function updateGameDir() {
+    async function updateGameDir(): Promise<void> {
         const newCmcDir: string = await api.getGameDir();
         setCmcDir(newCmcDir == null ? "None Selected" : newCmcDir);
     }

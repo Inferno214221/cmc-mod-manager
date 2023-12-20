@@ -13,3 +13,17 @@
     z-index: 1;
     padding: 5px;
 }
+
+.inline-sort-options {
+    display: inline-block;
+}
+
+#sort-type-select {
+    margin-left: 5px;
+    margin-top: -1px;
+}
+
+input[type=text],
+select {
+    width: 150px;
+}
