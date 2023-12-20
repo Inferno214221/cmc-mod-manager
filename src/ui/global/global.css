@@ -1,0 +1,272 @@
+/* @import url("https://fonts.googleapis.com/css?Ubuntu"); */
+
+body {
+    /* My Palette */
+    /* Titlebar */
+    --inf-grey1: #16171e;
+    /* Side-est-bar */
+    --inf-grey2: #1a1c23;
+    /* Sidebar */
+    --inf-grey3: #23252e;
+    /* Body */
+    --inf-grey4: #272a34;
+    /* Buttons */
+    --inf-grey5: #323643;
+
+    /* Primary Blue */
+    --inf-blue1: #2777ff;
+    /* Secondary Blue */
+    --inf-blue2: #005af3;
+
+    /* Text */
+    --inf-white3: #eeeeec;
+    /* Sidebar Icons */
+    --inf-white2: #bbbbbd;
+    /* Inactive (Used with sidebar) */
+    --inf-white1: #888a8d;
+
+    margin: 0px;
+    min-width: 790px;
+    font-family: Ubuntu;
+    color: var(--inf-white3);
+    background-color: var(--inf-grey4);
+    font-size: 11pt;
+    overflow: hidden;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+nav {
+    background-color: var(--inf-grey1);
+    width: 50px;
+    position: fixed;
+    top: 0px;
+    height: 100%;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+}
+
+section {
+    background-color: var(--inf-grey4);
+    position: fixed;
+    top: 0px;
+    left: 50px;
+    width: calc(100% - 50px);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+hr {
+    border-color: var(--inf-grey2);
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 5px;
+    margin: 5px 0px;
+}
+
+nav hr {
+    border-color: var(--inf-grey3);
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 5px;
+    /* margin-top: 5px;
+    margin-bottom: 0px; */
+    margin: 5px;
+    margin-bottom: 0px;
+}
+
+@font-face {
+    font-family: 'Material Icons';
+    font-style: normal;
+    font-weight: 400;
+    src: url(https://fonts.gstatic.com/s/materialicons/v140/flUhRq6tzZclQEJ-Vdg-IuiaDsNc.woff2) format('woff2');
+}
+
+.mat-icon {
+    font-family: 'Material Icons';
+    font-weight: normal;
+    font-style: normal;
+    display: inline-block;
+    line-height: 1;
+    text-transform: none;
+    letter-spacing: normal;
+    word-wrap: normal;
+    white-space: nowrap;
+    direction: ltr;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.nav-icon {
+    font-size: 30px;
+    width: 100%;
+    height: 100%;
+    color: var(--inf-white2);
+}
+
+.nav-click {
+    position: relative;
+    background-color: var(--inf-grey1);
+    width: 30px;
+    height: 30px;
+    border-style: none;
+    margin: 10px 10px;
+    padding: 0px;
+    box-shadow: none;
+}
+
+.nav-click:hover .nav-icon {
+    background-color: var(--inf-grey1);
+    color: var(--inf-white3);
+}
+
+.active-tab {
+    border-left: 2px solid var(--inf-blue1);
+}
+
+.active-tab .nav-click {
+    margin-left: 8px;
+}
+
+::-webkit-scrollbar {
+    width: 7px;
+    height: 7px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--inf-grey1);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--inf-grey5);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--inf-blue1);
+}
+
+button {
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 4px;
+    padding: 5px 10px;
+    font-size: 11pt;
+    background-color: var(--inf-grey5);
+    border-color: black;
+    color: inherit;
+    font-family: inherit;
+    margin: 5px 0px;
+    box-shadow: 0px 1px #00000088;
+}
+
+button:hover {
+    background-color: var(--inf-grey4);
+}
+
+.right {
+    float: right;
+}
+
+fieldset {
+    border: none;
+    padding-left: 15px;
+    margin-top: 5px;
+    margin-left: 5px;
+}
+
+legend {
+    font-weight: bold;
+    margin-left: -15px;
+    margin-bottom: 5px;
+}
+
+table,
+th,
+td {
+    border-style: none;
+    padding: 0px 10px;
+}
+
+table {
+    margin-left: -15px;
+}
+
+label {
+    color: white;
+}
+
+.flex-fill {
+    flex-grow: 1;
+}
+
+.center {
+    margin-left: auto;
+    margin-right: auto;
+    width: fit-content;
+}
+
+.tooltip-wrapper {
+    position: relative;
+}
+
+.tooltip {
+    visibility: hidden;
+    position: absolute;
+    top: 0px;
+    z-index: 1;
+    padding: 0px;
+    height: 100%;
+    width: max-content;
+    display: inline-flex;
+    align-items: center;
+}
+
+.tooltip span {
+    color: white;
+    font-size: 15px;
+    font-weight: bold;
+    background-color: var(--inf-grey1);
+    border-radius: 10px;
+    padding: 5px 10px;
+}
+
+.tooltip-wrapper:hover .tooltip {
+    visibility: visible;
+}
+
+.tooltip:hover {
+    visibility: hidden;
+    z-index: -1;
+}
+
+input[type=text],
+select {
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 3px;
+    background-color: var(--inf-grey5);
+    border-color: black;
+    color: inherit;
+    font-family: inherit;
+    font-size: 11pt;
+    outline: none;
+    box-shadow: 0px 1px #00000088;
+    padding: 0px 5px;
+}
+
+input[type=text] {
+    height: 27px;
+}
+
+select {
+    height: 29px;
+}

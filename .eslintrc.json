@@ -1,0 +1,40 @@
+{
+    "env": {
+        "browser": true,
+        "es6": true,
+        "node": true
+    },
+    "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/eslint-recommended",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:import/recommended",
+        "plugin:import/electron",
+        "plugin:import/typescript"
+    ],
+    "parser": "@typescript-eslint/parser",
+    "plugins": [
+        "@stylistic/ts",
+        "@stylistic/js",
+        "@stylistic/jsx"
+    ],
+    "rules": {
+        "@stylistic/js/max-len": ["error", {"code": 100}],
+        "@stylistic/js/space-infix-ops": ["error"],
+        "@stylistic/js/no-mixed-operators": ["error", {"allowSamePrecedence": true}],
+        "@stylistic/js/arrow-spacing": ["error", {"before": true, "after": true}],
+        "@stylistic/js/arrow-parens": ["error", "always"],
+        "@stylistic/ts/brace-style": ["error", "1tbs", {"allowSingleLine": true}],
+        "@stylistic/ts/comma-spacing": ["error", {"before": false, "after": true}],
+        "@stylistic/ts/function-call-spacing": ["error", "never"],
+        "@stylistic/ts/indent": ["error", 4],
+        "@stylistic/ts/key-spacing": ["error"],
+        "@stylistic/ts/object-curly-spacing": ["error", "always"],
+        "@stylistic/ts/quotes": ["error", "double"],
+        "@stylistic/ts/space-before-function-paren": ["error", {"anonymous": "always", "named": "never", "asyncArrow": "always"}],
+        "@stylistic/ts/type-annotation-spacing": ["error"],
+        "@stylistic/jsx/jsx-curly-spacing": ["error", {"when": "never" }],
+        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/explicit-function-return-type": ["error", {"allowExpressions": true}]
+    }
+}

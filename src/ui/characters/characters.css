@@ -1,0 +1,29 @@
+@import "../global/global.css";
+
+#character-div {
+    flex-grow: 1;
+    min-height: 0px;
+    padding: 5px;
+    margin-top: 5px;
+}
+
+#button-div, #sort-div {
+    height: min-content;
+    background-color: var(--inf-grey4);
+    z-index: 1;
+    padding: 5px;
+}
+
+.inline-sort-options {
+    display: inline-block;
+}
+
+#sort-type-select {
+    margin-left: 5px;
+    margin-top: -1px;
+}
+
+input[type=text],
+select {
+    width: 150px;
+}
