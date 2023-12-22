@@ -3,7 +3,7 @@ export interface Character {
     displayName: string,
     series: string,
     randomSelection: boolean,
-    // cssNumber: int,
+    cssNumber: number,
     // alts: []
     mug: string
 }

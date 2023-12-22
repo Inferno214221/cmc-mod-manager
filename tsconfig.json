@@ -14,7 +14,11 @@
         "paths": {
             "*": ["node_modules/*"]
         },
-        "jsx": "react-jsx"
+        "jsx": "react-jsx",
+        "lib": [
+            "ESNext.Array",
+            "DOM"
+        ]
     },
     "include": ["src/**/*"],
     "files": [

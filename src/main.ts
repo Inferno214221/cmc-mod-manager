@@ -191,7 +191,7 @@ async function getCharacters(dir: string = gameDir): Promise<Character[]> {
         "ascii"
     ).split(/\r?\n/);
     charactersTxt.shift(); // Drop the number
-    charactersTxt.forEach((character: string) => {
+    charactersTxt.forEach((character: string, index: number) => {
         if (fs.existsSync(path.join(dir, "data", "dats", character + ".dat"))) {
             const characterDat = fs.readFileSync(
                 path.join(dir, "data", "dats", character + ".dat"),
@@ -202,7 +202,7 @@ async function getCharacters(dir: string = gameDir): Promise<Character[]> {
                 displayName: characterDat[1],
                 series: characterDat[3].toLowerCase(),
                 randomSelection: true, //TODO:
-                // cssNumber: int,
+                cssNumber: index + 1,
                 // alts: []
                 mug: path.join(dir, "gfx", "mugs", character + ".png")
             });

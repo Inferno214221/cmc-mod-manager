@@ -74,7 +74,7 @@ function CharacterList(): JSX.Element {
     = useState("");
     const [sortType, setSortType]:
     [string, Dispatch<SetStateAction<string>>]
-    = useState("number");
+    = useState("cssNumber");
     const [reverseSort, setReverseSort]:
     [boolean, Dispatch<SetStateAction<boolean>>]
     = useState(false);
@@ -85,6 +85,21 @@ function CharacterList(): JSX.Element {
         setCharacters(await api.getCharacters());
     }
     getCharacters();
+    function sortCharacters(characters: Character[]): Character[] {
+        let sortedCharacters = characters;
+        if (searchValue != "") {
+            sortedCharacters = sortedCharacters.filter((character: Character) => 
+                (character.displayName.toLowerCase().includes(searchValue))
+            );
+        }
+        sortedCharacters = sortedCharacters.toSorted((a: Character, b: Character) => 
+            (a[sortType] > b[sortType] ? 1 : -1)
+        );
+        if (reverseSort) {
+            sortedCharacters.reverse();
+        }
+        return sortedCharacters;
+    }
     return (
         <>
             <div id={"sort-div"}>
@@ -110,7 +125,7 @@ function CharacterList(): JSX.Element {
                                 setSortType(event.target.value);
                             }}
                         >
-                            <option value="number">Internal Number</option>
+                            <option value="cssNumber">Internal Number</option>
                             <option value="series">Franchise</option>
                             <option value="displayName">Alphabetical</option>
                         </select>
@@ -138,7 +153,7 @@ function CharacterList(): JSX.Element {
             <div id={"character-div"}>
                 <div className={"center"}>
                     <table>
-                        {characters.map((character: Character) => {
+                        {sortCharacters(characters).map((character: Character) => {
                             return (
                                 <CharacterDisplay
                                     character={character}
@@ -160,7 +175,7 @@ function CharacterDisplay({
     return (
         <tr>
             <td>
-                <img src={"img://" + character.mug}/>
+                <img src={"img://" + character.mug} draggable={false}/>
             </td>
             <td>
                 <span>{character.displayName}</span>
@@ -170,7 +185,7 @@ function CharacterDisplay({
                     icon={"launch"}
                     iconSize={"30px"}
                     tooltip={"Extract Character"}
-                    onClick={() => {console.log("Extracting: " + name)}}
+                    onClick={() => {console.log("Extracting: " + character.name)}}
                 />
             </td>
             <td>
@@ -178,7 +193,7 @@ function CharacterDisplay({
                     icon={"delete"}
                     iconSize={"30px"}
                     tooltip={"Remove Character"}
-                    onClick={() => {console.log("Removing: " + name)}}
+                    onClick={() => {console.log("Removing: " + character.name)}}
                 />
             </td>
             <td>
