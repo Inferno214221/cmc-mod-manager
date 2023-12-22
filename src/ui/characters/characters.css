@@ -5,6 +5,7 @@
     min-height: 0px;
     padding: 5px;
     margin-top: 5px;
+    overflow: auto;
 }
 
 #button-div, #sort-div {

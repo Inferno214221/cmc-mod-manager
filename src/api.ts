@@ -15,4 +15,6 @@ export default {
         ipcRenderer.invoke("runGame", args),
     openExternal: (...args: [url?: string, options?: Electron.OpenExternalOptions]) => 
         ipcRenderer.invoke("openExternal", args),
+    getCharacters: (...args: [dir?: string]) =>
+        ipcRenderer.invoke("getCharacters", args),
 }

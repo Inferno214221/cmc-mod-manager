@@ -62,7 +62,8 @@ const config: ForgeConfig = {
         new WebpackPlugin({
             mainConfig,
             devContentSecurityPolicy:
-                "default-src 'self' https://fonts.gstatic.com 'unsafe-inline' 'unsafe-eval'",
+                "default-src'self' https://fonts.gstatic.com img://* 'unsafe-inline' \
+                'unsafe-eval'",
             renderer: {
                 config: rendererConfig,
                 entryPoints: [

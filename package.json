@@ -7,6 +7,12 @@
     "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
+    "make-win": "electron-forge make --platform win32 --targets @electron-forge/maker-zip",
+    "make-win32": "electron-forge make --platform win32 --targets @electron-forge/maker-zip --arch=ia32",
+    "make-linux-all": "electron-forge make --platform linux --targets @electron-forge/maker-deb,@electron-forge/maker-rpm,@electron-forge/maker-zip",
+    "make-linux": "electron-forge make --platform linux --targets @electron-forge/maker-zip",
+    "make-deb": "electron-forge make --platform linux --targets @electron-forge/maker-deb",
+    "make-rpm": "electron-forge make --platform linux @electron-forge/maker-rpm",
     "publish": "electron-forge publish",
     "lint": "eslint --ext .ts,.tsx ."
   },

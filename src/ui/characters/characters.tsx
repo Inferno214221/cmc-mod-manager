@@ -2,6 +2,7 @@ import { Dispatch, SetStateAction, useState } from "react";
 import "./characters.css";
 import ToggleIconButton from "../global/icon-button/toggle-icon-button";
 import IconButton from "../global/icon-button/icon-button";
+import { Character } from "../../interfaces";
 
 export default function TabCharacters(): JSX.Element {
     const [filterInstallation, setFilterInstallation]:
@@ -77,6 +78,13 @@ function CharacterList(): JSX.Element {
     const [reverseSort, setReverseSort]:
     [boolean, Dispatch<SetStateAction<boolean>>]
     = useState(false);
+    const [characters, setCharacters]:
+    [Character[], Dispatch<SetStateAction<Character[]>>]
+    = useState([]);
+    async function getCharacters(): Promise<void> {
+        setCharacters(await api.getCharacters());
+    }
+    getCharacters();
     return (
         <>
             <div id={"sort-div"}>
@@ -129,8 +137,63 @@ function CharacterList(): JSX.Element {
             </div>
             <div id={"character-div"}>
                 <div className={"center"}>
+                    <table>
+                        {characters.map((character: Character) => {
+                            return (
+                                <CharacterDisplay
+                                    character={character}
+                                />
+                            );
+                        })}
+                    </table>
                 </div>        
             </div>
         </>
+    );
+}
+
+function CharacterDisplay({
+    character
+}: {
+    character: Character
+}): JSX.Element {
+    return (
+        <tr>
+            <td>
+                <img src={"img://" + character.mug}/>
+            </td>
+            <td>
+                <span>{character.displayName}</span>
+            </td>
+            <td>
+                <IconButton
+                    icon={"launch"}
+                    iconSize={"30px"}
+                    tooltip={"Extract Character"}
+                    onClick={() => {console.log("Extracting: " + name)}}
+                />
+            </td>
+            <td>
+                <IconButton
+                    icon={"delete"}
+                    iconSize={"30px"}
+                    tooltip={"Remove Character"}
+                    onClick={() => {console.log("Removing: " + name)}}
+                />
+            </td>
+            <td>
+                <ToggleIconButton
+                    checked={character.randomSelection}
+                    trueIcon={"shuffle_on"}
+                    trueTooltip={"Random Selection: Available"}
+                    falseIcon={"shuffle"}
+                    falseTooltip={"Random Selection: Disabled"}
+                    iconSize={"30px"}
+                    setter={(state: SetStateAction<boolean>) => {
+                        character.randomSelection = !character.randomSelection
+                    }}
+                />
+            </td>
+        </tr>
     );
 }

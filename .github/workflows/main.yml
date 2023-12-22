@@ -21,7 +21,7 @@ jobs:
       - name: Install Node Dependencies
         run: yarn
       - name: Electron Forge Build
-        run: yarn run make -- --platform win32 --targets @electron-forge/maker-zip
+        run: yarn run make-win
       - name: Move Output Zip
         run: move .\out\make\zip\win32\x64\cmc-mod-manager-win32-x64-2.4.0.zip .\cmc-mod-manager-win32-x64.zip
       
@@ -32,7 +32,7 @@ jobs:
           path: './cmc-mod-manager-win32-x64.zip'
       
       - name: Electron Forge Build 32 bit
-        run: yarn run make -- --platform win32 --targets @electron-forge/maker-zip --arch=ia32
+        run: yarn run make-win32
       - name: Move Output Zip
         run: move .\out\make\zip\win32\ia32\cmc-mod-manager-win32-ia32-2.4.0.zip .\cmc-mod-manager-win32-ia32.zip
       
@@ -65,7 +65,7 @@ jobs:
       - name: Install Node Dependencies
         run: yarn
       - name: Electron Forge Build
-        run: yarn run make -- --platform linux --targets @electron-forge/maker-deb,@electron-forge/maker-rpm,@electron-forge/maker-zip
+        run: yarn run make-linux-all
       - name: Move Output Zip
         run: mv ./out/make/zip/linux/x64/cmc-mod-manager-linux-x64-2.4.0.zip ./cmc-mod-manager-linux-x64.zip
       - name: Move Output Deb
