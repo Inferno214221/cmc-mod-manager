@@ -17,6 +17,8 @@ export default {
         ipcRenderer.invoke("openExternal", args),
     getCharacters: (...args: [dir?: string]) =>
         ipcRenderer.invoke("getCharacters", args),
+    getCharacterList: (...args: [dir?: string]) =>
+        ipcRenderer.invoke("getCharacters", args),
     writeCharacterRandom: (...args: [character: string, randomSelection: boolean, dir?: string]) =>
         ipcRenderer.invoke("writeCharacterRandom", args),
 }

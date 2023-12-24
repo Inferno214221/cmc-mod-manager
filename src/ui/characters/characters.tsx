@@ -86,7 +86,7 @@ function CharacterList(): JSX.Element {
     = useState([]);
 
     async function getCharacters(): Promise<void> {
-        setCharacters((await api.getCharacters())[0]);
+        setCharacters(await api.getCharacters());
     }
 
     useEffect(() => {
