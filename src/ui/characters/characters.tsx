@@ -1,8 +1,8 @@
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useState, useEffect } from "react";
 import "./characters.css";
 import ToggleIconButton from "../global/icon-button/toggle-icon-button";
 import IconButton from "../global/icon-button/icon-button";
-import { Character } from "../../interfaces";
+import { Character, SortTypes } from "../../interfaces";
 
 export default function TabCharacters(): JSX.Element {
     const [filterInstallation, setFilterInstallation]:
@@ -72,19 +72,27 @@ function CharacterList(): JSX.Element {
     const [searchValue, setSearchValue]:
     [string, Dispatch<SetStateAction<string>>]
     = useState("");
+
     const [sortType, setSortType]:
-    [string, Dispatch<SetStateAction<string>>]
-    = useState("cssNumber");
+    [SortTypes, Dispatch<SetStateAction<SortTypes>>]
+    = useState(SortTypes.cssNumber);
+
     const [reverseSort, setReverseSort]:
     [boolean, Dispatch<SetStateAction<boolean>>]
     = useState(false);
+
     const [characters, setCharacters]:
     [Character[], Dispatch<SetStateAction<Character[]>>]
     = useState([]);
+
     async function getCharacters(): Promise<void> {
-        setCharacters(await api.getCharacters());
+        setCharacters((await api.getCharacters())[0]);
     }
-    getCharacters();
+
+    useEffect(() => {
+        getCharacters();
+    }, []);
+    
     function sortCharacters(characters: Character[]): Character[] {
         let sortedCharacters = characters;
         if (searchValue != "") {
@@ -135,7 +143,6 @@ function CharacterList(): JSX.Element {
                     </div>
                     <div className={"inline-sort-options"}>
                         <ToggleIconButton
-                            // defaultState={false}
                             checked={reverseSort}
                             trueIcon={"north"}
                             trueTooltip={"Sorted Direction: Backwards"}
@@ -143,9 +150,6 @@ function CharacterList(): JSX.Element {
                             falseTooltip={"Sorted Direction: Forwards"}
                             iconSize={"30px"}
                             setter={setReverseSort}
-                            // onClick={(state: boolean) => {
-                            //     setReverseSort(state);
-                            // }}
                         />
                     </div>
                 </div>
@@ -153,13 +157,16 @@ function CharacterList(): JSX.Element {
             <div id={"character-div"}>
                 <div className={"center"}>
                     <table>
-                        {sortCharacters(characters).map((character: Character) => {
-                            return (
-                                <CharacterDisplay
-                                    character={character}
-                                />
-                            );
-                        })}
+                        <tbody>
+                            {sortCharacters(characters).map((character: Character) => {
+                                return (
+                                    <CharacterDisplay
+                                        character={character}
+                                        key={character.name}
+                                    />
+                                );
+                            })}
+                        </tbody>
                     </table>
                 </div>        
             </div>
@@ -172,6 +179,10 @@ function CharacterDisplay({
 }: {
     character: Character
 }): JSX.Element {
+    const [randomSelection, setRandomSelection]:
+    [boolean, Dispatch<SetStateAction<boolean>>]
+    = useState(character.randomSelection);
+
     return (
         <tr>
             <td>
@@ -187,25 +198,22 @@ function CharacterDisplay({
                     tooltip={"Extract Character"}
                     onClick={() => {console.log("Extracting: " + character.name)}}
                 />
-            </td>
-            <td>
                 <IconButton
                     icon={"delete"}
                     iconSize={"30px"}
                     tooltip={"Remove Character"}
                     onClick={() => {console.log("Removing: " + character.name)}}
                 />
-            </td>
-            <td>
                 <ToggleIconButton
-                    checked={character.randomSelection}
+                    checked={randomSelection}
                     trueIcon={"shuffle_on"}
-                    trueTooltip={"Random Selection: Available"}
+                    trueTooltip={"Random Selection: Enabled"}
                     falseIcon={"shuffle"}
                     falseTooltip={"Random Selection: Disabled"}
                     iconSize={"30px"}
-                    setter={(state: SetStateAction<boolean>) => {
-                        character.randomSelection = !character.randomSelection
+                    setter={(state: boolean) => {
+                        setRandomSelection(state);
+                        api.writeCharacterRandom(character.name, state);
                     }}
                 />
             </td>

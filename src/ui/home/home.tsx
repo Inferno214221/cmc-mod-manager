@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useState, useEffect } from "react";
 import "./home.css";
 import cmcmm from "../../assets/icon.png";
 import pfp from "../../assets/pfp.png";
@@ -158,11 +158,16 @@ function GameDirectoryActions(): JSX.Element {
     const [cmcDir, setCmcDir]:
     [string, Dispatch<SetStateAction<string>>]
     = useState("None Selected");
+
     async function updateGameDir(): Promise<void> {
         const newCmcDir: string = await api.getGameDir();
         setCmcDir(newCmcDir == null ? "None Selected" : newCmcDir);
     }
-    updateGameDir();
+
+    useEffect(() => {
+        updateGameDir();
+    }, []);
+    
     return (
         <>
             <div className={"center"}>

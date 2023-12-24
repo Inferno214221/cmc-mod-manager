@@ -1,4 +1,3 @@
-import { Dispatch, SetStateAction } from "react";
 import "./icon-button.css";
 
 export default function ToggleIconButton({
@@ -18,17 +17,12 @@ export default function ToggleIconButton({
     falseIcon: string,
     falseTooltip: string,
     iconSize: string,
-    setter: Dispatch<SetStateAction<boolean>>
+    setter: (state: boolean) => void
 }): JSX.Element {
-    // const [checked, setChecked]:
-    // [boolean, Dispatch<SetStateAction<boolean>>]
-    // = useState(defaultState);
     return (
         <div className={"icon-button-wrapper"}>
             <button  className={"icon-button"} onClick={() => {
-                // setChecked((checked) => !checked);
-                // onClick(checked);
-                setter((state: boolean) => !state);
+                setter(!checked);
             }}>
                 <span className={"mat-icon button-icon"} style={{ fontSize: iconSize }}>
                     {checked ? trueIcon : falseIcon}
