@@ -78,6 +78,26 @@ export class CharacterList {
     }
 }
 
+export interface CharacterDat {
+    name: string, // File name
+    displayName: string, // Line 1
+    menuName: string, // Line 2
+    battleName: string, //Line 3
+    series: string, // Line 4
+    homeStages: string[], // After "---Classic Home Stages Below---"
+    randomDatas: string[], // After "---Random Datas---""
+    palettes: CharacterPalette[] // After "---From Here is Individual Palettes data---"
+}
+
+export interface CharacterPalette {
+    name: string,
+    0: number,
+    1: number,
+    2: number,
+    3: number,
+    4: number
+}
+
 export enum SortTypes {
     cssNumber = "cssNumber",
     series = "series",

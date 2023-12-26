@@ -21,4 +21,8 @@ export default {
         ipcRenderer.invoke("getCharacters", args),
     writeCharacterRandom: (...args: [character: string, randomSelection: boolean, dir?: string]) =>
         ipcRenderer.invoke("writeCharacterRandom", args),
+    extractCharacter: (...args: [character: string, dir?: string]) =>
+        ipcRenderer.invoke("extractCharacter", args),
+    getCharacterDat: (...args: [character: string, dir?: string]) =>
+        ipcRenderer.invoke("getCharacterDat", args),
 }
