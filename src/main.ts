@@ -298,32 +298,67 @@ async function writeCharacterRandom(
 }
 
 async function getCharacterDat(character: string, dir: string = gameDir): Promise<CharacterDat> {
+    return readCharacterDat(path.join(dir, "data", "dats", character + ".dat"), character);
+}
+
+async function readCharacterDat(
+    datPath: string,
+    character: string = path.parse(datPath).name
+): Promise<CharacterDat> {
     const characterDatTxt: string[] = fs.readFileSync(
-        path.join(dir, "data", "dats", character + ".dat"),
+        datPath,
         "ascii"
     ).split(/\r?\n/);
-    const homeStageCount: number = parseInt(characterDatTxt[5]);
+    // 4th Line is numeric = vanilla dat
+    // Also location might mean vanilla dat
+    // else if the 5th line is numeric it is a v7 dat
+    const isVanilla = !isNaN(Number(characterDatTxt[3]));
+    const isV7 = isVanilla || !isNaN(Number(characterDatTxt[6]));
+
+
     const homeStages: string[] = [];
-    for (let stage = 1; stage <= homeStageCount; stage++) {
-        homeStages.push(characterDatTxt[5 + stage]);
-    }
-    const randomDataCount: number = parseInt(characterDatTxt[7 + homeStageCount]);
     const randomDatas: string[] = [];
-    for (let data = 1; data <= randomDataCount; data++) {
-        randomDatas.push(characterDatTxt[7 + homeStageCount + data]);
-    }
-    const paletteCount: number = parseInt(characterDatTxt[9 + homeStageCount + randomDataCount]);
     const palettes: CharacterPalette[] = [];
-    for (let palette = 1; palette <= paletteCount * 6; palette += 6) {
-        const paletteLocation: number = 10 + homeStageCount + randomDataCount + palette;
-        palettes.push({
-            name: characterDatTxt[paletteLocation + 0],
-            0: parseInt(characterDatTxt[paletteLocation + 1]),
-            1: parseInt(characterDatTxt[paletteLocation + 2]),
-            2: parseInt(characterDatTxt[paletteLocation + 3]),
-            3: parseInt(characterDatTxt[paletteLocation + 4]),
-            4: parseInt(characterDatTxt[paletteLocation + 5])
-        });
+    if (isV7) {
+        homeStages.push("battlefield");
+        randomDatas.push("Updated to v8 dat format by CMC Mod Manager");
+        const paletteCount: number =
+        parseInt(characterDatTxt[isVanilla ? 1 : 5]);
+        for (let palette = 1; palette <= paletteCount * 6; palette += 6) {
+            const paletteLocation: number = isVanilla ? 1 : 5 + palette;
+            palettes.push({
+                name: characterDatTxt[paletteLocation + 0],
+                0: parseInt(characterDatTxt[paletteLocation + 1]),
+                1: parseInt(characterDatTxt[paletteLocation + 2]),
+                2: parseInt(characterDatTxt[paletteLocation + 3]),
+                3: parseInt(characterDatTxt[paletteLocation + 4]),
+                4: parseInt(characterDatTxt[paletteLocation + 5])
+            });
+        }
+    } else {
+        const homeStageCount: number = parseInt(characterDatTxt[5]);
+        for (let stage = 1; stage <= homeStageCount; stage++) {
+            homeStages.push(characterDatTxt[5 + stage]);
+        }
+
+        const randomDataCount: number = parseInt(characterDatTxt[7 + homeStageCount]);
+        for (let data = 1; data <= randomDataCount; data++) {
+            randomDatas.push(characterDatTxt[7 + homeStageCount + data]);
+        }
+
+        const paletteCount: number =
+            parseInt(characterDatTxt[9 + homeStageCount + randomDataCount]);
+        for (let palette = 1; palette <= paletteCount * 6; palette += 6) {
+            const paletteLocation: number = 10 + homeStageCount + randomDataCount + palette;
+            palettes.push({
+                name: characterDatTxt[paletteLocation + 0],
+                0: parseInt(characterDatTxt[paletteLocation + 1]),
+                1: parseInt(characterDatTxt[paletteLocation + 2]),
+                2: parseInt(characterDatTxt[paletteLocation + 3]),
+                3: parseInt(characterDatTxt[paletteLocation + 4]),
+                4: parseInt(characterDatTxt[paletteLocation + 5])
+            });
+        }
     }
     return {
         name: character,
