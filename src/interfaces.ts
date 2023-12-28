@@ -17,6 +17,7 @@ export interface CharacterUpdate {
     // alts?: []
     mug?: string
 }
+
 export class CharacterList {
     private characters: Character[];
     private charactersByName: { [name: string]: number };

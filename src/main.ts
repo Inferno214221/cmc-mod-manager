@@ -13,6 +13,10 @@ declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 
 let mainWindow: BrowserWindow;
 
+function isNumber(num: string): boolean {
+    return /^\+?(0|[1-9]\d*)$/.test(num);
+}
+
 function createWindow(): void {
     // Create the browser window.
     mainWindow = new BrowserWindow({
@@ -312,9 +316,8 @@ async function readCharacterDat(
     // 4th Line is numeric = vanilla dat
     // Also location might mean vanilla dat
     // else if the 5th line is numeric it is a v7 dat
-    const isVanilla = !isNaN(Number(characterDatTxt[3]));
-    const isV7 = isVanilla || !isNaN(Number(characterDatTxt[6]));
-
+    const isVanilla = isNumber(characterDatTxt[3]);
+    const isV7 = isVanilla || isNumber(characterDatTxt[6]);
 
     const homeStages: string[] = [];
     const randomDatas: string[] = [];
@@ -372,10 +375,64 @@ async function readCharacterDat(
     };
 }
 
+async function writeDat(dat: CharacterDat, destination: string): Promise<void> {
+    let output = [
+        dat.displayName,
+        dat.menuName,
+        dat.battleName,
+        dat.series,
+        "---Classic Home Stages Below---",
+        dat.homeStages.length,
+        dat.homeStages.join("\r\n"),
+        "---Random Datas---",
+        dat.randomDatas.length,
+        dat.randomDatas.join("\r\n"),
+        "---Palettes Number---",
+        dat.palettes.length,
+        "---From Here is Individual Palettes data---"
+    ].join("\r\n");
+    dat.palettes.forEach((palette: CharacterPalette) => {
+        output += [
+            "",
+            palette.name,
+            palette[0],
+            palette[1],
+            palette[2],
+            palette[3],
+            palette[4]
+        ].join("\r\n");
+    });
+    fs.writeFile(path.join(destination, dat.name), output, { encoding: "ascii" });
+}
+
 async function extractCharacter(character: string, dir: string = gameDir): Promise<void> {
     //
 }
 
-function filterCharacterFiles(character: string, palettes = 0, ignoreSeries = false): string[] {
-    return;
+function filterCharacterFiles(characterDat: CharacterDat, ignoreSeries = false): string[] {
+    const files: string[] = [];
+    CHARACTER_FILES.forEach((file: string) => {
+        const fixedFiles: string[] = [];
+        let replaced: string = file.replaceAll("<fighter>", characterDat.name);
+        if (!ignoreSeries) replaced = replaced.replaceAll("<series>", characterDat.series);
+        fixedFiles.push(replaced);
+        if (fixedFiles[0].includes("<audio>")) {
+            ["ogg", "wav", "mp3"].forEach((format: string) => {
+                fixedFiles.push(fixedFiles[0].replaceAll("<audio>", format));
+            });
+            fixedFiles.shift();
+        }
+        fixedFiles.forEach((fixedFile: string) => {
+            if (fixedFile.includes("<palette>")) {
+                characterDat.palettes.forEach((palette: CharacterPalette, index: number) => {
+                    fixedFiles.push(fixedFile.replaceAll("<palette>", String(index + 1)));
+                });
+                fixedFiles.shift();
+            }
+        });
+        fixedFiles.forEach((fixed: string) => {
+            files.push(fixed);
+        })
+    });
+    return files;
 }
