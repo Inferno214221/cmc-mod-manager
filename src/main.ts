@@ -109,6 +109,15 @@ function createHandlers(): void {
     ipcMain.handle("getCharacterDat",
         (event, args: Parameters<typeof getCharacterDat>) => getCharacterDat(...args)
     );
+    ipcMain.handle("readCharacterDat",
+        (event, args: Parameters<typeof readCharacterDat>) => readCharacterDat(...args)
+    );
+    ipcMain.handle("writeCharacterDat",
+        (event, args: Parameters<typeof writeCharacterDat>) => writeCharacterDat(...args)
+    );
+    ipcMain.handle("filterCharacterFiles",
+        (event, args: Parameters<typeof filterCharacterFiles>) => filterCharacterFiles(...args)
+    );
 }
 
 const SUPPORTED_VERSIONS: string[] = [
@@ -313,11 +322,26 @@ async function readCharacterDat(
         datPath,
         "ascii"
     ).split(/\r?\n/);
-    // 4th Line is numeric = vanilla dat
-    // Also location might mean vanilla dat
-    // else if the 5th line is numeric it is a v7 dat
+    // TODO: handle empty v7 names for builtin characters
     const isVanilla = isNumber(characterDatTxt[3]);
-    const isV7 = isVanilla || isNumber(characterDatTxt[6]);
+    const isV7 = isVanilla || isNumber(characterDatTxt[4]);
+
+    let displayName: string;
+    let menuName: string;
+    let battleName: string;
+    let series: string;
+    // TODO: get input for 
+    if (isVanilla) {
+        displayName = "TODO";
+        menuName = "TODO";
+        battleName = "TODO";
+        series = "TODO";
+    } else {
+        displayName = characterDatTxt[0];
+        menuName = characterDatTxt[1];
+        battleName = characterDatTxt[2];
+        series = characterDatTxt[3].toLowerCase();
+    }
 
     const homeStages: string[] = [];
     const randomDatas: string[] = [];
@@ -365,17 +389,17 @@ async function readCharacterDat(
     }
     return {
         name: character,
-        displayName: characterDatTxt[0],
-        menuName: characterDatTxt[1],
-        battleName: characterDatTxt[2],
-        series: characterDatTxt[3].toLowerCase(),
+        displayName: displayName,
+        menuName: menuName,
+        battleName: battleName,
+        series: series,
         homeStages: homeStages,
         randomDatas: randomDatas,
         palettes: palettes
     };
 }
 
-async function writeDat(dat: CharacterDat, destination: string): Promise<void> {
+async function writeCharacterDat(dat: CharacterDat, destination: string): Promise<void> {
     let output = [
         dat.displayName,
         dat.menuName,
@@ -402,7 +426,8 @@ async function writeDat(dat: CharacterDat, destination: string): Promise<void> {
             palette[4]
         ].join("\r\n");
     });
-    fs.writeFile(path.join(destination, dat.name), output, { encoding: "ascii" });
+    fs.ensureFileSync(path.join(destination, dat.name + ".dat"));
+    fs.writeFile(path.join(destination, dat.name + ".dat"), output, { encoding: "ascii" });
 }
 
 async function extractCharacter(character: string, dir: string = gameDir): Promise<void> {
@@ -425,7 +450,7 @@ function filterCharacterFiles(characterDat: CharacterDat, ignoreSeries = false):
         fixedFiles.forEach((fixedFile: string) => {
             if (fixedFile.includes("<palette>")) {
                 characterDat.palettes.forEach((palette: CharacterPalette, index: number) => {
-                    fixedFiles.push(fixedFile.replaceAll("<palette>", String(index + 1)));
+                    fixedFiles.push(fixedFile.replaceAll("<palette>", String(index)));
                 });
                 fixedFiles.shift();
             }

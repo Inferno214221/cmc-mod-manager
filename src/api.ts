@@ -1,4 +1,5 @@
 import { ipcRenderer } from "electron"
+import { CharacterDat } from "./interfaces"
 
 export default {
     getGameDir: () =>
@@ -25,4 +26,10 @@ export default {
         ipcRenderer.invoke("extractCharacter", args),
     getCharacterDat: (...args: [character: string, dir?: string]) =>
         ipcRenderer.invoke("getCharacterDat", args),
+    readCharacterDat: (...args: [datPath: string, character?: string]) =>
+        ipcRenderer.invoke("readCharacterDat", args),
+    writeCharacterDat: (...args: [dat: CharacterDat, destination: string]) =>
+        ipcRenderer.invoke("writeCharacterDat", args),
+    filterCharacterFiles: (...args: [characterDat: CharacterDat, ignoreSeries?: boolean]) =>
+        ipcRenderer.invoke("filterCharacterFiles", args),
 }
