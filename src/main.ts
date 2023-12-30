@@ -430,8 +430,53 @@ async function writeCharacterDat(dat: CharacterDat, destination: string): Promis
     fs.writeFile(path.join(destination, dat.name + ".dat"), output, { encoding: "ascii" });
 }
 
-async function extractCharacter(character: string, dir: string = gameDir): Promise<void> {
-    //
+async function extractCharacter(extract: string, dir: string = gameDir): Promise<void> {
+    const characters: Character[] = await getCharacters(dir);
+    const similarNames: string[] = [];
+    characters.forEach((character: Character) => {
+        if (character.name.includes(extract) && character.name != extract) {
+            similarNames.push(character.name);
+        }
+    });
+    const characterDat: CharacterDat = await getCharacterDat(extract, dir);
+    const extractDir: string = path.join(__dirname, "extracted", extract);
+    filterCharacterFiles(characterDat).forEach((file: string) => {
+        const subDir: string = path.parse(file).dir;
+        if (file.includes("*")) {
+            const start: string = path.parse(file).base.split("*")[0].replace(subDir, "");
+            const end: string = path.parse(file).base.split("*")[1];
+            if (fs.existsSync(path.join(dir, subDir))) {
+                const contents: string[] = fs.readdirSync(path.join(dir, subDir))
+                    .filter((i: string) => {
+                        similarNames.forEach((name: string) => {
+                            if (i.startsWith(name)) {
+                                console.log(i + " was ignored because it belongs to " + name);
+                                return false;
+                            }
+                        });
+                        return i.startsWith(start) && i.endsWith(end);
+                    });
+                contents.forEach((found) => {
+                    console.log("Extracting: " + path.join(dir, subDir, found));
+                    fs.copy(
+                        path.join(dir, subDir, found),
+                        path.join(extractDir, subDir, found),
+                        { overwrite: true }
+                    );
+                });
+            }
+        } else {
+            const target: string = path.join(dir, file);
+            if (fs.existsSync(target)) {
+                console.log("Extracting: " + path.join(dir, file));
+                fs.copy(target, path.join(extractDir, subDir, file), { overwrite: true });
+            }
+        }
+    });
+    writeCharacterDat(
+        characterDat,
+        path.join(extractDir, "data", "dats", characterDat.name + ".dat")
+    );
 }
 
 function filterCharacterFiles(characterDat: CharacterDat, ignoreSeries = false): string[] {
