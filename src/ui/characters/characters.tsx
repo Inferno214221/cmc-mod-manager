@@ -34,7 +34,9 @@ export default function TabCharacters(): JSX.Element {
                             icon={"source"}
                             iconSize={"50px"}
                             tooltip={"Open Extraction Directory"}
-                            onClick={() => {console.log("a")}}
+                            onClick={async () => {
+                                api.openDir(await api.getExtractedDir());
+                            }}
                         />
                         <IconButton
                             icon={"delete_sweep"}
@@ -196,13 +198,17 @@ function CharacterDisplay({
                     icon={"launch"}
                     iconSize={"30px"}
                     tooltip={"Extract Character"}
-                    onClick={() => {console.log("Extracting: " + character.name)}}
+                    onClick={() => {
+                        api.extractCharacter(character.name);
+                    }}
                 />
                 <IconButton
                     icon={"delete"}
                     iconSize={"30px"}
                     tooltip={"Remove Character"}
-                    onClick={() => {console.log("Removing: " + character.name)}}
+                    onClick={() => {
+                        api.removeCharacter(character.name);
+                    }}
                 />
                 <ToggleIconButton
                     checked={randomSelection}

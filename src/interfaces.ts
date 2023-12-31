@@ -26,6 +26,10 @@ export class CharacterList {
     // RIP overloads cause of JS
     constructor(characters?: Character[]) {
         this.characters = characters || [];
+        this.indexAllCharacters();
+    }
+
+    private indexAllCharacters(): void {
         this.charactersByName = {};
         this.charactersByNum = {};
         this.characters.forEach((character: Character, index: number) => {
@@ -52,13 +56,20 @@ export class CharacterList {
         this.characters[this.charactersByName[name]] = character;
     }
 
-    updateCharacterByName(name: string, character: CharacterUpdate): void {
-        Object.assign(this.characters[this.charactersByName[name]], character);
+    updateCharacterByName(name: string, update: CharacterUpdate): void {
+        Object.assign(this.characters[this.charactersByName[name]], update);
     }
 
     removeCharacterByName(name: string): void {
-        console.log(name);
-        // TODO:
+        const remove = this.getCharacterByName(name);
+        this.characters.splice(this.charactersByName[name], 1);
+        for (const character of this.characters) {
+            if (character.cssNumber > remove.cssNumber) {
+                character.cssNumber--;
+            }
+        }
+        this.indexAllCharacters();
+        console.log(this.charactersByNum);
     }
 
     getCharacterByNum(cssNumber: number): Character {
@@ -69,8 +80,8 @@ export class CharacterList {
         this.characters[this.charactersByNum[cssNumber]] = character;
     }
 
-    updateCharacterByNum(cssNumber: number, character: CharacterUpdate): void {
-        Object.assign(this.characters[this.charactersByNum[cssNumber]], character);
+    updateCharacterByNum(cssNumber: number, update: CharacterUpdate): void {
+        Object.assign(this.characters[this.charactersByNum[cssNumber]], update);
     }
 
     removeCharacterByNum(cssNumber: number): void {

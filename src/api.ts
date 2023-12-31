@@ -1,9 +1,11 @@
 import { ipcRenderer } from "electron"
-import { CharacterDat } from "./interfaces"
+import { Character, CharacterList, CharacterDat } from "./interfaces"
 
 export default {
     getGameDir: () =>
         ipcRenderer.invoke("getGameDir"),
+    getExtractedDir: () =>
+        ipcRenderer.invoke("getExtractedDir"),
     getGameVersion: (...args: [dir?: string, list?: string[]]) =>
         ipcRenderer.invoke("getGameVersion", args),
     isValidGameDir: (...args: [dir?: string]) =>
@@ -18,12 +20,16 @@ export default {
         ipcRenderer.invoke("openExternal", args),
     getCharacters: (...args: [dir?: string]) =>
         ipcRenderer.invoke("getCharacters", args),
-    getCharacterList: (...args: [dir?: string]) =>
-        ipcRenderer.invoke("getCharacters", args),
+    readCharacterList: (...args: [dir?: string]) =>
+        ipcRenderer.invoke("readCharacterList", args),
+    writeCharacterList: (...args: [characterList: CharacterList, dir?: string]) =>
+        ipcRenderer.invoke("writeCharacterList", args),
     writeCharacterRandom: (...args: [character: string, randomSelection: boolean, dir?: string]) =>
         ipcRenderer.invoke("writeCharacterRandom", args),
-    extractCharacter: (...args: [character: string, dir?: string]) =>
+    extractCharacter: (...args: [extract: string, dir?: string]) =>
         ipcRenderer.invoke("extractCharacter", args),
+    removeCharacter: (...args: [remove: string, dir?: string]) =>
+        ipcRenderer.invoke("removeCharacter", args),
     getCharacterDat: (...args: [character: string, dir?: string]) =>
         ipcRenderer.invoke("getCharacterDat", args),
     readCharacterDat: (...args: [datPath: string, character?: string]) =>

@@ -78,6 +78,7 @@ app.on("activate", () => {
 
 function createHandlers(): void {
     ipcMain.handle("getGameDir", getGameDir);
+    ipcMain.handle("getExtractedDir", getExtractedDir);
     ipcMain.handle("getGameVersion",
         (event, args: Parameters<typeof getGameVersion>) => getGameVersion(...args)
     );
@@ -97,14 +98,20 @@ function createHandlers(): void {
     ipcMain.handle("getCharacters",
         (event, args: Parameters<typeof getCharacters>) => getCharacters(...args)
     );
-    ipcMain.handle("getCharacterList",
-        (event, args: Parameters<typeof getCharacterList>) => getCharacterList(...args)
+    ipcMain.handle("readCharacterList",
+        (event, args: Parameters<typeof readCharacterList>) => readCharacterList(...args)
+    );
+    ipcMain.handle("writeCharacterList",
+        (event, args: Parameters<typeof writeCharacterList>) => writeCharacterList(...args)
     );
     ipcMain.handle("writeCharacterRandom",
         (event, args: Parameters<typeof writeCharacterRandom>) => writeCharacterRandom(...args)
     );
     ipcMain.handle("extractCharacter",
         (event, args: Parameters<typeof extractCharacter>) => extractCharacter(...args)
+    );
+    ipcMain.handle("removeCharacter",
+        (event, args: Parameters<typeof removeCharacter>) => removeCharacter(...args)
     );
     ipcMain.handle("getCharacterDat",
         (event, args: Parameters<typeof getCharacterDat>) => getCharacterDat(...args)
@@ -119,6 +126,8 @@ function createHandlers(): void {
         (event, args: Parameters<typeof filterCharacterFiles>) => filterCharacterFiles(...args)
     );
 }
+
+const PROGRAM_DIR = app.getPath("userData");
 
 const SUPPORTED_VERSIONS: string[] = [
     "CMC_v8",
@@ -194,14 +203,18 @@ function getAllFiles(dirPath: string, arrayOfFiles?: string[]): string[] {
     return arrayOfFiles;
 }
 
-async function getGameDir(): Promise<string> {
+function getGameDir(): string {
     return gameDir;
 }
 
-async function getGameVersion(
+function getExtractedDir(): string {
+    return path.join(gameDir, "extracted");
+}
+
+function getGameVersion(
     dir: string = gameDir,
     list: string[] = SUPPORTED_VERSIONS
-): Promise<string | null> {
+): string | null {
     if (dir == null) {
         return null;
     }
@@ -214,7 +227,7 @@ async function getGameVersion(
 }
 
 async function isValidGameDir(dir: string = gameDir): Promise<boolean> {
-    return (dir != null && await getGameVersion(dir) != null);
+    return (dir != null && getGameVersion(dir) != null);
 }
 
 async function selectGameDir(): Promise<string | null> {
@@ -244,26 +257,27 @@ async function openDir(dir: string): Promise<void> {
 }
 
 async function runGame(dir: string = gameDir): Promise<void> {
-    execFile(path.join(dir, await getGameVersion(gameDir) + ".exe"), {
+    execFile(path.join(dir, getGameVersion(gameDir) + ".exe"), {
         cwd: dir,
         windowsHide: true
     });
 }
 
-async function getCharacters(dir: string = gameDir): Promise<Character[]> {
-    return (await getCharacterList(dir)).getAllCharacters();
+function getCharacters(dir: string = gameDir): Character[] {
+    return readCharacterList(dir).getAllCharacters();
 }
 
-async function getCharacterList(dir: string = gameDir): Promise<CharacterList> {
+function readCharacterList(dir: string = gameDir): CharacterList {
+    // console.log(new Date().getTime());
     const characters: CharacterList = new CharacterList();
     const charactersTxt: string[] = fs.readFileSync(
         path.join(dir, "data", "fighters.txt"),
         "ascii"
     ).split(/\r?\n/);
     charactersTxt.shift(); // Drop the number
-    charactersTxt.forEach(async (character: string, index: number) => {
+    charactersTxt.forEach((character: string, index: number) => {
         if (fs.existsSync(path.join(dir, "data", "dats", character + ".dat"))) {
-            const characterDat: CharacterDat = await getCharacterDat(character, dir);
+            const characterDat: CharacterDat = getCharacterDat(character, dir);
             characters.addCharacter({
                 name: character,
                 displayName: characterDat.displayName,
@@ -283,8 +297,69 @@ async function getCharacterList(dir: string = gameDir): Promise<CharacterList> {
     lockedTxt.forEach((locked: string) => {
         characters.updateCharacterByName(locked, { randomSelection: false });
     });
+    // console.log(new Date().getTime());
     return characters;
 }
+
+async function writeCharacterList(
+    characterList: CharacterList,
+    dir: string = gameDir
+): Promise<void> {
+    console.log(characterList);
+    const characters: Character[] = characterList.getAllCharacters();
+    characters.sort((a: Character, b: Character) => 
+        (a.cssNumber > b.cssNumber ? 1 : -1)
+    );
+    const output: string = [
+        characters.length,
+        characters.map((character: Character) => character.name).join("\r\n")
+    ].join("\r\n");
+    fs.writeFile(
+        path.join(dir, "data", "fighters.txt"),
+        output,
+        { encoding: "ascii" }
+    );
+}
+
+// async function getCharacters(dir: string = gameDir): Promise<Character[]> {
+//     return (await readCharacterList(dir)).getAllCharacters();
+// }
+
+// async function readCharacterList(dir: string = gameDir): Promise<CharacterList> {
+//     // console.log(new Date().getTime());
+//     const characters: CharacterList = new CharacterList();
+//     const charactersTxtPromise: Promise<string> = fs.readFile(
+//         path.join(dir, "data", "fighters.txt"),
+//         { encoding: "ascii" }
+//     );// Drop the number
+//     const lockedTxtPromise: Promise<string> = fs.readFile(
+//         path.join(dir, "data", "fighter_lock.txt"),
+//         { encoding: "ascii" }
+//     );
+//     const [charactersTxt, lockedTxt]: [string, string] = await Promise.all(
+//         [charactersTxtPromise, lockedTxtPromise]
+//     );
+//     const charactersList: string[] = charactersTxt.split(/\r?\n/);
+//     const lockedList: string[] = lockedTxt.split(/\r?\n/);
+//     charactersList.shift(); 
+//     lockedList.shift();
+//     charactersList.forEach(async (character: string, index: number) => {
+//         if (fs.existsSync(path.join(dir, "data", "dats", character + ".dat"))) {
+//             const characterDat: CharacterDat = getCharacterDat(character, dir);
+//             characters.addCharacter({
+//                 name: character,
+//                 displayName: characterDat.displayName,
+//                 series: characterDat.series,
+//                 randomSelection: lockedList.includes(character),
+//                 cssNumber: index + 1,
+//                 // alts: []
+//                 mug: path.join(dir, "gfx", "mugs", character + ".png")
+//             });
+//         }
+//     });
+//     // console.log(new Date().getTime());
+//     return characters;
+// }
 
 async function writeCharacterRandom(
     character: string,
@@ -310,14 +385,14 @@ async function writeCharacterRandom(
     )
 }
 
-async function getCharacterDat(character: string, dir: string = gameDir): Promise<CharacterDat> {
+function getCharacterDat(character: string, dir: string = gameDir): CharacterDat {
     return readCharacterDat(path.join(dir, "data", "dats", character + ".dat"), character);
 }
 
-async function readCharacterDat(
+function readCharacterDat(
     datPath: string,
     character: string = path.parse(datPath).name
-): Promise<CharacterDat> {
+): CharacterDat {
     const characterDatTxt: string[] = fs.readFileSync(
         datPath,
         "ascii"
@@ -431,15 +506,15 @@ async function writeCharacterDat(dat: CharacterDat, destination: string): Promis
 }
 
 async function extractCharacter(extract: string, dir: string = gameDir): Promise<void> {
-    const characters: Character[] = await getCharacters(dir);
+    const characters: Character[] = getCharacters(dir);
     const similarNames: string[] = [];
     characters.forEach((character: Character) => {
         if (character.name.includes(extract) && character.name != extract) {
             similarNames.push(character.name);
         }
     });
-    const characterDat: CharacterDat = await getCharacterDat(extract, dir);
-    const extractDir: string = path.join(__dirname, "extracted", extract);
+    const characterDat: CharacterDat = getCharacterDat(extract, dir);
+    const extractDir: string = path.join(dir, "extracted", extract);
     filterCharacterFiles(characterDat).forEach((file: string) => {
         const subDir: string = path.parse(file).dir;
         if (file.includes("*")) {
@@ -468,7 +543,7 @@ async function extractCharacter(extract: string, dir: string = gameDir): Promise
         } else {
             const target: string = path.join(dir, file);
             if (fs.existsSync(target)) {
-                console.log("Extracting: " + path.join(dir, file));
+                console.log("Extracting: " + target);
                 fs.copy(target, path.join(extractDir, subDir, file), { overwrite: true });
             }
         }
@@ -477,6 +552,49 @@ async function extractCharacter(extract: string, dir: string = gameDir): Promise
         characterDat,
         path.join(extractDir, "data", "dats", characterDat.name + ".dat")
     );
+}
+
+async function removeCharacter(remove: string, dir: string = gameDir): Promise<void> {
+    const characters: CharacterList = readCharacterList(dir);
+    const similarNames: string[] = [];
+    characters.getAllCharacters().forEach((character: Character) => {
+        if (character.name.includes(remove) && character.name != remove) {
+            similarNames.push(character.name);
+        }
+    });
+    const characterDat: CharacterDat = getCharacterDat(remove, dir);
+    filterCharacterFiles(characterDat, true).forEach((file: string) => {
+        const subDir: string = path.parse(file).dir;
+        if (file.includes("*")) {
+            const start: string = path.parse(file).base.split("*")[0].replace(subDir, "");
+            const end: string = path.parse(file).base.split("*")[1];
+            if (fs.existsSync(path.join(dir, subDir))) {
+                const contents: string[] = fs.readdirSync(path.join(dir, subDir))
+                    .filter((i: string) => {
+                        similarNames.forEach((name: string) => {
+                            if (i.startsWith(name)) {
+                                console.log(i + " was ignored because it belongs to " + name);
+                                return false;
+                            }
+                        });
+                        return i.startsWith(start) && i.endsWith(end);
+                    });
+                contents.forEach((found) => {
+                    console.log("Removing: " + path.join(dir, subDir, found));
+                    fs.remove(path.join(dir, subDir, found));
+                });
+            }
+        } else {
+            const target: string = path.join(dir, file);
+            if (fs.existsSync(target)) {
+                console.log("Removing: " + target);
+                fs.remove(target);
+            }
+        }
+    });
+    characters.removeCharacterByName(remove);
+    writeCharacterList(characters, dir);
+    //TODO: Remove from CSS
 }
 
 function filterCharacterFiles(characterDat: CharacterDat, ignoreSeries = false): string[] {
