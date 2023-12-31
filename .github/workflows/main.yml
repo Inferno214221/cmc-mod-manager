@@ -3,8 +3,35 @@ run-name: Build With Electron Forge
 on: [push, workflow_dispatch]
 
 jobs:
+  setup-auto-release:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Delete Tag & Release
+        uses: dev-drprasad/delete-tag-and-release@v1.0
+        with:
+          tag_name: auto
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Make Tag
+        uses: mathieudutour/github-tag-action@v6.1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          custom_tag: auto
+          tag_prefix: ""
+
+
   windows-build:
     runs-on: windows-latest
+
+    permissions:
+      contents: write
+
+    if: ${{ always() }}
+    needs: [setup-auto-release]
 
     strategy:
       matrix:
@@ -18,37 +45,44 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       
-      - name: Install Node Dependencies
+      - name: Install Yarn Dependencies
         run: yarn
       - name: Electron Forge Build
         run: yarn run make-win
       - name: Move Output Zip
         run: move .\out\make\zip\win32\x64\cmc-mod-manager-win32-x64-2.4.0.zip .\cmc-mod-manager-win32-x64.zip
-      
-      - name: Upload Zip For Release
-        uses: actions/upload-artifact@v3.1.2
+
+      - name: Update Release
+        uses: ncipollo/release-action@v1
         with:
-          name: win32-x64
-          path: './cmc-mod-manager-win32-x64.zip'
-      
-      - name: Electron Forge Build 32 bit
+          artifacts: "./cmc-mod-manager-win32-x64.zip"
+          tag: auto
+          allowUpdates: true
+          prerelease: true
+          makeLatest: false
+
+      - name: Electron Forge Build 32 Bit
         run: yarn run make-win32
       - name: Move Output Zip
         run: move .\out\make\zip\win32\ia32\cmc-mod-manager-win32-ia32-2.4.0.zip .\cmc-mod-manager-win32-ia32.zip
-      
-      - name: Upload Zip For Release
-        uses: actions/upload-artifact@v3.1.2
+
+      - name: Update Release
+        uses: ncipollo/release-action@v1
         with:
-          name: win32-ia32
-          path: './cmc-mod-manager-win32-ia32.zip'
+          artifacts: "./cmc-mod-manager-win32-ia32.zip"
+          tag: auto
+          allowUpdates: true
+          prerelease: true
+          makeLatest: false
 
   ubuntu-build:
     runs-on: ubuntu-latest
 
-    if: ${{ always() }}
-    needs: [windows-build]
     permissions:
       contents: write
+
+    if: ${{ always() }}
+    needs: [setup-auto-release]
 
     strategy:
       matrix:
@@ -62,7 +96,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       
-      - name: Install Node Dependencies
+      - name: Install Yarn Dependencies
         run: yarn
       - name: Electron Forge Build
         run: yarn run make-linux-all
@@ -72,33 +106,12 @@ jobs:
         run: mv ./out/make/deb/x64/cmc-mod-manager_2.4.0_amd64.deb ./cmc-mod-manager-linux.deb
       - name: Move Output Rpm
         run: mv ./out/make/rpm/x64/cmc-mod-manager-2.4.0-1.x86_64.rpm ./cmc-mod-manager-linux.rpm
-          
-      - name: Retrieve Windows Build Output
-        uses: actions/download-artifact@v3
-        with:
-          name: win32-x64
-      - name: Retrieve Windows Build Output
-        uses: actions/download-artifact@v3
-        with:
-          name: win32-ia32
       
-      - name: Delete Tag & Release
-        uses: dev-drprasad/delete-tag-and-release@v1.0
-        with:
-          tag_name: auto
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-      
-      - name: Make Auto Tag
-        uses: mathieudutour/github-tag-action@v6.1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          custom_tag: auto
-          tag_prefix: ""
-      
-      - name: Make A Release
+      - name: Update Release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "./cmc-mod-manager-win32-x64.zip,./cmc-mod-manager-win32-ia32.zip,./cmc-mod-manager-linux-x64.zip,./cmc-mod-manager-linux.deb,./cmc-mod-manager-linux.rpm"
+          artifacts: "./cmc-mod-manager-linux-x64.zip,./cmc-mod-manager-linux.deb,./cmc-mod-manager-linux.rpm"
           tag: auto
+          allowUpdates: true
           prerelease: true
           makeLatest: false
