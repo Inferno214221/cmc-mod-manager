@@ -96,7 +96,7 @@ function CharacterList(): JSX.Element {
     }, []);
     
     function sortCharacters(characters: Character[]): Character[] {
-        let sortedCharacters = characters;
+        let sortedCharacters: Character[] = characters;
         if (searchValue != "") {
             sortedCharacters = sortedCharacters.filter((character: Character) => 
                 (character.displayName.toLowerCase().includes(searchValue))

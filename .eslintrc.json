@@ -19,7 +19,7 @@
         "@stylistic/jsx"
     ],
     "rules": {
-        "@stylistic/js/max-len": ["error", {"code": 100}],
+        "@stylistic/js/max-len": ["warn", {"code": 100}],
         "@stylistic/js/space-infix-ops": ["error"],
         "@stylistic/js/no-mixed-operators": ["error", {"allowSamePrecedence": true}],
         "@stylistic/js/arrow-spacing": ["error", {"before": true, "after": true}],
@@ -35,6 +35,16 @@
         "@stylistic/ts/type-annotation-spacing": ["error"],
         "@stylistic/jsx/jsx-curly-spacing": ["error", {"when": "never" }],
         "@typescript-eslint/no-explicit-any": "off",
-        "@typescript-eslint/explicit-function-return-type": ["error", {"allowExpressions": true}]
+        "@typescript-eslint/explicit-function-return-type": ["error", {"allowExpressions": true}],
+        "@typescript-eslint/no-inferrable-types": "off",
+        "@typescript-eslint/typedef": ["error", {
+            "arrayDestructuring": true,
+            "arrowParameter": true,
+            "memberVariableDeclaration": true,
+            "objectDestructuring": true,
+            "parameter": true,
+            "propertyDeclaration": true,
+            "variableDeclaration": true
+        }]
     }
 }

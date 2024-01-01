@@ -42,8 +42,12 @@ export class CharacterList {
         return this.characters;
     }
 
+    getNextCssNumber(): number {
+        return this.characters.length + 1;
+    }
+
     addCharacter(character: Character): void {
-        const index = this.characters.push(character) - 1;
+        const index: number = this.characters.push(character) - 1;
         this.charactersByName[character.name] = index;
         this.charactersByNum[character.cssNumber] = index;
     }
@@ -61,7 +65,7 @@ export class CharacterList {
     }
 
     removeCharacterByName(name: string): void {
-        const remove = this.getCharacterByName(name);
+        const remove: Character = this.getCharacterByName(name);
         this.characters.splice(this.charactersByName[name], 1);
         for (const character of this.characters) {
             if (character.cssNumber > remove.cssNumber) {
@@ -85,8 +89,15 @@ export class CharacterList {
     }
 
     removeCharacterByNum(cssNumber: number): void {
-        console.log(cssNumber);
-        // TODO:
+        const remove: Character = this.getCharacterByNum(cssNumber);
+        this.characters.splice(this.charactersByNum[cssNumber], 1);
+        for (const character of this.characters) {
+            if (character.cssNumber > remove.cssNumber) {
+                character.cssNumber--;
+            }
+        }
+        this.indexAllCharacters();
+        console.log(this.charactersByNum);
     }
 }
 

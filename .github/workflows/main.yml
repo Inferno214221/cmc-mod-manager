@@ -23,7 +23,6 @@ jobs:
           custom_tag: auto
           tag_prefix: ""
 
-
   windows-build:
     runs-on: windows-latest
 
