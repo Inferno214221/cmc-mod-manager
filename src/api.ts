@@ -61,12 +61,19 @@ export default {
         dir?: string
     ]) => ipcRenderer.invoke("writeCharacterRandom", args),
 
-    installCharacter:
+    installCharacterDir:
     (...args: [
-        characterDir: string,
         filterInstallation: boolean,
+        updateCharacters: boolean,
         dir?: string
-    ]) => ipcRenderer.invoke("installCharacter", args),
+    ]) => ipcRenderer.invoke("installCharacterDir", args),
+
+    installCharacterArchive:
+    (...args: [
+        filterInstallation: boolean,
+        updateCharacters: boolean,
+        dir?: string
+    ]) => ipcRenderer.invoke("installCharacterArchive", args),
 
     extractCharacter:
     (...args: [

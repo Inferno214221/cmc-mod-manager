@@ -45,6 +45,8 @@
             "parameter": true,
             "propertyDeclaration": true,
             "variableDeclaration": true
-        }]
+        }],
+        "no-case-declarations": "off",
+        "import/no-named-as-default-member": "off"
     }
 }

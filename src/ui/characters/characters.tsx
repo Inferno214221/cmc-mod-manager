@@ -11,10 +11,25 @@ export default function TabCharacters(): JSX.Element {
     const [updateCharacters, setUpdateCharacters]:
     [boolean, Dispatch<SetStateAction<boolean>>]
     = useState(false);
+    const [characters, setCharacters]:
+    [Character[], Dispatch<SetStateAction<Character[]>>]
+    = useState([]);
+
+    async function getCharacters(): Promise<void> {
+        setCharacters(await api.getCharacters());
+    }
+
+    useEffect(() => {
+        getCharacters();
+    }, []);
+
     return (
         <>
             <section>
-                <CharacterList/>
+                <CharacterList
+                    characters={characters}
+                    getCharacters={getCharacters}
+                />
                 <hr/>
                 <div id={"button-div"}>
                     <div className={"center"}>
@@ -22,13 +37,25 @@ export default function TabCharacters(): JSX.Element {
                             icon={"folder_shared"}
                             iconSize={"50px"}
                             tooltip={"Install Character From Directory"}
-                            onClick={() => {console.log("a")}}
+                            onClick={async () => {
+                                await api.installCharacterDir(
+                                    filterInstallation,
+                                    updateCharacters
+                                );
+                                getCharacters();
+                            }}
                         />
                         <IconButton
                             icon={"contact_page"}
                             iconSize={"50px"}
                             tooltip={"Install Character From Archive"}
-                            onClick={() => {console.log("a")}}
+                            onClick={async () => {
+                                await api.installCharacterArchive(
+                                    filterInstallation,
+                                    updateCharacters
+                                );
+                                getCharacters();
+                            }}
                         />
                         <IconButton
                             icon={"source"}
@@ -70,7 +97,13 @@ export default function TabCharacters(): JSX.Element {
     );
 }
 
-function CharacterList(): JSX.Element {
+function CharacterList({
+    characters,
+    getCharacters
+}: {
+    characters: Character[],
+    getCharacters: () => Promise<void>
+}): JSX.Element {
     const [searchValue, setSearchValue]:
     [string, Dispatch<SetStateAction<string>>]
     = useState("");
@@ -82,18 +115,6 @@ function CharacterList(): JSX.Element {
     const [reverseSort, setReverseSort]:
     [boolean, Dispatch<SetStateAction<boolean>>]
     = useState(false);
-
-    const [characters, setCharacters]:
-    [Character[], Dispatch<SetStateAction<Character[]>>]
-    = useState([]);
-
-    async function getCharacters(): Promise<void> {
-        setCharacters(await api.getCharacters());
-    }
-
-    useEffect(() => {
-        getCharacters();
-    }, []);
     
     function sortCharacters(characters: Character[]): Character[] {
         let sortedCharacters: Character[] = characters;
@@ -165,6 +186,7 @@ function CharacterList(): JSX.Element {
                                     <CharacterDisplay
                                         character={character}
                                         key={character.name}
+                                        getCharacters={getCharacters}
                                     />
                                 );
                             })}
@@ -177,9 +199,11 @@ function CharacterList(): JSX.Element {
 }
 
 function CharacterDisplay({
-    character
+    character,
+    getCharacters
 }: {
-    character: Character
+    character: Character,
+    getCharacters: () => Promise<void>
 }): JSX.Element {
     const [randomSelection, setRandomSelection]:
     [boolean, Dispatch<SetStateAction<boolean>>]
@@ -206,8 +230,9 @@ function CharacterDisplay({
                     icon={"delete"}
                     iconSize={"30px"}
                     tooltip={"Remove Character"}
-                    onClick={() => {
-                        api.removeCharacter(character.name);
+                    onClick={async () => {
+                        await api.removeCharacter(character.name);
+                        getCharacters();
                     }}
                 />
                 <ToggleIconButton

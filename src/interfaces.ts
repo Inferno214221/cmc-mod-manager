@@ -73,7 +73,6 @@ export class CharacterList {
             }
         }
         this.indexAllCharacters();
-        console.log(this.charactersByNum);
     }
 
     getCharacterByNum(cssNumber: number): Character {
@@ -97,7 +96,6 @@ export class CharacterList {
             }
         }
         this.indexAllCharacters();
-        console.log(this.charactersByNum);
     }
 }
 
