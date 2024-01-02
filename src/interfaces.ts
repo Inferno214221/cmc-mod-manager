@@ -119,6 +119,13 @@ export interface CharacterPalette {
     4: number
 }
 
+export interface CssPage {
+    name: string,
+    path: string
+}
+
+export type CssData = string[][];
+
 export enum SortTypes {
     cssNumber = "cssNumber",
     series = "series",

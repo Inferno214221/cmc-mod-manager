@@ -1,5 +1,5 @@
 import { ipcRenderer } from "electron"
-import { CharacterList, CharacterDat } from "./interfaces"
+import { CharacterList, CharacterDat, CssPage } from "./interfaces"
 
 export default {
     getGameDir:
@@ -105,9 +105,24 @@ export default {
         destination: string
     ]) => ipcRenderer.invoke("writeCharacterDat", args),
 
-    filterCharacterFiles:
+    readCssPages:
     (...args: [
-        characterDat: CharacterDat,
-        ignoreSeries?: boolean
-    ]) => ipcRenderer.invoke("filterCharacterFiles", args),
+        dir?: string
+    ]) => ipcRenderer.invoke("readCssPages", args),
+
+    writeCssPages:
+    (...args: [
+        pages: CssPage[],
+        dir?: string
+    ]) => ipcRenderer.invoke("writeCssPages", args),
+
+    readCssData:
+    (...args: [
+        page: CssPage
+    ]) => ipcRenderer.invoke("readCssData", args),
+
+    writeCssData:
+    (...args: [
+        page: CssPage
+    ]) => ipcRenderer.invoke("writeCssData", args),
 }
