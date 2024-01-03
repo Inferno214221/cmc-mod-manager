@@ -270,3 +270,12 @@ input[type=text] {
 select {
     height: 29px;
 }
+
+hr.vr {
+    display: inline;
+    border-color: var(--inf-grey2);
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 5px;
+    margin: 5px 0px 0px 5px;
+}

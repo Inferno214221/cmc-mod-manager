@@ -2,6 +2,7 @@ import { createRoot, Root } from "react-dom/client";
 import "./global.css";
 import TabHome from "../home/home";
 import TabCharacters from "../characters/characters";
+import TabCharacterSelectionScreen from "../character-selection-screen/character-selection-screen";
 
 let root: Root;
 let activeTabInfo: TabInfo;
@@ -32,7 +33,7 @@ export const CHARACTER_SELECTION_SCREEN: TabInfo = {
     name: "characterSelectionScreen",
     displayName: "Character Selection Screen",
     icon: "pan_tool_alt",
-    element: <TabHome/>
+    element: <TabCharacterSelectionScreen/>
 };
 export const PORT_CHARACTERS: TabInfo = {
     name: "portCharacters",

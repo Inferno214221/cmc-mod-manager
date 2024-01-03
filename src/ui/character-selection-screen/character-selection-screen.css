@@ -1,0 +1,43 @@
+@import "../global/global.css";
+
+#pages-div, #sort-excluded-div, #excluded-div {
+    height: min-content;
+    background-color: var(--inf-grey4);
+    z-index: 1;
+    padding: 5px;
+}
+
+#pages-div, #excluded-div {
+    overflow-x: auto;
+    margin: 5px;
+}
+
+#css-div {
+    flex-grow: 1;
+    min-height: 0px;
+    padding: 5px;
+    overflow: auto;
+}
+
+#excluded-wrapper {
+    display: flex;
+    width: 100%;
+    flex-wrap: nowrap;
+}
+
+.excluded-display-wrapper {
+    width: 62px;
+    margin: 5px;
+    height: auto;
+}
+
+.excluded-display-mug {
+    height: 62px;
+    width: 100%;
+}
+
+.excluded-display-name {
+    overflow: hidden;
+    height: 26pt;
+    word-wrap: break-word;
+}

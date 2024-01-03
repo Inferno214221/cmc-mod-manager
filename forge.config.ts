@@ -3,8 +3,10 @@ import type { ForgeConfig } from "@electron-forge/shared-types";
 // import { MakerZIP } from "@electron-forge/maker-zip";
 // import { MakerDeb } from "@electron-forge/maker-deb";
 // import { MakerRpm } from "@electron-forge/maker-rpm";
-import { AutoUnpackNativesPlugin } from "@electron-forge/plugin-auto-unpack-natives";
+// import { AutoUnpackNativesPlugin } from "@electron-forge/plugin-auto-unpack-natives";
 import { WebpackPlugin } from "@electron-forge/plugin-webpack";
+import fs from "fs-extra";
+import path from "path";
 
 import { mainConfig } from "./webpack.main.config";
 import { rendererConfig } from "./webpack.renderer.config";
@@ -79,6 +81,20 @@ const config: ForgeConfig = {
             },
         }),
     ],
+    hooks: {
+        postPackage: async (config: any, packageResult: any) => {
+            fs.copySync(
+                path.join(__dirname, "LICENSE"),
+                path.join(packageResult.outputPaths[0], "LICENSE"),
+                { overwrite: true }
+            );
+            // let dataFile = 
+            //     path.join(packageResult.outputPaths[0], "resources", "app", "data.json");
+            // let data = require(dataFile);
+            // data.platform = packageResult.platform + "-" + packageResult.arch;
+            // fs.writeFileSync(dataFile, JSON.stringify(data, null, 2), "utf-8");
+        },
+    },
 };
 
 export default config;

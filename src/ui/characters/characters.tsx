@@ -8,28 +8,109 @@ export default function TabCharacters(): JSX.Element {
     const [filterInstallation, setFilterInstallation]:
     [boolean, Dispatch<SetStateAction<boolean>>]
     = useState(true);
+    
     const [updateCharacters, setUpdateCharacters]:
     [boolean, Dispatch<SetStateAction<boolean>>]
     = useState(false);
+
     const [characters, setCharacters]:
     [Character[], Dispatch<SetStateAction<Character[]>>]
     = useState([]);
 
-    async function getCharacters(): Promise<void> {
-        setCharacters(await api.getCharacters());
-    }
+    const [searchValue, setSearchValue]:
+    [string, Dispatch<SetStateAction<string>>]
+    = useState("");
+
+    const [sortType, setSortType]:
+    [SortTypes, Dispatch<SetStateAction<SortTypes>>]
+    = useState(SortTypes.cssNumber);
+
+    const [reverseSort, setReverseSort]:
+    [boolean, Dispatch<SetStateAction<boolean>>]
+    = useState(false);
 
     useEffect(() => {
         getCharacters();
     }, []);
 
+    async function getCharacters(): Promise<void> {
+        setCharacters(await api.getCharacters());
+    }
+
+    function sortCharacters(characters: Character[]): Character[] {
+        let sortedCharacters: Character[] = characters;
+        if (searchValue != "") {
+            sortedCharacters = sortedCharacters.filter((character: Character) => 
+                (character.displayName.toLowerCase().includes(searchValue))
+            );
+        }
+        sortedCharacters = sortedCharacters.toSorted((a: Character, b: Character) => 
+            (a[sortType] > b[sortType] ? 1 : -1)
+        );
+        if (reverseSort) {
+            sortedCharacters.reverse();
+        }
+        return sortedCharacters;
+    }
+
     return (
         <>
             <section>
-                <CharacterList
-                    characters={characters}
-                    getCharacters={getCharacters}
-                />
+                <div id={"sort-div"}>
+                    <div className={"center"}>
+                        <div className={"tooltip-wrapper inline-sort-options"}>
+                            <input
+                                type={"text"}
+                                placeholder={"Search"}
+                                // id={"characterSearch"}
+                                onInput={(event: any) => {
+                                    setSearchValue(event.target.value);
+                                    console.log(searchValue, sortType, reverseSort);
+                                }}
+                            />
+                            <div className={"tooltip"}>
+                                <span>Search For Characters</span>
+                            </div>
+                        </div>
+                        <div className={"tooltip-wrapper inline-sort-options"}>
+                            <select
+                                id="sort-type-select"
+                                onChange={(event: any) => {
+                                    setSortType(event.target.value);
+                                }}
+                            >
+                                <option value="cssNumber">Internal Number</option>
+                                <option value="series">Franchise</option>
+                                <option value="displayName">Alphabetical</option>
+                            </select>
+                            <div className={"tooltip"}>
+                                <span>Sorting Method</span>
+                            </div>
+                        </div>
+                        <div className={"inline-sort-options"}>
+                            <ToggleIconButton
+                                checked={reverseSort}
+                                trueIcon={"north"}
+                                trueTooltip={"Sorted Direction: Backwards"}
+                                falseIcon={"south"}
+                                falseTooltip={"Sorted Direction: Forwards"}
+                                iconSize={"30px"}
+                                setter={setReverseSort}
+                            />
+                        </div>
+                    </div>
+                </div>
+                <div id={"character-div"}>
+                    {sortCharacters(characters).map((character: Character) => {
+                        return (
+                            <CharacterDisplay
+                                character={character}
+                                key={character.name}
+                                getCharacters={getCharacters}
+                            />
+                        );
+                    })}
+                </div>
                 <hr/>
                 <div id={"button-div"}>
                     <div className={"center"}>
@@ -65,13 +146,13 @@ export default function TabCharacters(): JSX.Element {
                                 api.openDir(await api.getExtractedDir());
                             }}
                         />
-                        <IconButton
+                        {/* <IconButton
                             icon={"delete_sweep"}
                             iconSize={"50px"}
                             tooltip={"Remove All Characters"}
                             onClick={() => {console.log("a")}}
-                        />
-                        {/* <vr/> */}
+                        /> */}
+                        <hr className={"vr"}/>
                         <ToggleIconButton
                             checked={filterInstallation}
                             trueIcon={"filter_alt"}
@@ -97,107 +178,6 @@ export default function TabCharacters(): JSX.Element {
     );
 }
 
-function CharacterList({
-    characters,
-    getCharacters
-}: {
-    characters: Character[],
-    getCharacters: () => Promise<void>
-}): JSX.Element {
-    const [searchValue, setSearchValue]:
-    [string, Dispatch<SetStateAction<string>>]
-    = useState("");
-
-    const [sortType, setSortType]:
-    [SortTypes, Dispatch<SetStateAction<SortTypes>>]
-    = useState(SortTypes.cssNumber);
-
-    const [reverseSort, setReverseSort]:
-    [boolean, Dispatch<SetStateAction<boolean>>]
-    = useState(false);
-    
-    function sortCharacters(characters: Character[]): Character[] {
-        let sortedCharacters: Character[] = characters;
-        if (searchValue != "") {
-            sortedCharacters = sortedCharacters.filter((character: Character) => 
-                (character.displayName.toLowerCase().includes(searchValue))
-            );
-        }
-        sortedCharacters = sortedCharacters.toSorted((a: Character, b: Character) => 
-            (a[sortType] > b[sortType] ? 1 : -1)
-        );
-        if (reverseSort) {
-            sortedCharacters.reverse();
-        }
-        return sortedCharacters;
-    }
-    return (
-        <>
-            <div id={"sort-div"}>
-                <div className={"center"}>
-                    <div className={"tooltip-wrapper inline-sort-options"}>
-                        <input
-                            type={"text"}
-                            placeholder={"Search"}
-                            // id={"characterSearch"}
-                            onInput={(event: any) => {
-                                setSearchValue(event.target.value);
-                                console.log(searchValue, sortType, reverseSort);
-                            }}
-                        />
-                        <div className={"tooltip"}>
-                            <span>Search For Characters</span>
-                        </div>
-                    </div>
-                    <div className={"tooltip-wrapper inline-sort-options"}>
-                        <select
-                            id="sort-type-select"
-                            onChange={(event: any) => {
-                                setSortType(event.target.value);
-                            }}
-                        >
-                            <option value="cssNumber">Internal Number</option>
-                            <option value="series">Franchise</option>
-                            <option value="displayName">Alphabetical</option>
-                        </select>
-                        <div className={"tooltip"}>
-                            <span>Sorting Method</span>
-                        </div>
-                    </div>
-                    <div className={"inline-sort-options"}>
-                        <ToggleIconButton
-                            checked={reverseSort}
-                            trueIcon={"north"}
-                            trueTooltip={"Sorted Direction: Backwards"}
-                            falseIcon={"south"}
-                            falseTooltip={"Sorted Direction: Forwards"}
-                            iconSize={"30px"}
-                            setter={setReverseSort}
-                        />
-                    </div>
-                </div>
-            </div>
-            <div id={"character-div"}>
-                <div className={"center"}>
-                    <table>
-                        <tbody>
-                            {sortCharacters(characters).map((character: Character) => {
-                                return (
-                                    <CharacterDisplay
-                                        character={character}
-                                        key={character.name}
-                                        getCharacters={getCharacters}
-                                    />
-                                );
-                            })}
-                        </tbody>
-                    </table>
-                </div>        
-            </div>
-        </>
-    );
-}
-
 function CharacterDisplay({
     character,
     getCharacters
@@ -210,14 +190,14 @@ function CharacterDisplay({
     = useState(character.randomSelection);
 
     return (
-        <tr>
-            <td>
+        <div className={"character-display-wrapper"}>
+            <div className={"character-display-mug"}>
                 <img src={"img://" + character.mug} draggable={false}/>
-            </td>
-            <td>
+            </div>
+            <div className={"character-display-name"}>
                 <span>{character.displayName}</span>
-            </td>
-            <td>
+            </div>
+            <div className={"character-display-actions"}>
                 <IconButton
                     icon={"launch"}
                     iconSize={"30px"}
@@ -247,7 +227,7 @@ function CharacterDisplay({
                         api.writeCharacterRandom(character.name, state);
                     }}
                 />
-            </td>
-        </tr>
+            </div>
+        </div>
     );
 }
