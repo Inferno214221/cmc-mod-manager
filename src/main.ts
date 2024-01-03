@@ -6,7 +6,6 @@ import fs from "fs-extra";
 import path from "path";
 import extract from "extract-zip";
 import { createExtractorFromFile, Extractor, ArcFiles, ArcFile } from "node-unrar-js/esm";
-const wasmBinary: Buffer = fs.readFileSync(require.resolve("node-unrar-js/esm/js/unrar.wasm"));
 // import sevenZip from "node-7z-archive";
 import ini from "ini";
 import { execFile } from "child_process";
@@ -18,6 +17,9 @@ import {
 // whether you're running in development or production).
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
+
+require.resolve("./unrar.wasm");
+const wasmBinary: Buffer = fs.readFileSync(path.join(__dirname, "unrar.wasm"));
 
 let mainWindow: BrowserWindow;
 
