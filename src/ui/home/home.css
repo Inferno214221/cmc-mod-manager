@@ -17,15 +17,16 @@
     width: 100%;
 }
 
-#tabs-div {
+/* #tabs-div {
     margin-top: 5px;
-}
+} */
 
 #tabs-scrollable {
     white-space: nowrap;
     overflow-y: hidden;
     overflow-x: auto;
     height: 100%;
+    padding-bottom: 5px;
 }
 
 #tabs-scrollable div.center {

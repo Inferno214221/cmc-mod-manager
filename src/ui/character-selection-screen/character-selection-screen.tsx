@@ -2,25 +2,46 @@ import { Dispatch, SetStateAction, useState, useEffect } from "react";
 import "./character-selection-screen.css";
 import ToggleIconButton from "../global/icon-button/toggle-icon-button";
 import IconButton from "../global/icon-button/icon-button";
-import { Character, SortTypes } from "../../interfaces";
+import { Character, CssPage, SortTypes } from "../../interfaces";
 
 export default function TabCharacterSelectionScreen(): JSX.Element {
     const [characters, setCharacters]:
     [Character[], Dispatch<SetStateAction<Character[]>>]
     = useState([]);
 
-    async function getCharacters(): Promise<void> {
+    const [cssPages, setCssPages]:
+    [CssPage[], Dispatch<SetStateAction<CssPage[]>>]
+    = useState([]);
+
+    const [activePage, setActivePage]:
+    [CssPage, Dispatch<SetStateAction<CssPage>>]
+    = useState(null);
+
+    async function getInfo(): Promise<void> {
         setCharacters(await api.getCharacters());
+        const pages: CssPage[] = await api.readCssPages();
+        setCssPages(pages);
+        setActivePage(pages[0]);
     }
 
     useEffect(() => {
-        getCharacters();
+        getInfo();
     }, []);
 
     return (
         <section>
             <div id={"pages-div"}>
-                E
+                <div className={"center"}>
+                    <div id={"pages-wrapper"}>
+                        {cssPages.map((page: CssPage) => 
+                            <CssPageDisplay
+                                page={page}
+                                activePage={activePage}
+                                key={page.name}
+                            />
+                        )}
+                    </div>
+                </div>
             </div>
             <hr/>
             <div id={"css-div"}>
@@ -112,14 +133,12 @@ function ExcludedCharacters({ characters }: { characters: Character[] }): JSX.El
             <div id={"excluded-div"}>
                 <div className={"center"}>
                     <div id={"excluded-wrapper"}>
-                        {sortCharacters(characters).map((character: Character) => {
-                            return (
-                                <CharacterDisplay
-                                    character={character}
-                                    key={character.name}
-                                />
-                            );
-                        })}
+                        {sortCharacters(characters).map((character: Character) => 
+                            <CharacterDisplay
+                                character={character}
+                                key={character.name}
+                            />
+                        )}
                     </div>
                 </div>
             </div>
@@ -128,10 +147,7 @@ function ExcludedCharacters({ characters }: { characters: Character[] }): JSX.El
 }
 
 function CharacterDisplay({ character }: { character: Character }): JSX.Element {
-    const [randomSelection, setRandomSelection]:
-    [boolean, Dispatch<SetStateAction<boolean>>]
-    = useState(character.randomSelection);
-
+    // Draggable
     return (
         <div className={"excluded-display-wrapper"}>
             <div className={"excluded-display-mug"}>
@@ -140,6 +156,26 @@ function CharacterDisplay({ character }: { character: Character }): JSX.Element 
             <div className={"excluded-display-name"}>
                 <span>{character.displayName}</span>
             </div>
+        </div>
+    );
+}
+
+function CssPageDisplay({ page, activePage }: { page: CssPage, activePage: CssPage }): JSX.Element {
+    return (
+        <div className={"css-page" + (activePage == page ? " css-page-active" : "")}>
+            <button
+                type={"button"}
+                onClick={() => {console.log(page.path)}}
+                className={"css-page-button"}
+            >
+                {page.name}
+            </button>
+            <IconButton
+                icon={"delete"}
+                iconSize={"18px"}
+                tooltip={"Delete Page"}
+                onClick={() => {console.log("e")}}
+            />
         </div>
     );
 }

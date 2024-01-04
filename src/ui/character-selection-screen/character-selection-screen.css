@@ -25,6 +25,14 @@
     flex-wrap: nowrap;
 }
 
+#pages-wrapper {
+    /* display: flex; */
+    width: fit-content;
+    text-wrap: nowrap;
+    overflow: hidden;
+    height: 35px;
+}
+
 .excluded-display-wrapper {
     width: 62px;
     margin: 5px;
@@ -40,4 +48,44 @@
     overflow: hidden;
     height: 26pt;
     word-wrap: break-word;
+}
+
+.css-page,
+.css-page-button {
+    box-sizing: border-box;
+    height: 100%;
+    display: inline-block;
+    border: none;
+    box-shadow: none;
+    background-color: var(--inf-grey4);
+    width: fit-content;
+    min-width: fit-content;
+}
+
+.css-page:hover:not(:has(.icon-button-wrapper:hover)),
+.css-page:hover:not(:has(.icon-button-wrapper:hover)) .css-page-button {
+    background-color: var(--inf-grey3);
+}
+
+.css-page .icon-button-wrapper {
+    margin-left: -5px;
+    margin-right: 0px;
+}
+
+.css-page .button-icon {
+    padding: 5px;
+}
+
+.css-page .icon-button-wrapper:hover,
+.css-page .icon-button-wrapper:hover .button-icon {
+    background-color: var(--inf-grey3);
+}
+
+.css-page-button {
+    height: 100%;
+    margin: 0px;
+}
+
+.css-page-active {
+    border-bottom: 4px solid var(--inf-blue1);
 }

@@ -101,15 +101,13 @@ export default function TabCharacters(): JSX.Element {
                     </div>
                 </div>
                 <div id={"character-div"}>
-                    {sortCharacters(characters).map((character: Character) => {
-                        return (
-                            <CharacterDisplay
-                                character={character}
-                                key={character.name}
-                                getCharacters={getCharacters}
-                            />
-                        );
-                    })}
+                    {sortCharacters(characters).map((character: Character) => 
+                        <CharacterDisplay
+                            character={character}
+                            key={character.name}
+                            getCharacters={getCharacters}
+                        />
+                    )}
                 </div>
                 <hr/>
                 <div id={"button-div"}>
