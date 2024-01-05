@@ -80,8 +80,11 @@ export default function TabCharacters(): JSX.Element {
                                 }}
                             >
                                 <option value="cssNumber">Internal Number</option>
+                                {/* numbers */}
                                 <option value="series">Franchise</option>
+                                {/* group */}
                                 <option value="displayName">Alphabetical</option>
+                                {/* sort_by_alpha */}
                             </select>
                             <div className={"tooltip"}>
                                 <span>Sorting Method</span>

@@ -12,6 +12,9 @@ import { execFile } from "child_process";
 import {
     Character, CharacterList, CharacterDat, CharacterPalette, CssPage, CssData
 } from "./interfaces";
+import https from "https";
+import request from "request";
+import http from "http";
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
@@ -20,6 +23,8 @@ require.resolve("./unrar.wasm");
 const wasmBinary: Buffer = fs.readFileSync(path.join(__dirname, "unrar.wasm"));
 
 let mainWindow: BrowserWindow;
+
+
 
 function isNumber(num: string): boolean {
     return /^\+?(0|[1-9]\d*)$/.test(num);
@@ -52,6 +57,7 @@ function createWindow(): void {
         const url: string = request.url.replace("img://", "");
         return callback(url);
     });
+    handleURI(process.argv.find((arg: string) => arg.startsWith("cmcmm:")));
 }
 
 if (require("electron-squirrel-startup")) {
@@ -263,6 +269,50 @@ async function extractArchive(archive: string, destination: string): Promise<str
             break;
     }
     return output;
+}
+
+function handleURI(uri: string): Promise<void> {
+    //TODO: info in downloads tab
+    if (uri == undefined || gameDir == null) {
+        return;
+    }
+    const url: string = uri.replace("cmcmm:", "").split(",")[0];
+    const temp: string = path.join(gameDir, "_temp");
+    fs.ensureDirSync(temp);
+    fs.emptyDirSync(temp);
+    request.get({ url: url })
+        .on("error", (error: Error) => { console.log(error) })
+        .on("response", (res: request.Response) => {
+            let file: string = "download.";
+            switch (res.headers["content-type"].split("/")[1]) {
+                case "zip":
+                    file += "zip";
+                    break;
+                case "rar":
+                case "x-rar-compressed":
+                    file += "rar";
+                    break;
+                default:
+                    //TODO: inform the user
+                    return;
+            }
+            https.get(res.request.uri.href, (res1: http.IncomingMessage) => {
+                const filePath: string = path.join(temp, file);
+                fs.ensureFileSync(filePath);
+                const writeStream: fs.WriteStream = fs.createWriteStream(filePath);
+                res1.pipe(writeStream);
+
+                writeStream.on("finish", async () => {
+                    writeStream.close();
+                    const output: string = await extractArchive(filePath, temp);
+                    console.log(output);
+                    //TODO: switch between character and stage
+                    // move 'fighters' folder search to more generic function
+                    installCharacter(output, true, false, gameDir);
+                });
+            });
+        });
+    // const output: string = await extractArchive(selected.filePaths[0], path.join(dir, "_temp"));
 }
 
 function getGameDir(): string {
@@ -551,6 +601,8 @@ async function installCharacterArchive(
     if (selected.canceled == true) {
         return null;
     }
+    fs.ensureDirSync(path.join(dir, "_temp"));
+    fs.emptyDirSync(path.join(dir, "_temp"));
     const output: string = await extractArchive(selected.filePaths[0], path.join(dir, "_temp"));
     console.log(output, filterInstallation);
     installCharacter(output, filterInstallation, updateCharacters, dir);

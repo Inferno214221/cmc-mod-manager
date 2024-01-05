@@ -12,7 +12,7 @@
     "make-linux-all": "electron-forge make --platform linux --targets @electron-forge/maker-deb,@electron-forge/maker-rpm,@electron-forge/maker-zip",
     "make-linux": "electron-forge make --platform linux --targets @electron-forge/maker-zip",
     "make-deb": "electron-forge make --platform linux --targets @electron-forge/maker-deb",
-    "make-rpm": "electron-forge make --platform linux @electron-forge/maker-rpm",
+    "make-rpm": "electron-forge make --platform linux --targets @electron-forge/maker-rpm",
     "publish": "electron-forge publish",
     "lint": "eslint --ext .ts,.tsx ."
   },
@@ -38,6 +38,7 @@
     "@types/node": "^20.10.6",
     "@types/react": "^18.2.42",
     "@types/react-dom": "^18.2.17",
+    "@types/request": "^2.48.12",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.0.0",
     "@vercel/webpack-asset-relocator-loader": "1.7.3",
@@ -64,6 +65,7 @@
     "path": "^0.12.7",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.20.1"
+    "react-router-dom": "^6.20.1",
+    "request": "^2.88.2"
   }
 }
