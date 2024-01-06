@@ -40,11 +40,11 @@ export default function TabCharacters(): JSX.Element {
     function sortCharacters(characters: Character[]): Character[] {
         let sortedCharacters: Character[] = characters;
         if (searchValue != "") {
-            sortedCharacters = sortedCharacters.filter((character: Character) => 
+            sortedCharacters = sortedCharacters.filter((character: Character) =>
                 (character.displayName.toLowerCase().includes(searchValue))
             );
         }
-        sortedCharacters = sortedCharacters.toSorted((a: Character, b: Character) => 
+        sortedCharacters = sortedCharacters.toSorted((a: Character, b: Character) =>
             (a[sortType] > b[sortType] ? 1 : -1)
         );
         if (reverseSort) {
@@ -104,7 +104,7 @@ export default function TabCharacters(): JSX.Element {
                     </div>
                 </div>
                 <div id={"character-div"}>
-                    {sortCharacters(characters).map((character: Character) => 
+                    {sortCharacters(characters).map((character: Character) =>
                         <CharacterDisplay
                             character={character}
                             key={character.name}

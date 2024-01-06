@@ -2,12 +2,16 @@ import { Dispatch, SetStateAction, useState, useEffect } from "react";
 import "./character-selection-screen.css";
 import ToggleIconButton from "../global/icon-button/toggle-icon-button";
 import IconButton from "../global/icon-button/icon-button";
-import { Character, CssPage, SortTypes } from "../../interfaces";
+import { Character, CharacterList, CssPage, CssData, SortTypes } from "../../interfaces";
 
 export default function TabCharacterSelectionScreen(): JSX.Element {
     const [characters, setCharacters]:
     [Character[], Dispatch<SetStateAction<Character[]>>]
     = useState([]);
+
+    const [characterList, setCharacterList]:
+    [CharacterList, Dispatch<SetStateAction<CharacterList>>]
+    = useState(null);
 
     const [cssPages, setCssPages]:
     [CssPage[], Dispatch<SetStateAction<CssPage[]>>]
@@ -15,6 +19,10 @@ export default function TabCharacterSelectionScreen(): JSX.Element {
 
     const [activePage, setActivePage]:
     [CssPage, Dispatch<SetStateAction<CssPage>>]
+    = useState(null);
+
+    const [cssData, setCssData]:
+    [CssData, Dispatch<SetStateAction<CssData>>]
     = useState(null);
 
     async function getInfo(): Promise<void> {
@@ -28,15 +36,30 @@ export default function TabCharacterSelectionScreen(): JSX.Element {
         getInfo();
     }, []);
 
+    async function getCssData(): Promise<void> {
+        if (activePage == null) return;
+        setCssData(await api.readCssData(activePage));
+        console.log(await api.readCssData(activePage));
+    }
+
+    useEffect(() => {
+        getCssData();
+    }, [activePage]);
+
+    useEffect(() => {
+        setCharacterList(new CharacterList(characters));
+    }, [characters]);
+
     return (
         <section>
             <div id={"pages-div"}>
                 <div className={"center"}>
                     <div id={"pages-wrapper"}>
-                        {cssPages.map((page: CssPage) => 
+                        {cssPages.map((page: CssPage) =>
                             <CssPageDisplay
                                 page={page}
                                 activePage={activePage}
+                                setActivePage={setActivePage}
                                 key={page.name}
                             />
                         )}
@@ -45,7 +68,18 @@ export default function TabCharacterSelectionScreen(): JSX.Element {
             </div>
             <hr/>
             <div id={"css-div"}>
-                E
+                <div id={"css-wrapper"}>
+                    <div className={"center"}>
+                        <table>
+                            <tbody>
+                                <CssTableContents
+                                    cssData={cssData}
+                                    characterList={characterList}
+                                />
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
             <hr/>
             <ExcludedCharacters
@@ -71,11 +105,11 @@ function ExcludedCharacters({ characters }: { characters: Character[] }): JSX.El
     function sortCharacters(characters: Character[]): Character[] {
         let sortedCharacters: Character[] = characters;
         if (searchValue != "") {
-            sortedCharacters = sortedCharacters.filter((character: Character) => 
+            sortedCharacters = sortedCharacters.filter((character: Character) =>
                 (character.displayName.toLowerCase().includes(searchValue))
             );
         }
-        sortedCharacters = sortedCharacters.toSorted((a: Character, b: Character) => 
+        sortedCharacters = sortedCharacters.toSorted((a: Character, b: Character) =>
             (a[sortType] > b[sortType] ? 1 : -1)
         );
         if (reverseSort) {
@@ -120,9 +154,9 @@ function ExcludedCharacters({ characters }: { characters: Character[] }): JSX.El
                     <div className={"inline-sort-options"}>
                         <ToggleIconButton
                             checked={reverseSort}
-                            trueIcon={"north"}
+                            trueIcon={"west"}
                             trueTooltip={"Sorted Direction: Backwards"}
-                            falseIcon={"south"}
+                            falseIcon={"east"}
                             falseTooltip={"Sorted Direction: Forwards"}
                             iconSize={"30px"}
                             setter={setReverseSort}
@@ -133,7 +167,7 @@ function ExcludedCharacters({ characters }: { characters: Character[] }): JSX.El
             <div id={"excluded-div"}>
                 <div className={"center"}>
                     <div id={"excluded-wrapper"}>
-                        {sortCharacters(characters).map((character: Character) => 
+                        {sortCharacters(characters).map((character: Character) =>
                             <CharacterDisplay
                                 character={character}
                                 key={character.name}
@@ -150,8 +184,11 @@ function CharacterDisplay({ character }: { character: Character }): JSX.Element 
     // Draggable
     return (
         <div className={"excluded-display-wrapper"}>
-            <div className={"excluded-display-mug"}>
+            <div className={"excluded-display-mug tooltip-wrapper"}>
                 <img src={"img://" + character.mug} draggable={false}/>
+                <div className={"tooltip excluded-tooltip"}>
+                    <span>{character.displayName}</span>
+                </div>
             </div>
             <div className={"excluded-display-name"}>
                 <span>{character.displayName}</span>
@@ -160,12 +197,22 @@ function CharacterDisplay({ character }: { character: Character }): JSX.Element 
     );
 }
 
-function CssPageDisplay({ page, activePage }: { page: CssPage, activePage: CssPage }): JSX.Element {
+function CssPageDisplay({
+    page,
+    activePage,
+    setActivePage
+}: {
+    page: CssPage,
+    activePage: CssPage,
+    setActivePage: (state: CssPage) => void
+}): JSX.Element {
     return (
         <div className={"css-page" + (activePage == page ? " css-page-active" : "")}>
             <button
                 type={"button"}
-                onClick={() => {console.log(page.path)}}
+                onClick={() => {
+                    setActivePage(page);
+                }}
                 className={"css-page-button"}
             >
                 {page.name}
@@ -177,5 +224,62 @@ function CssPageDisplay({ page, activePage }: { page: CssPage, activePage: CssPa
                 onClick={() => {console.log("e")}}
             />
         </div>
+    );
+}
+
+function CssTableContents({
+    cssData,
+    characterList
+}: {
+    cssData: CssData,
+    characterList: CharacterList
+}): JSX.Element {
+    return (cssData == null || characterList == null) ? null : (
+        <>
+            <tr>
+                <th></th>
+                {cssData[0].map((cell: string, index: number) =>
+                    <th key={index}>{index}</th>
+                )}
+                <td rowSpan={cssData.length + 1}>
+                    <div className={"center"}>
+                        <button>-</button>
+                    </div>
+                </td>
+                <td rowSpan={cssData.length + 1}>
+                    <div className={"center"}>
+                        <button>+</button>
+                    </div>
+                </td>
+            </tr>
+            {cssData.map((row: string[], index: number) =>
+                <tr key={index}>
+                    <th>{index}</th>
+                    {row.map((cell: string, index: number) =>
+                        <th key={index}>{
+                            (characterList.getCharacterByNum(parseInt(cell)) == undefined) ? null :
+                                characterList.getCharacterByNum(parseInt(cell)).displayName
+                                // <CharacterDisplay
+                                //     character={characterList.getCharacterByNum(parseInt(cell))}
+                                // />
+                        }</th>
+                    )}
+                </tr>
+            )}
+            <tr>
+                <td colSpan={cssData[0].length + 1}>
+                    <div className={"center"}>
+                        <button>-</button>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td colSpan={cssData[0].length + 1}>
+                    <div className={"center"}>
+                        <button>+</button>
+                    </div>
+                </td>
+            </tr>
+        </>
     );
 }

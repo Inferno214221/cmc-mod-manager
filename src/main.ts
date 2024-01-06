@@ -418,7 +418,7 @@ async function writeCharacterList(
     dir: string = gameDir
 ): Promise<void> {
     const characters: Character[] = characterList.getAllCharacters();
-    characters.sort((a: Character, b: Character) => 
+    characters.sort((a: Character, b: Character) =>
         (a.cssNumber > b.cssNumber ? 1 : -1)
     );
     const output: string = [
@@ -932,7 +932,7 @@ async function removeCharacterCss(character: Character, dir: string = gameDir): 
             return row.map((cell: string) => {
                 if (parseInt(cell) == character.cssNumber) {
                     return "0000";
-                } else if (parseInt(cell) > character.cssNumber) {
+                } else if (parseInt(cell) > character.cssNumber && cell != "9999") {
                     return ("0000" + (parseInt(cell) - 1)).slice(-4);
                 } else {
                     return cell;
