@@ -6,6 +6,7 @@
     background-color: var(--inf-grey4);
     z-index: 1;
     padding: 5px;
+    flex-shrink: 0;
 }
 
 #pages-div, #excluded-div {
@@ -106,6 +107,29 @@
 
 .excluded-tooltip {
     height: fit-content;
-    left: 0px;
+    left: -5px;
     top: 62px;
+}
+
+.css-character-display {
+    padding: 2px;
+    /* width: 35px;
+    overflow: hidden; */
+}
+
+.css-character-display img {
+    display: block;
+    width: 35px;
+    height: 35px;
+}
+
+.css-character-display span {
+    display: block;
+    font-size: 8pt;
+    /* margin-left: auto;
+    margin-right: auto; */
+    text-align: center;
+    width: 35px;
+    overflow: hidden;
+    text-wrap: nowrap;
 }

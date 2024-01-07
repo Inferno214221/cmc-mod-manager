@@ -13,6 +13,10 @@ export default function TabCharacterSelectionScreen(): JSX.Element {
     [CharacterList, Dispatch<SetStateAction<CharacterList>>]
     = useState(null);
 
+    const [excluded, setExcluded]:
+    [Character[], Dispatch<SetStateAction<Character[]>>]
+    = useState([]);
+
     const [cssPages, setCssPages]:
     [CssPage[], Dispatch<SetStateAction<CssPage[]>>]
     = useState([]);
@@ -50,6 +54,18 @@ export default function TabCharacterSelectionScreen(): JSX.Element {
         setCharacterList(new CharacterList(characters));
     }, [characters]);
 
+    useEffect(() => {
+        if (characters == null || cssData == null) return;
+        setExcluded(characters.filter((character: Character) => {
+            for (const row of cssData) {
+                if (row.includes(("0000" + character.cssNumber).slice(-4))) {
+                    return false;
+                }
+            }
+            return true;
+        }));
+    }, [characters, cssData])
+
     return (
         <section>
             <div id={"pages-div"}>
@@ -70,7 +86,7 @@ export default function TabCharacterSelectionScreen(): JSX.Element {
             <div id={"css-div"}>
                 <div id={"css-wrapper"}>
                     <div className={"center"}>
-                        <table>
+                        <table id={"css-table"}>
                             <tbody>
                                 <CssTableContents
                                     cssData={cssData}
@@ -84,12 +100,19 @@ export default function TabCharacterSelectionScreen(): JSX.Element {
             <hr/>
             <ExcludedCharacters
                 characters={characters}
+                excluded={excluded}
             />
         </section>
     );
 }
 
-function ExcludedCharacters({ characters }: { characters: Character[] }): JSX.Element {
+function ExcludedCharacters({
+    characters,
+    excluded
+}: {
+    characters: Character[],
+    excluded: Character[]
+}): JSX.Element {
     const [searchValue, setSearchValue]:
     [string, Dispatch<SetStateAction<string>>]
     = useState("");
@@ -99,6 +122,10 @@ function ExcludedCharacters({ characters }: { characters: Character[] }): JSX.El
     = useState(SortTypes.cssNumber);
 
     const [reverseSort, setReverseSort]:
+    [boolean, Dispatch<SetStateAction<boolean>>]
+    = useState(false);
+
+    const [showAllCharacters, setShowAllCharacters]:
     [boolean, Dispatch<SetStateAction<boolean>>]
     = useState(false);
 
@@ -161,13 +188,24 @@ function ExcludedCharacters({ characters }: { characters: Character[] }): JSX.El
                             iconSize={"30px"}
                             setter={setReverseSort}
                         />
+                        <ToggleIconButton
+                            checked={showAllCharacters}
+                            trueIcon={"groups"}
+                            trueTooltip={"Showing: All Characters"}
+                            falseIcon={"person_outline"}
+                            falseTooltip={"Showing: Excluded Characters"}
+                            iconSize={"30px"}
+                            setter={setShowAllCharacters}
+                        />
                     </div>
                 </div>
             </div>
             <div id={"excluded-div"}>
                 <div className={"center"}>
                     <div id={"excluded-wrapper"}>
-                        {sortCharacters(characters).map((character: Character) =>
+                        {sortCharacters(
+                            showAllCharacters ? characters : excluded
+                        ).map((character: Character) =>
                             <CharacterDisplay
                                 character={character}
                                 key={character.name}
@@ -229,7 +267,7 @@ function CssPageDisplay({
 
 function CssTableContents({
     cssData,
-    characterList
+    characterList,
 }: {
     cssData: CssData,
     characterList: CharacterList
@@ -256,13 +294,11 @@ function CssTableContents({
                 <tr key={index}>
                     <th>{index}</th>
                     {row.map((cell: string, index: number) =>
-                        <th key={index}>{
-                            (characterList.getCharacterByNum(parseInt(cell)) == undefined) ? null :
-                                characterList.getCharacterByNum(parseInt(cell)).displayName
-                                // <CharacterDisplay
-                                //     character={characterList.getCharacterByNum(parseInt(cell))}
-                                // />
-                        }</th>
+                        <CssCharacterDisplay
+                            cell={cell}
+                            characterList={characterList}
+                            key={index}
+                        />
                     )}
                 </tr>
             )}
@@ -281,5 +317,22 @@ function CssTableContents({
                 </td>
             </tr>
         </>
+    );
+}
+
+function CssCharacterDisplay({
+    cell,
+    characterList
+}: {
+    cell: string,
+    characterList: CharacterList
+}): JSX.Element {
+    const character: Character = characterList.getCharacterByNum(parseInt(cell));
+    if (character == undefined) return (<td className={"css-character-display"}></td>);
+    return (
+        <td className={"css-character-display"}>
+            <img src={"img://" + character.mug} draggable={false}/>
+            <span>{character.displayName}</span>
+        </td>
     );
 }
