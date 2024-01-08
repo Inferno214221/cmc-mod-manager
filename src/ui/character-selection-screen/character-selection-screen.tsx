@@ -64,7 +64,12 @@ export default function TabCharacterSelectionScreen(): JSX.Element {
             }
             return true;
         }));
-    }, [characters, cssData])
+    }, [characters, cssData]);
+
+    async function updateCssData(data: CssData): Promise<void> {
+        await api.writeCssData(activePage, data);
+        getCssData();
+    }
 
     return (
         <section>
@@ -82,7 +87,7 @@ export default function TabCharacterSelectionScreen(): JSX.Element {
                     </div>
                 </div>
             </div>
-            <hr/>
+            <hr />
             <div id={"css-div"}>
                 <div id={"css-wrapper"}>
                     <div className={"center"}>
@@ -90,14 +95,16 @@ export default function TabCharacterSelectionScreen(): JSX.Element {
                             <tbody>
                                 <CssTableContents
                                     cssData={cssData}
+                                    setCssData={setCssData}
                                     characterList={characterList}
+                                    updateCssData={updateCssData}
                                 />
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
-            <hr/>
+            <hr />
             <ExcludedCharacters
                 characters={characters}
                 excluded={excluded}
@@ -223,7 +230,7 @@ function CharacterDisplay({ character }: { character: Character }): JSX.Element 
     return (
         <div className={"excluded-display-wrapper"}>
             <div className={"excluded-display-mug tooltip-wrapper"}>
-                <img src={"img://" + character.mug} draggable={false}/>
+                <img src={"img://" + character.mug} draggable={false} />
                 <div className={"tooltip excluded-tooltip"}>
                     <span>{character.displayName}</span>
                 </div>
@@ -259,7 +266,7 @@ function CssPageDisplay({
                 icon={"delete"}
                 iconSize={"18px"}
                 tooltip={"Delete Page"}
-                onClick={() => {console.log("e")}}
+                onClick={() => { console.log("e") }}
             />
         </div>
     );
@@ -267,32 +274,51 @@ function CssPageDisplay({
 
 function CssTableContents({
     cssData,
+    setCssData,
     characterList,
+    updateCssData
 }: {
     cssData: CssData,
-    characterList: CharacterList
+    setCssData: Dispatch<SetStateAction<CssData>>,
+    characterList: CharacterList,
+    updateCssData: (data: CssData) => Promise<void>
 }): JSX.Element {
     return (cssData == null || characterList == null) ? null : (
         <>
             <tr>
                 <th></th>
                 {cssData[0].map((cell: string, index: number) =>
-                    <th key={index}>{index}</th>
+                    <CssColumnHeader
+                        column={index}
+                        setCssData={setCssData}
+                        updateCssData={updateCssData}
+                        key={index}
+                    />
                 )}
-                <td rowSpan={cssData.length + 1}>
-                    <div className={"center"}>
-                        <button>-</button>
-                    </div>
-                </td>
-                <td rowSpan={cssData.length + 1}>
-                    <div className={"center"}>
-                        <button>+</button>
-                    </div>
-                </td>
+                <th className="css-column-header" id={"css-add-column"}>
+                    <IconButton
+                        icon={"add"}
+                        iconSize={"11pt"}
+                        tooltip={"Add Column"}
+                        onClick={() => setCssData((prev: CssData) => {
+                            prev = prev.map((row: string[]) => {
+                                row.push("0000");
+                                return row;
+                            });
+                            updateCssData(prev);
+                            return prev;
+                        })}
+                    />
+                </th>
             </tr>
             {cssData.map((row: string[], index: number) =>
                 <tr key={index}>
-                    <th>{index}</th>
+                    <CssRowHeader
+                        row={index}
+                        setCssData={setCssData}
+                        updateCssData={updateCssData}
+                        key={index}
+                    />
                     {row.map((cell: string, index: number) =>
                         <CssCharacterDisplay
                             cell={cell}
@@ -303,18 +329,21 @@ function CssTableContents({
                 </tr>
             )}
             <tr>
-                <td colSpan={cssData[0].length + 1}>
-                    <div className={"center"}>
-                        <button>-</button>
-                    </div>
-                </td>
-            </tr>
-            <tr>
-                <td colSpan={cssData[0].length + 1}>
-                    <div className={"center"}>
-                        <button>+</button>
-                    </div>
-                </td>
+                <th className="css-row-header" id={"css-add-row"}>
+                    <IconButton
+                        icon={"add"}
+                        iconSize={"11pt"}
+                        tooltip={"Add Row"}
+                        onClick={() => setCssData((prev: CssData) => {
+                            prev.push([]);
+                            prev[0].forEach(() => {
+                                prev[prev.length - 1].push("0000");
+                            });
+                            updateCssData(prev);
+                            return prev;
+                        })}
+                    />
+                </th>
             </tr>
         </>
     );
@@ -331,8 +360,95 @@ function CssCharacterDisplay({
     if (character == undefined) return (<td className={"css-character-display"}></td>);
     return (
         <td className={"css-character-display"}>
-            <img src={"img://" + character.mug} draggable={false}/>
-            <span>{character.displayName}</span>
+            <div className={"tooltip-wrapper"}>
+                <img src={"img://" + character.mug} draggable={false} />
+                <span>{character.displayName}</span>
+                <div className={"tooltip css-tooltip"}>
+                    <span>{character.displayName}</span>
+                </div>
+            </div>
         </td>
+    );
+}
+
+function CssColumnHeader({
+    column,
+    setCssData,
+    updateCssData
+}: {
+    column: number,
+    setCssData: Dispatch<SetStateAction<CssData>>,
+    updateCssData: (data: CssData) => Promise<void>
+}): JSX.Element {
+    const [hovered, setHovered]:
+    [boolean, Dispatch<SetStateAction<boolean>>]
+    = useState(false);
+    return (
+        <th
+            className={"css-column-header"}
+            onMouseOver={() => {
+                setHovered(true);
+            }}
+            onMouseOut={() => {
+                setHovered(false);
+            }}
+        >
+            {hovered ?
+                <IconButton
+                    icon={"remove"}
+                    iconSize={"11pt"}
+                    tooltip={"Remove Column"}
+                    onClick={() => setCssData((prev: CssData) => {
+                        prev.map((row: string[]) => {
+                            row.splice(column, 1);
+                            return row;
+                        });
+                        // prev.splice(row, 1);
+                        updateCssData(prev);
+                        return prev;
+                    })}
+                />
+                : column
+            }
+        </th>
+    );
+}
+
+function CssRowHeader({
+    row,
+    setCssData,
+    updateCssData
+}: {
+    row: number,
+    setCssData: Dispatch<SetStateAction<CssData>>,
+    updateCssData: (data: CssData) => Promise<void>
+}): JSX.Element {
+    const [hovered, setHovered]:
+    [boolean, Dispatch<SetStateAction<boolean>>]
+    = useState(false);
+    return (
+        <th
+            className={"css-row-header"}
+            onMouseOver={() => {
+                setHovered(true);
+            }}
+            onMouseOut={() => {
+                setHovered(false);
+            }}
+        >
+            {hovered ?
+                <IconButton
+                    icon={"remove"}
+                    iconSize={"11pt"}
+                    tooltip={"Remove Row"}
+                    onClick={() => setCssData((prev: CssData) => {
+                        prev.splice(row, 1);
+                        updateCssData(prev);
+                        return prev;
+                    })}
+                />
+                : row
+            }
+        </th>
     );
 }

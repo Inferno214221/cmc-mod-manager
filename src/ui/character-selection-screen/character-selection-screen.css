@@ -1,6 +1,8 @@
 @import "../global/global.css";
 
-#pages-div, #sort-excluded-div, #excluded-div {
+#pages-div,
+#sort-excluded-div,
+#excluded-div {
     height: min-content;
     min-height: min-content;
     background-color: var(--inf-grey4);
@@ -9,7 +11,8 @@
     flex-shrink: 0;
 }
 
-#pages-div, #excluded-div {
+#pages-div,
+#excluded-div {
     overflow-x: auto;
     margin: 5px;
 }
@@ -24,6 +27,7 @@
     min-height: 0px;
     padding: 5px;
     overflow: auto;
+    margin: 5px;
 }
 
 #excluded-wrapper {
@@ -111,6 +115,14 @@
     top: 62px;
 }
 
+.css-tooltip {
+    /* height: 35px; */
+    height: 100%;
+    left: 35px;
+    /* left: -5px;
+    top: 35px; */
+}
+
 .css-character-display {
     padding: 2px;
     /* width: 35px;
@@ -123,13 +135,42 @@
     height: 35px;
 }
 
-.css-character-display span {
+.css-character-display span:not(.css-character-display .css-tooltip span) {
     display: block;
     font-size: 8pt;
-    /* margin-left: auto;
-    margin-right: auto; */
     text-align: center;
     width: 35px;
     overflow: hidden;
     text-wrap: nowrap;
 }
+
+.css-column-header .icon-button-wrapper {
+    margin: -2.5px 0px;
+}
+
+.css-column-header {
+    height: 17px;
+}
+
+/* #css-add-column {
+    width: min-content;
+    padding: 0px;
+} */
+
+.css-row-header .icon-button-wrapper {
+    margin: 0px -5px;
+}
+
+.css-row-header {
+    height: 51px;
+}
+
+.css-table {
+    overflow: hidden;
+}
+
+/* .css-column-header,
+.css-row-header {
+    overflow: visible;
+    overflow-anchor: auto;
+} */

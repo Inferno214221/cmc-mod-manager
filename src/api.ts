@@ -1,5 +1,5 @@
 import { ipcRenderer } from "electron"
-import { CharacterList, CharacterDat, CssPage } from "./interfaces"
+import { CharacterList, CharacterDat, CssPage, CssData } from "./interfaces"
 
 export default {
     getGameDir:
@@ -123,6 +123,7 @@ export default {
 
     writeCssData:
     (...args: [
-        page: CssPage
+        page: CssPage,
+        data: CssData
     ]) => ipcRenderer.invoke("writeCssData", args),
 }
