@@ -131,3 +131,19 @@ export enum SortTypes {
     series = "series",
     displayName = "displayName"
 }
+
+export interface Download {
+    filePath: string,
+    name: string,
+    image: string,
+    modType: string,
+    fileSize: number,
+    state: DownloadState,
+}
+
+export enum DownloadState {
+    queued,
+    started,
+    finished,
+    error
+}

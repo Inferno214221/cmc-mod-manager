@@ -10,7 +10,7 @@ import { createExtractorFromFile, Extractor, ArcFiles, ArcFile } from "node-unra
 import ini from "ini";
 import { execFile } from "child_process";
 import {
-    Character, CharacterList, CharacterDat, CharacterPalette, CssPage, CssData
+    Character, CharacterList, CharacterDat, CharacterPalette, CssPage, CssData, Download, DownloadState
 } from "./interfaces";
 import https from "https";
 import request from "request";
@@ -81,6 +81,7 @@ app.on("activate", () => {
 function createHandlers(): void {
     ipcMain.handle("getGameDir", getGameDir);
     ipcMain.handle("getExtractedDir", getExtractedDir);
+    ipcMain.handle("getDownloads", getDownloads);
     ipcMain.handle("getGameVersion", (
         event: IpcMainInvokeEvent,
         args: Parameters<typeof getGameVersion>) => getGameVersion(...args)
@@ -215,6 +216,8 @@ if (!fs.existsSync(DATA_FILE)) {
 
 let gameDir: string = readJSON(DATA_FILE).dir;
 
+const downloads: Download[] = [];
+
 function readJSON(file: string): any {
     return JSON.parse(fs.readFileSync(file, "utf-8"));
 }
@@ -239,9 +242,9 @@ function getAllFiles(dirPath: string, arrayOfFiles?: string[]): string[] {
     return arrayOfFiles;
 }
 
-async function extractArchive(archive: string, destination: string): Promise<string> { 
+async function extractArchive(archive: string, destination: string): Promise<string> {
     const output: string = path.join(destination, path.parse(archive).name);
-    switch(path.parse(archive).ext.toLowerCase()) {
+    switch (path.parse(archive).ext.toLowerCase()) {
         case ".zip":
             await extract(archive, {
                 dir: output,
@@ -276,14 +279,26 @@ function handleURI(uri: string): Promise<void> {
     if (uri == undefined || gameDir == null) {
         return;
     }
+    const downloadId: number = downloads.push({
+        filePath: null,
+        name: null,
+        image: null,
+        modType: null,
+        fileSize: null,
+        state: DownloadState.queued
+    }) - 1;
     const url: string = uri.replace("cmcmm:", "").split(",")[0];
     const temp: string = path.join(gameDir, "_temp");
     fs.ensureDirSync(temp);
     fs.emptyDirSync(temp);
+    
+    const infoPromise: Promise<void> = getDownloadInfo(uri, downloadId);
+
     request.get({ url: url })
         .on("error", (error: Error) => { console.log(error) })
         .on("response", (res: request.Response) => {
-            let file: string = "download.";
+            let file: string = "download" + downloadId + ".";
+            downloads[downloadId].fileSize = parseInt(res.headers["content-length"]);
             switch (res.headers["content-type"].split("/")[1]) {
                 case "zip":
                     file += "zip";
@@ -296,15 +311,24 @@ function handleURI(uri: string): Promise<void> {
                     //TODO: inform the user
                     return;
             }
-            https.get(res.request.uri.href, (res1: http.IncomingMessage) => {
+            https.get(res.request.uri.href, async (res1: http.IncomingMessage) => {
                 const filePath: string = path.join(temp, file);
+                downloads[downloadId].filePath = filePath;
                 fs.ensureFileSync(filePath);
                 const writeStream: fs.WriteStream = fs.createWriteStream(filePath);
                 res1.pipe(writeStream);
 
+                await Promise.resolve(infoPromise);
+                downloads[downloadId].state = DownloadState.started;
+
+                //TODO: progress tracking via writeStream.bytesWritten
+
                 writeStream.on("finish", async () => {
                     writeStream.close();
                     const output: string = await extractArchive(filePath, temp);
+                    fs.removeSync(filePath);
+                    downloads[downloadId].filePath = output;
+                    downloads[downloadId].state = DownloadState.finished;
                     console.log(output);
                     //TODO: switch between character and stage
                     // move 'fighters' folder search to more generic function
@@ -315,12 +339,49 @@ function handleURI(uri: string): Promise<void> {
     // const output: string = await extractArchive(selected.filePaths[0], path.join(dir, "_temp"));
 }
 
+async function getDownloadInfo(uri: string, downloadId: number): Promise<void> {
+    const modId: string = uri.replace("cmcmm:", "").split(",")[2];
+    if (uri.replace("cmcmm:", "").split(",")[2] == undefined) {
+        //TODO:
+        return;
+    }
+    downloads[downloadId].image = "https://gamebanana.com/tools/embeddables/" +
+        modId + "?type=large_square";
+    https.get(
+        "https://api.gamebanana.com/Core/Item/Data?itemtype=Mod&itemid=" +
+            modId + "&fields=name,RootCategory().name",
+        (res: http.IncomingMessage) => {
+            let response: string = "";
+
+            res.on("data", (data: string) => {
+                response += data;
+            });
+
+            res.on("end", () => {
+                [downloads[downloadId].name, downloads[downloadId].modType] = JSON.parse(response);
+                console.log(downloads);
+            });
+        }
+    );
+    // request.get({
+    //     url: "https://api.gamebanana.com/Core/Item/Data?itemtype=Mod&itemid=" +
+    //         modId + "&fields=name"
+    // }).on("response", (res: request.Response) => {
+    //     console.log(res.body);
+    //     // [downloads[downloadId].name, downloads[downloadId].modType] =
+    // });
+}
+
 function getGameDir(): string {
     return gameDir;
 }
 
 function getExtractedDir(): string {
     return path.join(gameDir, "extracted");
+}
+
+function getDownloads(): Download[] {
+    return downloads;
 }
 
 function getGameVersion(
@@ -496,7 +557,7 @@ function readCharacterDat(
         homeStages.push("battlefield");
         randomDatas.push("Updated to v8 dat format by CMC Mod Manager");
         const paletteCount: number =
-        parseInt(characterDatTxt[isVanilla ? 1 : 5]);
+            parseInt(characterDatTxt[isVanilla ? 1 : 5]);
         for (let palette: number = 1; palette <= paletteCount * 6; palette += 6) {
             const paletteLocation: number = isVanilla ? 1 : 5 + palette;
             palettes.push({
@@ -664,7 +725,7 @@ async function installCharacter(
         //TODO: inform user
         return;
     }
-    
+
     if (filterInstallation) {
         filterCharacterFiles(characterDat, true).forEach((file: string) => {
             const subDir: string = path.parse(file).dir;
@@ -700,7 +761,7 @@ async function installCharacter(
         console.log("Installing All Files");
         fs.copySync(correctedDir, dir, { overwrite: true });
     }
-    
+
     writeCharacterDat(
         characterDat,
         path.join(dir, "data", "dats")
@@ -895,7 +956,7 @@ async function writeCssPages(pages: CssPage[], dir: string = gameDir): Promise<v
             return line;
         }
     }).filter((line: string) => line != "\n");
-    
+
     pages.forEach((page: CssPage, index: number) => {
         gameSettings.push("global.css_custom[" + (index + 1) + "] = \"" + page.path + "\";");
         gameSettings.push("global.css_custom_name[" + (index + 1) + "] = \"" + page.name + "\";");
@@ -939,6 +1000,6 @@ async function removeCharacterCss(character: Character, dir: string = gameDir): 
                 }
             });
         }));
-        
+
     });
 }

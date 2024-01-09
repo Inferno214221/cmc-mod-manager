@@ -7,6 +7,9 @@ export default {
     
     getExtractedDir:
     () => ipcRenderer.invoke("getExtractedDir"),
+
+    getDownloads:
+    () => ipcRenderer.invoke("getDownloads"),
     
     getGameVersion:
     (...args: [
