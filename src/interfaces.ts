@@ -142,8 +142,8 @@ export interface Download {
 }
 
 export enum DownloadState {
-    queued,
-    started,
-    finished,
-    error
+    queued = "Queued",
+    started = "Started",
+    finished = "Finished",
+    error = "Error"
 }

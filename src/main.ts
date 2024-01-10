@@ -10,7 +10,8 @@ import { createExtractorFromFile, Extractor, ArcFiles, ArcFile } from "node-unra
 import ini from "ini";
 import { execFile } from "child_process";
 import {
-    Character, CharacterList, CharacterDat, CharacterPalette, CssPage, CssData, Download, DownloadState
+    Character, CharacterList, CharacterDat, CharacterPalette, CssPage, CssData, Download,
+    DownloadState
 } from "./interfaces";
 import https from "https";
 import request from "request";
@@ -153,6 +154,10 @@ function createHandlers(): void {
     ipcMain.handle("writeCssPages", (
         event: IpcMainInvokeEvent,
         args: Parameters<typeof writeCssPages>) => writeCssPages(...args)
+    );
+    ipcMain.handle("removeCssPage", (
+        event: IpcMainInvokeEvent,
+        args: Parameters<typeof removeCssPage>) => removeCssPage(...args)
     );
     ipcMain.handle("readCssData", (
         event: IpcMainInvokeEvent,
@@ -468,6 +473,7 @@ function readCharacterList(dir: string = gameDir): CharacterList {
     ).split(/\r?\n/);
     lockedTxt.shift();
     lockedTxt.forEach((locked: string) => {
+        if (locked == "") return;
         characters.updateCharacterByName(locked, { randomSelection: false });
     });
     // console.log(new Date().getTime());
@@ -958,7 +964,10 @@ async function writeCssPages(pages: CssPage[], dir: string = gameDir): Promise<v
     }).filter((line: string) => line != "\n");
 
     pages.forEach((page: CssPage, index: number) => {
-        gameSettings.push("global.css_custom[" + (index + 1) + "] = \"" + page.path + "\";");
+        gameSettings.push("global.css_custom[" + (index + 1) + "] = \"" +
+            path.relative(path.join(dir, "data"), page.path)
+            + "\";"
+        );
         gameSettings.push("global.css_custom_name[" + (index + 1) + "] = \"" + page.name + "\";");
     });
     fs.writeFile(
@@ -966,6 +975,12 @@ async function writeCssPages(pages: CssPage[], dir: string = gameDir): Promise<v
         gameSettings.join("\r\n"),
         { encoding: "ascii" }
     )
+}
+
+async function removeCssPage(page: CssPage, dir: string = gameDir): Promise<void> {
+    const pages: CssPage[] = readCssPages(dir).filter((i: CssPage) => i.path != page.path);
+    fs.remove(page.path);
+    writeCssPages(pages, dir);
 }
 
 function readCssData(page: CssPage): CssData {

@@ -31,6 +31,10 @@ export default function TabCharacterSelectionScreen(): JSX.Element {
 
     async function getInfo(): Promise<void> {
         setCharacters(await api.getCharacters());
+        getPages();
+    }
+
+    async function getPages(): Promise<void> {
         const pages: CssPage[] = await api.readCssPages();
         setCssPages(pages);
         setActivePage(pages[0]);
@@ -81,6 +85,7 @@ export default function TabCharacterSelectionScreen(): JSX.Element {
                                 page={page}
                                 activePage={activePage}
                                 setActivePage={setActivePage}
+                                getPages={getPages}
                                 key={page.name}
                             />
                         )}
@@ -245,11 +250,13 @@ function CharacterDisplay({ character }: { character: Character }): JSX.Element 
 function CssPageDisplay({
     page,
     activePage,
-    setActivePage
+    setActivePage,
+    getPages
 }: {
     page: CssPage,
     activePage: CssPage,
-    setActivePage: (state: CssPage) => void
+    setActivePage: (state: CssPage) => void,
+    getPages: () => Promise<void>
 }): JSX.Element {
     return (
         <div className={"css-page" + (activePage == page ? " css-page-active" : "")}>
@@ -266,7 +273,10 @@ function CssPageDisplay({
                 icon={"delete"}
                 iconSize={"18px"}
                 tooltip={"Delete Page"}
-                onClick={() => { console.log("e") }}
+                onClick={async () => {
+                    await api.removeCssPage(page);
+                    getPages()
+                }}
             />
         </div>
     );

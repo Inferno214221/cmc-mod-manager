@@ -119,6 +119,12 @@ export default {
         dir?: string
     ]) => ipcRenderer.invoke("writeCssPages", args),
 
+    removeCssPage:
+    (...args: [
+        page: CssPage,
+        dir?: string
+    ]) => ipcRenderer.invoke("removeCssPage", args),
+
     readCssData:
     (...args: [
         page: CssPage
