@@ -1,63 +1,72 @@
 import { createRoot, Root } from "react-dom/client";
 import "./global.css";
-import TabHome from "../home/home";
+import { TabHome, AllowTabSwitchHome } from "../home/home";
 import TabCharacters from "../characters/characters";
 import TabCharacterSelectionScreen from "../character-selection-screen/character-selection-screen";
+import { TabDownloads, AllowTabSwitchDownloads } from "../downloads/downloads";
 
 let root: Root;
-let activeTabInfo: TabInfo;
+let activeTab: Tab = null;
 
 export function render(): void {
     root = createRoot(document.body);
     switchTabs(HOME);
 }
-export interface TabInfo {
+export interface Tab {
     name: string,
     displayName: string,
     icon: string,
-    element: JSX.Element
+    element: JSX.Element,
+    allowTabSwitch: () => Promise<boolean>
 }
-export const HOME: TabInfo = {
+export const HOME: Tab = {
     name: "home",
     displayName: "Home",
     icon: "home",
-    element: <TabHome/>
+    element: <TabHome/>,
+    allowTabSwitch: AllowTabSwitchHome
 };
-export const CHARACTERS: TabInfo = {
+export const CHARACTERS: Tab = {
     name: "characters",
     displayName: "Characters",
     icon: "groups",
-    element: <TabCharacters/>
+    element: <TabCharacters/>,
+    allowTabSwitch: null
 };
-export const CHARACTER_SELECTION_SCREEN: TabInfo = {
+export const CHARACTER_SELECTION_SCREEN: Tab = {
     name: "characterSelectionScreen",
     displayName: "Character Selection Screen",
     icon: "pan_tool_alt",
-    element: <TabCharacterSelectionScreen/>
+    element: <TabCharacterSelectionScreen/>,
+    allowTabSwitch: null
 };
-export const PORT_CHARACTERS: TabInfo = {
+export const PORT_CHARACTERS: Tab = {
     name: "portCharacters",
     displayName: "Port Characters",
     icon: "reduce_capacity",
-    element: <TabHome/>
+    element: <TabHome/>,
+    allowTabSwitch: null
 };
-export const STAGES: TabInfo = {
+export const STAGES: Tab = {
     name: "stages",
     displayName: "Stages",
     icon: "terrain",
-    element: <TabHome/>
+    element: <TabHome/>,
+    allowTabSwitch: null
 };
-export const STAGE_SELECTION_SCREEN: TabInfo = {
+export const STAGE_SELECTION_SCREEN: Tab = {
     name: "stageSelectionScreen",
     displayName: "Stage Selection Screen",
     icon: "location_pin",
-    element: <TabHome/>
+    element: <TabHome/>,
+    allowTabSwitch: null
 };
-export const DOWNLOADS: TabInfo = {
+export const DOWNLOADS: Tab = {
     name: "downloads",
     displayName: "Downloads",
     icon: "download",
-    element: <TabHome/>
+    element: <TabDownloads/>,
+    allowTabSwitch: AllowTabSwitchDownloads
 };
 
 export interface NavButtonInfo {
@@ -88,11 +97,16 @@ export const RUN_GAME: NavButtonInfo = {
     }
 };
 
-export async function switchTabs(tab: TabInfo): Promise<void> {
-    if (!await api.isValidGameDir()) {
+export async function switchTabs(tab: Tab): Promise<void> {
+    if (
+        activeTab != null &&
+        activeTab.allowTabSwitch != null &&
+        !await activeTab.allowTabSwitch()
+    ) {
         console.log("Do some stuff and then return");
+        return;
     }
-    activeTabInfo = tab;
+    activeTab = tab;
     root.render(
         <>
             <Nav/>
@@ -123,9 +137,9 @@ export function Nav(): JSX.Element {
     );
 }
 
-export function NavTab({ info }: { info: TabInfo }): JSX.Element {
+export function NavTab({ info }: { info: Tab }): JSX.Element {
     return (
-        <div className={(activeTabInfo == info ? "active-tab " : "") + "tooltip-wrapper"}>
+        <div className={(activeTab == info ? "active-tab " : "") + "tooltip-wrapper"}>
             <button className={"nav-click"} onClick={() => {switchTabs(info);}}>
                 <span className={"mat-icon nav-icon"}>{info.icon}</span>
             </button>

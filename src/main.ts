@@ -13,7 +13,6 @@ import {
     Character, CharacterList, CharacterDat, CharacterPalette, CssPage, CssData, Download,
     DownloadState
 } from "./interfaces";
-import https from "https";
 import request from "request";
 import http from "http";
 
@@ -299,11 +298,12 @@ function handleURI(uri: string): Promise<void> {
     
     const infoPromise: Promise<void> = getDownloadInfo(uri, downloadId);
 
-    request.get({ url: url })
+    request.get(url)
         .on("error", (error: Error) => { console.log(error) })
-        .on("response", (res: request.Response) => {
+        .on("response", async (res: request.Response) => {
             let file: string = "download" + downloadId + ".";
             downloads[downloadId].fileSize = parseInt(res.headers["content-length"]);
+            //FIXME: array might not work because removed elements will screw up later downloads
             switch (res.headers["content-type"].split("/")[1]) {
                 case "zip":
                     file += "zip";
@@ -316,29 +316,23 @@ function handleURI(uri: string): Promise<void> {
                     //TODO: inform the user
                     return;
             }
-            https.get(res.request.uri.href, async (res1: http.IncomingMessage) => {
-                const filePath: string = path.join(temp, file);
-                downloads[downloadId].filePath = filePath;
-                fs.ensureFileSync(filePath);
-                const writeStream: fs.WriteStream = fs.createWriteStream(filePath);
-                res1.pipe(writeStream);
-
-                await Promise.resolve(infoPromise);
-                downloads[downloadId].state = DownloadState.started;
-
-                //TODO: progress tracking via writeStream.bytesWritten
-
-                writeStream.on("finish", async () => {
-                    writeStream.close();
-                    const output: string = await extractArchive(filePath, temp);
-                    fs.removeSync(filePath);
-                    downloads[downloadId].filePath = output;
-                    downloads[downloadId].state = DownloadState.finished;
-                    console.log(output);
-                    //TODO: switch between character and stage
-                    // move 'fighters' folder search to more generic function
-                    installCharacter(output, true, false, gameDir);
-                });
+            const filePath: string = path.join(temp, file);
+            downloads[downloadId].filePath = filePath;
+            await Promise.resolve(infoPromise);
+            downloads[downloadId].state = DownloadState.started;
+            //TODO: progress tracking via writeStream.bytesWritten
+            request.get(
+                res.request.uri.href
+            ).pipe(fs.createWriteStream(filePath)).on("close", async () => {
+                console.log("Image Downloaded");
+                const output: string = await extractArchive(filePath, temp);
+                fs.removeSync(filePath);
+                downloads[downloadId].filePath = output;
+                downloads[downloadId].state = DownloadState.finished;
+                console.log(output);
+                //TODO: switch between character and stage
+                // move 'fighters' folder search to more generic function
+                installCharacter(output, true, false, gameDir);
             });
         });
     // const output: string = await extractArchive(selected.filePaths[0], path.join(dir, "_temp"));
@@ -350,30 +344,25 @@ async function getDownloadInfo(uri: string, downloadId: number): Promise<void> {
         //TODO:
         return;
     }
-    downloads[downloadId].image = "https://gamebanana.com/tools/embeddables/" +
-        modId + "?type=large_square";
-    https.get(
-        "https://api.gamebanana.com/Core/Item/Data?itemtype=Mod&itemid=" +
-            modId + "&fields=name,RootCategory().name",
-        (res: http.IncomingMessage) => {
-            let response: string = "";
-
-            res.on("data", (data: string) => {
-                response += data;
-            });
-
-            res.on("end", () => {
-                [downloads[downloadId].name, downloads[downloadId].modType] = JSON.parse(response);
-                console.log(downloads);
-            });
+    downloads[downloadId].image = "https://gamebanana.com/mods/embeddables/" +
+        modId + "?type=large";
+    request.get(
+        {
+            url: "https://api.gamebanana.com/Core/Item/Data?itemtype=Mod&itemid=" +
+                modId + "&fields=name,RootCategory().name"
+        },
+        (error: string, res: http.IncomingMessage, body: string) => {
+            [downloads[downloadId].name, downloads[downloadId].modType] = JSON.parse(body);
+            console.log(downloads);
         }
     );
-    // request.get({
-    //     url: "https://api.gamebanana.com/Core/Item/Data?itemtype=Mod&itemid=" +
-    //         modId + "&fields=name"
-    // }).on("response", (res: request.Response) => {
-    //     console.log(res.body);
-    //     // [downloads[downloadId].name, downloads[downloadId].modType] =
+
+    // const filePath: string = path.join(gameDir, "_temp", "download" + downloadId + ".png");
+    // downloads[downloadId].image = filePath;
+    // request(
+    //     "https://gamebanana.com/mods/embeddables/" + modId + "?type=large",
+    // ).pipe(fs.createWriteStream(filePath)).on("close", () => {
+    //     console.log("Image Downloaded");
     // });
 }
 

@@ -6,13 +6,14 @@ import gh from "../../assets/github.png";
 import gb from "../../assets/gb.png";
 import IconButton from "../global/icon-button/icon-button";
 import {
-    TabInfo,
+    Tab,
     switchTabs,
     CHARACTERS,
     CHARACTER_SELECTION_SCREEN,
     PORT_CHARACTERS,
     STAGES,
-    STAGE_SELECTION_SCREEN
+    STAGE_SELECTION_SCREEN,
+    DOWNLOADS
 } from "../global/app";
 
 const LICENSE: string = (
@@ -29,7 +30,11 @@ const LICENSE: string = (
     "along with this program. If not, see <https://www.gnu.org/licenses/>."
 );
 
-export default function TabHome(): JSX.Element {
+export async function AllowTabSwitchHome(): Promise<boolean> {
+    return await api.isValidGameDir();
+}
+
+export function TabHome(): JSX.Element {
     return (
         <section>
             <div id={"about-div"} className={"vertical-outer-div"}>
@@ -113,12 +118,12 @@ export default function TabHome(): JSX.Element {
                                 desc={"Modify CMC+'s stage selection screen."}
                                 tab={STAGE_SELECTION_SCREEN}
                             />
-                            {/* <TabButton
+                            <TabButton
                                 icon={"download"}
                                 title={"Downloads"}
                                 desc={"View current downloads."}
-                                location={"e"}
-                            /> */}
+                                tab={DOWNLOADS}
+                            />
                         </div>
                     </div>
                 </div>
@@ -218,7 +223,7 @@ function TabButton({
     icon: string,
     title: string,
     desc: string,
-    tab: TabInfo
+    tab: Tab
 }): JSX.Element {
     return (
         <div className={"tab-button-wrapper"}>
