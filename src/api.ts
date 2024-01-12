@@ -1,138 +1,149 @@
 import { ipcRenderer } from "electron"
-import { CharacterList, CharacterDat, CssPage, CssData } from "./interfaces"
+import { CharacterList, CharacterDat, CssPage, CssData, Character, Download } from "./interfaces"
 
 export default {
     getGameDir:
-    () => ipcRenderer.invoke("getGameDir"),
+    (): Promise<string> => ipcRenderer.invoke("getGameDir"),
     
     getExtractedDir:
-    () => ipcRenderer.invoke("getExtractedDir"),
+    (): Promise<string> => ipcRenderer.invoke("getExtractedDir"),
 
     getDownloads:
-    () => ipcRenderer.invoke("getDownloads"),
+    (): Promise<Download[]> => ipcRenderer.invoke("getDownloads"),
     
     getGameVersion:
     (...args: [
         dir?: string,
         list?: string[]
-    ]) => ipcRenderer.invoke("getGameVersion", args),
+    ]): Promise<string | null> => ipcRenderer.invoke("getGameVersion", args),
     
     isValidGameDir:
     (...args: [
         dir?: string
-    ]) => ipcRenderer.invoke("isValidGameDir", args),
+    ]): Promise<boolean> => ipcRenderer.invoke("isValidGameDir", args),
     
     selectGameDir:
-    () => ipcRenderer.invoke("selectGameDir"),
+    (): Promise<string | null> => ipcRenderer.invoke("selectGameDir"),
     
     openDir:
     (...args: [
         dir: string
-    ]) => ipcRenderer.invoke("openDir", args),
+    ]): Promise<void> => ipcRenderer.invoke("openDir", args),
     
     runGame:
     (...args: [
         dir?: string
-    ]) => ipcRenderer.invoke("runGame", args),
+    ]): Promise<void> => ipcRenderer.invoke("runGame", args),
     
     openExternal:
     (...args: [
         url?: string,
         options?: Electron.OpenExternalOptions
-    ]) => ipcRenderer.invoke("openExternal", args),
+    ]): Promise<void> => ipcRenderer.invoke("openExternal", args),
+
+    pathJoin:
+    (...args: [
+        ...paths: string[]
+    ]): Promise<string> => ipcRenderer.invoke("pathJoin", args),
     
     getCharacters:
     (...args: [
         dir?: string
-    ]) => ipcRenderer.invoke("getCharacters", args),
+    ]): Promise<Character[]> => ipcRenderer.invoke("getCharacters", args),
     
     readCharacterList:
     (...args: [
         dir?: string
-    ]) => ipcRenderer.invoke("readCharacterList", args),
+    ]): Promise<CharacterList> => ipcRenderer.invoke("readCharacterList", args),
 
     writeCharacterList:
     (...args: [
         characterList: CharacterList,
         dir?: string
-    ]) => ipcRenderer.invoke("writeCharacterList", args),
+    ]): Promise<void> => ipcRenderer.invoke("writeCharacterList", args),
     
     writeCharacterRandom:
     (...args: [
         character: string,
         randomSelection: boolean,
         dir?: string
-    ]) => ipcRenderer.invoke("writeCharacterRandom", args),
+    ]): Promise<void> => ipcRenderer.invoke("writeCharacterRandom", args),
 
     installCharacterDir:
     (...args: [
         filterInstallation: boolean,
         updateCharacters: boolean,
         dir?: string
-    ]) => ipcRenderer.invoke("installCharacterDir", args),
+    ]): Promise<void> => ipcRenderer.invoke("installCharacterDir", args),
 
     installCharacterArchive:
     (...args: [
         filterInstallation: boolean,
         updateCharacters: boolean,
         dir?: string
-    ]) => ipcRenderer.invoke("installCharacterArchive", args),
+    ]): Promise<void> => ipcRenderer.invoke("installCharacterArchive", args),
 
     extractCharacter:
     (...args: [
         extract: string,
         dir?: string
-    ]) => ipcRenderer.invoke("extractCharacter", args),
+    ]): Promise<void> => ipcRenderer.invoke("extractCharacter", args),
 
     removeCharacter:
     (...args: [
         remove: string,
         dir?: string
-    ]) => ipcRenderer.invoke("removeCharacter", args),
+    ]): Promise<void> => ipcRenderer.invoke("removeCharacter", args),
 
     getCharacterDat:
     (...args: [
         character: string,
         dir?: string
-    ]) => ipcRenderer.invoke("getCharacterDat", args),
+    ]): Promise<CharacterDat> => ipcRenderer.invoke("getCharacterDat", args),
 
     readCharacterDat:
     (...args: [
         datPath: string,
         character?: string
-    ]) => ipcRenderer.invoke("readCharacterDat", args),
+    ]): Promise<CharacterDat> => ipcRenderer.invoke("readCharacterDat", args),
 
     writeCharacterDat:
     (...args: [
         dat: CharacterDat,
         destination: string
-    ]) => ipcRenderer.invoke("writeCharacterDat", args),
+    ]): Promise<void> => ipcRenderer.invoke("writeCharacterDat", args),
 
     readCssPages:
     (...args: [
         dir?: string
-    ]) => ipcRenderer.invoke("readCssPages", args),
+    ]): Promise<CssPage[]> => ipcRenderer.invoke("readCssPages", args),
 
     writeCssPages:
     (...args: [
         pages: CssPage[],
         dir?: string
-    ]) => ipcRenderer.invoke("writeCssPages", args),
+    ]): Promise<void> => ipcRenderer.invoke("writeCssPages", args),
+
+    addCssPage:
+    (...args: [
+        pageName: string,
+        dir?: string
+    ]): Promise<void> => ipcRenderer.invoke("addCssPage", args),
 
     removeCssPage:
     (...args: [
         page: CssPage,
         dir?: string
-    ]) => ipcRenderer.invoke("removeCssPage", args),
+    ]): Promise<void> => ipcRenderer.invoke("removeCssPage", args),
 
     readCssData:
     (...args: [
         page: CssPage
-    ]) => ipcRenderer.invoke("readCssData", args),
+    ]): Promise<CssData> => ipcRenderer.invoke("readCssData", args),
 
     writeCssData:
     (...args: [
         page: CssPage,
         data: CssData
-    ]) => ipcRenderer.invoke("writeCssData", args),
+    ]): Promise<void> => ipcRenderer.invoke("writeCssData", args),
 }

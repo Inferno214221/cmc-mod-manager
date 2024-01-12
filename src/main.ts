@@ -99,6 +99,10 @@ function createHandlers(): void {
         event: IpcMainInvokeEvent,
         args: Parameters<typeof runGame>) => runGame(...args)
     );
+    ipcMain.handle("pathJoin", (
+        event: IpcMainInvokeEvent,
+        args: Parameters<typeof path.join>) => path.join(...args)
+    );
     ipcMain.handle("openExternal", (
         event: IpcMainInvokeEvent,
         args: Parameters<typeof shell.openExternal>) => shell.openExternal(...args)
@@ -153,6 +157,10 @@ function createHandlers(): void {
     ipcMain.handle("writeCssPages", (
         event: IpcMainInvokeEvent,
         args: Parameters<typeof writeCssPages>) => writeCssPages(...args)
+    );
+    ipcMain.handle("addCssPage", (
+        event: IpcMainInvokeEvent,
+        args: Parameters<typeof addCssPage>) => addCssPage(...args)
     );
     ipcMain.handle("removeCssPage", (
         event: IpcMainInvokeEvent,
@@ -210,6 +218,12 @@ const CHARACTER_FILES: string[] = [
     "sticker/ultra/<fighter>.png",
     "sticker/ultra/desc/<fighter>.txt",
 ];
+
+const BLANK_CSS_PAGE_DATA: string = "\
+0000 0000 0000 0000 0000 0000 0000\r\n\
+0000 0000 0000 0000 0000 0000 0000\r\n\
+0000 0000 0000 0000 0000 0000 0000\r\n\
+0000 0000 0000 0000 0000 0000 0000 ";
 
 const DATA_FILE: string = path.join(app.getPath("userData"), "data.json");
 if (!fs.existsSync(DATA_FILE)) {
@@ -278,8 +292,7 @@ async function extractArchive(archive: string, destination: string): Promise<str
     return output;
 }
 
-function handleURI(uri: string): Promise<void> {
-    //TODO: info in downloads tab
+async function handleURI(uri: string): Promise<void> {
     if (uri == undefined || gameDir == null) {
         return;
     }
@@ -335,6 +348,7 @@ function handleURI(uri: string): Promise<void> {
                 installCharacter(output, true, false, gameDir);
             });
         });
+    return;
     // const output: string = await extractArchive(selected.filePaths[0], path.join(dir, "_temp"));
 }
 
@@ -356,6 +370,7 @@ async function getDownloadInfo(uri: string, downloadId: number): Promise<void> {
             console.log(downloads);
         }
     );
+    return;
 
     // const filePath: string = path.join(gameDir, "_temp", "download" + downloadId + ".png");
     // downloads[downloadId].image = filePath;
@@ -420,14 +435,16 @@ async function selectGameDir(): Promise<string | null> {
 }
 
 async function openDir(dir: string): Promise<void> {
-    shell.openPath(dir);
+    await shell.openPath(dir);
+    return;
 }
 
 async function runGame(dir: string = gameDir): Promise<void> {
-    execFile(path.join(dir, getGameVersion(gameDir) + ".exe"), {
+    await execFile(path.join(dir, getGameVersion(gameDir) + ".exe"), {
         cwd: dir,
         windowsHide: true
     });
+    return;
 }
 
 function getCharacters(dir: string = gameDir): Character[] {
@@ -486,6 +503,7 @@ async function writeCharacterList(
         output,
         { encoding: "ascii" }
     );
+    return;
 }
 
 async function writeCharacterRandom(
@@ -505,11 +523,12 @@ async function writeCharacterRandom(
     }
     let output: string = lockedTxt.length.toString() + "\r\n";
     output += lockedTxt.join("\r\n");
-    fs.writeFile(
+    await fs.writeFileSync(
         path.join(dir, "data", "fighter_lock.txt"),
         output,
         { encoding: "ascii" }
-    )
+    );
+    return;
 }
 
 function getCharacterDat(character: string, dir: string = gameDir): CharacterDat {
@@ -629,7 +648,8 @@ async function writeCharacterDat(dat: CharacterDat, destination: string): Promis
         ].join("\r\n");
     });
     fs.ensureFileSync(path.join(destination, dat.name + ".dat"));
-    fs.writeFile(path.join(destination, dat.name + ".dat"), output, { encoding: "ascii" });
+    fs.writeFileSync(path.join(destination, dat.name + ".dat"), output, { encoding: "ascii" });
+    return;
 }
 
 async function installCharacterDir(
@@ -643,7 +663,8 @@ async function installCharacterDir(
     if (selected.canceled == true) {
         return null;
     }
-    installCharacter(selected.filePaths[0], filterInstallation, updateCharacters, dir);
+    await installCharacter(selected.filePaths[0], filterInstallation, updateCharacters, dir);
+    return;
 }
 
 async function installCharacterArchive(
@@ -661,7 +682,8 @@ async function installCharacterArchive(
     fs.emptyDirSync(path.join(dir, "_temp"));
     const output: string = await extractArchive(selected.filePaths[0], path.join(dir, "_temp"));
     console.log(output, filterInstallation);
-    installCharacter(output, filterInstallation, updateCharacters, dir);
+    await installCharacter(output, filterInstallation, updateCharacters, dir);
+    return;
 }
 
 async function installCharacter(
@@ -670,6 +692,7 @@ async function installCharacter(
     updateCharacters: boolean = false,
     dir: string = gameDir
 ): Promise<void> {
+    const retVal: Promise<void>[] = [];
     let correctedDir: string = characterDir;
     const modFiles: string[] = getAllFiles(correctedDir)
         .map((file: string) => file.replace(correctedDir, ""));
@@ -734,33 +757,33 @@ async function installCharacter(
                         });
                     contents.forEach((found: string) => {
                         console.log("Copying: " + path.join(correctedDir, subDir, found));
-                        fs.copy(
+                        retVal.push(fs.copy(
                             path.join(correctedDir, subDir, found),
                             path.join(dir, subDir, found),
                             { overwrite: true }
-                        );
+                        ));
                     });
                 }
             } else {
                 if (fs.existsSync(path.join(correctedDir, file))) {
                     console.log("Copying: " + path.join(correctedDir, file));
-                    fs.copy(
+                    retVal.push(fs.copy(
                         path.join(correctedDir, file),
                         path.join(dir, file),
                         { overwrite: !file.startsWith("gfx/seriesicon/") }
-                    );
+                    ));
                 }
             }
         });
     } else {
         console.log("Installing All Files");
-        fs.copySync(correctedDir, dir, { overwrite: true });
+        retVal.push(fs.copy(correctedDir, dir, { overwrite: true }));
     }
 
-    writeCharacterDat(
+    retVal.push(writeCharacterDat(
         characterDat,
         path.join(dir, "data", "dats")
-    );
+    ));
 
     if (characters.getCharacterByName(character) != undefined) {
         return;
@@ -774,10 +797,13 @@ async function installCharacter(
         // alts: []
         mug: path.join(dir, "gfx", "mugs", character + ".png")
     });
-    writeCharacterList(characters, dir);
+    retVal.push(writeCharacterList(characters, dir));
+    await Promise.allSettled(retVal);
+    return;
 }
 
 async function extractCharacter(extract: string, dir: string = gameDir): Promise<void> {
+    const retVal: Promise<void>[] = [];
     const characters: Character[] = getCharacters(dir);
     const similarNames: string[] = [];
     characters.forEach((character: Character) => {
@@ -785,6 +811,7 @@ async function extractCharacter(extract: string, dir: string = gameDir): Promise
             similarNames.push(character.name);
         }
     });
+
     const characterDat: CharacterDat = getCharacterDat(extract, dir);
     const extractDir: string = path.join(dir, "extracted", extract);
     filterCharacterFiles(characterDat).forEach((file: string) => {
@@ -805,28 +832,32 @@ async function extractCharacter(extract: string, dir: string = gameDir): Promise
                     });
                 contents.forEach((found: string) => {
                     console.log("Extracting: " + path.join(dir, subDir, found));
-                    fs.copy(
+                    retVal.push(fs.copy(
                         path.join(dir, subDir, found),
                         path.join(extractDir, subDir, found),
                         { overwrite: true }
-                    );
+                    ));
                 });
             }
         } else {
             const target: string = path.join(dir, file);
             if (fs.existsSync(target)) {
                 console.log("Extracting: " + target);
-                fs.copy(target, path.join(extractDir, file), { overwrite: true });
+                retVal.push(fs.copy(target, path.join(extractDir, file), { overwrite: true }));
             }
         }
     });
-    writeCharacterDat(
+
+    retVal.push(writeCharacterDat(
         characterDat,
         path.join(extractDir, "data", "dats")
-    );
+    ));
+    await Promise.allSettled(retVal);
+    return;
 }
 
 async function removeCharacter(remove: string, dir: string = gameDir): Promise<void> {
+    const retVal: Promise<void>[] = [];
     const characters: CharacterList = readCharacterList(dir);
     const similarNames: string[] = [];
     characters.getAllCharacters().forEach((character: Character) => {
@@ -834,6 +865,7 @@ async function removeCharacter(remove: string, dir: string = gameDir): Promise<v
             similarNames.push(character.name);
         }
     });
+
     const characterDat: CharacterDat = getCharacterDat(remove, dir);
     filterCharacterFiles(characterDat, true).forEach((file: string) => {
         const subDir: string = path.parse(file).dir;
@@ -853,22 +885,24 @@ async function removeCharacter(remove: string, dir: string = gameDir): Promise<v
                     });
                 contents.forEach((found: string) => {
                     console.log("Removing: " + path.join(dir, subDir, found));
-                    fs.remove(path.join(dir, subDir, found));
+                    retVal.push(fs.remove(path.join(dir, subDir, found)));
                 });
             }
         } else {
             const target: string = path.join(dir, file);
             if (fs.existsSync(target)) {
                 console.log("Removing: " + target);
-                fs.remove(target);
+                retVal.push(fs.remove(target));
             }
         }
     });
     const character: Character = characters.getCharacterByName(remove);
 
     characters.removeCharacterByName(remove);
-    writeCharacterList(characters, dir);
-    removeCharacterCss(character, dir);
+    retVal.push(writeCharacterList(characters, dir));
+    retVal.push(removeCharacterCss(character, dir));
+    await Promise.allSettled(retVal);
+    return;    
 }
 
 function filterCharacterFiles(characterDat: CharacterDat, ignoreSeries: boolean = false): string[] {
@@ -959,17 +993,33 @@ async function writeCssPages(pages: CssPage[], dir: string = gameDir): Promise<v
         );
         gameSettings.push("global.css_custom_name[" + (index + 1) + "] = \"" + page.name + "\";");
     });
-    fs.writeFile(
+    fs.writeFileSync(
         path.join(dir, "data", "GAME_SETTINGS.txt"),
         gameSettings.join("\r\n"),
         { encoding: "ascii" }
-    )
+    );
+    return;
 }
 
 async function removeCssPage(page: CssPage, dir: string = gameDir): Promise<void> {
     const pages: CssPage[] = readCssPages(dir).filter((i: CssPage) => i.path != page.path);
     fs.remove(page.path);
+    return writeCssPages(pages, dir);
+}
+
+async function addCssPage(pageName: string, dir: string = gameDir): Promise<void> {
+    pageName = pageName.replace(/'|"/g, "");
+    const pagePath: string = pageName.replace(/[\\/:*?|.]/g, "-") + ".txt";
+    const pages: CssPage[] = readCssPages(dir);
+    pages.push({ name: pageName, path: pagePath });
     writeCssPages(pages, dir);
+    fs.ensureFileSync(pagePath);
+    fs.writeFileSync(
+        pagePath,
+        BLANK_CSS_PAGE_DATA,
+        { encoding: "ascii" }
+    );
+    return;
 }
 
 function readCssData(page: CssPage): CssData {
@@ -982,18 +1032,20 @@ function readCssData(page: CssPage): CssData {
 async function writeCssData(page: CssPage, data: CssData): Promise<void> {
     const output: string = data.map((row: string[]) => row.join(" ")).join("\r\n") + " ";
     // console.log(output + "EOF");
-    fs.writeFile(
+    fs.writeFileSync(
         page.path,
         output,
         { encoding: "ascii" }
     );
+    return;
 }
 
 async function removeCharacterCss(character: Character, dir: string = gameDir): Promise<void> {
+    const retVal: Promise<void>[] = [];
     const cssPages: CssPage[] = readCssPages(dir);
     cssPages.forEach((page: CssPage) => {
         const cssData: CssData = readCssData(page);
-        writeCssData(page, cssData.map((row: string[]) => {
+        retVal.push(writeCssData(page, cssData.map((row: string[]) => {
             return row.map((cell: string) => {
                 if (parseInt(cell) == character.cssNumber) {
                     return "0000";
@@ -1003,7 +1055,8 @@ async function removeCharacterCss(character: Character, dir: string = gameDir): 
                     return cell;
                 }
             });
-        }));
-
+        })));
     });
+    await Promise.allSettled(retVal);
+    return;
 }

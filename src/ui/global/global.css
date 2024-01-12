@@ -32,6 +32,11 @@ body {
     background-color: var(--inf-grey4);
     font-size: 11pt;
     overflow: hidden;
+    user-select: none;
+}
+
+span:not(.mat-icon) {
+    user-select: text;
 }
 
 a {

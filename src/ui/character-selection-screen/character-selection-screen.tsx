@@ -29,8 +29,22 @@ export default function TabCharacterSelectionScreen(): JSX.Element {
     [CssData, Dispatch<SetStateAction<CssData>>]
     = useState(null);
 
+    const [newPageName, setNewPageName]:
+    [string, Dispatch<SetStateAction<string>>]
+    = useState("");
+
     async function getInfo(): Promise<void> {
-        setCharacters(await api.getCharacters());
+        const characters: Character[] = await api.getCharacters();
+        characters[9998] = {
+            name: "random",
+            displayName: "Random",
+            series: null,
+            randomSelection: false,
+            cssNumber: 9999,
+            // alts: [],
+            mug: await api.pathJoin(await api.getGameDir(), "gfx", "mugs", "random.png")
+        };
+        setCharacters(characters)
         getPages();
     }
 
@@ -89,6 +103,27 @@ export default function TabCharacterSelectionScreen(): JSX.Element {
                                 key={page.name}
                             />
                         )}
+                        <div className={"css-page add-css-page"}>
+                            <input
+                                type={"text"}
+                                placeholder={"Page Name"}
+                                onInput={(event: any) => {
+                                    event.target.value = event.target.value.replace(/'|"/g, "");
+                                    setNewPageName(event.target.value);
+                                    getPages();
+                                }}
+                            />
+                            <IconButton
+                                icon={"add"}
+                                iconSize={"18px"}
+                                tooltip={"Add Page"}
+                                onClick={() => {
+                                    if (newPageName != "") {
+                                        api.addCssPage(newPageName);
+                                    }
+                                }}
+                            />
+                        </div>
                     </div>
                 </div>
             </div>

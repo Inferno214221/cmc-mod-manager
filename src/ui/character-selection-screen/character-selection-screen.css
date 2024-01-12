@@ -174,3 +174,11 @@
     overflow: visible;
     overflow-anchor: auto;
 } */
+
+.add-css-page input[type="text"] {
+    margin: 2px 0px 0px 2px;
+}
+
+.add-css-page .icon-button-wrapper {
+    margin-left: 0px;
+}
