@@ -1009,7 +1009,10 @@ async function removeCssPage(page: CssPage, dir: string = gameDir): Promise<void
 
 async function addCssPage(pageName: string, dir: string = gameDir): Promise<void> {
     pageName = pageName.replace(/'|"/g, "");
-    const pagePath: string = pageName.replace(/[\\/:*?|.]/g, "-") + ".txt";
+    const pagePath: string = path.join(
+        dir, "data", "css",
+        pageName.replace(/[\\/:*?|. ]/g, "-") + ".txt"
+    );
     const pages: CssPage[] = readCssPages(dir);
     pages.push({ name: pageName, path: pagePath });
     writeCssPages(pages, dir);

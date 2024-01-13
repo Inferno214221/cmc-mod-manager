@@ -2,7 +2,9 @@ import { Dispatch, SetStateAction, useState, useEffect } from "react";
 import "./character-selection-screen.css";
 import ToggleIconButton from "../global/icon-button/toggle-icon-button";
 import IconButton from "../global/icon-button/icon-button";
-import { Character, CharacterList, CssPage, CssData, SortTypes } from "../../interfaces";
+import {
+    Character, CharacterList, CssPage, CssData, SortTypes, DndData, DndDataType
+} from "../../interfaces";
 
 export default function TabCharacterSelectionScreen(): JSX.Element {
     const [characters, setCharacters]:
@@ -89,6 +91,10 @@ export default function TabCharacterSelectionScreen(): JSX.Element {
         getCssData();
     }
 
+    function characterDragAndDrop(from: DndData, to: DndData): void {
+        console.log(from, to);
+    }
+
     return (
         <section>
             <div id={"pages-div"}>
@@ -117,9 +123,10 @@ export default function TabCharacterSelectionScreen(): JSX.Element {
                                 icon={"add"}
                                 iconSize={"18px"}
                                 tooltip={"Add Page"}
-                                onClick={() => {
+                                onClick={async () => {
                                     if (newPageName != "") {
-                                        api.addCssPage(newPageName);
+                                        await api.addCssPage(newPageName);
+                                        getPages();
                                     }
                                 }}
                             />
@@ -138,6 +145,7 @@ export default function TabCharacterSelectionScreen(): JSX.Element {
                                     setCssData={setCssData}
                                     characterList={characterList}
                                     updateCssData={updateCssData}
+                                    characterDragAndDrop={characterDragAndDrop}
                                 />
                             </tbody>
                         </table>
@@ -148,6 +156,7 @@ export default function TabCharacterSelectionScreen(): JSX.Element {
             <ExcludedCharacters
                 characters={characters}
                 excluded={excluded}
+                characterDragAndDrop={characterDragAndDrop}
             />
         </section>
     );
@@ -155,10 +164,12 @@ export default function TabCharacterSelectionScreen(): JSX.Element {
 
 function ExcludedCharacters({
     characters,
-    excluded
+    excluded,
+    characterDragAndDrop
 }: {
     characters: Character[],
-    excluded: Character[]
+    excluded: Character[],
+    characterDragAndDrop: (from: DndData, to: DndData) => void
 }): JSX.Element {
     const [searchValue, setSearchValue]:
     [string, Dispatch<SetStateAction<string>>]
@@ -253,10 +264,12 @@ function ExcludedCharacters({
                         {sortCharacters(
                             showAllCharacters ? characters : excluded
                         ).map((character: Character) =>
-                            <CharacterDisplay
-                                character={character}
-                                key={character.name}
-                            />
+                            character == undefined ? null :
+                                <CharacterDisplay
+                                    character={character}
+                                    characterDragAndDrop={characterDragAndDrop}
+                                    key={character.name}
+                                />
                         )}
                     </div>
                 </div>
@@ -265,17 +278,43 @@ function ExcludedCharacters({
     );
 }
 
-function CharacterDisplay({ character }: { character: Character }): JSX.Element {
-    // Draggable
+function CharacterDisplay({
+    character,
+    characterDragAndDrop
+}: {
+    character: Character,
+    characterDragAndDrop: (from: DndData, to: DndData) => void
+}): JSX.Element {
+    const dndData: DndData = {
+        type: DndDataType.excludedCharacter,
+        data: {
+            cssNumber: character.cssNumber
+        }
+    }
     return (
-        <div className={"excluded-display-wrapper"}>
-            <div className={"excluded-display-mug tooltip-wrapper"}>
+        <div className={"excluded-display-wrapper tooltip-wrapper"}>
+            <div
+                className={"excluded-display-mug"}
+                draggable={true}
+                onDragStart={(event: any) => {
+                    event.dataTransfer.setData("data", JSON.stringify(dndData));
+                }}
+                onDragOver={(event: any) => {
+                    event.preventDefault();
+                }}
+                onDrop={(event: any) => {
+                    characterDragAndDrop(
+                        JSON.parse(event.dataTransfer.getData("data")),
+                        dndData
+                    );
+                }}
+            >
                 <img src={"img://" + character.mug} draggable={false} />
-                <div className={"tooltip excluded-tooltip"}>
+                <div className={"excluded-display-name"}>
                     <span>{character.displayName}</span>
                 </div>
             </div>
-            <div className={"excluded-display-name"}>
+            <div className={"tooltip excluded-tooltip"}>
                 <span>{character.displayName}</span>
             </div>
         </div>
@@ -321,12 +360,14 @@ function CssTableContents({
     cssData,
     setCssData,
     characterList,
-    updateCssData
+    updateCssData,
+    characterDragAndDrop
 }: {
     cssData: CssData,
     setCssData: Dispatch<SetStateAction<CssData>>,
     characterList: CharacterList,
-    updateCssData: (data: CssData) => Promise<void>
+    updateCssData: (data: CssData) => Promise<void>,
+    characterDragAndDrop: (from: DndData, to: DndData) => void
 }): JSX.Element {
     return (cssData == null || characterList == null) ? null : (
         <>
@@ -356,19 +397,22 @@ function CssTableContents({
                     />
                 </th>
             </tr>
-            {cssData.map((row: string[], index: number) =>
-                <tr key={index}>
+            {cssData.map((row: string[], yIndex: number) =>
+                <tr key={yIndex}>
                     <CssRowHeader
-                        row={index}
+                        row={yIndex}
                         setCssData={setCssData}
                         updateCssData={updateCssData}
-                        key={index}
+                        key={yIndex}
                     />
-                    {row.map((cell: string, index: number) =>
+                    {row.map((cell: string, xIndex: number) =>
                         <CssCharacterDisplay
                             cell={cell}
                             characterList={characterList}
-                            key={index}
+                            x={xIndex}
+                            y={yIndex}
+                            characterDragAndDrop={characterDragAndDrop}
+                            key={xIndex}
                         />
                     )}
                 </tr>
@@ -396,19 +440,52 @@ function CssTableContents({
 
 function CssCharacterDisplay({
     cell,
-    characterList
+    characterList,
+    x, y,
+    characterDragAndDrop
 }: {
     cell: string,
-    characterList: CharacterList
+    characterList: CharacterList,
+    x: number, y: number,
+    characterDragAndDrop: (from: DndData, to: DndData) => void
 }): JSX.Element {
     const character: Character = characterList.getCharacterByNum(parseInt(cell));
     if (character == undefined) return (<td className={"css-character-display"}></td>);
+    const dndData: DndData = {
+        type: DndDataType.cssCharacter,
+        data: {
+            x: x,
+            y: y
+        }
+    };
     return (
         <td className={"css-character-display"}>
             <div className={"tooltip-wrapper"}>
-                <img src={"img://" + character.mug} draggable={false} />
-                <span>{character.displayName}</span>
-                <div className={"tooltip css-tooltip"}>
+                <div
+                    draggable={true}
+                    onDragStart={(event: any) => {
+                        // console.log(event);
+                        event.dataTransfer.setData("data", JSON.stringify(dndData));
+                    }}
+                    onDragOver={(event: any) => {
+                        event.preventDefault();
+                    }}
+                    onDrop={(event: any) => {
+                        characterDragAndDrop(
+                            JSON.parse(event.dataTransfer.getData("data")),
+                            dndData
+                        );
+                    }}
+                >
+                    <img src={"img://" + character.mug} draggable={false}/>
+                    <span>{character.displayName}</span>
+                </div>
+                <div
+                    className={"tooltip css-tooltip"}
+                    // onDragEnter={(event: any) => {
+                    //     console.log(event);
+                    // }}
+                >
                     <span>{character.displayName}</span>
                 </div>
             </div>

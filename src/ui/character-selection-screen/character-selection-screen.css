@@ -48,7 +48,7 @@
 .excluded-display-wrapper {
     width: 62px;
     margin: 5px;
-    height: auto;
+    height: calc(62px + 26pt);
 }
 
 .excluded-display-mug {
@@ -113,6 +113,11 @@
     height: fit-content;
     left: -5px;
     top: 62px;
+}
+
+.excluded-tooltip:hover {
+    visibility: visible;
+    z-index: initial;
 }
 
 .css-tooltip {

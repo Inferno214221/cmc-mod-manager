@@ -147,3 +147,13 @@ export enum DownloadState {
     finished = "Finished",
     error = "Error"
 }
+
+export interface DndData {
+    type: DndDataType,
+    data: { x: number, y: number } | { cssNumber: number }
+}
+
+export enum DndDataType {
+    cssCharacter = "cssCharacter",
+    excludedCharacter = "excludedCharacter"
+}
