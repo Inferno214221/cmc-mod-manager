@@ -31,10 +31,6 @@ export default function TabCharacterSelectionScreen(): JSX.Element {
     [CssData, Dispatch<SetStateAction<CssData>>]
     = useState(null);
 
-    const [newPageName, setNewPageName]:
-    [string, Dispatch<SetStateAction<string>>]
-    = useState("");
-
     async function getInfo(): Promise<void> {
         const characters: Character[] = await api.getCharacters();
         characters[9998] = {
@@ -93,48 +89,37 @@ export default function TabCharacterSelectionScreen(): JSX.Element {
 
     function characterDragAndDrop(from: DndData, to: DndData): void {
         console.log(from, to);
+        const newCssData: CssData = cssData;
+        if (from.type == DndDataType.cssCharacter) {
+            if (to.type == DndDataType.cssCharacter) {
+                newCssData[from.y][from.x] = to.cssNumber;
+                newCssData[to.y][to.x] = from.cssNumber;
+            } else {
+                newCssData[from.y][from.x] = "0000";
+            }
+        } else {
+            if (to.type == DndDataType.cssCharacter) {
+                newCssData[to.y][to.x] = from.cssNumber;
+            } else {
+                return;
+            }
+        }
+        updateCssData(newCssData);
     }
 
     return (
         <section>
             <div id={"pages-div"}>
                 <div className={"center"}>
-                    <div id={"pages-wrapper"}>
-                        {cssPages.map((page: CssPage) =>
-                            <CssPageDisplay
-                                page={page}
-                                activePage={activePage}
-                                setActivePage={setActivePage}
-                                getPages={getPages}
-                                key={page.name}
-                            />
-                        )}
-                        <div className={"css-page add-css-page"}>
-                            <input
-                                type={"text"}
-                                placeholder={"Page Name"}
-                                onInput={(event: any) => {
-                                    event.target.value = event.target.value.replace(/'|"/g, "");
-                                    setNewPageName(event.target.value);
-                                    getPages();
-                                }}
-                            />
-                            <IconButton
-                                icon={"add"}
-                                iconSize={"18px"}
-                                tooltip={"Add Page"}
-                                onClick={async () => {
-                                    if (newPageName != "") {
-                                        await api.addCssPage(newPageName);
-                                        getPages();
-                                    }
-                                }}
-                            />
-                        </div>
-                    </div>
+                    <CssPages
+                        cssPages={cssPages}
+                        activePage={activePage}
+                        setActivePage={setActivePage}
+                        getPages={getPages}
+                    />
                 </div>
             </div>
-            <hr />
+            <hr/>
             <div id={"css-div"}>
                 <div id={"css-wrapper"}>
                     <div className={"center"}>
@@ -152,7 +137,7 @@ export default function TabCharacterSelectionScreen(): JSX.Element {
                     </div>
                 </div>
             </div>
-            <hr />
+            <hr/>
             <ExcludedCharacters
                 characters={characters}
                 excluded={excluded}
@@ -287,9 +272,7 @@ function CharacterDisplay({
 }): JSX.Element {
     const dndData: DndData = {
         type: DndDataType.excludedCharacter,
-        data: {
-            cssNumber: character.cssNumber
-        }
+        cssNumber: ("0000" + character.cssNumber).slice(-4)
     }
     return (
         <div className={"excluded-display-wrapper tooltip-wrapper"}>
@@ -316,6 +299,57 @@ function CharacterDisplay({
             </div>
             <div className={"tooltip excluded-tooltip"}>
                 <span>{character.displayName}</span>
+            </div>
+        </div>
+    );
+}
+
+function CssPages({
+    cssPages,
+    activePage,
+    setActivePage,
+    getPages
+}: {
+    cssPages: CssPage[],
+    activePage: CssPage,
+    setActivePage: Dispatch<SetStateAction<CssPage>>,
+    getPages: () => Promise<void>
+}): JSX.Element {
+    const [newPageName, setNewPageName]:
+    [string, Dispatch<SetStateAction<string>>]
+    = useState("");
+
+    return (
+        <div id={"pages-wrapper"}>
+            {cssPages.map((page: CssPage) =>
+                <CssPageDisplay
+                    page={page}
+                    activePage={activePage}
+                    setActivePage={setActivePage}
+                    getPages={getPages}
+                    key={page.name}
+                />
+            )}
+            <div className={"css-page add-css-page"}>
+                <input
+                    type={"text"}
+                    placeholder={"Page Name"}
+                    onInput={(event: any) => {
+                        event.target.value = event.target.value.replace(/'|"/g, "");
+                        setNewPageName(event.target.value);
+                    }}
+                />
+                <IconButton
+                    icon={"add"}
+                    iconSize={"18px"}
+                    tooltip={"Add Page"}
+                    onClick={async () => {
+                        if (newPageName != "") {
+                            await api.addCssPage(newPageName);
+                            getPages();
+                        }
+                    }}
+                />
             </div>
         </div>
     );
@@ -449,15 +483,30 @@ function CssCharacterDisplay({
     x: number, y: number,
     characterDragAndDrop: (from: DndData, to: DndData) => void
 }): JSX.Element {
-    const character: Character = characterList.getCharacterByNum(parseInt(cell));
-    if (character == undefined) return (<td className={"css-character-display"}></td>);
     const dndData: DndData = {
         type: DndDataType.cssCharacter,
-        data: {
-            x: x,
-            y: y
-        }
+        cssNumber: cell,
+        x: x,
+        y: y
     };
+    const character: Character = characterList.getCharacterByNum(parseInt(cell));
+    if (character == undefined) {
+        return (
+            <td
+                className={"css-character-display"}
+                onDragOver={(event: any) => {
+                    event.preventDefault();
+                }}
+                onDrop={(event: any) => {
+                    characterDragAndDrop(
+                        JSON.parse(event.dataTransfer.getData("data")),
+                        dndData
+                    );
+                }}
+            >
+            </td>
+        );
+    }
     return (
         <td className={"css-character-display"}>
             <div className={"tooltip-wrapper"}>
@@ -476,15 +525,25 @@ function CssCharacterDisplay({
                             dndData
                         );
                     }}
+                    onMouseEnter={(event: any) => {
+                        // console.log(event);
+                        event.target
+                            .parentElement
+                            .nextElementSibling
+                            .firstElementChild
+                            .hidden = false;
+                    }}
                 >
                     <img src={"img://" + character.mug} draggable={false}/>
                     <span>{character.displayName}</span>
                 </div>
                 <div
                     className={"tooltip css-tooltip"}
-                    // onDragEnter={(event: any) => {
-                    //     console.log(event);
-                    // }}
+                    hidden={true}
+                    onDragEnter={(event: any) => {
+                        // console.log(event);
+                        event.target.hidden = true;
+                    }}
                 >
                     <span>{character.displayName}</span>
                 </div>

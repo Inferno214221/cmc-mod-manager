@@ -150,7 +150,9 @@ export enum DownloadState {
 
 export interface DndData {
     type: DndDataType,
-    data: { x: number, y: number } | { cssNumber: number }
+    cssNumber: string,
+    x?: number,
+    y?: number
 }
 
 export enum DndDataType {
