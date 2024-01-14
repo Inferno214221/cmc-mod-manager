@@ -4,7 +4,16 @@ export interface Character {
     series: string,
     randomSelection: boolean,
     cssNumber: number,
-    // alts: []
+    alts: Alt[],
+    mug: string
+}
+
+export interface Alt {
+    base: string, // Storing base and alt would result in a recursive structure
+    alt: string, //  so they are stored as characters names
+    number: number,
+    displayName: string,
+    battleName: string,
     mug: string
 }
 
@@ -14,7 +23,7 @@ export interface CharacterUpdate {
     series?: string,
     randomSelection?: boolean,
     cssNumber?: number,
-    // alts?: []
+    alts?: Alt[],
     mug?: string
 }
 

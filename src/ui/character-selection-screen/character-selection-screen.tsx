@@ -32,14 +32,14 @@ export default function TabCharacterSelectionScreen(): JSX.Element {
     = useState(null);
 
     async function getInfo(): Promise<void> {
-        const characters: Character[] = await api.getCharacters();
+        const characters: Character[] = await api.readCharcters();
         characters[9998] = {
             name: "random",
             displayName: "Random",
             series: null,
             randomSelection: false,
             cssNumber: 9999,
-            // alts: [],
+            alts: [],
             mug: await api.pathJoin(await api.getGameDir(), "gfx", "mugs", "random.png")
         };
         setCharacters(characters)

@@ -1,5 +1,7 @@
 import { ipcRenderer } from "electron"
-import { CharacterList, CharacterDat, CssPage, CssData, Character, Download } from "./interfaces"
+import {
+    CharacterList, CharacterDat, CssPage, CssData, Character, Download, Alt
+} from "./interfaces"
 
 export default {
     getGameDir:
@@ -46,10 +48,10 @@ export default {
         ...paths: string[]
     ]): Promise<string> => ipcRenderer.invoke("pathJoin", args),
     
-    getCharacters:
+    readCharcters:
     (...args: [
         dir?: string
-    ]): Promise<Character[]> => ipcRenderer.invoke("getCharacters", args),
+    ]): Promise<Character[]> => ipcRenderer.invoke("readCharcters", args),
     
     readCharacterList:
     (...args: [
@@ -68,6 +70,17 @@ export default {
         randomSelection: boolean,
         dir?: string
     ]): Promise<void> => ipcRenderer.invoke("writeCharacterRandom", args),
+
+    readAlts:
+    (...args: [
+        dir?: string
+    ]): Promise<Character[]> => ipcRenderer.invoke("readAlts", args),
+
+    writeAlts:
+    (...args: [
+        alts: Alt[],
+        dir?: string
+    ]): Promise<Character[]> => ipcRenderer.invoke("writeAlts", args),
 
     installCharacterDir:
     (...args: [
@@ -95,17 +108,17 @@ export default {
         dir?: string
     ]): Promise<void> => ipcRenderer.invoke("removeCharacter", args),
 
-    getCharacterDat:
+    readCharacterDat:
     (...args: [
         character: string,
         dir?: string
-    ]): Promise<CharacterDat> => ipcRenderer.invoke("getCharacterDat", args),
+    ]): Promise<CharacterDat> => ipcRenderer.invoke("readCharacterDat", args),
 
-    readCharacterDat:
+    readCharacterDatPath:
     (...args: [
         datPath: string,
         character?: string
-    ]): Promise<CharacterDat> => ipcRenderer.invoke("readCharacterDat", args),
+    ]): Promise<CharacterDat> => ipcRenderer.invoke("readCharacterDatPath", args),
 
     writeCharacterDat:
     (...args: [

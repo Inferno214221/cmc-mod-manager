@@ -2,7 +2,7 @@ import { Dispatch, SetStateAction, useState, useEffect } from "react";
 import "./characters.css";
 import ToggleIconButton from "../global/icon-button/toggle-icon-button";
 import IconButton from "../global/icon-button/icon-button";
-import { Character, SortTypes } from "../../interfaces";
+import { Character, SortTypes, CharacterList, Alt } from "../../interfaces";
 
 export default function TabCharacters(): JSX.Element {
     const [filterInstallation, setFilterInstallation]:
@@ -17,6 +17,10 @@ export default function TabCharacters(): JSX.Element {
     [Character[], Dispatch<SetStateAction<Character[]>>]
     = useState([]);
 
+    const [characterList, setCharacterList]:
+    [CharacterList, Dispatch<SetStateAction<CharacterList>>]
+    = useState(null);
+
     const [searchValue, setSearchValue]:
     [string, Dispatch<SetStateAction<string>>]
     = useState("");
@@ -30,11 +34,15 @@ export default function TabCharacters(): JSX.Element {
     = useState(false);
 
     useEffect(() => {
-        getCharacters();
+        readCharcters();
     }, []);
 
-    async function getCharacters(): Promise<void> {
-        setCharacters(await api.getCharacters());
+    useEffect(() => {
+        setCharacterList(new CharacterList(characters));
+    }, [characters]);
+
+    async function readCharcters(): Promise<void> {
+        setCharacters(await api.readCharcters());
     }
 
     function sortCharacters(characters: Character[]): Character[] {
@@ -106,8 +114,9 @@ export default function TabCharacters(): JSX.Element {
                 {sortCharacters(characters).map((character: Character) =>
                     <CharacterDisplay
                         character={character}
+                        characterList={characterList}
+                        readCharcters={readCharcters}
                         key={character.name}
-                        getCharacters={getCharacters}
                     />
                 )}
             </div>
@@ -123,7 +132,7 @@ export default function TabCharacters(): JSX.Element {
                                 filterInstallation,
                                 updateCharacters
                             );
-                            getCharacters();
+                            readCharcters();
                         }}
                     />
                     <IconButton
@@ -135,7 +144,7 @@ export default function TabCharacters(): JSX.Element {
                                 filterInstallation,
                                 updateCharacters
                             );
-                            getCharacters();
+                            readCharcters();
                         }}
                     />
                     <IconButton
@@ -179,10 +188,12 @@ export default function TabCharacters(): JSX.Element {
 
 function CharacterDisplay({
     character,
-    getCharacters
+    characterList,
+    readCharcters
 }: {
     character: Character,
-    getCharacters: () => Promise<void>
+    characterList: CharacterList,
+    readCharcters: () => Promise<void>
 }): JSX.Element {
     const [randomSelection, setRandomSelection]:
     [boolean, Dispatch<SetStateAction<boolean>>]
@@ -211,7 +222,7 @@ function CharacterDisplay({
                     tooltip={"Remove Character"}
                     onClick={async () => {
                         await api.removeCharacter(character.name);
-                        getCharacters();
+                        readCharcters();
                     }}
                 />
                 <ToggleIconButton
@@ -227,6 +238,24 @@ function CharacterDisplay({
                     }}
                 />
             </div>
+            <div className={"character-display-alts"}>
+                {characterList == null ? null :
+                    character.alts.map((alt: Alt) =>
+                        <CharacterAltDisplay
+                            alt={alt}
+                        />
+                    )
+                }
+            </div>
+        </div>
+    );
+}
+
+function CharacterAltDisplay({ alt }: { alt: Alt }): JSX.Element {
+    return (
+        <div>
+            {alt.displayName}
+            <img src={"img://" + alt.mug} draggable={false}/>
         </div>
     );
 }

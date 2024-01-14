@@ -11,7 +11,7 @@ import ini from "ini";
 import { execFile } from "child_process";
 import {
     Character, CharacterList, CharacterDat, CharacterPalette, CssPage, CssData, Download,
-    DownloadState
+    DownloadState, Alt
 } from "./interfaces";
 import request from "request";
 import http from "http";
@@ -107,9 +107,9 @@ function createHandlers(): void {
         event: IpcMainInvokeEvent,
         args: Parameters<typeof shell.openExternal>) => shell.openExternal(...args)
     );
-    ipcMain.handle("getCharacters", (
+    ipcMain.handle("readCharcters", (
         event: IpcMainInvokeEvent,
-        args: Parameters<typeof getCharacters>) => getCharacters(...args)
+        args: Parameters<typeof readCharcters>) => readCharcters(...args)
     );
     ipcMain.handle("readCharacterList", (
         event: IpcMainInvokeEvent,
@@ -121,6 +121,14 @@ function createHandlers(): void {
     ipcMain.handle("writeCharacterRandom", (
         event: IpcMainInvokeEvent,
         args: Parameters<typeof writeCharacterRandom>) => writeCharacterRandom(...args)
+    );
+    ipcMain.handle("readAlts", (
+        event: IpcMainInvokeEvent,
+        args: Parameters<typeof readAlts>) => readAlts(...args)
+    );
+    ipcMain.handle("writeAlts", (
+        event: IpcMainInvokeEvent,
+        args: Parameters<typeof writeAlts>) => writeAlts(...args)
     );
     ipcMain.handle("installCharacterDir", (
         event: IpcMainInvokeEvent,
@@ -138,13 +146,13 @@ function createHandlers(): void {
         event: IpcMainInvokeEvent,
         args: Parameters<typeof removeCharacter>) => removeCharacter(...args)
     );
-    ipcMain.handle("getCharacterDat", (
-        event: IpcMainInvokeEvent,
-        args: Parameters<typeof getCharacterDat>) => getCharacterDat(...args)
-    );
     ipcMain.handle("readCharacterDat", (
         event: IpcMainInvokeEvent,
         args: Parameters<typeof readCharacterDat>) => readCharacterDat(...args)
+    );
+    ipcMain.handle("readCharacterDatPath", (
+        event: IpcMainInvokeEvent,
+        args: Parameters<typeof readCharacterDatPath>) => readCharacterDatPath(...args)
     );
     ipcMain.handle("writeCharacterDat", (
         event: IpcMainInvokeEvent,
@@ -447,12 +455,13 @@ async function runGame(dir: string = gameDir): Promise<void> {
     return;
 }
 
-function getCharacters(dir: string = gameDir): Character[] {
+function readCharcters(dir: string = gameDir): Character[] {
     return readCharacterList(dir).getAllCharacters();
 }
 
 function readCharacterList(dir: string = gameDir): CharacterList {
     // console.log(new Date().getTime());
+    const alts: Alt[] = readAlts(dir);
     const characters: CharacterList = new CharacterList();
     const charactersTxt: string[] = fs.readFileSync(
         path.join(dir, "data", "fighters.txt"),
@@ -461,14 +470,14 @@ function readCharacterList(dir: string = gameDir): CharacterList {
     charactersTxt.shift(); // Drop the number
     charactersTxt.forEach((character: string, index: number) => {
         if (fs.existsSync(path.join(dir, "data", "dats", character + ".dat"))) {
-            const characterDat: CharacterDat = getCharacterDat(character, dir);
+            const characterDat: CharacterDat = readCharacterDat(character, dir);
             characters.addCharacter({
                 name: character,
                 displayName: characterDat.displayName,
                 series: characterDat.series,
                 randomSelection: true, // Assume true and then iterate through false list
                 cssNumber: index + 1,
-                // alts: []
+                alts: alts.filter((alt: Alt) => alt.base == character),
                 mug: path.join(dir, "gfx", "mugs", character + ".png")
             });
         }
@@ -521,9 +530,9 @@ async function writeCharacterRandom(
     } else {
         lockedTxt.push(character);
     }
-    let output: string = lockedTxt.length.toString() + "\r\n";
+    let output: string = lockedTxt.length + "\r\n";
     output += lockedTxt.join("\r\n");
-    await fs.writeFileSync(
+    fs.writeFileSync(
         path.join(dir, "data", "fighter_lock.txt"),
         output,
         { encoding: "ascii" }
@@ -531,11 +540,51 @@ async function writeCharacterRandom(
     return;
 }
 
-function getCharacterDat(character: string, dir: string = gameDir): CharacterDat {
-    return readCharacterDat(path.join(dir, "data", "dats", character + ".dat"), character);
+function readAlts(dir: string = gameDir): Alt[] {
+    console.log(dir);
+    const altsTxt: string[] = fs.readFileSync(
+        path.join(dir, "data", "alts.txt"),
+        "ascii"
+    ).split(/\r?\n/);
+    altsTxt.shift(); // Drop the number
+    const alts: Alt[] = [];
+    for (let alt: number = 0; alt < Math.floor(altsTxt.length / 5); alt++) {
+        alts.push({
+            base: altsTxt[(alt * 5) + 0],
+            alt: altsTxt[(alt * 5) + 2],
+            number: parseInt(altsTxt[(alt * 5) + 1]),
+            displayName: altsTxt[(alt * 5) + 3],
+            battleName: altsTxt[(alt * 5) + 4],
+            mug: path.join(dir, "gfx", "mugs", altsTxt[(alt * 5) + 2] + ".png")
+        });
+    }
+    return alts;
 }
 
-function readCharacterDat(
+async function writeAlts(alts: Alt[], dir: string = gameDir): Promise<void> {
+    let output: string = alts.length + "\r\n";
+    output += alts.map((alt: Alt) =>
+        [
+            alt.base,
+            alt.number,
+            alt.alt,
+            alt.displayName,
+            alt.battleName
+        ].join("\r\n")
+    ).join("\r\n");
+    fs.writeFileSync(
+        path.join(dir, "data", "alts.txt"),
+        output,
+        { encoding: "ascii" }
+    );
+    return;
+}
+
+function readCharacterDat(character: string, dir: string = gameDir): CharacterDat {
+    return readCharacterDatPath(path.join(dir, "data", "dats", character + ".dat"), character);
+}
+
+function readCharacterDatPath(
     datPath: string,
     character: string = path.parse(datPath).name
 ): CharacterDat {
@@ -723,12 +772,12 @@ async function installCharacter(
 
     let characterDat: CharacterDat;
     if (fs.existsSync(path.join(correctedDir, "data", "dats", character + ".dat"))) {
-        characterDat = readCharacterDat(
+        characterDat = readCharacterDatPath(
             path.join(correctedDir, "data", "dats", character + ".dat"),
             character
         );
     } else if (fs.existsSync(path.join(correctedDir, "data", character + ".dat"))) {
-        characterDat = readCharacterDat(
+        characterDat = readCharacterDatPath(
             path.join(correctedDir, "data", character + ".dat"),
             character
         );
@@ -794,7 +843,7 @@ async function installCharacter(
         series: characterDat.series,
         randomSelection: true,
         cssNumber: characters.getNextCssNumber(),
-        // alts: []
+        alts: [],
         mug: path.join(dir, "gfx", "mugs", character + ".png")
     });
     retVal.push(writeCharacterList(characters, dir));
@@ -804,7 +853,7 @@ async function installCharacter(
 
 async function extractCharacter(extract: string, dir: string = gameDir): Promise<void> {
     const retVal: Promise<void>[] = [];
-    const characters: Character[] = getCharacters(dir);
+    const characters: Character[] = readCharcters(dir);
     const similarNames: string[] = [];
     characters.forEach((character: Character) => {
         if (character.name.includes(extract) && character.name != extract) {
@@ -812,7 +861,7 @@ async function extractCharacter(extract: string, dir: string = gameDir): Promise
         }
     });
 
-    const characterDat: CharacterDat = getCharacterDat(extract, dir);
+    const characterDat: CharacterDat = readCharacterDat(extract, dir);
     const extractDir: string = path.join(dir, "extracted", extract);
     filterCharacterFiles(characterDat).forEach((file: string) => {
         const subDir: string = path.parse(file).dir;
@@ -866,7 +915,7 @@ async function removeCharacter(remove: string, dir: string = gameDir): Promise<v
         }
     });
 
-    const characterDat: CharacterDat = getCharacterDat(remove, dir);
+    const characterDat: CharacterDat = readCharacterDat(remove, dir);
     filterCharacterFiles(characterDat, true).forEach((file: string) => {
         const subDir: string = path.parse(file).dir;
         if (file.includes("*")) {
