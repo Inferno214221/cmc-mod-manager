@@ -17,10 +17,6 @@ export default function TabCharacters(): JSX.Element {
     [Character[], Dispatch<SetStateAction<Character[]>>]
     = useState([]);
 
-    const [characterList, setCharacterList]:
-    [CharacterList, Dispatch<SetStateAction<CharacterList>>]
-    = useState(null);
-
     const [searchValue, setSearchValue]:
     [string, Dispatch<SetStateAction<string>>]
     = useState("");
@@ -36,10 +32,6 @@ export default function TabCharacters(): JSX.Element {
     useEffect(() => {
         readCharcters();
     }, []);
-
-    useEffect(() => {
-        setCharacterList(new CharacterList(characters));
-    }, [characters]);
 
     async function readCharcters(): Promise<void> {
         setCharacters(await api.readCharcters());
@@ -111,14 +103,19 @@ export default function TabCharacters(): JSX.Element {
                 </div>
             </div>
             <div id={"character-div"}>
-                {sortCharacters(characters).map((character: Character) =>
-                    <CharacterDisplay
-                        character={character}
-                        characterList={characterList}
-                        readCharcters={readCharcters}
-                        key={character.name}
-                    />
-                )}
+                <div className={"center"}>
+                    <table>
+                        <tbody>
+                            {sortCharacters(characters).map((character: Character) =>
+                                <CharacterDisplay
+                                    character={character}
+                                    readCharcters={readCharcters}
+                                    key={character.name}
+                                />
+                            )}
+                        </tbody>
+                    </table>
+                </div>
             </div>
             <hr/>
             <div id={"button-div"}>
@@ -188,11 +185,9 @@ export default function TabCharacters(): JSX.Element {
 
 function CharacterDisplay({
     character,
-    characterList,
     readCharcters
 }: {
     character: Character,
-    characterList: CharacterList,
     readCharcters: () => Promise<void>
 }): JSX.Element {
     const [randomSelection, setRandomSelection]:
@@ -200,62 +195,71 @@ function CharacterDisplay({
     = useState(character.randomSelection);
 
     return (
-        <div className={"character-display-wrapper"}>
-            <div className={"character-display-mug"}>
-                <img src={"img://" + character.mug} draggable={false}/>
-            </div>
-            <div className={"character-display-name"}>
-                <span>{character.displayName}</span>
-            </div>
-            <div className={"character-display-actions"}>
-                <IconButton
-                    icon={"launch"}
-                    iconSize={"30px"}
-                    tooltip={"Extract Character"}
-                    onClick={() => {
-                        api.extractCharacter(character.name);
-                    }}
-                />
-                <IconButton
-                    icon={"delete"}
-                    iconSize={"30px"}
-                    tooltip={"Remove Character"}
-                    onClick={async () => {
-                        await api.removeCharacter(character.name);
-                        readCharcters();
-                    }}
-                />
-                <ToggleIconButton
-                    checked={randomSelection}
-                    trueIcon={"shuffle_on"}
-                    trueTooltip={"Random Selection: Enabled"}
-                    falseIcon={"shuffle"}
-                    falseTooltip={"Random Selection: Disabled"}
-                    iconSize={"30px"}
-                    setter={(state: boolean) => {
-                        setRandomSelection(state);
-                        api.writeCharacterRandom(character.name, state);
-                    }}
-                />
-            </div>
-            <div className={"character-display-alts"}>
-                {characterList == null ? null :
-                    character.alts.map((alt: Alt) =>
+        <tr>
+            <td>
+                <div className={"character-display-wrapper"}>
+                    <div className={"character-display-mug"}>
+                        <img src={"img://" + character.mug} draggable={false}/>
+                    </div>
+                    <div className={"character-display-name"}>
+                        <span>{character.displayName}</span>
+                    </div>
+                    <div className={"character-display-actions"}>
+                        <IconButton
+                            icon={"launch"}
+                            iconSize={"30px"}
+                            tooltip={"Extract Character"}
+                            onClick={() => {
+                                api.extractCharacter(character.name);
+                            }}
+                        />
+                        <IconButton
+                            icon={"delete"}
+                            iconSize={"30px"}
+                            tooltip={"Remove Character"}
+                            onClick={async () => {
+                                await api.removeCharacter(character.name);
+                                readCharcters();
+                            }}
+                        />
+                        <ToggleIconButton
+                            checked={randomSelection}
+                            trueIcon={"shuffle_on"}
+                            trueTooltip={"Random Selection: Enabled"}
+                            falseIcon={"shuffle"}
+                            falseTooltip={"Random Selection: Disabled"}
+                            iconSize={"30px"}
+                            setter={(state: boolean) => {
+                                setRandomSelection(state);
+                                api.writeCharacterRandom(character.name, state);
+                            }}
+                        />
+                    </div>
+                </div>
+            </td>
+            <td>
+                <div className={"character-display-alts"}>
+                    {character.alts.map((alt: Alt, index: number) =>
                         <CharacterAltDisplay
                             alt={alt}
+                            key={index}
                         />
-                    )
-                }
-            </div>
-        </div>
+                    )}
+                </div>
+            </td>
+        </tr>
     );
 }
 
 function CharacterAltDisplay({ alt }: { alt: Alt }): JSX.Element {
     return (
-        <div>
-            {alt.displayName}
-            <img src={"img://" + alt.mug} draggable={false}/>
+        <div className={"alt-display-wrapper"}>
+            <div className={"alt-display-mug"}>
+                <img src={"img://" + alt.mug} draggable={false}/>
+            </div>
+            <div className={"alt-display-name"}>
+                <span>{alt.displayName}</span>
+            </div>
         </div>
     );
 }
