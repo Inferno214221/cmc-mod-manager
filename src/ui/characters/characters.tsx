@@ -3,7 +3,7 @@ import "./characters.css";
 import IconButton from "../global/icon-button/icon-button";
 import ToggleIconButton from "../global/icon-button/toggle-icon-button";
 import CycleIconButton from "../global/icon-button/cycle-icon-button";
-import { Character, Alt, sortTypes } from "../../interfaces";
+import { Character, Alt, sortTypes, SortTypeOptions } from "../../interfaces";
 
 export default function TabCharacters(): JSX.Element {
     const [filterInstallation, setFilterInstallation]:
@@ -15,6 +15,10 @@ export default function TabCharacters(): JSX.Element {
     = useState(false);
 
     const [characters, setCharacters]:
+    [Character[], Dispatch<SetStateAction<Character[]>>]
+    = useState([]);
+
+    const [sortedCharacters, setSortedCharacters]:
     [Character[], Dispatch<SetStateAction<Character[]>>]
     = useState([]);
 
@@ -31,12 +35,16 @@ export default function TabCharacters(): JSX.Element {
     = useState(false);
 
     useEffect(() => {
-        readCharcters();
+        readCharacters();
     }, []);
 
-    async function readCharcters(): Promise<void> {
-        setCharacters(await api.readCharcters());
+    async function readCharacters(): Promise<void> {
+        setCharacters(await api.readCharacters());
     }
+
+    useEffect(() => {
+        setSortedCharacters(sortCharacters(characters));
+    }, [characters, sortType, reverseSort, searchValue]);
 
     function sortCharacters(characters: Character[]): Character[] {
         let sortedCharacters: Character[] = characters;
@@ -104,13 +112,45 @@ export default function TabCharacters(): JSX.Element {
                 <div className={"center"}>
                     <table>
                         <tbody>
-                            {sortCharacters(characters).map((character: Character) =>
-                                <CharacterDisplay
-                                    character={character}
-                                    readCharcters={readCharcters}
-                                    key={character.name}
-                                />
-                            )}
+                            {sortType == sortTypes.indexOf(SortTypeOptions.series) ?
+                                sortedCharacters.map((
+                                    character: Character,
+                                    index: number
+                                ) => {
+                                    const characterDisplay: JSX.Element = (
+                                        <CharacterDisplay
+                                            character={character}
+                                            readCharacters={readCharacters}
+                                            key={character.name}
+                                        />
+                                    );
+                                    if (
+                                        index == 0 ||
+                                        character.series != sortedCharacters[index - 1].series
+                                    ) {
+                                        return (
+                                            <>
+                                                <tr>
+                                                    <th>
+                                                        {character.series.toUpperCase()}
+                                                    </th>
+                                                </tr>
+                                                {characterDisplay}
+                                            </>
+                                        );
+                                    }
+                                    return characterDisplay;
+                                }) :
+                                sortedCharacters.map((
+                                    character: Character
+                                ) => 
+                                    <CharacterDisplay
+                                        character={character}
+                                        readCharacters={readCharacters}
+                                        key={character.name}
+                                    />
+                                )
+                            }
                         </tbody>
                     </table>
                 </div>
@@ -127,7 +167,7 @@ export default function TabCharacters(): JSX.Element {
                                 filterInstallation,
                                 updateCharacters
                             );
-                            readCharcters();
+                            readCharacters();
                         }}
                     />
                     <IconButton
@@ -139,7 +179,7 @@ export default function TabCharacters(): JSX.Element {
                                 filterInstallation,
                                 updateCharacters
                             );
-                            readCharcters();
+                            readCharacters();
                         }}
                     />
                     <IconButton
@@ -183,10 +223,10 @@ export default function TabCharacters(): JSX.Element {
 
 function CharacterDisplay({
     character,
-    readCharcters
+    readCharacters
 }: {
     character: Character,
-    readCharcters: () => Promise<void>
+    readCharacters: () => Promise<void>
 }): JSX.Element {
     const [randomSelection, setRandomSelection]:
     [boolean, Dispatch<SetStateAction<boolean>>]
@@ -217,7 +257,7 @@ function CharacterDisplay({
                             tooltip={"Remove Character"}
                             onClick={async () => {
                                 await api.removeCharacter(character.name);
-                                readCharcters();
+                                readCharacters();
                             }}
                         />
                         <ToggleIconButton
@@ -262,7 +302,7 @@ function CharacterAltDisplay({ alt }: { alt: Alt }): JSX.Element {
             </div>
             <div className={"alt-display-actions"}>
                 <IconButton
-                    icon={"delete"}
+                    icon={"remove"}
                     iconSize={"30px"}
                     tooltip={"Remove Alt"}
                     onClick={async () => {

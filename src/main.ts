@@ -107,9 +107,9 @@ function createHandlers(): void {
         event: IpcMainInvokeEvent,
         args: Parameters<typeof shell.openExternal>) => shell.openExternal(...args)
     );
-    ipcMain.handle("readCharcters", (
+    ipcMain.handle("readCharacters", (
         event: IpcMainInvokeEvent,
-        args: Parameters<typeof readCharcters>) => readCharcters(...args)
+        args: Parameters<typeof readCharacters>) => readCharacters(...args)
     );
     ipcMain.handle("readCharacterList", (
         event: IpcMainInvokeEvent,
@@ -455,7 +455,7 @@ async function runGame(dir: string = gameDir): Promise<void> {
     return;
 }
 
-function readCharcters(dir: string = gameDir): Character[] {
+function readCharacters(dir: string = gameDir): Character[] {
     return readCharacterList(dir).getAllCharacters();
 }
 
@@ -853,7 +853,7 @@ async function installCharacter(
 
 async function extractCharacter(extract: string, dir: string = gameDir): Promise<void> {
     const retVal: Promise<void>[] = [];
-    const characters: Character[] = readCharcters(dir);
+    const characters: Character[] = readCharacters(dir);
     const similarNames: string[] = [];
     characters.forEach((character: Character) => {
         if (character.name.includes(extract) && character.name != extract) {

@@ -187,3 +187,12 @@
 .add-css-page .icon-button-wrapper {
     margin-left: 0px;
 }
+
+.series-name {
+    display: flex;
+    align-items: center;
+}
+
+.series-name span {
+    padding: 5px;
+}

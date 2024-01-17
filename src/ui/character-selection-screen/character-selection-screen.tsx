@@ -4,7 +4,7 @@ import IconButton from "../global/icon-button/icon-button";
 import ToggleIconButton from "../global/icon-button/toggle-icon-button";
 import CycleIconButton from "../global/icon-button/cycle-icon-button";
 import {
-    Character, CharacterList, CssPage, CssData, DndData, DndDataType, sortTypes
+    Character, CharacterList, CssPage, CssData, DndData, DndDataType, sortTypes, SortTypeOptions
 } from "../../interfaces";
 
 export default function TabCharacterSelectionScreen(): JSX.Element {
@@ -33,16 +33,17 @@ export default function TabCharacterSelectionScreen(): JSX.Element {
     = useState(null);
 
     async function getInfo(): Promise<void> {
-        const characters: Character[] = await api.readCharcters();
-        characters[9998] = {
+        const characters: Character[] = await api.readCharacters();
+        // characters[9998] = {
+        characters.push({
             name: "random",
             menuName: "Random",
-            series: null,
+            series: "random",
             randomSelection: false,
             cssNumber: 9999,
             alts: [],
             mug: await api.pathJoin(await api.getGameDir(), "gfx", "mugs", "random.png")
-        };
+        });
         setCharacters(characters)
         getPages();
     }
@@ -173,8 +174,17 @@ function ExcludedCharacters({
     [boolean, Dispatch<SetStateAction<boolean>>]
     = useState(false);
 
+    const [sortedCharacters, setSortedCharacters]:
+    [Character[], Dispatch<SetStateAction<Character[]>>]
+    = useState([]);
+
+    useEffect(() => {
+        setSortedCharacters(sortCharacters(characters));
+        console.log(sortCharacters(characters));
+    }, [characters, excluded, sortType, reverseSort, showAllCharacters, searchValue]);
+
     function sortCharacters(characters: Character[]): Character[] {
-        let sortedCharacters: Character[] = characters;
+        let sortedCharacters: Character[] = showAllCharacters ? characters : excluded;
         if (searchValue != "") {
             sortedCharacters = sortedCharacters.filter((character: Character) =>
                 (character.menuName.toLowerCase().includes(searchValue))
@@ -247,16 +257,46 @@ function ExcludedCharacters({
             <div id={"excluded-div"}>
                 <div className={"center"}>
                     <div id={"excluded-wrapper"}>
-                        {sortCharacters(
-                            showAllCharacters ? characters : excluded
-                        ).map((character: Character) =>
-                            character == undefined ? null :
+                        {sortType == sortTypes.indexOf(SortTypeOptions.series) ?
+                            sortedCharacters.map((
+                                character: Character,
+                                index: number
+                            ) => {
+                                if (character == undefined) return null;
+                                const characterDisplay: JSX.Element = (
+                                    <CharacterDisplay
+                                        character={character}
+                                        characterDragAndDrop={characterDragAndDrop}
+                                        key={character.name}
+                                    />
+                                );
+                                if (
+                                    index == 0 ||
+                                    character.series != sortedCharacters[index - 1].series
+                                ) {
+                                    return (
+                                        <>
+                                            <div className={"series-name"}>
+                                                <span>
+                                                    <b>{character.series.toUpperCase()}</b>
+                                                </span>
+                                            </div>
+                                            {characterDisplay}
+                                        </>
+                                    );
+                                }
+                                return characterDisplay;
+                            }) :
+                            sortedCharacters.map((
+                                character: Character
+                            ) => character == undefined ? null :
                                 <CharacterDisplay
                                     character={character}
                                     characterDragAndDrop={characterDragAndDrop}
                                     key={character.name}
                                 />
-                        )}
+                            )
+                        }
                     </div>
                 </div>
             </div>

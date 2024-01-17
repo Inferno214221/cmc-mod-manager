@@ -48,10 +48,10 @@ export default {
         ...paths: string[]
     ]): Promise<string> => ipcRenderer.invoke("pathJoin", args),
     
-    readCharcters:
+    readCharacters:
     (...args: [
         dir?: string
-    ]): Promise<Character[]> => ipcRenderer.invoke("readCharcters", args),
+    ]): Promise<Character[]> => ipcRenderer.invoke("readCharacters", args),
     
     readCharacterList:
     (...args: [
