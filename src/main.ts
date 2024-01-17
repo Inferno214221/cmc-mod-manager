@@ -473,7 +473,7 @@ function readCharacterList(dir: string = gameDir): CharacterList {
             const characterDat: CharacterDat = readCharacterDat(character, dir);
             characters.addCharacter({
                 name: character,
-                displayName: characterDat.displayName,
+                menuName: characterDat.menuName,
                 series: characterDat.series,
                 randomSelection: true, // Assume true and then iterate through false list
                 cssNumber: index + 1,
@@ -553,7 +553,7 @@ function readAlts(dir: string = gameDir): Alt[] {
             base: altsTxt[(alt * 5) + 0],
             alt: altsTxt[(alt * 5) + 2],
             number: parseInt(altsTxt[(alt * 5) + 1]),
-            displayName: altsTxt[(alt * 5) + 3],
+            menuName: altsTxt[(alt * 5) + 3],
             battleName: altsTxt[(alt * 5) + 4],
             mug: path.join(dir, "gfx", "mugs", altsTxt[(alt * 5) + 2] + ".png")
         });
@@ -568,7 +568,7 @@ async function writeAlts(alts: Alt[], dir: string = gameDir): Promise<void> {
             alt.base,
             alt.number,
             alt.alt,
-            alt.displayName,
+            alt.menuName,
             alt.battleName
         ].join("\r\n")
     ).join("\r\n");
@@ -839,7 +839,7 @@ async function installCharacter(
     }
     characters.addCharacter({
         name: character,
-        displayName: characterDat.displayName,
+        menuName: characterDat.menuName,
         series: characterDat.series,
         randomSelection: true,
         cssNumber: characters.getNextCssNumber(),

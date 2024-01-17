@@ -3,8 +3,9 @@
 #character-div {
     flex-grow: 1;
     min-height: 0px;
-    padding: 5px;
-    margin-top: 5px;
+    /* padding: 5px;
+    margin-top: 5px; */
+    margin: 5px;
     overflow: auto;
 }
 
@@ -55,8 +56,9 @@ select {
     align-items: center;
 }
 
-.character-display-actions {
-    width: 120px;
+.character-display-actions,
+.alt-display-actions {
+    width: fit-content;
     height: calc(100% - 10px);
     padding: 5px;
     display: inline-flex;

@@ -17,11 +17,7 @@
     width: 100%;
 }
 
-/* #tabs-div {
-    margin-top: 5px;
-} */
-
-#tabs-scrollable {
+/* #tabs-scrollable {
     white-space: nowrap;
     overflow-y: hidden;
     overflow-x: auto;
@@ -31,6 +27,13 @@
 
 #tabs-scrollable div.center {
     height: 100%;
+} */
+
+#tabs-div {
+    white-space: nowrap;
+    overflow-y: hidden;
+    overflow-x: auto;
+    margin: 5px;
 }
 
 #cmcmm-icon {

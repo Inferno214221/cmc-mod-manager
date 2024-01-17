@@ -1,36 +1,36 @@
 import { Dispatch, SetStateAction } from "react";
 import "./icon-button.css";
 
-export default function ToggleIconButton({
-    // defaultState,
-    checked,
-    trueIcon,
-    trueTooltip,
-    falseIcon,
-    falseTooltip,
+export default function CycleIconButton({
+    index,
+    icons,
+    tooltips,
     iconSize,
     setter
 }: {
-    // defaultState: boolean,
-    checked: boolean,
-    trueIcon: string,
-    trueTooltip: string,
-    falseIcon: string,
-    falseTooltip: string,
+    index: number,
+    icons: string[],
+    tooltips: string[],
     iconSize: string,
-    setter: Dispatch<SetStateAction<boolean>>
+    setter: Dispatch<SetStateAction<number>>
 }): JSX.Element {
     return (
         <div className={"icon-button-wrapper"}>
             <button  className={"icon-button"} onClick={() => {
-                setter((prev: boolean) => !prev);
+                setter((prev: number) => {
+                    prev++;
+                    if (prev == icons.length) {
+                        prev = 0;
+                    }
+                    return prev;
+                });
             }}>
                 <span className={"mat-icon button-icon"} style={{ fontSize: iconSize }}>
-                    {checked ? trueIcon : falseIcon}
+                    {icons[index]}
                 </span>
             </button>
             <div className={"icon-button-tooltip"}>
-                <span>{checked ? trueTooltip : falseTooltip}</span>
+                <span>{tooltips[index]}</span>
             </div>
         </div>
     );

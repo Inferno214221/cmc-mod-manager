@@ -1,6 +1,6 @@
 export interface Character {
     name: string,
-    displayName: string,
+    menuName: string,
     series: string,
     randomSelection: boolean,
     cssNumber: number,
@@ -12,14 +12,14 @@ export interface Alt {
     base: string, // Storing base and alt would result in a recursive structure
     alt: string, //  so they are stored as characters names
     number: number,
-    displayName: string,
+    menuName: string,
     battleName: string,
     mug: string
 }
 
 export interface CharacterUpdate {
     name?: string,
-    displayName?: string,
+    menuName?: string,
     series?: string,
     randomSelection?: boolean,
     cssNumber?: number,
@@ -135,11 +135,17 @@ export interface CssPage {
 
 export type CssData = string[][];
 
-export enum SortTypes {
+export enum SortTypeOptions {
     cssNumber = "cssNumber",
     series = "series",
-    displayName = "displayName"
+    menuName = "menuName"
 }
+
+export const sortTypes: SortTypeOptions[] = [
+    SortTypeOptions.cssNumber,
+    SortTypeOptions.series,
+    SortTypeOptions.menuName
+];
 
 export interface Download {
     filePath: string,

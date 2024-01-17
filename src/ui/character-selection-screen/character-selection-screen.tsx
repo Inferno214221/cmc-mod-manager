@@ -1,9 +1,10 @@
 import { Dispatch, SetStateAction, useState, useEffect } from "react";
 import "./character-selection-screen.css";
-import ToggleIconButton from "../global/icon-button/toggle-icon-button";
 import IconButton from "../global/icon-button/icon-button";
+import ToggleIconButton from "../global/icon-button/toggle-icon-button";
+import CycleIconButton from "../global/icon-button/cycle-icon-button";
 import {
-    Character, CharacterList, CssPage, CssData, SortTypes, DndData, DndDataType
+    Character, CharacterList, CssPage, CssData, DndData, DndDataType, sortTypes
 } from "../../interfaces";
 
 export default function TabCharacterSelectionScreen(): JSX.Element {
@@ -35,7 +36,7 @@ export default function TabCharacterSelectionScreen(): JSX.Element {
         const characters: Character[] = await api.readCharcters();
         characters[9998] = {
             name: "random",
-            displayName: "Random",
+            menuName: "Random",
             series: null,
             randomSelection: false,
             cssNumber: 9999,
@@ -161,8 +162,8 @@ function ExcludedCharacters({
     = useState("");
 
     const [sortType, setSortType]:
-    [SortTypes, Dispatch<SetStateAction<SortTypes>>]
-    = useState(SortTypes.cssNumber);
+    [number, Dispatch<SetStateAction<number>>]
+    = useState(0);
 
     const [reverseSort, setReverseSort]:
     [boolean, Dispatch<SetStateAction<boolean>>]
@@ -176,11 +177,11 @@ function ExcludedCharacters({
         let sortedCharacters: Character[] = characters;
         if (searchValue != "") {
             sortedCharacters = sortedCharacters.filter((character: Character) =>
-                (character.displayName.toLowerCase().includes(searchValue))
+                (character.menuName.toLowerCase().includes(searchValue))
             );
         }
         sortedCharacters = sortedCharacters.toSorted((a: Character, b: Character) =>
-            (a[sortType] > b[sortType] ? 1 : -1)
+            (a[sortTypes[sortType]] > b[sortTypes[sortType]] ? 1 : -1)
         );
         if (reverseSort) {
             sortedCharacters.reverse();
@@ -206,28 +207,28 @@ function ExcludedCharacters({
                             <span>Search For Characters</span>
                         </div>
                     </div>
-                    <div className={"tooltip-wrapper inline-sort-options"}>
-                        <select
-                            id="sort-type-select"
-                            onChange={(event: any) => {
-                                setSortType(event.target.value);
-                            }}
-                        >
-                            <option value="cssNumber">Internal Number</option>
-                            <option value="series">Franchise</option>
-                            <option value="displayName">Alphabetical</option>
-                        </select>
-                        <div className={"tooltip"}>
-                            <span>Sorting Method</span>
-                        </div>
-                    </div>
                     <div className={"inline-sort-options"}>
+                        <CycleIconButton
+                            index={sortType}
+                            icons={[
+                                "format_list_numbered",
+                                "group",
+                                "sort_by_alpha"
+                            ]}
+                            tooltips={[
+                                "Sort By: Internal Number",
+                                "Sort By: Franchise",
+                                "Sort By: Alphabetical"
+                            ]}
+                            iconSize={"30px"}
+                            setter={setSortType}
+                        />
                         <ToggleIconButton
                             checked={reverseSort}
                             trueIcon={"west"}
-                            trueTooltip={"Sorted Direction: Backwards"}
+                            trueTooltip={"Sort Direction: Backwards"}
                             falseIcon={"east"}
-                            falseTooltip={"Sorted Direction: Forwards"}
+                            falseTooltip={"Sort Direction: Forwards"}
                             iconSize={"30px"}
                             setter={setReverseSort}
                         />
@@ -294,11 +295,11 @@ function CharacterDisplay({
             >
                 <img src={"img://" + character.mug} draggable={false} />
                 <div className={"excluded-display-name"}>
-                    <span>{character.displayName}</span>
+                    <span>{character.menuName}</span>
                 </div>
             </div>
             <div className={"tooltip excluded-tooltip"}>
-                <span>{character.displayName}</span>
+                <span>{character.menuName}</span>
             </div>
         </div>
     );
@@ -535,7 +536,7 @@ function CssCharacterDisplay({
                     }}
                 >
                     <img src={"img://" + character.mug} draggable={false}/>
-                    <span>{character.displayName}</span>
+                    <span>{character.menuName}</span>
                 </div>
                 <div
                     className={"tooltip css-tooltip"}
@@ -545,7 +546,7 @@ function CssCharacterDisplay({
                         event.target.hidden = true;
                     }}
                 >
-                    <span>{character.displayName}</span>
+                    <span>{character.menuName}</span>
                 </div>
             </div>
         </td>

@@ -86,46 +86,46 @@ export function TabHome(): JSX.Element {
             <hr/>
             <div id={"tabs-div"} className={"vertical-outer-div"}>
                 <div className={"vertical-inner-div"}>
-                    <div id={"tabs-scrollable"}>
-                        <div className={"center"}>
-                            <TabButton
-                                icon={"groups"}
-                                title={"Characters"}
-                                desc={"Install, extract or delete characters from CMC+."}
-                                tab={CHARACTERS}
-                            />
-                            <TabButton
-                                icon={"pan_tool_alt"}
-                                title={"Character Selection Screen"}
-                                desc={"Modify CMC+'s character selection screen."}
-                                tab={CHARACTER_SELECTION_SCREEN}
-                            />
-                            <TabButton
-                                icon={"reduce_capacity"}
-                                title={"Port Characters"}
-                                desc={"Install characters from another version of CMC+."}
-                                tab={PORT_CHARACTERS}
-                            />
-                            <TabButton
-                                icon={"terrain"}
-                                title={"Stages"}
-                                desc={"Install, extract or delete stages from CMC+."}
-                                tab={STAGES}
-                            />
-                            <TabButton
-                                icon={"location_pin"}
-                                title={"Stage Selection Screen"}
-                                desc={"Modify CMC+'s stage selection screen."}
-                                tab={STAGE_SELECTION_SCREEN}
-                            />
-                            <TabButton
-                                icon={"download"}
-                                title={"Downloads"}
-                                desc={"View current downloads."}
-                                tab={DOWNLOADS}
-                            />
-                        </div>
+                    {/* <div id={"tabs-scrollable"}> */}
+                    <div className={"center"}>
+                        <TabButton
+                            icon={"groups"}
+                            title={"Characters"}
+                            desc={"Install, extract or delete characters from CMC+."}
+                            tab={CHARACTERS}
+                        />
+                        <TabButton
+                            icon={"pan_tool_alt"}
+                            title={"Character Selection Screen"}
+                            desc={"Modify CMC+'s character selection screen."}
+                            tab={CHARACTER_SELECTION_SCREEN}
+                        />
+                        <TabButton
+                            icon={"reduce_capacity"}
+                            title={"Port Characters"}
+                            desc={"Install characters from another version of CMC+."}
+                            tab={PORT_CHARACTERS}
+                        />
+                        <TabButton
+                            icon={"terrain"}
+                            title={"Stages"}
+                            desc={"Install, extract or delete stages from CMC+."}
+                            tab={STAGES}
+                        />
+                        <TabButton
+                            icon={"location_pin"}
+                            title={"Stage Selection Screen"}
+                            desc={"Modify CMC+'s stage selection screen."}
+                            tab={STAGE_SELECTION_SCREEN}
+                        />
+                        <TabButton
+                            icon={"download"}
+                            title={"Downloads"}
+                            desc={"View current downloads."}
+                            tab={DOWNLOADS}
+                        />
                     </div>
+                    {/* </div> */}
                 </div>
             </div>
         </section>

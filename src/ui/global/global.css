@@ -72,7 +72,7 @@ hr {
     border-width: 1px;
     border-style: solid;
     border-radius: 5px;
-    margin: 5px 0px;
+    margin: 0px 0px 5px;
 }
 
 nav hr {
@@ -80,10 +80,7 @@ nav hr {
     border-width: 1px;
     border-style: solid;
     border-radius: 5px;
-    /* margin-top: 5px;
-    margin-bottom: 0px; */
-    margin: 5px;
-    margin-bottom: 0px;
+    margin: 5px 5px 0px;
 }
 
 @font-face {

@@ -1,8 +1,9 @@
 import { Dispatch, SetStateAction, useState, useEffect } from "react";
 import "./characters.css";
-import ToggleIconButton from "../global/icon-button/toggle-icon-button";
 import IconButton from "../global/icon-button/icon-button";
-import { Character, SortTypes, CharacterList, Alt } from "../../interfaces";
+import ToggleIconButton from "../global/icon-button/toggle-icon-button";
+import CycleIconButton from "../global/icon-button/cycle-icon-button";
+import { Character, Alt, sortTypes } from "../../interfaces";
 
 export default function TabCharacters(): JSX.Element {
     const [filterInstallation, setFilterInstallation]:
@@ -22,8 +23,8 @@ export default function TabCharacters(): JSX.Element {
     = useState("");
 
     const [sortType, setSortType]:
-    [SortTypes, Dispatch<SetStateAction<SortTypes>>]
-    = useState(SortTypes.cssNumber);
+    [number, Dispatch<SetStateAction<number>>]
+    = useState(0);
 
     const [reverseSort, setReverseSort]:
     [boolean, Dispatch<SetStateAction<boolean>>]
@@ -41,11 +42,11 @@ export default function TabCharacters(): JSX.Element {
         let sortedCharacters: Character[] = characters;
         if (searchValue != "") {
             sortedCharacters = sortedCharacters.filter((character: Character) =>
-                (character.displayName.toLowerCase().includes(searchValue))
+                (character.menuName.toLowerCase().includes(searchValue))
             );
         }
         sortedCharacters = sortedCharacters.toSorted((a: Character, b: Character) =>
-            (a[sortType] > b[sortType] ? 1 : -1)
+            (a[sortTypes[sortType]] > b[sortTypes[sortType]] ? 1 : -1)
         );
         if (reverseSort) {
             sortedCharacters.reverse();
@@ -71,31 +72,28 @@ export default function TabCharacters(): JSX.Element {
                             <span>Search For Characters</span>
                         </div>
                     </div>
-                    <div className={"tooltip-wrapper inline-sort-options"}>
-                        <select
-                            id="sort-type-select"
-                            onChange={(event: any) => {
-                                setSortType(event.target.value);
-                            }}
-                        >
-                            <option value="cssNumber">Internal Number</option>
-                            {/* numbers */}
-                            <option value="series">Franchise</option>
-                            {/* group */}
-                            <option value="displayName">Alphabetical</option>
-                            {/* sort_by_alpha */}
-                        </select>
-                        <div className={"tooltip"}>
-                            <span>Sorting Method</span>
-                        </div>
-                    </div>
                     <div className={"inline-sort-options"}>
+                        <CycleIconButton
+                            index={sortType}
+                            icons={[
+                                "format_list_numbered",
+                                "group",
+                                "sort_by_alpha"
+                            ]}
+                            tooltips={[
+                                "Sort By: Internal Number",
+                                "Sort By: Franchise",
+                                "Sort By: Alphabetical"
+                            ]}
+                            iconSize={"30px"}
+                            setter={setSortType}
+                        />
                         <ToggleIconButton
                             checked={reverseSort}
                             trueIcon={"north"}
-                            trueTooltip={"Sorted Direction: Backwards"}
+                            trueTooltip={"Sort Direction: Backwards"}
                             falseIcon={"south"}
-                            falseTooltip={"Sorted Direction: Forwards"}
+                            falseTooltip={"Sort Direction: Forwards"}
                             iconSize={"30px"}
                             setter={setReverseSort}
                         />
@@ -202,7 +200,7 @@ function CharacterDisplay({
                         <img src={"img://" + character.mug} draggable={false}/>
                     </div>
                     <div className={"character-display-name"}>
-                        <span>{character.displayName}</span>
+                        <span>{character.menuName}</span>
                     </div>
                     <div className={"character-display-actions"}>
                         <IconButton
@@ -224,9 +222,11 @@ function CharacterDisplay({
                         />
                         <ToggleIconButton
                             checked={randomSelection}
-                            trueIcon={"shuffle_on"}
+                            // trueIcon={"shuffle_on"}
+                            trueIcon={"help"}
                             trueTooltip={"Random Selection: Enabled"}
-                            falseIcon={"shuffle"}
+                            // falseIcon={"shuffle"}
+                            falseIcon={"help_outline"}
                             falseTooltip={"Random Selection: Disabled"}
                             iconSize={"30px"}
                             setter={(state: boolean) => {
@@ -258,7 +258,17 @@ function CharacterAltDisplay({ alt }: { alt: Alt }): JSX.Element {
                 <img src={"img://" + alt.mug} draggable={false}/>
             </div>
             <div className={"alt-display-name"}>
-                <span>{alt.displayName}</span>
+                <span>{alt.menuName}</span>
+            </div>
+            <div className={"alt-display-actions"}>
+                <IconButton
+                    icon={"delete"}
+                    iconSize={"30px"}
+                    tooltip={"Remove Alt"}
+                    onClick={async () => {
+                        console.log("A");
+                    }}
+                />
             </div>
         </div>
     );
