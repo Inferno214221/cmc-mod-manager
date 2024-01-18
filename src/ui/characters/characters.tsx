@@ -5,7 +5,7 @@ import ToggleIconButton from "../global/icon-button/toggle-icon-button";
 import CycleIconButton from "../global/icon-button/cycle-icon-button";
 import { Character, Alt, sortTypes, SortTypeOptions } from "../../interfaces";
 
-export default function TabCharacters(): JSX.Element {
+export function TabCharacters(): JSX.Element {
     const [filterInstallation, setFilterInstallation]:
     [boolean, Dispatch<SetStateAction<boolean>>]
     = useState(true);
@@ -33,6 +33,10 @@ export default function TabCharacters(): JSX.Element {
     const [reverseSort, setReverseSort]:
     [boolean, Dispatch<SetStateAction<boolean>>]
     = useState(false);
+
+    const [altTarget, setAltTarget]:
+    [Character, Dispatch<SetStateAction<Character>>]
+    = useState(null);
 
     useEffect(() => {
         readCharacters();
@@ -70,7 +74,7 @@ export default function TabCharacters(): JSX.Element {
                         <input
                             type={"text"}
                             placeholder={"Search"}
-                            // id={"characterSearch"}
+                            id={"character-search"}
                             onInput={(event: any) => {
                                 setSearchValue(event.target.value);
                                 console.log(searchValue, sortType, reverseSort);
@@ -121,6 +125,8 @@ export default function TabCharacters(): JSX.Element {
                                         <CharacterDisplay
                                             character={character}
                                             readCharacters={readCharacters}
+                                            altTarget={altTarget}
+                                            setAltTarget={setAltTarget}
                                             key={character.name}
                                         />
                                     );
@@ -147,6 +153,8 @@ export default function TabCharacters(): JSX.Element {
                                     <CharacterDisplay
                                         character={character}
                                         readCharacters={readCharacters}
+                                        altTarget={altTarget}
+                                        setAltTarget={setAltTarget}
                                         key={character.name}
                                     />
                                 )
@@ -223,17 +231,21 @@ export default function TabCharacters(): JSX.Element {
 
 function CharacterDisplay({
     character,
-    readCharacters
+    readCharacters,
+    altTarget,
+    setAltTarget
 }: {
     character: Character,
-    readCharacters: () => Promise<void>
+    readCharacters: () => Promise<void>,
+    altTarget: Character,
+    setAltTarget: Dispatch<SetStateAction<Character>>
 }): JSX.Element {
     const [randomSelection, setRandomSelection]:
     [boolean, Dispatch<SetStateAction<boolean>>]
     = useState(character.randomSelection);
 
     return (
-        <tr>
+        <tr className={"character-display-row"}>
             <td>
                 <div className={"character-display-wrapper"}>
                     <div className={"character-display-mug"}>
@@ -274,24 +286,39 @@ function CharacterDisplay({
                                 api.writeCharacterRandom(character.name, state);
                             }}
                         />
+                        <AddAltButton
+                            character={character}
+                            altTarget={altTarget}
+                            setAltTarget={setAltTarget}
+                            readCharacters={readCharacters}
+                        />
                     </div>
                 </div>
             </td>
             <td>
                 <div className={"character-display-alts"}>
-                    {character.alts.map((alt: Alt, index: number) =>
-                        <CharacterAltDisplay
-                            alt={alt}
-                            key={index}
-                        />
-                    )}
+                    {character.alts.filter((alt: Alt) => alt.base != alt.alt)
+                        .map((alt: Alt, index: number) =>
+                            <CharacterAltDisplay
+                                alt={alt}
+                                readCharacters={readCharacters}
+                                key={index}
+                            />
+                        )
+                    }
                 </div>
             </td>
         </tr>
     );
 }
 
-function CharacterAltDisplay({ alt }: { alt: Alt }): JSX.Element {
+function CharacterAltDisplay({
+    alt,
+    readCharacters
+}: {
+    alt: Alt,
+    readCharacters: () => Promise<void>
+}): JSX.Element {
     return (
         <div className={"alt-display-wrapper"}>
             <div className={"alt-display-mug"}>
@@ -302,14 +329,64 @@ function CharacterAltDisplay({ alt }: { alt: Alt }): JSX.Element {
             </div>
             <div className={"alt-display-actions"}>
                 <IconButton
-                    icon={"remove"}
+                    icon={"group_remove"}
                     iconSize={"30px"}
                     tooltip={"Remove Alt"}
                     onClick={async () => {
-                        console.log("A");
+                        await api.removeAlt(alt);
+                        readCharacters();
                     }}
                 />
             </div>
         </div>
+    );
+}
+
+function AddAltButton({
+    character,
+    altTarget,
+    setAltTarget,
+    readCharacters
+}: {
+    character: Character,
+    altTarget: Character,
+    setAltTarget: Dispatch<SetStateAction<Character>>,
+    readCharacters: () => Promise<void>
+}): JSX.Element {
+    if (altTarget == null) {
+        return (
+            <IconButton
+                icon={"group_add"}
+                iconSize={"30px"}
+                tooltip={"Add Alt To This Character"}
+                onClick={() => {
+                    setAltTarget(character);
+                }}
+            />
+        );
+    }
+    if (altTarget.name == character.name) {
+        return (
+            <IconButton
+                icon={"cancel"}
+                iconSize={"30px"}
+                tooltip={"Cancel Alt Addition"}
+                onClick={() => {
+                    setAltTarget(null);
+                }}
+            />
+        );
+    }
+    return (
+        <IconButton
+            icon={"person_add"}
+            iconSize={"30px"}
+            tooltip={"Add As Alt To Selected Character"}
+            onClick={async () => {
+                await api.addAlt(altTarget, character);
+                setAltTarget(null);
+                readCharacters();
+            }}
+        />
     );
 }

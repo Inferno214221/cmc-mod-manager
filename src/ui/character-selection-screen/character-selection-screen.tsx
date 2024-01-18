@@ -7,7 +7,7 @@ import {
     Character, CharacterList, CssPage, CssData, DndData, DndDataType, sortTypes, SortTypeOptions
 } from "../../interfaces";
 
-export default function TabCharacterSelectionScreen(): JSX.Element {
+export function TabCharacterSelectionScreen(): JSX.Element {
     const [characters, setCharacters]:
     [Character[], Dispatch<SetStateAction<Character[]>>]
     = useState([]);
@@ -207,7 +207,7 @@ function ExcludedCharacters({
                         <input
                             type={"text"}
                             placeholder={"Search"}
-                            // id={"characterSearch"}
+                            id={"excluded-search"}
                             onInput={(event: any) => {
                                 setSearchValue(event.target.value);
                                 console.log(searchValue, sortType, reverseSort);

@@ -80,7 +80,20 @@ export default {
     (...args: [
         alts: Alt[],
         dir?: string
-    ]): Promise<Character[]> => ipcRenderer.invoke("writeAlts", args),
+    ]): Promise<void> => ipcRenderer.invoke("writeAlts", args),
+
+    addAlt:
+    (...args: [
+        base: Character,
+        newAlt: Character,
+        dir?: string
+    ]): Promise<void> => ipcRenderer.invoke("addAlt", args),
+    
+    removeAlt:
+    (...args: [
+        alt: Alt,
+        dir?: string
+    ]): Promise<void> => ipcRenderer.invoke("removeAlt", args),
 
     installCharacterDir:
     (...args: [

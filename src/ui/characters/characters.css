@@ -27,8 +27,7 @@
     margin-top: -1px;
 }
 
-input[type=text],
-select {
+#character-search {
     width: 150px;
 }
 
@@ -36,7 +35,6 @@ select {
 .character-display-alts {
     display: inline-flex;
     height: 62px;
-    margin: 5px 0px;
     width: 100%;
 }
 

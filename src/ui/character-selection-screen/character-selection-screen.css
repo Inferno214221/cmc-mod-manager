@@ -196,3 +196,8 @@
 .series-name span {
     padding: 5px;
 }
+
+#excluded-search,
+.add-css-page input[type="text"] {
+    width: 150px;
+}

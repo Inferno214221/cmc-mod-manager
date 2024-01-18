@@ -1,9 +1,17 @@
 import { createRoot, Root } from "react-dom/client";
 import "./global.css";
-import { TabHome, AllowTabSwitchHome } from "../home/home";
-import TabCharacters from "../characters/characters";
-import TabCharacterSelectionScreen from "../character-selection-screen/character-selection-screen";
-import { TabDownloads, AllowTabSwitchDownloads } from "../downloads/downloads";
+import {
+    TabHome, AllowTabSwitchHome
+} from "../home/home";
+import {
+    TabCharacters
+} from "../characters/characters";
+import {
+    TabCharacterSelectionScreen
+} from "../character-selection-screen/character-selection-screen";
+import {
+    TabDownloads, AllowTabSwitchDownloads
+} from "../downloads/downloads";
 
 let root: Root;
 let activeTab: Tab = null;
@@ -79,7 +87,7 @@ export const CHANGE_DIR: NavButtonInfo = {
     icon: "policy",
     function: async () => {
         await api.selectGameDir();
-        //TODO: change a ui element?
+        switchTabs(HOME);
     }
 };
 export const OPEN_DIR: NavButtonInfo = {

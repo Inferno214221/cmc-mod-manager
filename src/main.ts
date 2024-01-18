@@ -130,6 +130,14 @@ function createHandlers(): void {
         event: IpcMainInvokeEvent,
         args: Parameters<typeof writeAlts>) => writeAlts(...args)
     );
+    ipcMain.handle("addAlt", (
+        event: IpcMainInvokeEvent,
+        args: Parameters<typeof addAlt>) => addAlt(...args)
+    );
+    ipcMain.handle("removeAlt", (
+        event: IpcMainInvokeEvent,
+        args: Parameters<typeof removeAlt>) => removeAlt(...args)
+    );
     ipcMain.handle("installCharacterDir", (
         event: IpcMainInvokeEvent,
         args: Parameters<typeof installCharacterDir>) => installCharacterDir(...args)
@@ -562,6 +570,7 @@ function readAlts(dir: string = gameDir): Alt[] {
 }
 
 async function writeAlts(alts: Alt[], dir: string = gameDir): Promise<void> {
+    //TODO: verify alt numbers
     let output: string = alts.length + "\r\n";
     output += alts.map((alt: Alt) =>
         [
@@ -577,6 +586,62 @@ async function writeAlts(alts: Alt[], dir: string = gameDir): Promise<void> {
         output,
         { encoding: "ascii" }
     );
+    return;
+}
+
+async function addAlt(base: Character, newAlt: Character, dir: string = gameDir): Promise<void> {
+    const alts: Alt[] = readAlts(dir);
+    let altNumber: number = 1;
+    alts.filter((alt: Alt) => alt.base == base.name).forEach((alt: Alt) => {
+        if (alt.number > altNumber) altNumber = alt.number;
+    });
+    const newAltDat: CharacterDat = readCharacterDat(newAlt.name, dir);
+    alts.push({
+        base: base.name,
+        alt: newAlt.name,
+        number: altNumber + 1,
+        menuName: newAlt.menuName,
+        battleName: newAltDat.battleName,
+        mug: newAlt.mug
+    });
+    await writeAlts(alts, dir);
+    return;
+}
+
+async function removeAlt(alt: Alt, dir: string = gameDir): Promise<void> {
+    const retVal: Promise<void>[] = [];
+    const alts: Alt[] = readAlts(dir).filter((i: Alt) => !(
+        i.base == alt.base &&
+        i.alt == alt.alt &&
+        i.number == alt.number
+    )).map((i: Alt) => {
+        if (i.base == alt.base && i.number > alt.number) {
+            i.number--;
+        }
+        return i;
+    });
+    retVal.push(writeAlts(alts, dir));
+    retVal.push(ensureAltAccessable(alt, dir));
+    await Promise.allSettled(retVal);
+    return;
+}
+
+async function ensureAltAccessable(alt: Alt, dir: string = gameDir): Promise<void> {
+    const characterList: CharacterList = readCharacterList(dir);
+    if (characterList.getCharacterByName(alt.alt) != undefined) return;
+
+    const baseCharacter: Character = characterList.getCharacterByName(alt.base);
+    characterList.addCharacter({
+        name: alt.alt,
+        menuName: alt.menuName,
+        series: baseCharacter.series,
+        randomSelection: true,
+        cssNumber: characterList.getNextCssNumber(),
+        alts: [],
+        mug: path.join(dir, "gfx", "mugs", alt.alt + ".png")
+    });
+
+    await writeCharacterList(characterList, dir);
     return;
 }
 
@@ -950,6 +1015,7 @@ async function removeCharacter(remove: string, dir: string = gameDir): Promise<v
     characters.removeCharacterByName(remove);
     retVal.push(writeCharacterList(characters, dir));
     retVal.push(removeCharacterCss(character, dir));
+    //TODO: Deal with alts
     await Promise.allSettled(retVal);
     return;    
 }
