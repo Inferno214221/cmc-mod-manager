@@ -92,7 +92,7 @@ export default {
     removeAlt:
     (...args: [
         alt: Alt,
-        ensureAccessable?: boolean,
+        ensureAccessible?: boolean,
         dir?: string
     ]): Promise<void> => ipcRenderer.invoke("removeAlt", args),
 

@@ -73,7 +73,7 @@ export function TabHome(): JSX.Element {
                     <div className={"center"}>
                         <button onClick={() => {
                             alert(LICENSE)
-                        }}>Show License (GPLv3)</button>
+                        }}>Show License (GNU GPLv3)</button>
                     </div>
                 </div>
             </div>

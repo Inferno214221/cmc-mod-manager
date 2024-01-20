@@ -244,6 +244,12 @@ function CharacterDisplay({
     [boolean, Dispatch<SetStateAction<boolean>>]
     = useState(character.randomSelection);
 
+    useEffect(() => {
+        if (randomSelection == character.randomSelection) return;
+        api.writeCharacterRandom(character.name, randomSelection);
+        character.randomSelection = randomSelection;
+    }, [randomSelection])
+
     return (
         <tr className={"character-display-row"}>
             <td>
@@ -274,17 +280,17 @@ function CharacterDisplay({
                         />
                         <ToggleIconButton
                             checked={randomSelection}
-                            // trueIcon={"shuffle_on"}
                             trueIcon={"help"}
                             trueTooltip={"Random Selection: Enabled"}
-                            // falseIcon={"shuffle"}
                             falseIcon={"help_outline"}
                             falseTooltip={"Random Selection: Disabled"}
                             iconSize={"30px"}
-                            setter={(state: boolean) => {
-                                setRandomSelection(state);
-                                api.writeCharacterRandom(character.name, state);
-                            }}
+                            setter={setRandomSelection}
+                            //     (state: boolean) => {
+                            //     console.log(character.name, state);
+                            //     api.writeCharacterRandom(character.name, state);
+                            //     setRandomSelection(state);
+                            // }}
                         />
                         <AddAltButton
                             character={character}
