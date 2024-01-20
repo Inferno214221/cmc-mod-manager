@@ -58,11 +58,11 @@ export default {
         dir?: string
     ]): Promise<CharacterList> => ipcRenderer.invoke("readCharacterList", args),
 
-    writeCharacterList:
+    writeCharacters:
     (...args: [
         characterList: CharacterList,
         dir?: string
-    ]): Promise<void> => ipcRenderer.invoke("writeCharacterList", args),
+    ]): Promise<void> => ipcRenderer.invoke("writeCharacters", args),
     
     writeCharacterRandom:
     (...args: [
@@ -92,6 +92,7 @@ export default {
     removeAlt:
     (...args: [
         alt: Alt,
+        ensureAccessable?: boolean,
         dir?: string
     ]): Promise<void> => ipcRenderer.invoke("removeAlt", args),
 
