@@ -173,4 +173,11 @@ export default {
         page: CssPage,
         data: CssData
     ]): Promise<void> => ipcRenderer.invoke("writeCssData", args),
+
+    getCharacterRegExps:
+    (...args: [
+        characterDat: CharacterDat,
+        includeExtraFiles: boolean,
+        ignoreSeries: boolean
+    ]): Promise<void> => ipcRenderer.invoke("getCharacterRegExps", args),
 }

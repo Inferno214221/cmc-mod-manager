@@ -183,6 +183,11 @@ function createHandlers(): void {
         event: IpcMainInvokeEvent,
         args: Parameters<typeof writeCssData>) => writeCssData(...args)
     );
+
+    ipcMain.handle("getCharacterRegExps", (
+        event: IpcMainInvokeEvent,
+        args: Parameters<typeof getCharacterRegExps>) => getCharacterRegExps(...args)
+    );
 }
 
 // const PROGRAM_DIR = app.getPath("userData");
@@ -194,15 +199,16 @@ const SUPPORTED_VERSIONS: string[] = [
 
 const CHARACTER_FILES: string[] = [
     "arcade/routes/<fighter>.txt",
+    "arcade/routes/<series>_series.txt",
     "data/dats/<fighter>.dat",
     "fighter/<fighter>.bin",
-    "fighter/<fighter>",
+    "fighter/<fighter>/<any>",
     "gfx/abust/<fighter>.png",
     "gfx/bust/<fighter>.png",
     "gfx/bust/<fighter>_<palette>.png",
     "gfx/cbust/<fighter>.png",
     "gfx/mbust/<fighter>.png",
-    "gfx/tbust/<fighter>__*.png",
+    "gfx/tbust/<fighter>__<any>.png",
     "gfx/mugs/<fighter>.png",
     "gfx/hudicon/<series>.png",
     "gfx/name/<fighter>.png",
@@ -210,8 +216,8 @@ const CHARACTER_FILES: string[] = [
     "gfx/portrait/<fighter>_<palette>.png",
     "gfx/seriesicon/<series>.png",
     "gfx/stock/<fighter>.png",
-    "palettes/<fighter>",
-    "music/versus/<fighter>_*.<audio>",
+    "palettes/<fighter>/<any>",
+    "music/versus/<fighter>_<any>.<audio>",
     "music/victory/<series>.<audio>",
     "music/victory/individual/<fighter>.<audio>",
     "sfx/announcer/fighter/<fighter>.<audio>",
@@ -225,7 +231,7 @@ const CHARACTER_FILES: string[] = [
     "sticker/ultra/desc/<fighter>.txt",
 ];
 
-const EXTRA_CHARACTER_FILES: string[] = CHARACTER_FILES;
+const EXTRA_CHARACTER_FILES: string[] = [...CHARACTER_FILES];
 EXTRA_CHARACTER_FILES.push(...[
     "data/<fighter>.dat",
     "gfx/portrait_new/<fighter>.png",
@@ -410,7 +416,7 @@ function getGameDir(): string {
 }
 
 function getExtractedDir(): string {
-    return path.join(gameDir, "extracted");
+    return path.join(gameDir, "0extracted");
 }
 
 function getDownloads(): Download[] {
@@ -925,35 +931,40 @@ async function installCharacter(
     }
 
     if (filterInstallation) {
-        filterCharacterFiles(characterDat, false, true).forEach((file: string) => {
-            const subDir: string = path.parse(file).dir;
-            if (file.includes("*")) {
-                const start: string = path.parse(file).base.split("*")[0].replace(subDir, "");
-                const end: string = path.parse(file).base.split("*")[1];
-                if (fs.existsSync(path.join(correctedDir, subDir))) {
-                    const contents: string[] = fs.readdirSync(path.join(correctedDir, subDir))
-                        .filter((i: string) => {
-                            return i.startsWith(start) && i.endsWith(end);
-                        });
-                    contents.forEach((found: string) => {
-                        log("Copying: " + path.join(correctedDir, subDir, found));
-                        toResolve.push(fs.copy(
-                            path.join(correctedDir, subDir, found),
-                            path.join(dir, subDir, found),
-                            { overwrite: true }
-                        ));
-                    });
-                }
-            } else {
-                if (fs.existsSync(path.join(correctedDir, file))) {
-                    log("Copying: " + path.join(correctedDir, file));
-                    toResolve.push(fs.copy(
-                        path.join(correctedDir, file),
-                        path.join(dir, file),
-                        { overwrite: !file.startsWith("gfx/seriesicon/") }
-                    ));
-                }
-            }
+        // const characterFiles: string[] = getAllFiles(correctedDir)
+        //     .map((file: string) => path.relative(correctedDir, file));
+        // let characterFilesString: string = characterFiles.join("\n");
+        // const validFiles: string[] = [];
+        // getCharacterRegExps(characterDat, false, false).forEach((exp: RegExp) => {
+        //     console.log(exp);
+        //     for (const match of characterFilesString.matchAll(exp)) {
+        //         console.log(match);
+        //         validFiles.push(match[0]);
+        //         characterFiles.splice(characterFiles.indexOf(match[0]), 1);
+        //     }
+        //     characterFilesString = characterFiles.join("\n");
+        //     // for (let file: number = 0; file < characterFiles.length; file++) {
+        //     //     if (exp.test(characterFiles[file])) {
+        //     //         validFiles.push(characterFiles[file]);
+        //     //         characterFiles.splice(file, 1);
+        //     //         file--;
+        //     //     }
+        //     // }
+        // });
+        // console.log(validFiles, characterFiles);
+        getCharacterFiles(correctedDir, characterDat, false, false).forEach((file: string) => {
+            const filePath: string = path.join(correctedDir, file);
+            const targetPath: string = path.join(dir, file);
+            fs.ensureDirSync(path.parse(targetPath).dir);
+            if (!updateCharacters && fs.existsSync(targetPath)) return;
+            log("Copying: " + filePath);
+            toResolve.push(
+                fs.copy(
+                    filePath,
+                    targetPath,
+                    { overwrite: !file.startsWith("gfx/seriesicon/") }
+                )
+            );
         });
     } else {
         log("Copying: All Files");
@@ -989,47 +1000,29 @@ async function extractCharacter(extract: string, dir: string = gameDir): Promise
     const toResolve: Promise<void>[] = [];
     const characters: Character[] = readCharacters(dir);
     const similarNames: string[] = [];
+    const characterDat: CharacterDat = readCharacterDat(extract, dir);
+    const extractDir: string = path.join(dir, "0extracted", extract);
     characters.forEach((character: Character) => {
         if (character.name.includes(extract) && character.name != extract) {
             similarNames.push(character.name);
         }
     });
-
-    const characterDat: CharacterDat = readCharacterDat(extract, dir);
-    const extractDir: string = path.join(dir, "extracted", extract);
-    filterCharacterFiles(characterDat, true, false).forEach((file: string) => {
-        const subDir: string = path.parse(file).dir;
-        if (file.includes("*")) {
-            const start: string = path.parse(file).base.split("*")[0].replace(subDir, "");
-            const end: string = path.parse(file).base.split("*")[1];
-            if (fs.existsSync(path.join(dir, subDir))) {
-                const contents: string[] = fs.readdirSync(path.join(dir, subDir))
-                    .filter((i: string) => {
-                        similarNames.forEach((name: string) => {
-                            if (i.startsWith(name)) {
-                                log(i + " was ignored because it belongs to " + name);
-                                return false;
-                            }
-                        });
-                        return i.startsWith(start) && i.endsWith(end);
-                    });
-                contents.forEach((found: string) => {
-                    log("Extracting: " + path.join(dir, subDir, found));
-                    toResolve.push(fs.copy(
-                        path.join(dir, subDir, found),
-                        path.join(extractDir, subDir, found),
-                        { overwrite: true }
-                    ));
-                });
-            }
-        } else {
-            const target: string = path.join(dir, file);
-            if (fs.existsSync(target)) {
-                log("Extracting: " + target);
-                toResolve.push(fs.copy(target, path.join(extractDir, file), { overwrite: true }));
-            }
-        }
+    
+    console.log(new Date().getTime());
+    getCharacterFiles(dir, characterDat, true, false, similarNames).forEach((file: string) => {
+        const filePath: string = path.join(dir, file);
+        const targetPath: string = path.join(extractDir, file);
+        fs.ensureDirSync(path.parse(targetPath).dir);
+        log("Extracting: " + filePath);
+        toResolve.push(
+            fs.copy(
+                filePath,
+                targetPath,
+                { overwrite: true }
+            )
+        );
     });
+    console.log(new Date().getTime());
 
     toResolve.push(writeCharacterDat(
         characterDat,
@@ -1046,44 +1039,24 @@ async function removeCharacter(remove: string, dir: string = gameDir): Promise<v
     const character: Character = readCharacterList(dir).getCharacterByName(remove);
     await removeAllAlts(character, dir);
     const characters: CharacterList = readCharacterList(dir);
+    const characterDat: CharacterDat = readCharacterDat(remove, dir);
 
     const similarNames: string[] = [];
     characters.getAllCharacters().forEach((character: Character) => {
-        if (character.name.includes(remove) && character.name != remove) {
+        if (character.name.startsWith(remove) && character.name != remove) {
             similarNames.push(character.name);
         }
     });
 
-    const characterDat: CharacterDat = readCharacterDat(remove, dir);
-    filterCharacterFiles(characterDat, true, true).forEach((file: string) => {
-        const subDir: string = path.parse(file).dir;
-        if (file.includes("*")) {
-            const start: string = path.parse(file).base.split("*")[0].replace(subDir, "");
-            const end: string = path.parse(file).base.split("*")[1];
-            if (fs.existsSync(path.join(dir, subDir))) {
-                const contents: string[] = fs.readdirSync(path.join(dir, subDir))
-                    .filter((i: string) => {
-                        similarNames.forEach((name: string) => {
-                            if (i.startsWith(name)) {
-                                log("Ignoring: " + i + " because it belongs to " + name);
-                                return false;
-                            }
-                        });
-                        return i.startsWith(start) && i.endsWith(end);
-                    });
-                contents.forEach((found: string) => {
-                    log("Removing: " + path.join(dir, subDir, found));
-                    toResolve.push(fs.remove(path.join(dir, subDir, found)));
-                });
-            }
-        } else {
-            const target: string = path.join(dir, file);
-            if (fs.existsSync(target)) {
-                log("Removing: " + target);
-                toResolve.push(fs.remove(target));
-            }
-        }
+    console.log(new Date().getTime());
+    getCharacterFiles(dir, characterDat, true, true, similarNames).forEach((file: string) => {
+        const filePath: string = path.join(dir, file);
+        log("Removing: " + filePath);
+        toResolve.push(
+            fs.remove(filePath)
+        );
     });
+    console.log(new Date().getTime());
     
     characters.removeCharacterByName(remove);
     toResolve.push(writeCharacters(characters.getAllCharacters(), dir));
@@ -1093,38 +1066,67 @@ async function removeCharacter(remove: string, dir: string = gameDir): Promise<v
     return;    
 }
 
-function filterCharacterFiles(
+function escapeRegex(str: string): string {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function getCharacterRegExps(
     characterDat: CharacterDat,
     includeExtraFiles: boolean,
     ignoreSeries: boolean = false
-): string[] {
+): RegExp[] {
     // log("Filter Character Files - Start:", characterDat, includeExtraFiles, ignoreSeries);
-    const files: string[] = [];
+    const files: RegExp[] = [];
     (includeExtraFiles ? EXTRA_CHARACTER_FILES : CHARACTER_FILES).forEach((file: string) => {
-        const fixedFiles: string[] = [];
-        let replaced: string = file.replaceAll("<fighter>", characterDat.name);
-        if (!ignoreSeries) replaced = replaced.replaceAll("<series>", characterDat.series);
-        fixedFiles.push(replaced);
-        if (fixedFiles[0].includes("<audio>")) {
-            ["ogg", "wav", "mp3"].forEach((format: string) => {
-                fixedFiles.push(fixedFiles[0].replaceAll("<audio>", format));
-            });
-            fixedFiles.shift();
-        }
-        fixedFiles.forEach((fixedFile: string) => {
-            if (fixedFile.includes("<palette>")) {
-                characterDat.palettes.forEach((palette: CharacterPalette, index: number) => {
-                    fixedFiles.push(fixedFile.replaceAll("<palette>", String(index)));
-                });
-                fixedFiles.shift();
-            }
-        });
-        fixedFiles.forEach((fixed: string) => {
-            files.push(fixed);
-        })
+        let wipString: string = file.replaceAll("<fighter>", characterDat.name);
+        if (!ignoreSeries) wipString = wipString.replaceAll("<series>", characterDat.series);
+        wipString = escapeRegex(wipString);
+        wipString += "$";
+        wipString = wipString.replaceAll("<audio>", "(mp3|wav|ogg)");
+        wipString = wipString.replaceAll("<palette>", "\\d+");
+        wipString = wipString.replaceAll("<any>", "[^\\/\\\\]+");
+        files.push(new RegExp(wipString, "gm"));
     });
     // log("Filter Character Files - Return:", files);
     return files;
+}
+
+function getCharacterFiles(
+    dir: string,
+    characterDat: CharacterDat,
+    includeExtraFiles: boolean,
+    ignoreSeries: boolean,
+    similarNames: string[] = []
+): string[] {
+    const characterFiles: string[] = getAllFiles(dir)
+        .map((file: string) => path.posix.relative(dir, file));
+    // (includeExtraFiles ? EXTRA_CHARACTER_FILES : CHARACTER_FILES).forEach((file: string) => {
+    //     if (!/.*\.[^/\\]+$/.test(file) && fs.existsSync(path.join(dir, file))) {
+    //         //
+    //     }
+    // });
+    let characterFilesString: string = characterFiles.join("\n");
+    const validFiles: string[] = [];
+    getCharacterRegExps(characterDat, includeExtraFiles, ignoreSeries).forEach((exp: RegExp) => {
+        // console.log(exp);
+        for (const match of characterFilesString.matchAll(exp)) {
+            // console.log(match);
+            validFiles.push(match[0]);
+            characterFiles.splice(characterFiles.indexOf(match[0]), 1);
+        }
+        characterFilesString = characterFiles.join("\n");
+    });
+    similarNames.forEach((name: string) => {
+        const validFilesString: string = validFiles.join("\n");
+        getCharacterRegExps(readCharacterDat(name, dir), includeExtraFiles, ignoreSeries)
+            .forEach((exp: RegExp) => {
+                for (const match of validFilesString.matchAll(exp)) {
+                    validFiles.splice(validFiles.indexOf(match[0]), 1);
+                }
+            });
+    });
+    console.log(validFiles);
+    return validFiles;
 }
 
 function readCssPages(dir: string = gameDir): CssPage[] {
