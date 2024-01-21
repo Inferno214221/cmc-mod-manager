@@ -16,6 +16,7 @@ import {
 import request from "request";
 import http from "http";
 import util from "util";
+import semver from "semver";
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
@@ -50,7 +51,8 @@ function createWindow(): void {
         const url: string = request.url.replace("img://", "");
         return callback(url);
     });
-    handleURI(process.argv.find((arg: string) => arg.startsWith("cmcmm:")));
+
+    checkForUpdates();
 }
 
 if (require("electron-squirrel-startup")) {
@@ -183,7 +185,10 @@ function createHandlers(): void {
         event: IpcMainInvokeEvent,
         args: Parameters<typeof writeCssData>) => writeCssData(...args)
     );
-
+    ipcMain.handle("removeSeries", (
+        event: IpcMainInvokeEvent,
+        args: Parameters<typeof removeSeries>) => removeSeries(...args)
+    );
     ipcMain.handle("getCharacterRegExps", (
         event: IpcMainInvokeEvent,
         args: Parameters<typeof getCharacterRegExps>) => getCharacterRegExps(...args)
@@ -329,6 +334,24 @@ async function extractArchive(archive: string, destination: string): Promise<str
     }
     // log("Extract Archive - Return:", output);
     return output;
+}
+
+async function checkForUpdates(): Promise<void> {
+    const currentVersion: string = semver.clean(app.getVersion());
+    // const currentVersion: string = semver.clean("v2.3.0");
+    request.get("https://api.github.com/repos/Inferno214221/cmc-mod-manager/releases/latest", {
+        headers: {
+            "Accept": "application/vnd.github.v3+json",
+            "User-Agent": "CMC-Mod-Manager",
+        }
+    }, (error: string, res: http.IncomingMessage, body: string) => {
+        const latestVersion: string = semver.clean(JSON.parse(body).tag_name)
+        if (semver.lt(currentVersion, latestVersion)) {
+            console.log("Update Required");
+            return;
+        }
+        handleURI(process.argv.find((arg: string) => arg.startsWith("cmcmm:")));
+    });
 }
 
 async function handleURI(uri: string): Promise<void> {
@@ -931,27 +954,6 @@ async function installCharacter(
     }
 
     if (filterInstallation) {
-        // const characterFiles: string[] = getAllFiles(correctedDir)
-        //     .map((file: string) => path.relative(correctedDir, file));
-        // let characterFilesString: string = characterFiles.join("\n");
-        // const validFiles: string[] = [];
-        // getCharacterRegExps(characterDat, false, false).forEach((exp: RegExp) => {
-        //     console.log(exp);
-        //     for (const match of characterFilesString.matchAll(exp)) {
-        //         console.log(match);
-        //         validFiles.push(match[0]);
-        //         characterFiles.splice(characterFiles.indexOf(match[0]), 1);
-        //     }
-        //     characterFilesString = characterFiles.join("\n");
-        //     // for (let file: number = 0; file < characterFiles.length; file++) {
-        //     //     if (exp.test(characterFiles[file])) {
-        //     //         validFiles.push(characterFiles[file]);
-        //     //         characterFiles.splice(file, 1);
-        //     //         file--;
-        //     //     }
-        //     // }
-        // });
-        // console.log(validFiles, characterFiles);
         getCharacterFiles(correctedDir, characterDat, false, false).forEach((file: string) => {
             const filePath: string = path.join(correctedDir, file);
             const targetPath: string = path.join(dir, file);
@@ -1061,6 +1063,7 @@ async function removeCharacter(remove: string, dir: string = gameDir): Promise<v
     characters.removeCharacterByName(remove);
     toResolve.push(writeCharacters(characters.getAllCharacters(), dir));
     toResolve.push(removeCharacterCss(character, dir));
+    toResolve.push(writeCharacterRandom(character.name, true, dir));
     await Promise.allSettled(toResolve);
     // log("Remove Character - Return");
     return;    
@@ -1271,5 +1274,27 @@ async function removeCharacterCss(character: Character, dir: string = gameDir): 
     });
     await Promise.allSettled(toResolve);
     // log("Remove Character CSS - Return");
+    return;
+}
+
+async function removeSeries(series: string, dir: string = gameDir): Promise<void> {
+    const charactersToRemove: Character[] = readCharacters(dir)
+        .filter((character: Character) => character.series == series);
+    const altsToRemove: Alt[] = [];
+    charactersToRemove.forEach((character: Character) => {
+        character.alts.forEach((alt: Alt) => {
+            if (alt.alt != alt.base) altsToRemove.push(alt);
+        });
+    });
+    console.log(new Date().getTime());
+    for (const character of charactersToRemove) {
+        console.log(character);
+        await removeCharacter(character.name, dir);
+    }
+    for (const alt of altsToRemove) {
+        console.log(alt);
+        await removeCharacter(alt.alt, dir);
+    }
+    console.log(new Date().getTime());
     return;
 }

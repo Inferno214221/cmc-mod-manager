@@ -66,3 +66,14 @@
 .alt-display-wrapper {
     display: inline-flex;
 }
+
+.series-display-name {
+    display: inline-block;
+    width: calc(100% - 40px);
+}
+
+.series-display-wrapper .icon-button-wrapper {
+    display: inline-block;
+    width: 30px;
+    margin: 0px 10px 0px 0px;
+}

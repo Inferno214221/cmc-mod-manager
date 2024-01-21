@@ -174,6 +174,12 @@ export default {
         data: CssData
     ]): Promise<void> => ipcRenderer.invoke("writeCssData", args),
 
+    removeSeries:
+    (...args: [
+        series: string,
+        dir?: string
+    ]): Promise<void> => ipcRenderer.invoke("removeSeries", args),
+
     getCharacterRegExps:
     (...args: [
         characterDat: CharacterDat,

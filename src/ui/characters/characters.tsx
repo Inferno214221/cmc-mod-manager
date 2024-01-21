@@ -18,6 +18,10 @@ export function TabCharacters(): JSX.Element {
     [Character[], Dispatch<SetStateAction<Character[]>>]
     = useState([]);
 
+    const [preSorted, setPreSorted]:
+    [Character[][], Dispatch<SetStateAction<Character[][]>>]
+    = useState([[], [], []]);
+
     const [sortedCharacters, setSortedCharacters]:
     [Character[], Dispatch<SetStateAction<Character[]>>]
     = useState([]);
@@ -47,8 +51,20 @@ export function TabCharacters(): JSX.Element {
     }
 
     useEffect(() => {
-        setSortedCharacters(sortCharacters(characters));
-    }, [characters, sortType, reverseSort, searchValue]);
+        setPreSorted(() => {
+            const retVal: Character[][] = [];
+            sortTypes.forEach((sortType: SortTypeOptions, index: number) => {
+                retVal[index] = characters.toSorted((a: Character, b: Character) =>
+                    (a[sortType] > b[sortType] ? 1 : -1)
+                );
+            });
+            return retVal;
+        });
+    }, [characters])
+
+    useEffect(() => {
+        setSortedCharacters(sortCharacters(preSorted[sortType]));
+    }, [preSorted, sortType, reverseSort, searchValue]);
 
     function sortCharacters(characters: Character[]): Character[] {
         let sortedCharacters: Character[] = characters;
@@ -57,9 +73,6 @@ export function TabCharacters(): JSX.Element {
                 (character.menuName.toLowerCase().includes(searchValue))
             );
         }
-        sortedCharacters = sortedCharacters.toSorted((a: Character, b: Character) =>
-            (a[sortTypes[sortType]] > b[sortTypes[sortType]] ? 1 : -1)
-        );
         if (reverseSort) {
             sortedCharacters.reverse();
         }
@@ -94,7 +107,7 @@ export function TabCharacters(): JSX.Element {
                             ]}
                             tooltips={[
                                 "Sort By: Internal Number",
-                                "Sort By: Franchise",
+                                "Sort By: Series",
                                 "Sort By: Alphabetical"
                             ]}
                             iconSize={"30px"}
@@ -136,11 +149,10 @@ export function TabCharacters(): JSX.Element {
                                     ) {
                                         return (
                                             <>
-                                                <tr>
-                                                    <th>
-                                                        {character.series.toUpperCase()}
-                                                    </th>
-                                                </tr>
+                                                <SeriesDisplay
+                                                    series={character.series}
+                                                    readCharacters={readCharacters}
+                                                />
                                                 {characterDisplay}
                                             </>
                                         );
@@ -262,20 +274,20 @@ function CharacterDisplay({
                     </div>
                     <div className={"character-display-actions"}>
                         <IconButton
-                            icon={"launch"}
+                            icon={"delete"}
+                            iconSize={"30px"}
+                            tooltip={"Delete Character"}
+                            onClick={async () => {
+                                await api.removeCharacter(character.name);
+                                readCharacters();
+                            }}
+                        />
+                        <IconButton
+                            icon={"drive_file_move"}
                             iconSize={"30px"}
                             tooltip={"Extract Character"}
                             onClick={() => {
                                 api.extractCharacter(character.name);
-                            }}
-                        />
-                        <IconButton
-                            icon={"delete"}
-                            iconSize={"30px"}
-                            tooltip={"Remove Character"}
-                            onClick={async () => {
-                                await api.removeCharacter(character.name);
-                                readCharacters();
                             }}
                         />
                         <ToggleIconButton
@@ -394,5 +406,32 @@ function AddAltButton({
                 readCharacters();
             }}
         />
+    );
+}
+
+function SeriesDisplay({
+    series,
+    readCharacters
+}: {
+    series: string,
+    readCharacters: () => Promise<void>
+}): JSX.Element {
+    return (
+        <tr>
+            <th className={"series-display-wrapper"}>
+                <div className={"series-display-name"}>
+                    <span>{series.toUpperCase()}</span>
+                </div>
+                <IconButton
+                    icon={"delete_sweep"}
+                    iconSize={"30px"}
+                    tooltip={"Delete All Characters In Series"}
+                    onClick={async () => {
+                        await api.removeSeries(series);
+                        readCharacters();
+                    }}
+                />
+            </th>
+        </tr>
     );
 }

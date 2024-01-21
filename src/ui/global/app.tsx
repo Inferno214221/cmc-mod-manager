@@ -99,7 +99,7 @@ export const OPEN_DIR: NavButtonInfo = {
 };
 export const RUN_GAME: NavButtonInfo = {
     displayName: "Run CMC+",
-    icon: "play_circle",
+    icon: "launch",
     function: () => {
         api.runGame();
     }
