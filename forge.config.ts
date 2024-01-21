@@ -39,7 +39,7 @@ const config: ForgeConfig = {
                 license: "GNU General Public License v3.0",
                 categories: ["Utility"],
                 icon: "./gb/icon.png",
-                version: "2.4.0",
+                version: "3.0.0",
             },
         },
         {
@@ -51,7 +51,7 @@ const config: ForgeConfig = {
                 license: "GNU General Public License v3.0",
                 categories: ["Utility"],
                 icon: "./gb/icon.png",
-                version: "2.4.0",
+                version: "3.0.0",
             },
         },
         // new MakerSquirrel({}),
