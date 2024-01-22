@@ -3,16 +3,16 @@ import "./characters.css";
 import IconButton from "../global/icon-button/icon-button";
 import ToggleIconButton from "../global/icon-button/toggle-icon-button";
 import CycleIconButton from "../global/icon-button/cycle-icon-button";
-import { Character, Alt, sortTypes, SortTypeOptions } from "../../interfaces";
+import { Character, Alt, sortTypes, SortTypeOptions, AppData } from "../../interfaces";
 
 export function TabCharacters(): JSX.Element {
     const [filterInstallation, setFilterInstallation]:
     [boolean, Dispatch<SetStateAction<boolean>>]
-    = useState(true);
+    = useState(null);
     
     const [updateCharacters, setUpdateCharacters]:
     [boolean, Dispatch<SetStateAction<boolean>>]
-    = useState(false);
+    = useState(null);
 
     const [characters, setCharacters]:
     [Character[], Dispatch<SetStateAction<Character[]>>]
@@ -44,10 +44,17 @@ export function TabCharacters(): JSX.Element {
 
     useEffect(() => {
         readCharacters();
+        readDefaultConfig();
     }, []);
 
     async function readCharacters(): Promise<void> {
         setCharacters(await api.readCharacters());
+    }
+
+    async function readDefaultConfig(): Promise<void> {
+        const data: AppData = await api.readAppData();
+        setFilterInstallation(data.config.filterCharacterInstallation);
+        setUpdateCharacters(data.config.updateCharacters);
     }
 
     useEffect(() => {
@@ -60,7 +67,7 @@ export function TabCharacters(): JSX.Element {
             });
             return retVal;
         });
-    }, [characters])
+    }, [characters]);
 
     useEffect(() => {
         setSortedCharacters(sortCharacters(preSorted[sortType]));
@@ -74,7 +81,7 @@ export function TabCharacters(): JSX.Element {
             );
         }
         if (reverseSort) {
-            sortedCharacters.reverse();
+            return sortedCharacters.toReversed();
         }
         return sortedCharacters;
     }
@@ -260,7 +267,7 @@ function CharacterDisplay({
         if (randomSelection == character.randomSelection) return;
         api.writeCharacterRandom(character.name, randomSelection);
         character.randomSelection = randomSelection;
-    }, [randomSelection])
+    }, [randomSelection]);
 
     return (
         <tr className={"character-display-row"}>

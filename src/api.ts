@@ -1,6 +1,6 @@
 import { ipcRenderer } from "electron"
 import {
-    CharacterList, CharacterDat, CssPage, CssData, Character, Download, Alt
+    CharacterList, CharacterDat, CssPage, CssData, Character, Download, Alt, AppData
 } from "./interfaces"
 
 export default {
@@ -186,4 +186,15 @@ export default {
         includeExtraFiles: boolean,
         ignoreSeries: boolean
     ]): Promise<void> => ipcRenderer.invoke("getCharacterRegExps", args),
+
+    readAppData:
+    (): Promise<AppData> => ipcRenderer.invoke("readAppData"),
+
+    writeAppData:
+    (...args: [
+        data: AppData
+    ]): Promise<void> => ipcRenderer.invoke("writeAppData", args),
+
+    isURIAssociated:
+    (): Promise<boolean> => ipcRenderer.invoke("isURIAssociated"),
 }

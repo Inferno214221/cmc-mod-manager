@@ -174,3 +174,17 @@ export enum DndDataType {
     cssCharacter = "cssCharacter",
     excludedCharacter = "excludedCharacter"
 }
+
+export interface AppConfig {
+    enableLogs: boolean,
+    altsAsCharacters: boolean,
+    useUnbinner: boolean,
+    moveBins: boolean,
+    filterCharacterInstallation: boolean,
+    updateCharacters: boolean
+}
+
+export interface AppData {
+    dir: string,
+    config: AppConfig
+}

@@ -13,7 +13,8 @@ import {
     PORT_CHARACTERS,
     STAGES,
     STAGE_SELECTION_SCREEN,
-    DOWNLOADS
+    DOWNLOADS,
+    SETTINGS
 } from "../global/app";
 
 const LICENSE: string = (
@@ -35,6 +36,18 @@ export async function AllowTabSwitchHome(): Promise<boolean> {
 }
 
 export function TabHome(): JSX.Element {
+    const [showDownloads, setShowDownloads]:
+    [boolean, Dispatch<SetStateAction<boolean>>]
+    = useState(false);
+
+    useEffect(() => {
+        checkURIAssociated();
+    }, []);
+
+    async function checkURIAssociated(): Promise<void> {
+        setShowDownloads(await api.isURIAssociated());
+    }
+
     return (
         <section>
             <div id={"about-div"} className={"vertical-outer-div"}>
@@ -89,40 +102,34 @@ export function TabHome(): JSX.Element {
                     {/* <div id={"tabs-scrollable"}> */}
                     <div className={"center"}>
                         <TabButton
-                            icon={"groups"}
-                            title={"Characters"}
-                            desc={"Install, extract or delete characters from CMC+."}
                             tab={CHARACTERS}
+                            desc={"Install, extract or delete characters from CMC+."}
                         />
                         <TabButton
-                            icon={"pan_tool_alt"}
-                            title={"Character Selection Screen"}
-                            desc={"Modify CMC+'s character selection screen."}
                             tab={CHARACTER_SELECTION_SCREEN}
+                            desc={"Modify CMC+'s character selection screen."}
                         />
                         <TabButton
-                            icon={"reduce_capacity"}
-                            title={"Port Characters"}
-                            desc={"Install characters from another version of CMC+."}
                             tab={PORT_CHARACTERS}
+                            desc={"Install characters from another version of CMC+."}
                         />
                         <TabButton
-                            icon={"terrain"}
-                            title={"Stages"}
-                            desc={"Install, extract or delete stages from CMC+."}
                             tab={STAGES}
+                            desc={"Install, extract or delete stages from CMC+."}
                         />
                         <TabButton
-                            icon={"location_pin"}
-                            title={"Stage Selection Screen"}
-                            desc={"Modify CMC+'s stage selection screen."}
                             tab={STAGE_SELECTION_SCREEN}
+                            desc={"Modify CMC+'s stage selection screen."}
                         />
+                        {showDownloads ?
+                            <TabButton
+                                tab={DOWNLOADS}
+                                desc={"View current downloads."}
+                            /> : null
+                        }
                         <TabButton
-                            icon={"download"}
-                            title={"Downloads"}
-                            desc={"View current downloads."}
-                            tab={DOWNLOADS}
+                            tab={SETTINGS}
+                            desc={"Configure the program and enable optional features."}
                         />
                     </div>
                     {/* </div> */}
@@ -215,24 +222,20 @@ function GameDirectoryActions(): JSX.Element {
 }
 
 function TabButton({
-    icon,
-    title,
-    desc,
-    tab
+    tab,
+    desc
 }: {
-    icon: string,
-    title: string,
-    desc: string,
-    tab: Tab
+    tab: Tab,
+    desc: string
 }): JSX.Element {
     return (
         <div className={"tab-button-wrapper"}>
             <button className={"tab-button"} onClick={() => {switchTabs(tab)}}>
                 <span className={"mat-icon tab-button-icon"} style={{ fontSize: "80px" }}>
-                    {icon}
+                    {tab.icon}
                 </span>
                 <p className={"tab-button-title"}>
-                    {title}
+                    {tab.displayName}
                 </p>
                 <p className={"tab-button-desc"}>
                     {desc}

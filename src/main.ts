@@ -11,7 +11,7 @@ import ini from "ini";
 import { execFile } from "child_process";
 import {
     Character, CharacterList, CharacterDat, CharacterPalette, CssPage, CssData, Download,
-    DownloadState, Alt
+    DownloadState, Alt, AppConfig, AppData
 } from "./interfaces";
 import request from "request";
 import http from "http";
@@ -193,6 +193,12 @@ function createHandlers(): void {
         event: IpcMainInvokeEvent,
         args: Parameters<typeof getCharacterRegExps>) => getCharacterRegExps(...args)
     );
+    ipcMain.handle("readAppData", readAppData);
+    ipcMain.handle("writeAppData", (
+        event: IpcMainInvokeEvent,
+        args: Parameters<typeof writeAppData>) => writeAppData(...args)
+    );
+    ipcMain.handle("isURIAssociated", isURIAssociated);
 }
 
 // const PROGRAM_DIR = app.getPath("userData");
@@ -249,11 +255,27 @@ const BLANK_CSS_PAGE_DATA: string = "\
 0000 0000 0000 0000 0000 0000 0000\r\n\
 0000 0000 0000 0000 0000 0000 0000 ";
 
+const DEFAULT_CONFIG: AppConfig = {
+    enableLogs: false,
+    altsAsCharacters: true,
+    useUnbinner: false,
+    moveBins: false,
+    filterCharacterInstallation: true,
+    updateCharacters: false
+};
+
 const DATA_FILE: string = path.join(app.getPath("userData"), "data.json");
 if (!fs.existsSync(DATA_FILE)) {
-    writeJSON(DATA_FILE, {
+    writeAppData({
         dir: "",
+        config: DEFAULT_CONFIG
     });
+} else {
+    const data: AppData = readAppData();
+    if (data.config == undefined) {
+        data.config = DEFAULT_CONFIG;
+    }
+    writeAppData(data);
 }
 
 let gameDir: string = readJSON(DATA_FILE).dir;
@@ -282,8 +304,18 @@ function readJSON(file: string): any {
     return JSON.parse(fs.readFileSync(file, "utf-8"));
 }
 
-function writeJSON(file: string, data: object): void {
+async function writeJSON(file: string, data: object): Promise<void> {
     fs.writeFileSync(file, JSON.stringify(data, null, 4), "utf-8");
+    return;
+}
+
+function readAppData(): AppData {
+    return readJSON(DATA_FILE);
+}
+
+async function writeAppData(data: AppData): Promise<void> {
+    await writeJSON(DATA_FILE, data);
+    return;
 }
 
 function getAllFiles(dirPath: string, arrayOfFiles?: string[]): string[] {
@@ -352,6 +384,10 @@ async function checkForUpdates(): Promise<void> {
         }
         handleURI(process.argv.find((arg: string) => arg.startsWith("cmcmm:")));
     });
+}
+
+function isURIAssociated(): boolean {
+    return (!app.isPackaged || app.isDefaultProtocolClient("cmcmm"));
 }
 
 async function handleURI(uri: string): Promise<void> {
@@ -484,9 +520,9 @@ async function selectGameDir(): Promise<string | null> {
         fs.chmod(file, 0o777);
     });
     gameDir = dir.filePaths[0];
-    const data: any = readJSON(DATA_FILE);
+    const data: AppData = readAppData();
     data.dir = gameDir;
-    writeJSON(DATA_FILE, data);
+    writeAppData(data);
     // log("Extract Archive - Return:", gameDir);
     return gameDir;
 }
@@ -686,11 +722,12 @@ async function ensureAltAccessible(alt: Alt, dir: string = gameDir): Promise<voi
     const characterList: CharacterList = readCharacterList(dir);
     if (characterList.getCharacterByName(alt.alt) != undefined) return;
 
+    const characterDat: CharacterDat = readCharacterDat(alt.alt, dir);
     const baseCharacter: Character = characterList.getCharacterByName(alt.base);
     characterList.addCharacter({
         name: alt.alt,
-        menuName: alt.menuName,
-        series: baseCharacter.series,
+        menuName: characterDat == null ? alt.menuName : characterDat.menuName,
+        series: characterDat == null ? baseCharacter.series : characterDat.series,
         randomSelection: true,
         cssNumber: characterList.getNextCssNumber(),
         alts: [],
@@ -732,8 +769,9 @@ function readCharacterDat(character: string, dir: string = gameDir): CharacterDa
 function readCharacterDatPath(
     datPath: string,
     character: string = path.parse(datPath).name
-): CharacterDat {
+): CharacterDat | null {
     // log("Read Character Dat Path - Start:", datPath, character);
+    if (!fs.existsSync(datPath)) return null;
     const characterDatTxt: string[] = fs.readFileSync(
         datPath,
         "ascii"

@@ -1,3 +1,4 @@
+import { Dispatch, SetStateAction, useState, useEffect } from "react";
 import { createRoot, Root } from "react-dom/client";
 import "./global.css";
 import {
@@ -12,6 +13,9 @@ import {
 import {
     TabDownloads, AllowTabSwitchDownloads
 } from "../downloads/downloads";
+import {
+    TabSettings
+} from "../settings/settings";
 
 let root: Root;
 let activeTab: Tab = null;
@@ -76,6 +80,13 @@ export const DOWNLOADS: Tab = {
     element: <TabDownloads/>,
     allowTabSwitch: AllowTabSwitchDownloads
 };
+export const SETTINGS: Tab = {
+    name: "settings",
+    displayName: "Settings",
+    icon: "settings",
+    element: <TabSettings/>,
+    allowTabSwitch: null
+};
 
 export interface NavButtonInfo {
     displayName: string,
@@ -125,6 +136,18 @@ export async function switchTabs(tab: Tab): Promise<void> {
 }
 
 export function Nav(): JSX.Element {
+    const [showDownloads, setShowDownloads]:
+    [boolean, Dispatch<SetStateAction<boolean>>]
+    = useState(false);
+
+    useEffect(() => {
+        checkURIAssociated();
+    }, []);
+
+    async function checkURIAssociated(): Promise<void> {
+        setShowDownloads(await api.isURIAssociated());
+    }
+
     return (
         <nav>
             <NavTab info={HOME}/>
@@ -135,8 +158,14 @@ export function Nav(): JSX.Element {
             <hr/>
             <NavTab info={STAGES}/>
             <NavTab info={STAGE_SELECTION_SCREEN}/>
+            {showDownloads ?
+                <>
+                    <hr/>
+                    <NavTab info={DOWNLOADS}/>
+                </> : null
+            }
             <hr/>
-            <NavTab info={DOWNLOADS}/>
+            <NavTab info={SETTINGS}/>
             <div className={"flex-fill"}/>
             <NavButton info={CHANGE_DIR}/>
             <NavButton info={OPEN_DIR}/>

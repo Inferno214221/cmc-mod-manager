@@ -17,7 +17,7 @@ export function TabDownloads(): JSX.Element {
 
     useEffect(() => {
         getDownloads();
-    }, [])
+    }, []);
 
     return (
         <section>
