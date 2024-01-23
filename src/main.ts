@@ -1,7 +1,4 @@
-import {
-    app, BrowserWindow, dialog, ipcMain, shell, protocol, ProtocolRequest, ProtocolResponse,
-    IpcMainInvokeEvent, OpenDialogReturnValue
-} from "electron";
+import { app, BrowserWindow, dialog, shell, OpenDialogReturnValue } from "electron";
 import fs from "fs-extra";
 import path from "path";
 import extract from "extract-zip";
@@ -18,190 +15,14 @@ import http from "http";
 import util from "util";
 import semver from "semver";
 
-declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
-declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
+let win: BrowserWindow = null;
 
 require.resolve("./unrar.wasm");
 const wasmBinary: Buffer = fs.readFileSync(path.join(__dirname, "unrar.wasm"));
 
-let mainWindow: BrowserWindow;
-
-function isNumber(num: string): boolean {
-    return /^\+?(0|[1-9]\d*)$/.test(num);
-}
-
-function createWindow(): void {
-    mainWindow = new BrowserWindow({
-        width: 1120,
-        height: 630,
-        minWidth: 810,
-        minHeight: 600,
-        webPreferences: {
-            preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
-        },
-        autoHideMenuBar: true,
-    });
-    mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
-
-    createHandlers();
-    protocol.registerFileProtocol("img", (
-        request: ProtocolRequest,
-        callback: (response: string | ProtocolResponse) => void
-    ) => {
-        const url: string = request.url.replace("img://", "");
-        return callback(url);
-    });
-
-    checkForUpdates();
-}
-
-if (require("electron-squirrel-startup")) {
-    app.quit();
-}
-
-app.on("ready", createWindow);
-
-app.on("window-all-closed", () => {
-    if (process.platform !== "darwin") {
-        app.quit();
-    }
+app.on("browser-window-created", (event: Event, window: BrowserWindow) => {
+    win = window;
 });
-
-app.on("activate", () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-        createWindow();
-    }
-});
-
-function createHandlers(): void {
-    ipcMain.handle("getGameDir", getGameDir);
-    ipcMain.handle("getExtractedDir", getExtractedDir);
-    ipcMain.handle("getDownloads", getDownloads);
-    ipcMain.handle("getGameVersion", (
-        event: IpcMainInvokeEvent,
-        args: Parameters<typeof getGameVersion>) => getGameVersion(...args)
-    );
-    ipcMain.handle("isValidGameDir", (
-        event: IpcMainInvokeEvent,
-        args: Parameters<typeof isValidGameDir>) => isValidGameDir(...args)
-    );
-    ipcMain.handle("selectGameDir", selectGameDir);
-    ipcMain.handle("openDir", (
-        event: IpcMainInvokeEvent,
-        args: Parameters<typeof openDir>) => openDir(...args)
-    );
-    ipcMain.handle("runGame", (
-        event: IpcMainInvokeEvent,
-        args: Parameters<typeof runGame>) => runGame(...args)
-    );
-    ipcMain.handle("pathJoin", (
-        event: IpcMainInvokeEvent,
-        args: Parameters<typeof path.join>) => path.join(...args)
-    );
-    ipcMain.handle("openExternal", (
-        event: IpcMainInvokeEvent,
-        args: Parameters<typeof shell.openExternal>) => shell.openExternal(...args)
-    );
-    ipcMain.handle("readCharacters", (
-        event: IpcMainInvokeEvent,
-        args: Parameters<typeof readCharacters>) => readCharacters(...args)
-    );
-    ipcMain.handle("readCharacterList", (
-        event: IpcMainInvokeEvent,
-        args: Parameters<typeof readCharacterList>) => readCharacterList(...args)
-    );
-    ipcMain.handle("writeCharacters", (event: IpcMainInvokeEvent,
-        args: Parameters<typeof writeCharacters>) => writeCharacters(...args)
-    );
-    ipcMain.handle("writeCharacterRandom", (
-        event: IpcMainInvokeEvent,
-        args: Parameters<typeof writeCharacterRandom>) => writeCharacterRandom(...args)
-    );
-    ipcMain.handle("readAlts", (
-        event: IpcMainInvokeEvent,
-        args: Parameters<typeof readAlts>) => readAlts(...args)
-    );
-    ipcMain.handle("writeAlts", (
-        event: IpcMainInvokeEvent,
-        args: Parameters<typeof writeAlts>) => writeAlts(...args)
-    );
-    ipcMain.handle("addAlt", (
-        event: IpcMainInvokeEvent,
-        args: Parameters<typeof addAlt>) => addAlt(...args)
-    );
-    ipcMain.handle("removeAlt", (
-        event: IpcMainInvokeEvent,
-        args: Parameters<typeof removeAlt>) => removeAlt(...args)
-    );
-    ipcMain.handle("installCharacterDir", (
-        event: IpcMainInvokeEvent,
-        args: Parameters<typeof installCharacterDir>) => installCharacterDir(...args)
-    );
-    ipcMain.handle("installCharacterArchive", (
-        event: IpcMainInvokeEvent,
-        args: Parameters<typeof installCharacterArchive>) => installCharacterArchive(...args)
-    );
-    ipcMain.handle("extractCharacter", (
-        event: IpcMainInvokeEvent,
-        args: Parameters<typeof extractCharacter>) => extractCharacter(...args)
-    );
-    ipcMain.handle("removeCharacter", (
-        event: IpcMainInvokeEvent,
-        args: Parameters<typeof removeCharacter>) => removeCharacter(...args)
-    );
-    ipcMain.handle("readCharacterDat", (
-        event: IpcMainInvokeEvent,
-        args: Parameters<typeof readCharacterDat>) => readCharacterDat(...args)
-    );
-    ipcMain.handle("readCharacterDatPath", (
-        event: IpcMainInvokeEvent,
-        args: Parameters<typeof readCharacterDatPath>) => readCharacterDatPath(...args)
-    );
-    ipcMain.handle("writeCharacterDat", (
-        event: IpcMainInvokeEvent,
-        args: Parameters<typeof writeCharacterDat>) => writeCharacterDat(...args)
-    );
-    ipcMain.handle("readCssPages", (
-        event: IpcMainInvokeEvent,
-        args: Parameters<typeof readCssPages>) => readCssPages(...args)
-    );
-    ipcMain.handle("writeCssPages", (
-        event: IpcMainInvokeEvent,
-        args: Parameters<typeof writeCssPages>) => writeCssPages(...args)
-    );
-    ipcMain.handle("addCssPage", (
-        event: IpcMainInvokeEvent,
-        args: Parameters<typeof addCssPage>) => addCssPage(...args)
-    );
-    ipcMain.handle("removeCssPage", (
-        event: IpcMainInvokeEvent,
-        args: Parameters<typeof removeCssPage>) => removeCssPage(...args)
-    );
-    ipcMain.handle("readCssData", (
-        event: IpcMainInvokeEvent,
-        args: Parameters<typeof readCssData>) => readCssData(...args)
-    );
-    ipcMain.handle("writeCssData", (
-        event: IpcMainInvokeEvent,
-        args: Parameters<typeof writeCssData>) => writeCssData(...args)
-    );
-    ipcMain.handle("removeSeries", (
-        event: IpcMainInvokeEvent,
-        args: Parameters<typeof removeSeries>) => removeSeries(...args)
-    );
-    ipcMain.handle("getCharacterRegExps", (
-        event: IpcMainInvokeEvent,
-        args: Parameters<typeof getCharacterRegExps>) => getCharacterRegExps(...args)
-    );
-    ipcMain.handle("readAppData", readAppData);
-    ipcMain.handle("writeAppData", (
-        event: IpcMainInvokeEvent,
-        args: Parameters<typeof writeAppData>) => writeAppData(...args)
-    );
-    ipcMain.handle("isURIAssociated", isURIAssociated);
-}
-
-// const PROGRAM_DIR = app.getPath("userData");
 
 const SUPPORTED_VERSIONS: string[] = [
     "CMC_v8",
@@ -285,6 +106,7 @@ const downloads: Download[] = [];
 const LOG_FILE: string = path.join(app.getPath("userData"), "log.txt");
 fs.ensureFileSync(LOG_FILE);
 
+
 function log(...objs: any[]): void {
     // return;
     console.log(...objs);
@@ -309,13 +131,17 @@ async function writeJSON(file: string, data: object): Promise<void> {
     return;
 }
 
-function readAppData(): AppData {
+export function readAppData(): AppData {
     return readJSON(DATA_FILE);
 }
 
-async function writeAppData(data: AppData): Promise<void> {
+export async function writeAppData(data: AppData): Promise<void> {
     await writeJSON(DATA_FILE, data);
     return;
+}
+
+function isNumber(num: string): boolean {
+    return /^\+?(0|[1-9]\d*)$/.test(num);
 }
 
 function getAllFiles(dirPath: string, arrayOfFiles?: string[]): string[] {
@@ -334,7 +160,7 @@ function getAllFiles(dirPath: string, arrayOfFiles?: string[]): string[] {
     return arrayOfFiles;
 }
 
-async function extractArchive(archive: string, destination: string): Promise<string> {
+export async function extractArchive(archive: string, destination: string): Promise<string> {
     // log("Extract Archive - Start:", archive, destination);
     const output: string = path.join(destination, path.parse(archive).name);
     switch (path.parse(archive).ext.toLowerCase()) {
@@ -368,7 +194,7 @@ async function extractArchive(archive: string, destination: string): Promise<str
     return output;
 }
 
-async function checkForUpdates(): Promise<void> {
+export async function checkForUpdates(): Promise<void> {
     const currentVersion: string = semver.clean(app.getVersion());
     // const currentVersion: string = semver.clean("v2.3.0");
     request.get("https://api.github.com/repos/Inferno214221/cmc-mod-manager/releases/latest", {
@@ -386,11 +212,11 @@ async function checkForUpdates(): Promise<void> {
     });
 }
 
-function isURIAssociated(): boolean {
+export function isURIAssociated(): boolean {
     return (!app.isPackaged || app.isDefaultProtocolClient("cmcmm"));
 }
 
-async function handleURI(uri: string): Promise<void> {
+export async function handleURI(uri: string): Promise<void> {
     if (uri == undefined || gameDir == null) {
         return;
     }
@@ -449,7 +275,7 @@ async function handleURI(uri: string): Promise<void> {
     // const output: string = await extractArchive(selected.filePaths[0], path.join(dir, "_temp"));
 }
 
-async function getDownloadInfo(uri: string, downloadId: number): Promise<void> {
+export async function getDownloadInfo(uri: string, downloadId: number): Promise<void> {
     const modId: string = uri.replace("cmcmm:", "").split(",")[2];
     if (uri.replace("cmcmm:", "").split(",")[2] == undefined) {
         //TODO:
@@ -470,19 +296,19 @@ async function getDownloadInfo(uri: string, downloadId: number): Promise<void> {
     return;
 }
 
-function getGameDir(): string {
+export function getGameDir(): string {
     return gameDir;
 }
 
-function getExtractedDir(): string {
+export function getExtractedDir(): string {
     return path.join(gameDir, "0extracted");
 }
 
-function getDownloads(): Download[] {
+export function getDownloads(): Download[] {
     return downloads;
 }
 
-function getGameVersion(
+export function getGameVersion(
     dir: string = gameDir,
     list: string[] = SUPPORTED_VERSIONS
 ): string | null {
@@ -497,13 +323,13 @@ function getGameVersion(
     return null;
 }
 
-async function isValidGameDir(dir: string = gameDir): Promise<boolean> {
+export async function isValidGameDir(dir: string = gameDir): Promise<boolean> {
     return (dir != null && getGameVersion(dir) != null);
 }
 
-async function selectGameDir(): Promise<string | null> {
+export async function selectGameDir(): Promise<string | null> {
     // log("Extract Archive - Start");
-    const dir: OpenDialogReturnValue = await dialog.showOpenDialog(mainWindow, {
+    const dir: OpenDialogReturnValue = await dialog.showOpenDialog(win, {
         properties: ["openDirectory"]
     });
     if (dir.canceled == true) {
@@ -527,12 +353,12 @@ async function selectGameDir(): Promise<string | null> {
     return gameDir;
 }
 
-async function openDir(dir: string): Promise<void> {
+export async function openDir(dir: string): Promise<void> {
     await shell.openPath(dir);
     return;
 }
 
-async function runGame(dir: string = gameDir): Promise<void> {
+export async function runGame(dir: string = gameDir): Promise<void> {
     execFile(path.join(dir, getGameVersion(gameDir) + ".exe"), {
         cwd: dir,
         windowsHide: true
@@ -540,11 +366,11 @@ async function runGame(dir: string = gameDir): Promise<void> {
     return;
 }
 
-function readCharacters(dir: string = gameDir): Character[] {
+export function readCharacters(dir: string = gameDir): Character[] {
     return readCharacterList(dir).getAllCharacters();
 }
 
-function readCharacterList(dir: string = gameDir): CharacterList {
+export function readCharacterList(dir: string = gameDir): CharacterList {
     // log("Read Character List - Start:", dir);
     const alts: Alt[] = readAlts(dir);
     const characters: CharacterList = new CharacterList();
@@ -580,7 +406,7 @@ function readCharacterList(dir: string = gameDir): CharacterList {
     return characters;
 }
 
-async function writeCharacters(
+export async function writeCharacters(
     characters: Character[],
     dir: string = gameDir
 ): Promise<void> {
@@ -601,7 +427,7 @@ async function writeCharacters(
     return;
 }
 
-async function writeCharacterRandom(
+export async function writeCharacterRandom(
     character: string,
     randomSelection: boolean,
     dir: string = gameDir
@@ -628,7 +454,7 @@ async function writeCharacterRandom(
     return;
 }
 
-function readAlts(dir: string = gameDir): Alt[] {
+export function readAlts(dir: string = gameDir): Alt[] {
     // log("Read Alts - Start:", dir);
     const altsTxt: string[] = fs.readFileSync(
         path.join(dir, "data", "alts.txt"),
@@ -650,7 +476,7 @@ function readAlts(dir: string = gameDir): Alt[] {
     return alts;
 }
 
-async function writeAlts(alts: Alt[], dir: string = gameDir): Promise<void> {
+export async function writeAlts(alts: Alt[], dir: string = gameDir): Promise<void> {
     // log("Write Alts - Start:", alts, dir);
     //TODO: verify alt numbers
     let output: string = alts.length + "\r\n";
@@ -672,7 +498,11 @@ async function writeAlts(alts: Alt[], dir: string = gameDir): Promise<void> {
     return;
 }
 
-async function addAlt(base: Character, newAlt: Character, dir: string = gameDir): Promise<void> {
+export async function addAlt(
+    base: Character,
+    newAlt: Character,
+    dir: string = gameDir
+): Promise<void> {
     // log("Add Alt - Start:", base, newAlt, dir);
     const alts: Alt[] = readAlts(dir);
     let altNumber: number = 1;
@@ -693,7 +523,7 @@ async function addAlt(base: Character, newAlt: Character, dir: string = gameDir)
     return;
 }
 
-async function removeAlt(
+export async function removeAlt(
     alt: Alt,
     ensureAccessible: boolean = true,
     dir: string = gameDir
@@ -717,7 +547,7 @@ async function removeAlt(
     return;
 }
 
-async function ensureAltAccessible(alt: Alt, dir: string = gameDir): Promise<void> {
+export async function ensureAltAccessible(alt: Alt, dir: string = gameDir): Promise<void> {
     // log("Ensure Alt Accessible - Start:", alt, dir);
     const characterList: CharacterList = readCharacterList(dir);
     if (characterList.getCharacterByName(alt.alt) != undefined) return;
@@ -739,7 +569,7 @@ async function ensureAltAccessible(alt: Alt, dir: string = gameDir): Promise<voi
     return;
 }
 
-async function removeAllAlts(character: Character, dir: string = gameDir): Promise<void> {
+export async function removeAllAlts(character: Character, dir: string = gameDir): Promise<void> {
     // log("Remove All Alts - Start:", character, dir);
     // remove each of character's alts
     while (character.alts.length > 0) {
@@ -762,11 +592,11 @@ async function removeAllAlts(character: Character, dir: string = gameDir): Promi
     return;
 }
 
-function readCharacterDat(character: string, dir: string = gameDir): CharacterDat {
+export function readCharacterDat(character: string, dir: string = gameDir): CharacterDat {
     return readCharacterDatPath(path.join(dir, "data", "dats", character + ".dat"), character);
 }
 
-function readCharacterDatPath(
+export function readCharacterDatPath(
     datPath: string,
     character: string = path.parse(datPath).name
 ): CharacterDat | null {
@@ -855,7 +685,7 @@ function readCharacterDatPath(
     return characterDat;
 }
 
-async function writeCharacterDat(dat: CharacterDat, destination: string): Promise<void> {
+export async function writeCharacterDat(dat: CharacterDat, destination: string): Promise<void> {
     // log("Write Character Dat - Start:", dat, destination);
     let output: string = [
         dat.displayName,
@@ -889,13 +719,13 @@ async function writeCharacterDat(dat: CharacterDat, destination: string): Promis
     return;
 }
 
-async function installCharacterDir(
+export async function installCharacterDir(
     filterInstallation: boolean,
     updateCharacters: boolean,
     dir: string = gameDir
 ): Promise<void> {
     // log("Install Character Dir - Start:", filterInstallation, updateCharacters, dir);
-    const selected: OpenDialogReturnValue = await dialog.showOpenDialog(mainWindow, {
+    const selected: OpenDialogReturnValue = await dialog.showOpenDialog(win, {
         properties: ["openDirectory"]
     });
     if (selected.canceled == true) {
@@ -907,13 +737,13 @@ async function installCharacterDir(
     return;
 }
 
-async function installCharacterArchive(
+export async function installCharacterArchive(
     filterInstallation: boolean,
     updateCharacters: boolean,
     dir: string = gameDir
 ): Promise<void> {
     // log("Install Character Arch - Start:", filterInstallation, updateCharacters, dir);
-    const selected: OpenDialogReturnValue = await dialog.showOpenDialog(mainWindow, {
+    const selected: OpenDialogReturnValue = await dialog.showOpenDialog(win, {
         properties: ["openFile"]
     });
     if (selected.canceled == true) {
@@ -929,7 +759,7 @@ async function installCharacterArchive(
     return;
 }
 
-async function installCharacter(
+export async function installCharacter(
     characterDir: string,
     filterInstallation: boolean = true,
     updateCharacters: boolean = false,
@@ -1035,7 +865,7 @@ async function installCharacter(
     return;
 }
 
-async function extractCharacter(extract: string, dir: string = gameDir): Promise<void> {
+export async function extractCharacter(extract: string, dir: string = gameDir): Promise<void> {
     // log("Extract Character - Start:", extract, dir);
     const toResolve: Promise<void>[] = [];
     const characters: Character[] = readCharacters(dir);
@@ -1073,7 +903,7 @@ async function extractCharacter(extract: string, dir: string = gameDir): Promise
     return;
 }
 
-async function removeCharacter(remove: string, dir: string = gameDir): Promise<void> {
+export async function removeCharacter(remove: string, dir: string = gameDir): Promise<void> {
     // log("Remove Character - Start:", remove, dir);
     const toResolve: Promise<void>[] = [];
     const character: Character = readCharacterList(dir).getCharacterByName(remove);
@@ -1107,11 +937,11 @@ async function removeCharacter(remove: string, dir: string = gameDir): Promise<v
     return;    
 }
 
-function escapeRegex(str: string): string {
+export function escapeRegex(str: string): string {
     return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-function getCharacterRegExps(
+export function getCharacterRegExps(
     characterDat: CharacterDat,
     includeExtraFiles: boolean,
     ignoreSeries: boolean = false
@@ -1132,7 +962,7 @@ function getCharacterRegExps(
     return files;
 }
 
-function getCharacterFiles(
+export function getCharacterFiles(
     dir: string,
     characterDat: CharacterDat,
     includeExtraFiles: boolean,
@@ -1170,7 +1000,7 @@ function getCharacterFiles(
     return validFiles;
 }
 
-function readCssPages(dir: string = gameDir): CssPage[] {
+export function readCssPages(dir: string = gameDir): CssPage[] {
     // log("Read CSS Pages - Start:", dir);
     const pages: CssPage[] = [];
     const gameSettings: any = ini.parse(fs.readFileSync(
@@ -1202,7 +1032,7 @@ function readCssPages(dir: string = gameDir): CssPage[] {
     return pages;
 }
 
-async function writeCssPages(pages: CssPage[], dir: string = gameDir): Promise<void> {
+export async function writeCssPages(pages: CssPage[], dir: string = gameDir): Promise<void> {
     // log("Write CSS Pages - Start:", pages, dir);
     let gameSettings: string[] = fs.readFileSync(
         path.join(dir, "data", "GAME_SETTINGS.txt"),
@@ -1242,7 +1072,7 @@ async function writeCssPages(pages: CssPage[], dir: string = gameDir): Promise<v
     return;
 }
 
-async function removeCssPage(page: CssPage, dir: string = gameDir): Promise<void> {
+export async function removeCssPage(page: CssPage, dir: string = gameDir): Promise<void> {
     // log("Remove CSS Page - Start:", page, dir);
     const pages: CssPage[] = readCssPages(dir).filter((i: CssPage) => i.path != page.path);
     fs.remove(page.path);
@@ -1251,7 +1081,7 @@ async function removeCssPage(page: CssPage, dir: string = gameDir): Promise<void
     return;
 }
 
-async function addCssPage(pageName: string, dir: string = gameDir): Promise<void> {
+export async function addCssPage(pageName: string, dir: string = gameDir): Promise<void> {
     // log("Add CSS Page - Start:", pageName, dir);
     pageName = pageName.replace(/'|"/g, "");
     const pagePath: string = path.join(
@@ -1271,7 +1101,7 @@ async function addCssPage(pageName: string, dir: string = gameDir): Promise<void
     return;
 }
 
-function readCssData(page: CssPage): CssData {
+export function readCssData(page: CssPage): CssData {
     // log("Read CSS Data - Start:", page);
     const cssFile: string[] = fs.readFileSync(page.path, "ascii").split(/\r?\n/);
     const css: CssData = cssFile.map((line: string) => line.split(" "));
@@ -1280,7 +1110,7 @@ function readCssData(page: CssPage): CssData {
     return css;
 }
 
-async function writeCssData(page: CssPage, data: CssData): Promise<void> {
+export async function writeCssData(page: CssPage, data: CssData): Promise<void> {
     // log("Write CSS Data - Start:", page, data);
     const output: string = data.map((row: string[]) => row.join(" ")).join("\r\n") + " ";
     fs.writeFileSync(
@@ -1292,7 +1122,10 @@ async function writeCssData(page: CssPage, data: CssData): Promise<void> {
     return;
 }
 
-async function removeCharacterCss(character: Character, dir: string = gameDir): Promise<void> {
+export async function removeCharacterCss(
+    character: Character,
+    dir: string = gameDir
+): Promise<void> {
     // log("Remove Character CSS - Start:", character, dir);
     const toResolve: Promise<void>[] = [];
     const cssPages: CssPage[] = readCssPages(dir);
@@ -1315,7 +1148,7 @@ async function removeCharacterCss(character: Character, dir: string = gameDir): 
     return;
 }
 
-async function removeSeries(series: string, dir: string = gameDir): Promise<void> {
+export async function removeSeries(series: string, dir: string = gameDir): Promise<void> {
     const charactersToRemove: Character[] = readCharacters(dir)
         .filter((character: Character) => character.series == series);
     const altsToRemove: Alt[] = [];

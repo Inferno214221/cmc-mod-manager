@@ -1,7 +1,48 @@
-import { ipcRenderer } from "electron"
+// import { ipcRenderer } from "electron";
+// import * as main from "./main";
+
+// require.resolve("./unrar.wasm");
+
+// const API: any = {};
+// Object.keys(main).forEach((func: keyof typeof import("./main")) => {
+//     /* eslint-disable import/namespace */
+//     if (typeof main[func] != "function") return;
+//     if (main[func].length == 0) {
+//         API[func] = (): Promise<ReturnType<typeof main[keyof typeof main]>> =>
+//             ipcRenderer.invoke(func);
+//         return;
+//     }
+//     API[func] = (
+//         ...args: Parameters<typeof main[keyof typeof main]>
+//     ): Promise<ReturnType<typeof main[keyof typeof main]>> =>
+//         ipcRenderer.invoke(func, args);
+// });
+
+// API.pathJoin = (
+//     args: any
+// ): any => ipcRenderer.invoke("pathJoin", args);
+
+// // API.pathJoin = (
+// //     args: Parameters<typeof path.join>
+// // ): Promise<ReturnType<typeof path.join>> => ipcRenderer.invoke("pathJoin", args);
+
+// API.openExternal = (
+//     args: any
+// ): any => ipcRenderer.invoke("openExternal", args);
+
+// // API.openExternal = (
+// //     args: Parameters<typeof import("electron").shell.openExternal>
+// // ): Promise<ReturnType<typeof import("electron").openExternal>> =>
+// //     ipcRenderer.invoke("openExternal", args);
+
+// export default API;
+
+import { ipcRenderer } from "electron";
 import {
     CharacterList, CharacterDat, CssPage, CssData, Character, Download, Alt, AppData
-} from "./interfaces"
+} from "./interfaces";
+
+// console.log(API);
 
 export default {
     getGameDir:
