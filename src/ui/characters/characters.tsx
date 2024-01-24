@@ -202,7 +202,7 @@ export function TabCharacters(): JSX.Element {
                         iconSize={"50px"}
                         tooltip={"Install Character From Archive"}
                         onClick={async () => {
-                            await api.installCharacterArchive(
+                            await api.installCharacterArch(
                                 filterInstallation,
                                 updateCharacters
                             );

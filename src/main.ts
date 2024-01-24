@@ -160,7 +160,7 @@ function getAllFiles(dirPath: string, arrayOfFiles?: string[]): string[] {
     return arrayOfFiles;
 }
 
-export async function extractArchive(archive: string, destination: string): Promise<string> {
+async function extractArchive(archive: string, destination: string): Promise<string> {
     // log("Extract Archive - Start:", archive, destination);
     const output: string = path.join(destination, path.parse(archive).name);
     switch (path.parse(archive).ext.toLowerCase()) {
@@ -937,7 +937,7 @@ export async function removeCharacter(remove: string, dir: string = gameDir): Pr
     return;    
 }
 
-export function escapeRegex(str: string): string {
+function escapeRegex(str: string): string {
     return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
