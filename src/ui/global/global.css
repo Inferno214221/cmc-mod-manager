@@ -80,7 +80,7 @@ nav hr {
     border-width: 1px;
     border-style: solid;
     border-radius: 5px;
-    margin: 5px 5px 0px;
+    margin: 0px 5px;
 }
 
 @font-face {
@@ -204,6 +204,22 @@ table {
 
 label {
     color: white;
+}
+
+h1,
+h2 {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+h1 {
+    font-size: 30px;
+    margin: 0px;
+}
+
+h2 {
+    font-size: 20px;
+    margin: 0px;
 }
 
 .flex-fill {

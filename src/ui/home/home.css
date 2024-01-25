@@ -53,20 +53,12 @@
     margin-bottom: -12px;
 }
 
-h1,
-h2 {
-    display: inline-block;
-    vertical-align: middle;
-}
-
-h1 {
-    font-size: 30px;
-    margin: 0px 0px 0px 5px;
-}
-
-h2 {
-    font-size: 20px;
+#about-div h2 {
     margin: 0px 0px 0px 10px;
+}
+
+#about-div h1 {
+    margin: 0px 0px 0px 5px;
 }
 
 .margin-vertical {
