@@ -373,7 +373,7 @@ export function readCharacters(dir: string = gameDir): Character[] {
 }
 
 export function readCharacterList(dir: string = gameDir): CharacterList {
-    log("Read Character List - Start:", dir);
+    // log("Read Character List - Start:", dir);
     const alts: Alt[] = readAlts(dir);
     const characters: CharacterList = new CharacterList();
     const charactersTxt: string[] = fs.readFileSync(
@@ -404,7 +404,7 @@ export function readCharacterList(dir: string = gameDir): CharacterList {
         if (locked == "") return;
         characters.updateCharacterByName(locked, { randomSelection: false });
     });
-    log("Read Character List - Return:", characters);
+    // log("Read Character List - Return:", characters);
     return characters;
 }
 
@@ -506,6 +506,7 @@ export async function addAlt(
     dir: string = gameDir
 ): Promise<void> {
     log("Add Alt - Start:", base, newAlt, dir);
+    const toResolve: Promise<void>[] = [];
     const alts: Alt[] = readAlts(dir);
     let altNumber: number = 1;
     alts.filter((alt: Alt) => alt.base == base.name).forEach((alt: Alt) => {
@@ -521,7 +522,16 @@ export async function addAlt(
         mug: newAlt.mug
     });
     await writeAlts(alts, dir);
-    log("Add Alt - Return");
+    if (appData.config.altsAsCharacters) {
+        log("Add Alt - Return: Alt Remains A Character");
+        return;
+    }
+    const characterList: CharacterList = readCharacterList(dir);
+    characterList.removeCharacterByName(newAlt.name);
+    toResolve.push(writeCharacters(characterList.getAllCharacters(), dir));
+    toResolve.push(writeCharacterRandom(newAlt.name, true, dir));
+    await Promise.allSettled(toResolve);
+    log("Add Alt - Return: Alt Is No Longer A Character");
     return;
 }
 
@@ -543,16 +553,19 @@ export async function removeAlt(
     });
     await writeAlts(alts, dir);
     if (ensureAccessible) {
-        await ensureAltAccessible(alt, dir);
+        await ensureAltIsCharacter(alt, dir);
     }
     log("Remove Alt - Return");
     return;
 }
 
-export async function ensureAltAccessible(alt: Alt, dir: string = gameDir): Promise<void> {
-    log("Ensure Alt Accessible - Start:", alt, dir);
+export async function ensureAltIsCharacter(alt: Alt, dir: string = gameDir): Promise<void> {
+    log("Ensure Alt Is Character - Start:", alt, dir);
     const characterList: CharacterList = readCharacterList(dir);
-    if (characterList.getCharacterByName(alt.alt) != undefined) return;
+    if (characterList.getCharacterByName(alt.alt) != undefined) {
+        log("Ensure Alt Is Character - Exit: Character Already Exists");
+        return;
+    }
 
     const characterDat: CharacterDat = readCharacterDat(alt.alt, dir);
     const baseCharacter: Character = characterList.getCharacterByName(alt.base);
@@ -567,7 +580,41 @@ export async function ensureAltAccessible(alt: Alt, dir: string = gameDir): Prom
     });
 
     await writeCharacters(characterList.getAllCharacters(), dir);
-    log("Ensure Alt Accessible - Return");
+    log("Ensure Alt Is Character - Return");
+    return;
+}
+
+export async function ensureAltIsntCharacter(alt: Alt, dir: string = gameDir): Promise<void> {
+    log("Ensure Alt Isn't Character - Start:", alt, dir);
+    const toResolve: Promise<void>[] = [];
+    const characterList: CharacterList = readCharacterList(dir);
+    if (characterList.getCharacterByName(alt.alt) == undefined) {
+        log("Ensure Alt Isn't Character - Exit: No Character Found");
+        return;
+    }
+    characterList.removeCharacterByName(alt.alt);
+    toResolve.push(writeCharacters(characterList.getAllCharacters(), dir));
+    toResolve.push(writeCharacterRandom(alt.alt, true, dir));
+    await Promise.allSettled(toResolve);
+    log("Ensure Alt Isn't Character - Return");
+    return;
+}
+
+export async function ensureAllAltsAreCharacters(
+    areCharacters: boolean,
+    dir: string = gameDir
+): Promise<void> {
+    log("Ensure All Alts Are? Characters - Start:", dir);
+    const alts: Alt[] = readAlts(dir);
+    for (const alt of alts) {
+        console.log(alt);
+        if (areCharacters) {
+            await ensureAltIsCharacter(alt, dir);
+        } else {
+            await ensureAltIsntCharacter(alt, dir);
+        }
+    }
+    log("Ensure All Alts Are? Characters - Return");
     return;
 }
 
@@ -602,7 +649,7 @@ export function readCharacterDatPath(
     datPath: string,
     character: string = path.parse(datPath).name
 ): CharacterDat | null {
-    log("Read Character Dat Path - Start:", datPath, character);
+    // log("Read Character Dat Path - Start:", datPath, character);
     if (!fs.existsSync(datPath)) return null;
     const characterDatTxt: string[] = fs.readFileSync(
         datPath,
@@ -683,7 +730,7 @@ export function readCharacterDatPath(
         randomDatas: randomDatas,
         palettes: palettes
     };
-    log("Read Character Dat Path - Return:", characterDat);
+    // log("Read Character Dat Path - Return:", characterDat);
     return characterDat;
 }
 
@@ -1151,6 +1198,7 @@ export async function removeCharacterCss(
 }
 
 export async function removeSeries(series: string, dir: string = gameDir): Promise<void> {
+    log("Remove Series - Start:", series, dir);
     const charactersToRemove: Character[] = readCharacters(dir)
         .filter((character: Character) => character.series == series);
     const altsToRemove: Alt[] = [];
@@ -1169,5 +1217,6 @@ export async function removeSeries(series: string, dir: string = gameDir): Promi
         await removeCharacter(alt.alt, dir);
     }
     console.log(new Date().getTime());
+    log("Remove Series - Return");
     return;
 }

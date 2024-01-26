@@ -17,10 +17,20 @@ export default {
 
     checkForUpdates: ((): Promise<void> => ipcRenderer.invoke("checkForUpdates")),
 
-    ensureAltAccessible: ((...args: [
+    ensureAllAltsAreCharacters: ((...args: [
+        areCharacter: boolean,
+        dir?: string
+    ]): Promise<void> => ipcRenderer.invoke("ensureAllAltsAreCharacters", args)),
+
+    ensureAltIsCharacter: ((...args: [
         alt: Alt,
         dir?: string
-    ]): Promise<void> => ipcRenderer.invoke("ensureAltAccessible", args)),
+    ]): Promise<void> => ipcRenderer.invoke("ensureAltIsCharacter", args)),
+
+    ensureAltIsntCharacter: ((...args: [
+        alt: Alt,
+        dir?: string
+    ]): Promise<void> => ipcRenderer.invoke("ensureAltIsCharacter", args)),
 
     extractCharacter: ((...args: [
         extract: string,
