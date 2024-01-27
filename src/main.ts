@@ -8,7 +8,7 @@ import ini from "ini";
 import { execFile } from "child_process";
 import {
     Character, CharacterList, CharacterDat, CharacterPalette, CssPage, CssData, Download,
-    DownloadState, Alt, AppConfig, AppData
+    DownloadState, Alt, AppConfig, AppData, Stage, StageList
 } from "./interfaces";
 import request from "request";
 import http from "http";
@@ -82,7 +82,9 @@ const DEFAULT_CONFIG: AppConfig = {
     useUnbinner: false,
     moveBins: false,
     filterCharacterInstallation: true,
-    updateCharacters: false
+    updateCharacters: false,
+    filterStageInstallation: true,
+    updateStages: false
 };
 
 const DATA_FILE: string = path.join(app.getPath("userData"), "data.json");
@@ -143,7 +145,7 @@ export async function writeAppData(data: AppData): Promise<void> {
 }
 
 function isNumber(num: string): boolean {
-    return /^\+?(0|[1-9]\d*)$/.test(num);
+    return /^\d+$/.test(num);
 }
 
 function getAllFiles(dirPath: string, arrayOfFiles?: string[]): string[] {
@@ -372,10 +374,10 @@ export function readCharacters(dir: string = gameDir): Character[] {
     return readCharacterList(dir).getAllCharacters();
 }
 
-export function readCharacterList(dir: string = gameDir): CharacterList {
+function readCharacterList(dir: string = gameDir): CharacterList {
     // log("Read Character List - Start:", dir);
     const alts: Alt[] = readAlts(dir);
-    const characters: CharacterList = new CharacterList();
+    const characterList: CharacterList = new CharacterList();
     const charactersTxt: string[] = fs.readFileSync(
         path.join(dir, "data", "fighters.txt"),
         "ascii"
@@ -384,7 +386,7 @@ export function readCharacterList(dir: string = gameDir): CharacterList {
     charactersTxt.forEach((character: string, index: number) => {
         if (fs.existsSync(path.join(dir, "data", "dats", character + ".dat"))) {
             const characterDat: CharacterDat = readCharacterDat(character, dir);
-            characters.addCharacter({
+            characterList.addCharacter({
                 name: character,
                 menuName: characterDat.menuName,
                 series: characterDat.series,
@@ -402,10 +404,10 @@ export function readCharacterList(dir: string = gameDir): CharacterList {
     lockedTxt.shift();
     lockedTxt.forEach((locked: string) => {
         if (locked == "") return;
-        characters.updateCharacterByName(locked, { randomSelection: false });
+        characterList.updateCharacterByName(locked, { randomSelection: false });
     });
     // log("Read Character List - Return:", characters);
-    return characters;
+    return characterList;
 }
 
 export async function writeCharacters(
@@ -1218,5 +1220,68 @@ export async function removeSeries(series: string, dir: string = gameDir): Promi
     }
     console.log(new Date().getTime());
     log("Remove Series - Return");
+    return;
+}
+
+export function readStages(dir: string = gameDir): Stage[] {
+    return readStageList(dir).getAllStages();
+}
+
+function readStageList(dir: string = gameDir): StageList {
+    log("Read Stage List - Start:", dir);
+    const stageList: StageList = new StageList();
+    const stagesTxt: string[] = fs.readFileSync(
+        path.join(dir, "data", "stages.txt"),
+        "ascii"
+    ).split(/\r?\n/);
+    stagesTxt.shift(); // Drop the number
+    for (let stage: number = 0; stage < Math.floor(stagesTxt.length / 4); stage++) {
+        stageList.addStage({
+            name: stagesTxt[(stage * 4) + 0],
+            menuName: stagesTxt[(stage * 4) + 1],
+            source: stagesTxt[(stage * 4) + 2],
+            series: stagesTxt[(stage * 4) + 3].toLowerCase(),
+            randomSelection: true,
+            cssNumber: stage + 1,
+            icon: path.join(dir, "gfx", "stgicons", stagesTxt[(stage * 4) + 0] + ".png")
+        });
+    }
+    const lockedTxt: string[] = fs.readFileSync(
+        path.join(dir, "data", "stage_lock.txt"),
+        "ascii"
+    ).split(/\r?\n/);
+    lockedTxt.shift();
+    lockedTxt.forEach((locked: string) => {
+        if (locked == "") return;
+        stageList.updateStageByName(locked, { randomSelection: false });
+    });
+    log("Read Stage List - Return:", stageList);
+    return stageList;
+}
+
+export async function writeStageRandom(
+    stage: string,
+    randomSelection: boolean,
+    dir: string = gameDir
+): Promise<void> {
+    log("Write Stage Random - Start:", stage, randomSelection, dir);
+    let lockedTxt: string[] = fs.readFileSync(
+        path.join(dir, "data", "stage_lock.txt"),
+        "ascii"
+    ).split(/\r?\n/);
+    lockedTxt.shift();
+    if (randomSelection) {
+        lockedTxt = lockedTxt.filter((locked: string) => locked != stage);
+    } else {
+        lockedTxt.push(stage);
+    }
+    let output: string = lockedTxt.length + "\r\n";
+    output += lockedTxt.join("\r\n");
+    fs.writeFileSync(
+        path.join(dir, "data", "stage_lock.txt"),
+        output,
+        { encoding: "ascii" }
+    );
+    log("Write Stage Random - Return");
     return;
 }

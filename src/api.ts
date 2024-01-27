@@ -1,6 +1,6 @@
 import { ipcRenderer } from "electron";
 import {
-    CharacterList, CharacterDat, CssPage, CssData, Character, Download, Alt, AppData
+    Character, CharacterDat, CssPage, CssData, Download, Alt, AppData, Stage
 } from "./interfaces";
 
 export default {
@@ -125,10 +125,6 @@ export default {
         character?: string
     ]): Promise<CharacterDat | null> => ipcRenderer.invoke("readCharacterDatPath", args)),
 
-    readCharacterList: ((...args: [
-        dir?: string
-    ]): Promise<CharacterList> => ipcRenderer.invoke("readCharacterList", args)),
-
     readCharacters: ((...args: [
         dir?: string
     ]): Promise<Character[]> => ipcRenderer.invoke("readCharacters", args)),
@@ -140,6 +136,10 @@ export default {
     readCssPages: ((...args: [
         dir?: string
     ]): Promise<CssPage[]> => ipcRenderer.invoke("readCssPages", args)),
+
+    readStages: ((...args: [
+        dir?: string
+    ]): Promise<Stage[]> => ipcRenderer.invoke("readStages", args)),
 
     removeAllAlts: ((...args: [
         character: Character,
@@ -211,5 +211,11 @@ export default {
     writeCssPages: ((...args: [
         pages: CssPage[],
         dir?: string
-    ]): Promise<void> => ipcRenderer.invoke("writeCssPages", args))
+    ]): Promise<void> => ipcRenderer.invoke("writeCssPages", args)),
+
+    writeStageRandom: ((...args: [
+        stage: string,
+        randomSelection: boolean,
+        dir?: string
+    ]): Promise<void> => ipcRenderer.invoke("writeStageRandom", args))
 }

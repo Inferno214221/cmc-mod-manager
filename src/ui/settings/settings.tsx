@@ -11,10 +11,6 @@ export function TabSettings(): JSX.Element {
                         <p>E</p>
                         <h3>Include Alts As Characters (Toggle Button)</h3>
                         <p>E</p>
-                        <h3>Filter Character Installation Default Value (Toggle Button)</h3>
-                        <p>E</p>
-                        <h3>Update Characters Default Value (Toggle Button)</h3>
-                        <p>E</p>
                     </div>
                     <hr/>
                     <div className={"settings-group"}>

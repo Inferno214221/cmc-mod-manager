@@ -1,6 +1,6 @@
 @import "../global/global.css";
 
-#character-div {
+#stage-div {
     flex-grow: 1;
     min-height: 0px;
     /* padding: 5px;
@@ -27,28 +27,24 @@
     margin-top: -1px;
 }
 
-#character-search {
+#stage-search {
     width: 150px;
 }
 
-.character-display-wrapper,
-.character-display-alts {
+.stage-display-wrapper {
     display: inline-flex;
     height: 62px;
     width: 100%;
 }
 
-.character-display-mug,
-.alt-display-mug,
-.character-display-mug img,
-.alt-display-mug img {
+.stage-display-mug,
+.stage-display-mug img {
     width: 62px;
     height: 100%;
     display: inline;
 }
 
-.character-display-name,
-.alt-display-name {
+.stage-display-name {
     height: calc(100% - 20px);
     flex-grow: 1;
     padding: 10px;
@@ -56,17 +52,12 @@
     align-items: center;
 }
 
-.character-display-actions,
-.alt-display-actions {
+.stage-display-actions {
     width: fit-content;
     height: calc(100% - 10px);
     padding: 5px;
     display: inline-flex;
     align-items: center;
-}
-
-.alt-display-wrapper {
-    display: inline-flex;
 }
 
 .series-display-name {

@@ -86,6 +86,36 @@ export function TabCharacters(): JSX.Element {
         return sortedCharacters;
     }
 
+    useEffect(() => {
+        writeFilterInstallation();
+    }, [filterInstallation]);
+
+    async function writeFilterInstallation(): Promise<void> {
+        const appData: AppData = await api.readAppData();
+        if (
+            filterInstallation != null &&
+            appData.config.filterCharacterInstallation != filterInstallation
+        ) {
+            appData.config.filterCharacterInstallation = filterInstallation;
+            await api.writeAppData(appData);
+        }
+    }
+
+    useEffect(() => {
+        writeUpdateCharacters();
+    }, [updateCharacters]);
+
+    async function writeUpdateCharacters(): Promise<void> {
+        const appData: AppData = await api.readAppData();
+        if (
+            updateCharacters != null &&
+            appData.config.updateCharacters != updateCharacters
+        ) {
+            appData.config.updateCharacters = updateCharacters;
+            await api.writeAppData(appData);
+        }
+    }
+
     return (
         <section>
             <div id={"sort-div"}>

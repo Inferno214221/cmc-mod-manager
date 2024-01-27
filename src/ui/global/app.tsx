@@ -11,6 +11,9 @@ import {
     TabCharacterSelectionScreen
 } from "../character-selection-screen/character-selection-screen";
 import {
+    TabStages
+} from "../stages/stages";
+import {
     TabDownloads, AllowTabSwitchDownloads
 } from "../downloads/downloads";
 import {
@@ -63,7 +66,7 @@ export const STAGES: Tab = {
     name: "stages",
     displayName: "Stages",
     icon: "terrain",
-    element: <TabHome/>,
+    element: <TabStages/>,
     allowTabSwitch: null
 };
 export const STAGE_SELECTION_SCREEN: Tab = {

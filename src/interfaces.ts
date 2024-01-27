@@ -181,10 +181,112 @@ export interface AppConfig {
     useUnbinner: boolean,
     moveBins: boolean,
     filterCharacterInstallation: boolean,
-    updateCharacters: boolean
+    updateCharacters: boolean,
+    filterStageInstallation: boolean,
+    updateStages: boolean
 }
 
 export interface AppData {
     dir: string,
     config: AppConfig
+}
+
+export interface Stage {
+    name: string,
+    menuName: string,
+    source: string,
+    series: string,
+    randomSelection: boolean,
+    cssNumber: number,
+    icon: string
+}
+
+export interface StageUpdate {
+    name?: string,
+    menuName?: string,
+    source?: string,
+    series?: string,
+    randomSelection?: boolean,
+    cssNumber?: number,
+    icon?: string
+}
+
+export class StageList {
+    private stages: Stage[];
+    private stagesByName: { [name: string]: number };
+    private stagesByNum: { [cssNumber: number]: number };
+    
+    constructor(stages?: Stage[]) {
+        this.stages = stages || [];
+        this.indexAllStages();
+    }
+
+    private indexAllStages(): void {
+        this.stagesByName = {};
+        this.stagesByNum = {};
+        this.stages.forEach((stage: Stage, index: number) => {
+            this.stagesByName[stage.name] = index;
+            this.stagesByNum[stage.cssNumber] = index;
+        });
+    }
+
+    getAllStages(): Stage[] {
+        return this.stages;
+    }
+
+    getNextCssNumber(): number {
+        return this.stages.length + 1;
+    }
+
+    addStage(stage: Stage): void {
+        const index: number = this.stages.push(stage) - 1;
+        this.stagesByName[stage.name] = index;
+        this.stagesByNum[stage.cssNumber] = index;
+    }
+
+    getStageByName(name: string): Stage {
+        return this.stages[this.stagesByName[name]];
+    }
+
+    setStageByName(name: string, stage: Stage): void {
+        this.stages[this.stagesByName[name]] = stage;
+    }
+
+    updateStageByName(name: string, update: StageUpdate): void {
+        Object.assign(this.stages[this.stagesByName[name]], update);
+    }
+
+    removeStageByName(name: string): void {
+        const remove: Stage = this.getStageByName(name);
+        this.stages.splice(this.stagesByName[name], 1);
+        for (const stage of this.stages) {
+            if (stage.cssNumber > remove.cssNumber) {
+                stage.cssNumber--;
+            }
+        }
+        this.indexAllStages();
+    }
+
+    getStageByNum(cssNumber: number): Stage {
+        return this.stages[this.stagesByNum[cssNumber]];
+    }
+
+    setStageByNum(cssNumber: number, stage: Stage): void {
+        this.stages[this.stagesByNum[cssNumber]] = stage;
+    }
+
+    updateStageByNum(cssNumber: number, update: StageUpdate): void {
+        Object.assign(this.stages[this.stagesByNum[cssNumber]], update);
+    }
+
+    removeStageByNum(cssNumber: number): void {
+        const remove: Stage = this.getStageByNum(cssNumber);
+        this.stages.splice(this.stagesByNum[cssNumber], 1);
+        for (const stage of this.stages) {
+            if (stage.cssNumber > remove.cssNumber) {
+                stage.cssNumber--;
+            }
+        }
+        this.indexAllStages();
+    }
 }
