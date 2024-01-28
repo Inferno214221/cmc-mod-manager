@@ -70,6 +70,15 @@ EXTRA_CHARACTER_FILES.push(...[
     "gfx/portrait_new/<fighter>_<palette>.png",
 ]);
 
+const STAGE_FILES: string[] = [
+    "stage/<stage>.bin",
+    "stage/<stage>/<any>",
+    "music/stage/<stage>/<any>",
+    "gfx/stgicons/<stage>.png",
+    "gfx/stgprevs/<stage>.png",
+    "gfx/seriesicon/<series>.png",
+];
+
 const BLANK_CSS_PAGE_DATA: string = "\
 0000 0000 0000 0000 0000 0000 0000\r\n\
 0000 0000 0000 0000 0000 0000 0000\r\n\
@@ -873,7 +882,7 @@ export async function installCharacter(
     }
 
     if (filterInstallation) {
-        getCharacterFiles(correctedDir, characterDat, false, false).forEach((file: string) => {
+        getCharacterFiles(characterDat, false, false, correctedDir).forEach((file: string) => {
             const filePath: string = path.join(correctedDir, file);
             const targetPath: string = path.join(dir, file);
             fs.ensureDirSync(path.parse(targetPath).dir);
@@ -930,7 +939,7 @@ export async function extractCharacter(extract: string, dir: string = gameDir): 
     });
     
     console.log(new Date().getTime());
-    getCharacterFiles(dir, characterDat, true, false, similarNames).forEach((file: string) => {
+    getCharacterFiles(characterDat, true, false, dir, similarNames).forEach((file: string) => {
         const filePath: string = path.join(dir, file);
         const targetPath: string = path.join(extractDir, file);
         fs.ensureDirSync(path.parse(targetPath).dir);
@@ -970,7 +979,7 @@ export async function removeCharacter(remove: string, dir: string = gameDir): Pr
     });
 
     console.log(new Date().getTime());
-    getCharacterFiles(dir, characterDat, true, true, similarNames).forEach((file: string) => {
+    getCharacterFiles(characterDat, true, true, dir, similarNames).forEach((file: string) => {
         const filePath: string = path.join(dir, file);
         log("Removing: " + filePath);
         toResolve.push(
@@ -997,7 +1006,7 @@ export function getCharacterRegExps(
     includeExtraFiles: boolean,
     ignoreSeries: boolean = false
 ): RegExp[] {
-    log("Filter Character Files - Start:", characterDat, includeExtraFiles, ignoreSeries);
+    log("Get Character RegExps - Start:", characterDat, includeExtraFiles, ignoreSeries);
     const files: RegExp[] = [];
     (includeExtraFiles ? EXTRA_CHARACTER_FILES : CHARACTER_FILES).forEach((file: string) => {
         let wipString: string = file.replaceAll("<fighter>", characterDat.name);
@@ -1009,24 +1018,21 @@ export function getCharacterRegExps(
         wipString = wipString.replaceAll("<any>", "[^\\/\\\\]+");
         files.push(new RegExp(wipString, "gm"));
     });
-    log("Filter Character Files - Return:", files);
+    log("Get Character RegExps - Return:", files);
     return files;
 }
 
 export function getCharacterFiles(
-    dir: string,
     characterDat: CharacterDat,
     includeExtraFiles: boolean,
     ignoreSeries: boolean,
+    dir: string = gameDir,
     similarNames: string[] = []
 ): string[] {
+    log("Get Character Files - Start:",
+        dir, characterDat, includeExtraFiles, ignoreSeries, similarNames);
     const characterFiles: string[] = getAllFiles(dir)
         .map((file: string) => path.posix.relative(dir, file));
-    // (includeExtraFiles ? EXTRA_CHARACTER_FILES : CHARACTER_FILES).forEach((file: string) => {
-    //     if (!/.*\.[^/\\]+$/.test(file) && fs.existsSync(path.join(dir, file))) {
-    //         //
-    //     }
-    // });
     let characterFilesString: string = characterFiles.join("\n");
     const validFiles: string[] = [];
     getCharacterRegExps(characterDat, includeExtraFiles, ignoreSeries).forEach((exp: RegExp) => {
@@ -1047,7 +1053,7 @@ export function getCharacterFiles(
                 }
             });
     });
-    console.log(validFiles);
+    log("Get Character Files - Return:", validFiles);
     return validFiles;
 }
 
@@ -1199,7 +1205,7 @@ export async function removeCharacterCss(
     return;
 }
 
-export async function removeSeries(series: string, dir: string = gameDir): Promise<void> {
+export async function removeSeriesCharacters(series: string, dir: string = gameDir): Promise<void> {
     log("Remove Series - Start:", series, dir);
     const charactersToRemove: Character[] = readCharacters(dir)
         .filter((character: Character) => character.series == series);
@@ -1283,5 +1289,128 @@ export async function writeStageRandom(
         { encoding: "ascii" }
     );
     log("Write Stage Random - Return");
+    return;
+}
+
+export function getStageRegExps(
+    stage: Stage,
+    ignoreSeries: boolean = false
+): RegExp[] {
+    log("Get Stage RegExps - Start:", stage, ignoreSeries);
+    const files: RegExp[] = [];
+    STAGE_FILES.forEach((file: string) => {
+        let wipString: string = file.replaceAll("<stage>", stage.name);
+        if (!ignoreSeries) wipString = wipString.replaceAll("<series>", stage.series);
+        wipString = escapeRegex(wipString);
+        wipString += "$";
+        wipString = wipString.replaceAll("<any>", "[^\\/\\\\]+");
+        files.push(new RegExp(wipString, "gm"));
+    });
+    log("Get Stage RegExps - Return:", files);
+    return files;
+}
+
+export function getStageFiles(
+    stage: Stage,
+    ignoreSeries: boolean,
+    dir: string = gameDir,
+    similarNames: string[] = []
+): string[] {
+    log("Get Stage Files - Start:", dir, stage, ignoreSeries, similarNames);
+    const stageFiles: string[] = getAllFiles(dir)
+        .map((file: string) => path.posix.relative(dir, file));
+    let stageFilesString: string = stageFiles.join("\n");
+    const validFiles: string[] = [];
+    getStageRegExps(stage, ignoreSeries).forEach((exp: RegExp) => {
+        // console.log(exp);
+        for (const match of stageFilesString.matchAll(exp)) {
+            // console.log(match);
+            validFiles.push(match[0]);
+            stageFiles.splice(stageFiles.indexOf(match[0]), 1);
+        }
+        stageFilesString = stageFiles.join("\n");
+    });
+    const stageList: StageList = readStageList(dir);
+    similarNames.forEach((name: string) => {
+        const validFilesString: string = validFiles.join("\n");
+        getStageRegExps(stageList.getStageByName(name), ignoreSeries)
+            .forEach((exp: RegExp) => {
+                for (const match of validFilesString.matchAll(exp)) {
+                    validFiles.splice(validFiles.indexOf(match[0]), 1);
+                }
+            });
+    });
+    log("Get Stage Files - Return:", validFiles);
+    return validFiles;
+}
+
+export async function extractStage(extract: string, dir: string = gameDir): Promise<void> {
+    log("Extract Stage - Start:", extract, dir);
+    const toResolve: Promise<void>[] = [];
+    const stageList: StageList = readStageList(dir);
+    const similarNames: string[] = [];
+    const stage: Stage = stageList.getStageByName(extract);
+    const extractDir: string = path.join(dir, "0extracted", extract);
+    stageList.getAllStages().forEach((stage: Stage) => {
+        if (stage.name.includes(extract) && stage.name != extract) {
+            similarNames.push(stage.name);
+        }
+    });
+    
+    console.log(new Date().getTime());
+    getStageFiles(stage, false, dir, similarNames).forEach((file: string) => {
+        const filePath: string = path.join(dir, file);
+        const targetPath: string = path.join(extractDir, file);
+        fs.ensureDirSync(path.parse(targetPath).dir);
+        log("Extracting: " + filePath);
+        toResolve.push(
+            fs.copy(
+                filePath,
+                targetPath,
+                { overwrite: true }
+            )
+        );
+    });
+    console.log(new Date().getTime());
+
+    //TODO: create a stage dat format for mod manager only
+    // toResolve.push(writeCharacterDat(
+    //     characterDat,
+    //     path.join(extractDir, "data", "dats")
+    // ));
+    await Promise.allSettled(toResolve);
+    log("Extract Stage - Return");
+    return;
+}
+
+export async function removeStage(remove: string, dir: string = gameDir): Promise<void> {
+    log("Remove Stage - Start:", remove, dir);
+    const toResolve: Promise<void>[] = [];
+    const stageList: StageList = readStageList(dir);
+    const stage: Stage = stageList.getStageByName(remove);
+
+    const similarNames: string[] = [];
+    stageList.getAllStages().forEach((stage: Stage) => {
+        if (stage.name.startsWith(remove) && stage.name != remove) {
+            similarNames.push(stage.name);
+        }
+    });
+
+    console.log(new Date().getTime());
+    getStageFiles(stage, true, dir, similarNames).forEach((file: string) => {
+        const filePath: string = path.join(dir, file);
+        log("Removing: " + filePath);
+        toResolve.push(
+            fs.remove(filePath)
+        );
+    });
+    console.log(new Date().getTime());
+    
+    stageList.removeStageByName(remove);
+    // toResolve.push(writeStages(stageList.getAllStages(), dir)); //TODO:
+    // toResolve.push(removeStageSss(stage, dir)); //TODO:
+    toResolve.push(writeStageRandom(stage.name, true, dir));
+    await Promise.allSettled(toResolve);
+    log("Remove Stage - Return");
     return;
 }

@@ -247,10 +247,23 @@ export function TabCharacters(): JSX.Element {
                             api.openDir(await api.getExtractedDir());
                         }}
                     />
-                    {/* <IconButton
+                    <hr className={"vr"}/>
+                    <IconButton
                         icon={"delete_sweep"}
                         iconSize={"50px"}
                         tooltip={"Remove All Characters"}
+                        onClick={() => {console.log("a")}}
+                    />
+                    <IconButton
+                        icon={"drive_file_move"}
+                        iconSize={"50px"}
+                        tooltip={"Extract All Characters"}
+                        onClick={() => {console.log("a")}}
+                    />
+                    {/* <IconButton
+                        icon={"folder_zip"}
+                        iconSize={"50px"}
+                        tooltip={"Unbin All Characters"}
                         onClick={() => {console.log("a")}}
                     /> */}
                     <hr className={"vr"}/>
@@ -464,7 +477,7 @@ function SeriesDisplay({
                     iconSize={"30px"}
                     tooltip={"Delete All Characters In Series"}
                     onClick={async () => {
-                        await api.removeSeries(series);
+                        await api.removeSeriesCharacters(series);
                         readCharacters();
                     }}
                 />

@@ -38,10 +38,10 @@ export default {
     ]): Promise<void> => ipcRenderer.invoke("extractCharacter", args)),
 
     getCharacterFiles: ((...args: [
-        dir: string,
         characterDat: CharacterDat,
         includeExtraFiles: boolean,
         ignoreSeries: boolean,
+        dir?: string,
         similarNames?: string[]
     ]): Promise<string[]> => ipcRenderer.invoke("getCharacterFiles", args)),
 
@@ -66,6 +66,18 @@ export default {
         dir?: string,
         list?: string[]
     ]): Promise<string | null> => ipcRenderer.invoke("getGameVersion", args)),
+
+    getStageFiles: ((...args: [
+        stage: Stage,
+        ignoreSeries: boolean,
+        dir?: string,
+        similarName?: string[]
+    ]): Promise<string[]> => ipcRenderer.invoke("getStageFiles", args)),
+
+    getStageRegExps: ((...args: [
+        stage: Stage,
+        ignoreSeries?: boolean
+    ]): Promise<RegExp[]> => ipcRenderer.invoke("getStageRegExps", args)),
 
     handleURI: ((... args: [
         uri: string
@@ -167,10 +179,10 @@ export default {
         dir?: string
     ]): Promise<void> => ipcRenderer.invoke("removeCssPage", args)),
 
-    removeSeries: ((...args: [
+    removeSeriesCharacters: ((...args: [
         series: string,
         dir?: string
-    ]): Promise<void> => ipcRenderer.invoke("removeSeries", args)),
+    ]): Promise<void> => ipcRenderer.invoke("removeSeriesCharacters", args)),
 
     runGame: ((...args: [
         dir?: string
