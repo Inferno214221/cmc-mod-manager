@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useState, useEffect } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import "./home.css";
 import cmcmm from "../../assets/icon.png";
 import pfp from "../../assets/pfp.png";
@@ -6,15 +6,15 @@ import gh from "../../assets/github.png";
 import gb from "../../assets/gb.png";
 import IconButton from "../global/icon-button/icon-button";
 import {
-    Tab,
-    switchTabs,
     CHARACTERS,
     CHARACTER_SELECTION_SCREEN,
+    DOWNLOADS,
     PORT_CHARACTERS,
+    SETTINGS,
     STAGES,
     STAGE_SELECTION_SCREEN,
-    DOWNLOADS,
-    SETTINGS
+    Tab,
+    switchTabs
 } from "../global/app";
 
 const LICENSE: string = (

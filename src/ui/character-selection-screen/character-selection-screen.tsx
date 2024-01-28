@@ -1,10 +1,10 @@
-import { Dispatch, SetStateAction, useState, useEffect } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import "./character-selection-screen.css";
 import IconButton from "../global/icon-button/icon-button";
 import ToggleIconButton from "../global/icon-button/toggle-icon-button";
 import CycleIconButton from "../global/icon-button/cycle-icon-button";
 import {
-    Character, CharacterList, CssPage, CssData, DndData, DndDataType, sortTypes, SortTypeOptions
+    Character, CharacterList, CssData, CssPage, DndData, DndDataType, SortTypeOptions, sortTypes
 } from "../../interfaces";
 
 export function TabCharacterSelectionScreen(): JSX.Element {

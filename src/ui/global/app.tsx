@@ -1,8 +1,8 @@
-import { Dispatch, SetStateAction, useState, useEffect } from "react";
-import { createRoot, Root } from "react-dom/client";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Root, createRoot } from "react-dom/client";
 import "./global.css";
 import {
-    TabHome, AllowTabSwitchHome
+    AllowTabSwitchHome, TabHome
 } from "../home/home";
 import {
     TabCharacters
@@ -14,7 +14,7 @@ import {
     TabStages
 } from "../stages/stages";
 import {
-    TabDownloads, AllowTabSwitchDownloads
+    AllowTabSwitchDownloads, TabDownloads
 } from "../downloads/downloads";
 import {
     TabSettings

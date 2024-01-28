@@ -1,9 +1,9 @@
-import { Dispatch, SetStateAction, useState, useEffect } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import "./stages.css";
 import IconButton from "../global/icon-button/icon-button";
 import ToggleIconButton from "../global/icon-button/toggle-icon-button";
 import CycleIconButton from "../global/icon-button/cycle-icon-button";
-import { Stage, sortTypes, SortTypeOptions, AppData } from "../../interfaces";
+import { AppData, SortTypeOptions, Stage, sortTypes } from "../../interfaces";
 
 export function TabStages(): JSX.Element {
     const [filterInstallation, setFilterInstallation]:

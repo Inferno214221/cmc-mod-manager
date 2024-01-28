@@ -1,9 +1,9 @@
-import { Dispatch, SetStateAction, useState, useEffect } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import "./characters.css";
 import IconButton from "../global/icon-button/icon-button";
 import ToggleIconButton from "../global/icon-button/toggle-icon-button";
 import CycleIconButton from "../global/icon-button/cycle-icon-button";
-import { Character, Alt, sortTypes, SortTypeOptions, AppData } from "../../interfaces";
+import { Alt, AppData, Character, SortTypeOptions, sortTypes } from "../../interfaces";
 
 export function TabCharacters(): JSX.Element {
     const [filterInstallation, setFilterInstallation]:

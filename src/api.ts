@@ -1,6 +1,6 @@
 import { ipcRenderer } from "electron";
 import {
-    Character, CharacterDat, CssPage, CssData, Download, Alt, AppData, Stage
+    Alt, AppData, Character, CharacterDat, CssData, CssPage, Download, Stage
 } from "./interfaces";
 
 export default {
