@@ -37,6 +37,11 @@ export default {
         dir?: string
     ]): Promise<void> => ipcRenderer.invoke("extractCharacter", args)),
 
+    extractStage: ((...args: [
+        extract: string,
+        dir?: string
+    ]): Promise<void> => ipcRenderer.invoke("extractStage", args)),
+
     getCharacterFiles: ((...args: [
         characterDat: CharacterDat,
         includeExtraFiles: boolean,
@@ -183,6 +188,11 @@ export default {
         series: string,
         dir?: string
     ]): Promise<void> => ipcRenderer.invoke("removeSeriesCharacters", args)),
+
+    removeStage: ((...args: [
+        remove: string,
+        dir?: string
+    ]): Promise<void> => ipcRenderer.invoke("removeStage", args)),
 
     runGame: ((...args: [
         dir?: string

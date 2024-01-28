@@ -316,7 +316,7 @@ function StageDisplay({
                             iconSize={"30px"}
                             tooltip={"Delete Stage"}
                             onClick={async () => {
-                                // await api.removeStage(stage.name);
+                                await api.removeStage(stage.name);
                                 readStages();
                             }}
                         />
@@ -325,7 +325,7 @@ function StageDisplay({
                             iconSize={"30px"}
                             tooltip={"Extract Stage"}
                             onClick={() => {
-                                // api.extractStage(stage.name);
+                                api.extractStage(stage.name);
                             }}
                         />
                         <ToggleIconButton

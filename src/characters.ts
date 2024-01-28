@@ -177,16 +177,18 @@ export function readAlts(dir: string = global.gameDir): Alt[] {
 export async function writeAlts(alts: Alt[], dir: string = global.gameDir): Promise<void> {
     general.log("Write Alts - Start:", alts, dir);
     //TODO: verify alt numbers
-    let output: string = alts.length + "\r\n";
-    output += alts.map((alt: Alt) =>
-        [
-            alt.base,
-            alt.number,
-            alt.alt,
-            alt.menuName,
-            alt.battleName
-        ].join("\r\n")
-    ).join("\r\n");
+    const output: string = [
+        alts.length,
+        alts.map((alt: Alt) =>
+            [
+                alt.base,
+                alt.number,
+                alt.alt,
+                alt.menuName,
+                alt.battleName
+            ].join("\r\n")
+        ).join("\r\n")
+    ].join("\r\n");
     fs.writeFileSync(
         path.join(dir, "data", "alts.txt"),
         output,

@@ -58,6 +58,34 @@ function readStageList(dir: string = global.gameDir): StageList {
     return stageList;
 }
 
+export async function writeStages(
+    stages: Stage[],
+    dir: string = global.gameDir
+): Promise<void> {
+    general.log("Write Stage - Start:", stages, dir);
+    stages.sort((a: Stage, b: Stage) =>
+        (a.cssNumber > b.cssNumber ? 1 : -1)
+    );
+    const output: string = [
+        stages.length,
+        stages.map((stage: Stage) => 
+            [
+                stage.name,
+                stage.menuName,
+                stage.source,
+                stage.series
+            ].join("\r\n")
+        ).join("\r\n")
+    ].join("\r\n");
+    fs.writeFileSync(
+        path.join(dir, "data", "stages.txt"),
+        output,
+        { encoding: "ascii" }
+    );
+    general.log("Write Stages - Return");
+    return;
+}
+
 export async function writeStageRandom(
     stage: string,
     randomSelection: boolean,
@@ -171,6 +199,12 @@ export async function extractStage(extract: string, dir: string = global.gameDir
     //     characterDat,
     //     path.join(extractDir, "data", "dats")
     // ));
+    toResolve.push(fs.writeFile(
+        path.join(extractDir, "info.json"),
+        JSON.stringify([
+            stage.name, stage.menuName, stage.source, stage.series
+        ], null, 2)
+    ));
     await Promise.allSettled(toResolve);
     general.log("Extract Stage - Return");
     return;
@@ -200,7 +234,7 @@ export async function removeStage(remove: string, dir: string = global.gameDir):
     console.log(new Date().getTime());
     
     stageList.removeStageByName(remove);
-    // toResolve.push(writeStages(stageList.getAllStages(), dir)); //TODO:
+    toResolve.push(writeStages(stageList.getAllStages(), dir));
     // toResolve.push(removeStageSss(stage, dir)); //TODO:
     toResolve.push(writeStageRandom(stage.name, true, dir));
     await Promise.allSettled(toResolve);
