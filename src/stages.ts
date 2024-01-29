@@ -22,6 +22,15 @@ const STAGE_FILES: string[] = [
     "gfx/seriesicon/<series>.png",
 ];
 
+const BLANK_SSS_PAGE_DATA: SssData = [
+    [ "0000", "0000", "0000", "0000", "0000", "0000", "0000", "0000", "0000", "0000" ],
+    [ "0000", "0000", "0000", "0000", "0000", "0000", "0000", "0000", "0000", "0000" ],
+    [ "0000", "0000", "0000", "0000", "0000", "0000", "0000", "0000", "0000", "0000" ],
+    [ "0000", "0000", "0000", "0000", "0000", "0000", "0000", "0000", "0000", "0000" ],
+    [ "0000", "0000", "0000", "0000", "0000", "0000", "0000", "0000", "0000", "0000" ],
+    [ "0000", "0000", "0000", "0000", "0000", "0000", "0000", "0000", "0000", "9999" ],
+];
+
 export function readStages(dir: string = global.gameDir): Stage[] {
     return readStageList(dir).getAllStages();
 }
@@ -307,5 +316,42 @@ export async function removeStageSss(
     }
     await writeSssPages(sssPages, dir);
     general.log("Remove Stage SSS - Return");
+    return;
+}
+
+export async function removeSeriesStages(
+    series: string,
+    dir: string = global.gameDir
+): Promise<void> {
+    general.log("Remove Series Stages - Start:", series, dir);
+    const stagesToRemove: Stage[] = readStages(dir)
+        .filter((stage: Stage) => stage.series == series);
+    console.log(new Date().getTime());
+    for (const stage of stagesToRemove) {
+        console.log(stage);
+        await removeStage(stage.name, dir);
+    }
+    console.log(new Date().getTime());
+    general.log("Remove Series Stages - Return");
+    return;
+}
+
+export async function addSssPage(pageName: string, dir: string = global.gameDir): Promise<void> {
+    general.log("Add SSS Page - Start:", pageName, dir);
+    pageName = pageName.replace(/'|"/g, "");
+    const pages: SssPage[] = readSssPages(dir);
+    pages.push({ name: pageName, pageNumber: pages.length, data: BLANK_SSS_PAGE_DATA });
+    writeSssPages(pages);
+    general.log("Add SSS Page - Return");
+    return;
+}
+
+export async function removeSssPage(page: SssPage, dir: string = global.gameDir): Promise<void> {
+    general.log("Remove SSS Page - Start:", page, dir);
+    const pages: SssPage[] = readSssPages(dir).filter((i: SssPage) =>
+        !(i.name == page.name && i.pageNumber == page.pageNumber)
+    );
+    await writeSssPages(pages, dir);
+    general.log("Remove SSS Page - Return");
     return;
 }

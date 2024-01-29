@@ -362,7 +362,7 @@ function SeriesDisplay({
                     iconSize={"30px"}
                     tooltip={"Delete All Stages In Series"}
                     onClick={async () => {
-                        await api.removeSeriesCharacters(series);
+                        await api.removeSeriesStages(series);
                         readStages();
                     }}
                 />

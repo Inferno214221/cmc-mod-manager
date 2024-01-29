@@ -15,6 +15,11 @@ export default {
         dir?: string
     ]): Promise<void> => ipcRenderer.invoke("addCssPage", args)),
 
+    addSssPage: ((...args: [
+        pageName: string,
+        dir?: string
+    ]): Promise<void> => ipcRenderer.invoke("addSssPage", args)),
+
     checkForUpdates: ((): Promise<void> => ipcRenderer.invoke("checkForUpdates")),
 
     ensureAllAltsAreCharacters: ((...args: [
@@ -192,6 +197,16 @@ export default {
         series: string,
         dir?: string
     ]): Promise<void> => ipcRenderer.invoke("removeSeriesCharacters", args)),
+
+    removeSeriesStages: ((...args: [
+        series: string,
+        dir?: string
+    ]): Promise<void> => ipcRenderer.invoke("removeSeriesStages", args)),
+
+    removeSssPage: ((...args: [
+        page: SssPage,
+        dir?: string
+    ]): Promise<void> => ipcRenderer.invoke("removeSssPage", args)),
 
     removeStage: ((...args: [
         remove: string,

@@ -62,7 +62,7 @@ const BLANK_CSS_PAGE_DATA: string = "\
 0000 0000 0000 0000 0000 0000 0000\r\n\
 0000 0000 0000 0000 0000 0000 0000\r\n\
 0000 0000 0000 0000 0000 0000 0000\r\n\
-0000 0000 0000 0000 0000 0000 0000 ";
+0000 0000 0000 9999 0000 0000 0000 ";
 
 export function readCharacters(dir: string = global.gameDir): Character[] {
     return readCharacterList(dir).getAllCharacters();
@@ -905,7 +905,7 @@ export async function removeSeriesCharacters(
     series: string,
     dir: string = global.gameDir
 ): Promise<void> {
-    general.log("Remove Series - Start:", series, dir);
+    general.log("Remove Series Characters - Start:", series, dir);
     const charactersToRemove: Character[] = readCharacters(dir)
         .filter((character: Character) => character.series == series);
     const altsToRemove: Alt[] = [];
@@ -924,6 +924,6 @@ export async function removeSeriesCharacters(
         await removeCharacter(alt.alt, dir);
     }
     console.log(new Date().getTime());
-    general.log("Remove Series - Return");
+    general.log("Remove Series Characters - Return");
     return;
 }
