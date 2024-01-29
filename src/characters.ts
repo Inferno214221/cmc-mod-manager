@@ -85,7 +85,7 @@ export function readCharacterList(dir: string = global.gameDir): CharacterList {
                 menuName: characterDat.menuName,
                 series: characterDat.series,
                 randomSelection: true, // Assume true and then iterate through false list
-                cssNumber: index + 1,
+                number: index + 1,
                 alts: alts.filter((alt: Alt) => alt.base == character),
                 mug: path.join(dir, "gfx", "mugs", character + ".png")
             });
@@ -110,7 +110,7 @@ export async function writeCharacters(
 ): Promise<void> {
     general.log("Write Characters - Start:", characters, dir);
     characters.sort((a: Character, b: Character) =>
-        (a.cssNumber > b.cssNumber ? 1 : -1)
+        (a.number > b.number ? 1 : -1)
     );
     const output: string = [
         characters.length,
@@ -272,7 +272,7 @@ export async function ensureAltIsCharacter(alt: Alt, dir: string = global.gameDi
         menuName: characterDat == null ? alt.menuName : characterDat.menuName,
         series: characterDat == null ? baseCharacter.series : characterDat.series,
         randomSelection: true,
-        cssNumber: characterList.getNextCssNumber(),
+        number: characterList.getNextnumber(),
         alts: [],
         mug: path.join(dir, "gfx", "mugs", alt.alt + ".png")
     });
@@ -612,7 +612,7 @@ export async function installCharacter(
         menuName: characterDat.menuName,
         series: characterDat.series,
         randomSelection: true,
-        cssNumber: characters.getNextCssNumber(),
+        number: characters.getNextnumber(),
         alts: [],
         mug: path.join(dir, "gfx", "mugs", character + ".png")
     });
@@ -886,9 +886,9 @@ export async function removeCharacterCss(
         const cssData: CssData = readCssData(page);
         toResolve.push(writeCssData(page, cssData.map((row: string[]) => {
             return row.map((cell: string) => {
-                if (parseInt(cell) == character.cssNumber) {
+                if (parseInt(cell) == character.number) {
                     return "0000";
-                } else if (parseInt(cell) > character.cssNumber && cell != "9999") {
+                } else if (parseInt(cell) > character.number && cell != "9999") {
                     return ("0000" + (parseInt(cell) - 1)).slice(-4);
                 } else {
                     return cell;

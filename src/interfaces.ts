@@ -3,7 +3,7 @@ export interface Character {
     menuName: string,
     series: string,
     randomSelection: boolean,
-    cssNumber: number,
+    number: number,
     alts: Alt[],
     mug: string
 }
@@ -22,7 +22,7 @@ export interface CharacterUpdate {
     menuName?: string,
     series?: string,
     randomSelection?: boolean,
-    cssNumber?: number,
+    number?: number,
     alts?: Alt[],
     mug?: string
 }
@@ -30,7 +30,7 @@ export interface CharacterUpdate {
 export class CharacterList {
     private characters: Character[];
     private charactersByName: { [name: string]: number };
-    private charactersByNum: { [cssNumber: number]: number };
+    private charactersByNum: { [number: number]: number };
     
     // RIP overloads cause of JS
     constructor(characters?: Character[]) {
@@ -43,7 +43,7 @@ export class CharacterList {
         this.charactersByNum = {};
         this.characters.forEach((character: Character, index: number) => {
             this.charactersByName[character.name] = index;
-            this.charactersByNum[character.cssNumber] = index;
+            this.charactersByNum[character.number] = index;
         });
     }
 
@@ -51,14 +51,14 @@ export class CharacterList {
         return this.characters;
     }
 
-    getNextCssNumber(): number {
+    getNextnumber(): number {
         return this.characters.length + 1;
     }
 
     addCharacter(character: Character): void {
         const index: number = this.characters.push(character) - 1;
         this.charactersByName[character.name] = index;
-        this.charactersByNum[character.cssNumber] = index;
+        this.charactersByNum[character.number] = index;
     }
 
     getCharacterByName(name: string): Character {
@@ -77,31 +77,31 @@ export class CharacterList {
         const remove: Character = this.getCharacterByName(name);
         this.characters.splice(this.charactersByName[name], 1);
         for (const character of this.characters) {
-            if (character.cssNumber > remove.cssNumber) {
-                character.cssNumber--;
+            if (character.number > remove.number) {
+                character.number--;
             }
         }
         this.indexAllCharacters();
     }
 
-    getCharacterByNum(cssNumber: number): Character {
-        return this.characters[this.charactersByNum[cssNumber]];
+    getCharacterByNum(number: number): Character {
+        return this.characters[this.charactersByNum[number]];
     }
 
-    setCharacterByNum(cssNumber: number, character: Character): void {
-        this.characters[this.charactersByNum[cssNumber]] = character;
+    setCharacterByNum(number: number, character: Character): void {
+        this.characters[this.charactersByNum[number]] = character;
     }
 
-    updateCharacterByNum(cssNumber: number, update: CharacterUpdate): void {
-        Object.assign(this.characters[this.charactersByNum[cssNumber]], update);
+    updateCharacterByNum(number: number, update: CharacterUpdate): void {
+        Object.assign(this.characters[this.charactersByNum[number]], update);
     }
 
-    removeCharacterByNum(cssNumber: number): void {
-        const remove: Character = this.getCharacterByNum(cssNumber);
-        this.characters.splice(this.charactersByNum[cssNumber], 1);
+    removeCharacterByNum(number: number): void {
+        const remove: Character = this.getCharacterByNum(number);
+        this.characters.splice(this.charactersByNum[number], 1);
         for (const character of this.characters) {
-            if (character.cssNumber > remove.cssNumber) {
-                character.cssNumber--;
+            if (character.number > remove.number) {
+                character.number--;
             }
         }
         this.indexAllCharacters();
@@ -136,13 +136,13 @@ export interface CssPage {
 export type CssData = string[][];
 
 export enum SortTypeOptions {
-    cssNumber = "cssNumber",
+    number = "number",
     series = "series",
     menuName = "menuName"
 }
 
 export const sortTypes: SortTypeOptions[] = [
-    SortTypeOptions.cssNumber,
+    SortTypeOptions.number,
     SortTypeOptions.series,
     SortTypeOptions.menuName
 ];
@@ -165,7 +165,7 @@ export enum DownloadState {
 
 export interface DndData {
     type: DndDataType,
-    cssNumber: string,
+    number: string,
     x?: number,
     y?: number
 }
@@ -197,7 +197,7 @@ export interface Stage {
     source: string,
     series: string,
     randomSelection: boolean,
-    cssNumber: number,
+    number: number,
     icon: string
 }
 
@@ -207,14 +207,14 @@ export interface StageUpdate {
     source?: string,
     series?: string,
     randomSelection?: boolean,
-    cssNumber?: number,
+    number?: number,
     icon?: string
 }
 
 export class StageList {
     private stages: Stage[];
     private stagesByName: { [name: string]: number };
-    private stagesByNum: { [cssNumber: number]: number };
+    private stagesByNum: { [number: number]: number };
     
     constructor(stages?: Stage[]) {
         this.stages = stages || [];
@@ -226,7 +226,7 @@ export class StageList {
         this.stagesByNum = {};
         this.stages.forEach((stage: Stage, index: number) => {
             this.stagesByName[stage.name] = index;
-            this.stagesByNum[stage.cssNumber] = index;
+            this.stagesByNum[stage.number] = index;
         });
     }
 
@@ -234,14 +234,14 @@ export class StageList {
         return this.stages;
     }
 
-    getNextCssNumber(): number {
+    getNextnumber(): number {
         return this.stages.length + 1;
     }
 
     addStage(stage: Stage): void {
         const index: number = this.stages.push(stage) - 1;
         this.stagesByName[stage.name] = index;
-        this.stagesByNum[stage.cssNumber] = index;
+        this.stagesByNum[stage.number] = index;
     }
 
     getStageByName(name: string): Stage {
@@ -260,33 +260,41 @@ export class StageList {
         const remove: Stage = this.getStageByName(name);
         this.stages.splice(this.stagesByName[name], 1);
         for (const stage of this.stages) {
-            if (stage.cssNumber > remove.cssNumber) {
-                stage.cssNumber--;
+            if (stage.number > remove.number) {
+                stage.number--;
             }
         }
         this.indexAllStages();
     }
 
-    getStageByNum(cssNumber: number): Stage {
-        return this.stages[this.stagesByNum[cssNumber]];
+    getStageByNum(number: number): Stage {
+        return this.stages[this.stagesByNum[number]];
     }
 
-    setStageByNum(cssNumber: number, stage: Stage): void {
-        this.stages[this.stagesByNum[cssNumber]] = stage;
+    setStageByNum(number: number, stage: Stage): void {
+        this.stages[this.stagesByNum[number]] = stage;
     }
 
-    updateStageByNum(cssNumber: number, update: StageUpdate): void {
-        Object.assign(this.stages[this.stagesByNum[cssNumber]], update);
+    updateStageByNum(number: number, update: StageUpdate): void {
+        Object.assign(this.stages[this.stagesByNum[number]], update);
     }
 
-    removeStageByNum(cssNumber: number): void {
-        const remove: Stage = this.getStageByNum(cssNumber);
-        this.stages.splice(this.stagesByNum[cssNumber], 1);
+    removeStageByNum(number: number): void {
+        const remove: Stage = this.getStageByNum(number);
+        this.stages.splice(this.stagesByNum[number], 1);
         for (const stage of this.stages) {
-            if (stage.cssNumber > remove.cssNumber) {
-                stage.cssNumber--;
+            if (stage.number > remove.number) {
+                stage.number--;
             }
         }
         this.indexAllStages();
     }
 }
+
+export interface SssPage {
+    name: string,
+    pageNumber: number
+    data: SssData
+}
+
+export type SssData = string[][];

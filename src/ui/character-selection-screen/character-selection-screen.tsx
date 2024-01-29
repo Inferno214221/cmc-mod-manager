@@ -40,7 +40,7 @@ export function TabCharacterSelectionScreen(): JSX.Element {
             menuName: "Random",
             series: "random",
             randomSelection: false,
-            cssNumber: 9999,
+            number: 9999,
             alts: [],
             mug: await api.pathJoin(await api.getGameDir(), "gfx", "mugs", "random.png")
         });
@@ -76,7 +76,7 @@ export function TabCharacterSelectionScreen(): JSX.Element {
         if (characters == null || cssData == null) return;
         setExcluded(characters.filter((character: Character) => {
             for (const row of cssData) {
-                if (row.includes(("0000" + character.cssNumber).slice(-4))) {
+                if (row.includes(("0000" + character.number).slice(-4))) {
                     return false;
                 }
             }
@@ -94,14 +94,14 @@ export function TabCharacterSelectionScreen(): JSX.Element {
         const newCssData: CssData = cssData;
         if (from.type == DndDataType.cssCharacter) {
             if (to.type == DndDataType.cssCharacter) {
-                newCssData[from.y][from.x] = to.cssNumber;
-                newCssData[to.y][to.x] = from.cssNumber;
+                newCssData[from.y][from.x] = to.number;
+                newCssData[to.y][to.x] = from.number;
             } else {
                 newCssData[from.y][from.x] = "0000";
             }
         } else {
             if (to.type == DndDataType.cssCharacter) {
-                newCssData[to.y][to.x] = from.cssNumber;
+                newCssData[to.y][to.x] = from.number;
             } else {
                 return;
             }
@@ -313,7 +313,7 @@ function CharacterDisplay({
 }): JSX.Element {
     const dndData: DndData = {
         type: DndDataType.excludedCharacter,
-        cssNumber: ("0000" + character.cssNumber).slice(-4)
+        number: ("0000" + character.number).slice(-4)
     }
     return (
         <div className={"excluded-display-wrapper tooltip-wrapper"}>
@@ -526,7 +526,7 @@ function CssCharacterDisplay({
 }): JSX.Element {
     const dndData: DndData = {
         type: DndDataType.cssCharacter,
-        cssNumber: cell,
+        number: cell,
         x: x,
         y: y
     };

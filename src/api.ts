@@ -1,6 +1,6 @@
 import { ipcRenderer } from "electron";
 import {
-    Alt, AppData, Character, CharacterDat, CssData, CssPage, Download, Stage
+    Alt, AppData, Character, CharacterDat, CssData, CssPage, Download, SssPage, Stage
 } from "./interfaces";
 
 export default {
@@ -154,6 +154,10 @@ export default {
         dir?: string
     ]): Promise<CssPage[]> => ipcRenderer.invoke("readCssPages", args)),
 
+    readSssPages: ((...args: [
+        dir?: string
+    ]): Promise<CssPage[]> => ipcRenderer.invoke("readSssPages", args)),
+
     readStages: ((...args: [
         dir?: string
     ]): Promise<Stage[]> => ipcRenderer.invoke("readStages", args)),
@@ -193,6 +197,12 @@ export default {
         remove: string,
         dir?: string
     ]): Promise<void> => ipcRenderer.invoke("removeStage", args)),
+
+
+    removeStageSss: ((...args: [
+        page: SssPage,
+        dir?: string
+    ]): Promise<void> => ipcRenderer.invoke("removeStageSss", args)),
 
     runGame: ((...args: [
         dir?: string
@@ -234,6 +244,11 @@ export default {
         pages: CssPage[],
         dir?: string
     ]): Promise<void> => ipcRenderer.invoke("writeCssPages", args)),
+
+    writeSssPages: ((...args: [
+        pages: SssPage[],
+        dir?: string
+    ]): Promise<void> => ipcRenderer.invoke("writeSssPages", args)),
 
     writeStageRandom: ((...args: [
         stage: string,

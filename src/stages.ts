@@ -1,7 +1,7 @@
 import { BrowserWindow } from "electron";
 import fs from "fs-extra";
 import path from "path";
-import { AppData, Download, Stage, StageList } from "./interfaces";
+import { AppData, Download, SssData, SssPage, Stage, StageList } from "./interfaces";
 
 declare const global: {
     win: BrowserWindow,
@@ -41,7 +41,7 @@ function readStageList(dir: string = global.gameDir): StageList {
             source: stagesTxt[(stage * 4) + 2],
             series: stagesTxt[(stage * 4) + 3].toLowerCase(),
             randomSelection: true,
-            cssNumber: stage + 1,
+            number: stage + 1,
             icon: path.join(dir, "gfx", "stgicons", stagesTxt[(stage * 4) + 0] + ".png")
         });
     }
@@ -64,7 +64,7 @@ export async function writeStages(
 ): Promise<void> {
     general.log("Write Stage - Start:", stages, dir);
     stages.sort((a: Stage, b: Stage) =>
-        (a.cssNumber > b.cssNumber ? 1 : -1)
+        (a.number > b.number ? 1 : -1)
     );
     const output: string = [
         stages.length,
@@ -194,11 +194,6 @@ export async function extractStage(extract: string, dir: string = global.gameDir
     });
     console.log(new Date().getTime());
 
-    //TODO: create a stage dat format for mod manager only
-    // toResolve.push(writeCharacterDat(
-    //     characterDat,
-    //     path.join(extractDir, "data", "dats")
-    // ));
     toResolve.push(fs.writeFile(
         path.join(extractDir, "info.json"),
         JSON.stringify([
@@ -235,9 +230,82 @@ export async function removeStage(remove: string, dir: string = global.gameDir):
     
     stageList.removeStageByName(remove);
     toResolve.push(writeStages(stageList.getAllStages(), dir));
-    // toResolve.push(removeStageSss(stage, dir)); //TODO:
+    toResolve.push(removeStageSss(stage, dir));
     toResolve.push(writeStageRandom(stage.name, true, dir));
     await Promise.allSettled(toResolve);
     general.log("Remove Stage - Return");
+    return;
+}
+
+export function readSssPages(dir: string = global.gameDir): SssPage[] {
+    general.log("Read SSS Pages - Start:", dir);
+    const pages: SssPage[] = [];
+    // Currently SSS Pages are a fixed size - 10x6. Although it is possible that his may change in
+    // the future, if any changes would be made to the stage format, it would likely become more
+    // consistent with the current character format and therefor need major adjustments anyway
+    const sssTxt: string[] = fs.readFileSync(
+        path.join(dir, "data", "sss.txt"),
+        "ascii"
+    ).split(/\r?\n/);
+    sssTxt.shift();
+    for (let page: number = 0; page < Math.floor(sssTxt.length / 7); page++) {
+        const data: SssData = [];
+        for (let line: number = 1; line < 7; line++) {
+            data.push(sssTxt[(page * 7) + line].split(" ").filter((cell: string) => cell != ""));
+        }
+        pages.push({
+            name: sssTxt[(page * 7) + 0],
+            pageNumber: page,
+            data: data
+        });
+    }
+    general.log("Read SSS Pages - Return:", pages);
+    return pages;
+}
+
+export async function writeSssPages(pages: SssPage[], dir: string = global.gameDir): Promise<void> {
+    general.log("Write SSS Pages - Start:", pages, dir);
+    pages.sort((a: SssPage, b: SssPage) =>
+        (a.pageNumber > b.pageNumber ? 1 : -1)
+    );
+    const output: string = [
+        pages.length,
+        pages.map((page: SssPage) =>
+            [
+                page.name,
+                page.data.map((row: string[]) => row.join(" ")).join("\r\n")
+            ].join("\r\n")
+        ).join("\r\n")
+    ].join("\r\n"); // + " ";
+    fs.writeFileSync(
+        path.join(dir, "data", "sss.txt"),
+        output,
+        { encoding: "ascii" }
+    );
+    general.log("Write SSS Pages - Return");
+    return;
+}
+
+export async function removeStageSss(
+    stage: Stage,
+    dir: string = global.gameDir
+): Promise<void> {
+    general.log("Remove Stage SSS - Start:", stage, dir);
+    const sssPages: SssPage[] = readSssPages(dir);
+    for (const page of sssPages) {
+        page.data = page.data.map((row: string[]) =>
+            row.map((cell: string) => {
+                if (parseInt(cell) == stage.number) {
+                    return "0000";
+                } else if (parseInt(cell) > stage.number && cell != "9999") {
+                    return ("0000" + (parseInt(cell) - 1)).slice(-4);
+                } else {
+                    return cell;
+                }
+            })
+        );
+    }
+    await writeSssPages(sssPages, dir);
+    general.log("Remove Stage SSS - Return");
     return;
 }
