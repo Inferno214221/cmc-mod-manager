@@ -14,6 +14,9 @@ import {
     TabStages
 } from "../stages/stages";
 import {
+    TabStageSelectionScreen
+} from "../stage-selection-screen/stage-selection-screen";
+import {
     AllowTabSwitchDownloads, TabDownloads
 } from "../downloads/downloads";
 import {
@@ -73,7 +76,7 @@ export const STAGE_SELECTION_SCREEN: Tab = {
     name: "stageSelectionScreen",
     displayName: "Stage Selection Screen",
     icon: "location_pin",
-    element: <TabHome/>,
+    element: <TabStageSelectionScreen/>,
     allowTabSwitch: null
 };
 export const DOWNLOADS: Tab = {

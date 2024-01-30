@@ -92,15 +92,15 @@ export function TabCharacterSelectionScreen(): JSX.Element {
     function characterDragAndDrop(from: DndData, to: DndData): void {
         console.log(from, to);
         const newCssData: CssData = cssData;
-        if (from.type == DndDataType.cssCharacter) {
-            if (to.type == DndDataType.cssCharacter) {
+        if (from.type == DndDataType.ssNumber) {
+            if (to.type == DndDataType.ssNumber) {
                 newCssData[from.y][from.x] = to.number;
                 newCssData[to.y][to.x] = from.number;
             } else {
                 newCssData[from.y][from.x] = "0000";
             }
         } else {
-            if (to.type == DndDataType.cssCharacter) {
+            if (to.type == DndDataType.ssNumber) {
                 newCssData[to.y][to.x] = from.number;
             } else {
                 return;
@@ -312,7 +312,7 @@ function CharacterDisplay({
     characterDragAndDrop: (from: DndData, to: DndData) => void
 }): JSX.Element {
     const dndData: DndData = {
-        type: DndDataType.excludedCharacter,
+        type: DndDataType.excluded,
         number: ("0000" + character.number).slice(-4)
     }
     return (
@@ -408,7 +408,7 @@ function CssPageDisplay({
     getPages: () => Promise<void>
 }): JSX.Element {
     return (
-        <div className={"css-page" + (activePage == page ? " css-page-active" : "")}>
+        <div className={"css-page" + (activePage.path == page.path ? " css-page-active" : "")}>
             <button
                 type={"button"}
                 onClick={() => {
@@ -525,7 +525,7 @@ function CssCharacterDisplay({
     characterDragAndDrop: (from: DndData, to: DndData) => void
 }): JSX.Element {
     const dndData: DndData = {
-        type: DndDataType.cssCharacter,
+        type: DndDataType.ssNumber,
         number: cell,
         x: x,
         y: y

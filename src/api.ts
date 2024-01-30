@@ -161,7 +161,7 @@ export default {
 
     readSssPages: ((...args: [
         dir?: string
-    ]): Promise<CssPage[]> => ipcRenderer.invoke("readSssPages", args)),
+    ]): Promise<SssPage[]> => ipcRenderer.invoke("readSssPages", args)),
 
     readStages: ((...args: [
         dir?: string

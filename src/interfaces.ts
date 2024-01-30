@@ -171,8 +171,8 @@ export interface DndData {
 }
 
 export enum DndDataType {
-    cssCharacter = "cssCharacter",
-    excludedCharacter = "excludedCharacter"
+    ssNumber = "ssNumber",
+    excluded = "excluded"
 }
 
 export interface AppConfig {
