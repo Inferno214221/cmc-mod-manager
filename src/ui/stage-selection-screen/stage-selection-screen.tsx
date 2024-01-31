@@ -108,6 +108,7 @@ export function TabStageSelectionScreen(): JSX.Element {
     useEffect(() => {
         console.log("useEffect");
         setSssPage(sssPages[activePage]);
+        //FIXME: sssPages is an array of references and therefore does not trigger a re-render
     }, [sssPages, activePage]);
 
     return (

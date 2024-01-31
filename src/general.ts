@@ -147,8 +147,10 @@ export async function checkForUpdates(): Promise<void> {
             "Accept": "application/vnd.github.v3+json",
             "User-Agent": "CMC-Mod-Manager",
         }
-    }, (error: string, res: http.IncomingMessage, body: string) => {
-        const latestVersion: string = semver.clean(JSON.parse(body).tag_name)
+    }, (error: any, res: http.IncomingMessage, body: string) => {
+        if (error != null) return;
+        const latestVersion: string = semver.clean(JSON.parse(body).tag_name);
+        console.log("Latest Version: " + latestVersion);
         if (semver.lt(currentVersion, latestVersion)) {
             console.log("Update Required");
             return;
@@ -276,17 +278,17 @@ export async function isValidGameDir(dir: string = global.gameDir): Promise<bool
 }
 
 export async function selectGameDir(): Promise<string | null> {
-    log("Extract Archive - Start");
+    log("Select Game Dir - Start");
     const dir: OpenDialogReturnValue = await dialog.showOpenDialog(global.win, {
         properties: ["openDirectory"]
     });
     if (dir.canceled == true) {
-        log("Extract Archive - Exit: Selection Cancelled");
+        log("Select Game Dir - Exit: Selection Cancelled");
         return null;
     }
     if (!await isValidGameDir(dir.filePaths[0])) {
         //TODO: inform the user
-        log("Extract Archive - Exit: Invalid Game Dir");
+        log("Select Game Dir - Exit: Invalid Game Dir");
         return null;
     }
 
@@ -297,7 +299,7 @@ export async function selectGameDir(): Promise<string | null> {
     global.appData = readJSON(DATA_FILE);
     global.appData.dir = global.gameDir;
     writeAppData(global.appData);
-    log("Extract Archive - Return:", global.gameDir);
+    log("Select Game Dir - Return:", global.gameDir);
     return global.gameDir;
 }
 

@@ -272,7 +272,7 @@ export async function ensureAltIsCharacter(alt: Alt, dir: string = global.gameDi
         menuName: characterDat == null ? alt.menuName : characterDat.menuName,
         series: characterDat == null ? baseCharacter.series : characterDat.series,
         randomSelection: true,
-        number: characterList.getNextnumber(),
+        number: characterList.getNextNumber(),
         alts: [],
         mug: path.join(dir, "gfx", "mugs", alt.alt + ".png")
     });
@@ -495,12 +495,12 @@ export async function installCharacterArchive(
     updateCharacters: boolean,
     dir: string = global.gameDir
 ): Promise<void> {
-    general.log("Install Character Arch - Start:", filterInstallation, updateCharacters, dir);
+    general.log("Install Character Archive - Start:", filterInstallation, updateCharacters, dir);
     const selected: OpenDialogReturnValue = await dialog.showOpenDialog(global.win, {
         properties: ["openFile"]
     });
     if (selected.canceled == true) {
-        general.log("Install Character Arch - Exit: Selection Cancelled");
+        general.log("Install Character Archive - Exit: Selection Cancelled");
         return null;
     }
     fs.ensureDirSync(path.join(dir, "_temp"));
@@ -511,7 +511,7 @@ export async function installCharacterArchive(
     );
     general.log(output, filterInstallation);
     await installCharacter(output, filterInstallation, updateCharacters, dir);
-    general.log("Install Character Arch - Return");
+    general.log("Install Character Archive - Return");
     return;
 }
 
@@ -612,7 +612,7 @@ export async function installCharacter(
         menuName: characterDat.menuName,
         series: characterDat.series,
         randomSelection: true,
-        number: characters.getNextnumber(),
+        number: characters.getNextNumber(),
         alts: [],
         mug: path.join(dir, "gfx", "mugs", character + ".png")
     });

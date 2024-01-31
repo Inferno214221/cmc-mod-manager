@@ -1,4 +1,4 @@
-import { BrowserWindow } from "electron";
+import { BrowserWindow, OpenDialogReturnValue, dialog } from "electron";
 import fs from "fs-extra";
 import path from "path";
 import { AppData, Download, SssData, SssPage, Stage, StageList } from "./interfaces";
@@ -160,18 +160,170 @@ export function getStageFiles(
         }
         stageFilesString = stageFiles.join("\n");
     });
-    const stageList: StageList = readStageList(dir);
-    similarNames.forEach((name: string) => {
-        const validFilesString: string = validFiles.join("\n");
-        getStageRegExps(stageList.getStageByName(name), ignoreSeries)
-            .forEach((exp: RegExp) => {
-                for (const match of validFilesString.matchAll(exp)) {
-                    validFiles.splice(validFiles.indexOf(match[0]), 1);
-                }
-            });
-    });
+    if (similarNames.length > 0) {
+        const stageList: StageList = readStageList(dir);
+        similarNames.forEach((name: string) => {
+            const validFilesString: string = validFiles.join("\n");
+            getStageRegExps(stageList.getStageByName(name), ignoreSeries)
+                .forEach((exp: RegExp) => {
+                    for (const match of validFilesString.matchAll(exp)) {
+                        validFiles.splice(validFiles.indexOf(match[0]), 1);
+                    }
+                });
+        });
+    }
     general.log("Get Stage Files - Return:", validFiles);
     return validFiles;
+}
+
+export async function installStageDir(
+    filterInstallation: boolean,
+    updateStages: boolean,
+    dir: string = global.gameDir
+): Promise<void> {
+    general.log("Install Stage Dir - Start:", filterInstallation, updateStages, dir);
+    const selected: OpenDialogReturnValue = await dialog.showOpenDialog(global.win, {
+        properties: ["openDirectory"]
+    });
+    if (selected.canceled == true) {
+        general.log("Install Stage Dir - Exit: Selection Cancelled");
+        return null;
+    }
+    await installStage(selected.filePaths[0], filterInstallation, updateStages, dir);
+    general.log("Install Stage Dir - Return");
+    return;
+}
+
+export async function installStageArchive(
+    filterInstallation: boolean,
+    updateStages: boolean,
+    dir: string = global.gameDir
+): Promise<void> {
+    general.log("Install Stage Archive - Start:", filterInstallation, updateStages, dir);
+    const selected: OpenDialogReturnValue = await dialog.showOpenDialog(global.win, {
+        properties: ["openFile"]
+    });
+    if (selected.canceled == true) {
+        general.log("Install Stage Archive - Exit: Selection Cancelled");
+        return null;
+    }
+    fs.ensureDirSync(path.join(dir, "_temp"));
+    fs.emptyDirSync(path.join(dir, "_temp"));
+    const output: string = await general.extractArchive(
+        selected.filePaths[0],
+        path.join(dir, "_temp")
+    );
+    general.log(output, filterInstallation);
+    await installStage(output, filterInstallation, updateStages, dir);
+    general.log("Install Stage Archive - Return");
+    return;
+}
+
+export async function installStage(
+    stageDir: string,
+    filterInstallation: boolean = true,
+    updateStages: boolean = false,
+    dir: string = global.gameDir
+): Promise<void> {
+    general.log("Install Stage - Start:",
+        stageDir, filterInstallation, updateStages, dir);
+    const toResolve: Promise<void>[] = [];
+    let correctedDir: string = stageDir;
+    const modFiles: string[] = general.getAllFiles(correctedDir)
+        .map((file: string) => file.replace(correctedDir, ""));
+    for (let file of modFiles) {
+        file = path.posix.join(file);
+        const fileDir: string = path.posix.parse(file).dir + "/";
+        if (fileDir.includes("/stage/") && !file.includes("/music/")) {
+            let topDir: string = file.split("/").shift();
+            while (topDir != "stage") {
+                correctedDir = path.join(correctedDir, topDir);
+                file = file.replace(topDir + "/", "");
+                topDir = file.split("/").shift();
+            }
+            break;
+        }
+    }
+    if (!fs.readdirSync(correctedDir).includes("stage")) {
+        //TODO: inform user
+        general.log("Install Stage - Exit: No Fighter Directory");
+        return;
+    }
+    general.log(correctedDir);
+
+    const stageName: string = fs.readdirSync(path.join(correctedDir, "stage"))
+        .filter((file: string) => {
+            return file.endsWith(".bin") || !file.includes(".");
+        })[0].split(".")[0];
+    general.log(stageName);
+
+    const stageList: StageList = readStageList(dir);
+    if (!updateStages && stageList.getStageByName(stageName) != undefined) {
+        //TODO: inform user
+        general.log("Install Stage - Exit: Character Already Installed");
+        return;
+    }
+
+    let stage: Stage;
+    console.log(
+        path.join(correctedDir, "info.json"),
+        fs.existsSync(path.join(correctedDir, "info.json"))
+    );
+    if (fs.existsSync(path.join(correctedDir, "info.json"))) {
+        const infoTxt: string[] = general.readJSON(path.join(correctedDir, "info.json"));
+        console.log(infoTxt);
+        stage = {
+            name: stageName,
+            menuName: infoTxt[0],
+            source: infoTxt[1],
+            series: infoTxt[2],
+            randomSelection: true,
+            number: stageList.getNextNumber(),
+            icon: path.join(dir, "gfx", "stgicons", stageName + ".png")
+        }
+    } else {
+        //TODO: get text input
+        stage = {
+            name: stageName,
+            menuName: "Missing",
+            source: "Missing",
+            series: "missing",
+            randomSelection: true,
+            number: stageList.getNextNumber(),
+            icon: path.join(dir, "gfx", "stgicons", stageName + ".png")
+        }
+    }
+
+    if (filterInstallation) {
+        getStageFiles(stage, false, correctedDir).forEach((file: string) => {
+            const filePath: string = path.join(correctedDir, file);
+            const targetPath: string = path.join(dir, file);
+            fs.ensureDirSync(path.parse(targetPath).dir);
+            if (!updateStages && fs.existsSync(targetPath)) return;
+            general.log("Copying: " + filePath);
+            toResolve.push(
+                fs.copy(
+                    filePath,
+                    targetPath,
+                    { overwrite: !file.startsWith("gfx/seriesicon/") }
+                )
+            );
+        });
+    } else {
+        general.log("Copying: All Files");
+        toResolve.push(fs.copy(correctedDir, dir, { overwrite: true }));
+    }
+
+    if (stageList.getStageByName(stageName) != undefined) {
+        general.log("Install Character - Return: Character Already In List");
+        return;
+    }
+    stageList.addStage(stage);
+    toResolve.push(writeStages(stageList.getAllStages(), dir));
+    await Promise.allSettled(toResolve);
+    fs.removeSync(path.join(dir, "info.json"));
+    general.log("Install Character - Return");
+    return;
 }
 
 export async function extractStage(extract: string, dir: string = global.gameDir): Promise<void> {
@@ -206,7 +358,7 @@ export async function extractStage(extract: string, dir: string = global.gameDir
     toResolve.push(fs.writeFile(
         path.join(extractDir, "info.json"),
         JSON.stringify([
-            stage.name, stage.menuName, stage.source, stage.series
+            stage.menuName, stage.source, stage.series
         ], null, 2)
     ));
     await Promise.allSettled(toResolve);

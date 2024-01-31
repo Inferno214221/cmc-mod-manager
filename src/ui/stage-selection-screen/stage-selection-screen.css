@@ -137,8 +137,8 @@
 
 .sss-stage-display img {
     display: block;
-    width: 35px;
-    height: 35px;
+    width: 40px;
+    height: 40px;
 }
 
 .sss-stage-display span:not(.sss-stage-display .sss-tooltip span) {

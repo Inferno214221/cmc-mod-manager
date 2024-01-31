@@ -100,17 +100,29 @@ export default {
         dir?: string
     ]): Promise<void> => ipcRenderer.invoke("installCharacter", args)),
 
-    installCharacterArch: ((...args: [
+    installCharacterArchive: ((...args: [
         filterInstallation: boolean,
         updateCharacters: boolean,
         dir?: string
-    ]): Promise<void> => ipcRenderer.invoke("installCharacterArch", args)),
+    ]): Promise<void> => ipcRenderer.invoke("installCharacterArchive", args)),
 
     installCharacterDir: ((...args: [
         filterInstallation: boolean,
         updateCharacters: boolean,
         dir?: string
     ]): Promise<void> => ipcRenderer.invoke("installCharacterDir", args)),
+
+    installStageArchive: ((...args: [
+        filterInstallation: boolean,
+        updateStages: boolean,
+        dir?: string
+    ]): Promise<void> => ipcRenderer.invoke("installStageArchive", args)),
+
+    installStageDir: ((...args: [
+        filterInstallation: boolean,
+        updateStages: boolean,
+        dir?: string
+    ]): Promise<void> => ipcRenderer.invoke("installStageDir", args)),
 
     isURIAssociated: ((): Promise<boolean> => ipcRenderer.invoke("isURIAssociated")),
 

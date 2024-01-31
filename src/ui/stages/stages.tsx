@@ -212,10 +212,10 @@ export function TabStages(): JSX.Element {
                         iconSize={"50px"}
                         tooltip={"Install Stage From Directory"}
                         onClick={async () => {
-                            // await api.installStageDir(
-                            //     filterInstallation,
-                            //     updateStages
-                            // );
+                            await api.installStageDir(
+                                filterInstallation,
+                                updateStages
+                            );
                             readStages();
                         }}
                     />
@@ -224,10 +224,10 @@ export function TabStages(): JSX.Element {
                         iconSize={"50px"}
                         tooltip={"Install Stage From Archive"}
                         onClick={async () => {
-                            // await api.installStageArch(
-                            //     filterInstallation,
-                            //     updateStages
-                            // );
+                            await api.installStageArchive(
+                                filterInstallation,
+                                updateStages
+                            );
                             readStages();
                         }}
                     />

@@ -51,7 +51,7 @@ export class CharacterList {
         return this.characters;
     }
 
-    getNextnumber(): number {
+    getNextNumber(): number {
         return this.characters.length + 1;
     }
 
@@ -234,7 +234,7 @@ export class StageList {
         return this.stages;
     }
 
-    getNextnumber(): number {
+    getNextNumber(): number {
         return this.stages.length + 1;
     }
 
