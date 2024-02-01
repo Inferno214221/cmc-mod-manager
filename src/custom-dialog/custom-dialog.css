@@ -1,0 +1,93 @@
+/* @import url("https://fonts.googleapis.com/css?Ubuntu"); */
+
+body {
+    /* My Palette */
+    /* Titlebar */
+    --inf-grey1: #16171e;
+    /* Side-est-bar */
+    --inf-grey2: #1a1c23;
+    /* Sidebar */
+    --inf-grey3: #23252e;
+    /* Body */
+    --inf-grey4: #272a34;
+    /* Buttons */
+    --inf-grey5: #323643;
+
+    /* Primary Blue */
+    --inf-blue1: #2777ff;
+    /* Secondary Blue */
+    --inf-blue2: #005af3;
+
+    /* Text */
+    --inf-white3: #eeeeec;
+    /* Sidebar Icons */
+    --inf-white2: #bbbbbd;
+    /* Inactive (Used with sidebar) */
+    --inf-white1: #888a8d;
+
+    margin: 10px;
+    font-family: Ubuntu;
+    color: var(--inf-white3);
+    background-color: var(--inf-grey4);
+    font-size: 11pt;
+    overflow: hidden;
+    user-select: none;
+}
+
+button {
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 4px;
+    padding: 5px 10px;
+    font-size: 11pt;
+    background-color: var(--inf-grey5);
+    border-color: black;
+    color: inherit;
+    font-family: inherit;
+    margin: 5px 0px;
+    box-shadow: 0px 1px #00000088;
+}
+
+button:hover {
+    background-color: var(--inf-grey4);
+}
+
+h1 {
+    font-size: 25px;
+    margin: 0px;
+}
+
+input[type=text],
+select {
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 3px;
+    background-color: var(--inf-grey5);
+    border-color: black;
+    color: inherit;
+    font-family: inherit;
+    font-size: 11pt;
+    outline: none;
+    box-shadow: 0px 1px #00000088;
+    padding: 0px 5px;
+    margin: 5px 0px;
+    width: calc(100% - 10px);
+}
+
+input[type=text] {
+    height: 27px;
+}
+
+/* select {
+    height: 29px;
+} */
+
+.center {
+    margin-left: auto;
+    margin-right: auto;
+    width: fit-content;
+}
+
+.right {
+    float: right;
+}

@@ -61,6 +61,16 @@ function createWindow(): void {
     });
 
     general.checkForUpdates();
+
+    // const customDialogWin: BrowserWindow = new BrowserWindow({
+    //     width: 360,
+    //     height: 120,
+    //     parent: global.win,
+    //     modal: true,
+    //     title: "Title",
+    //     autoHideMenuBar: true,
+    // });
+    // customDialogWin.loadFile("./custom-dialog/alert.html");
 }
 
 if (require("electron-squirrel-startup")) {
