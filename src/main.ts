@@ -26,6 +26,7 @@ global.downloads = [];
 import * as general from "./general";
 import * as characters from "./characters";
 import * as stages from "./stages";
+import * as customDialogs from "./custom-dialogs";
 
 function createWindow(): void {
     global.win = new BrowserWindow({
@@ -37,6 +38,7 @@ function createWindow(): void {
             preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
         },
         autoHideMenuBar: true,
+        darkTheme: true
     });
     global.win.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
 
@@ -61,16 +63,9 @@ function createWindow(): void {
     });
 
     general.checkForUpdates();
-
-    // const customDialogWin: BrowserWindow = new BrowserWindow({
-    //     width: 360,
-    //     height: 120,
-    //     parent: global.win,
-    //     modal: true,
-    //     title: "Title",
-    //     autoHideMenuBar: true,
-    // });
-    // customDialogWin.loadFile("./custom-dialog/alert.html");
+    customDialogs.alert(global.win, { body: "Alert" });
+    customDialogs.confirm(global.win, { body: "Confirm" });
+    customDialogs.prompt(global.win, { body: "Prompt" });
 }
 
 if (require("electron-squirrel-startup")) {
