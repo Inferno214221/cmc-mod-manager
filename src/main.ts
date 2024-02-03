@@ -26,7 +26,6 @@ global.downloads = [];
 import * as general from "./general";
 import * as characters from "./characters";
 import * as stages from "./stages";
-import * as customDialogs from "./custom-dialogs";
 
 function createWindow(): void {
     global.win = new BrowserWindow({

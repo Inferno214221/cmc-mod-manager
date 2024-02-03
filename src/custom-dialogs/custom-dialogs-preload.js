@@ -7,4 +7,5 @@ electron.contextBridge.exposeInMainWorld("dialog", {
         electron.ipcRenderer.on("dialogOnStart", (event, value) => callback(value)),
     ok: (value) => electron.ipcRenderer.invoke("dialogOk", value),
     cancel: () => electron.ipcRenderer.invoke("dialogCancel"),
+    resize: (value) => electron.ipcRenderer.invoke("dialogResize", value),
 });

@@ -11,8 +11,10 @@ const WINDOW_OPTIONS: BrowserWindowConstructorOptions = {
     maximizable: false,
     alwaysOnTop: true,
     fullscreenable: false,
-    darkTheme: true,
+    darkTheme: true
 }
+
+const PRELOAD_SCRIPT: string = path.join(__dirname, "custom-dialogs/custom-dialogs-preload.js");
 
 export type AlertOptions = {
     body: string,
@@ -35,11 +37,11 @@ export function alertSync(
 ): void {
     const alertOptions: BrowserWindowConstructorOptions = {
         width: 360,
-        height: 85, // 115, //TODO: Constant sizing wont work for windows with more than one line
+        height: 0,
         parent: parentWindow,
         webPreferences: {
             devTools: false,
-            preload: path.join(__dirname, "custom-dialogs/custom-dialogs-preload.js")
+            preload: PRELOAD_SCRIPT
         }
     };
     const customDialogWin: BrowserWindow = new BrowserWindow(
@@ -56,6 +58,11 @@ export function alertSync(
 
     customDialogWin.on("close", () => {
         if (callback != undefined) callback();
+    });
+
+    ipcMain.removeHandler("dialogResize");
+    ipcMain.handleOnce("dialogResize", (event: IpcMainInvokeEvent, height: number) => {
+        customDialogWin.setContentSize(360, height);
     });
 
     ipcMain.removeHandler("dialogOk");
@@ -86,11 +93,11 @@ export function confirmSync(
 ): void {
     const alertOptions: BrowserWindowConstructorOptions = {
         width: 360,
-        height: 85, // 115, //TODO: Constant sizing wont work for windows with more than one line
+        height: 0,
         parent: parentWindow,
         webPreferences: {
             devTools: false,
-            preload: path.join(__dirname, "custom-dialogs/custom-dialogs-preload.js")
+            preload: PRELOAD_SCRIPT
         }
     };
     const customDialogWin: BrowserWindow = new BrowserWindow(
@@ -107,6 +114,11 @@ export function confirmSync(
 
     customDialogWin.on("close", () => {
         if (callback != undefined) callback(undefined);
+    });
+
+    ipcMain.removeHandler("dialogResize");
+    ipcMain.handleOnce("dialogResize", (event: IpcMainInvokeEvent, height: number) => {
+        customDialogWin.setContentSize(360, height);
     });
 
     ipcMain.removeHandler("dialogOk");
@@ -145,11 +157,11 @@ export function promptSync(
 ): void {
     const alertOptions: BrowserWindowConstructorOptions = {
         width: 360,
-        height: 107, //TODO: Constant sizing wont work for windows with more than one line
+        height: 0,
         parent: parentWindow,
         webPreferences: {
             devTools: false,
-            preload: path.join(__dirname, "custom-dialogs/custom-dialogs-preload.js")
+            preload: PRELOAD_SCRIPT
         }
     };
     const customDialogWin: BrowserWindow = new BrowserWindow(
@@ -166,6 +178,11 @@ export function promptSync(
 
     customDialogWin.on("close", () => {
         if (callback != undefined) callback(undefined);
+    });
+
+    ipcMain.removeHandler("dialogResize");
+    ipcMain.handleOnce("dialogResize", (event: IpcMainInvokeEvent, height: number) => {
+        customDialogWin.setContentSize(360, height);
     });
 
     ipcMain.removeHandler("dialogOk");

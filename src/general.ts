@@ -22,6 +22,7 @@ declare const global: {
 require.resolve("./unrar.wasm");
 const WASM_BINARY: Buffer = fs.readFileSync(path.join(__dirname, "unrar.wasm"));
 
+import * as customDialogs from "./custom-dialogs";
 import * as characters from "./characters";
 
 const SUPPORTED_VERSIONS: string[] = [
@@ -127,10 +128,10 @@ export async function extractArchive(archive: string, destination: string): Prom
             const files: ArcFile[] = [...extracted.files];
             log(files);
             break;
-        case ".7z":
+        // case ".7z":
             //FIXME: doesn't work
             // await sevenZip.extractArchive(archive, output, {}, true);
-            break;
+            // break;
         default:
             //TODO: Throw error
             break;
