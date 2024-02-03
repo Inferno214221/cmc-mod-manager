@@ -63,9 +63,6 @@ function createWindow(): void {
     });
 
     general.checkForUpdates();
-    customDialogs.alert(global.win, { body: "Alert" });
-    customDialogs.confirm(global.win, { body: "Confirm" });
-    customDialogs.prompt(global.win, { body: "Prompt" });
 }
 
 if (require("electron-squirrel-startup")) {

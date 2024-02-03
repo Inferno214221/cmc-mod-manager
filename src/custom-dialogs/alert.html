@@ -12,7 +12,16 @@
         </div>
         <br/>
         <div class="right">
-            <button id="ok">OK</button>
+            <button id="ok" onclick="dialog.ok();">OK</button>
         </div>
+        <script>
+            dialog.onStart((options) => {
+                console.log(options);
+                document.getElementById("body").innerHTML = options.body;
+                if (options.title != undefined) {
+                    document.title = options.title;
+                }
+            });
+        </script>
     </body>
 </html>

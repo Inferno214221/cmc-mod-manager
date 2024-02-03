@@ -10,11 +10,28 @@
         <div class="center">
             <span id="body">Body</span>
         </div>
-        <input type="text" id="input" placeholder="Placeholder"/>
+        <input type="text" id="input" placeholder=""/>
         <br/>
         <div class="right">
-            <button id="cancel">Cancel</button>
-            <button id="ok">OK</button>
+            <button id="cancel" onclick="dialog.cancel();">Cancel</button>
+            <button id="ok" onclick="dialog.ok(document.getElementById('input').value);">OK</button>
         </div>
+        <script>
+            dialog.onStart((options) => {
+                console.log(options);
+                document.getElementById("body").innerHTML = options.body;
+                if (options.title != undefined) {
+                    document.title = options.title;
+                }
+                if (options.placeholder != undefined) {
+                    document.getElementById("input").placeholder = options.placeholder;
+                }
+                if (options.invalidCharacters != false) {
+                    document.getElementById("input").oninput = (event) => {
+                        event.target.value = event.target.value.replace(options.invalidCharacters, "");
+                    }
+                }
+            });
+        </script>
     </body>
 </html>
