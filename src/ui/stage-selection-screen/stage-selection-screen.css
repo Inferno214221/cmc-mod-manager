@@ -7,14 +7,22 @@
     min-height: min-content;
     background-color: var(--inf-grey4);
     z-index: 1;
-    padding: 5px;
     flex-shrink: 0;
+}
+
+#sort-excluded-div,
+#excluded-div {
+    padding: 5px;
 }
 
 #pages-div,
 #excluded-div {
     overflow-x: auto;
     margin: 5px;
+}
+
+#pages-div {
+    padding: 0px 0px 5px 0px;
 }
 
 #sort-excluded-div {

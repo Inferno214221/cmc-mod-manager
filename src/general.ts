@@ -22,7 +22,7 @@ declare const global: {
 require.resolve("./unrar.wasm");
 const WASM_BINARY: Buffer = fs.readFileSync(path.join(__dirname, "unrar.wasm"));
 
-import * as customDialogs from "./custom-dialogs";
+// import * as customDialogs from "./custom-dialogs";
 import * as characters from "./characters";
 
 const SUPPORTED_VERSIONS: string[] = [
@@ -154,6 +154,7 @@ export async function checkForUpdates(): Promise<void> {
         console.log("Latest Version: " + latestVersion);
         if (semver.lt(currentVersion, latestVersion)) {
             console.log("Update Required");
+            //TODO:
             return;
         }
         handleURI(process.argv.find((arg: string) => arg.startsWith("cmcmm:")));

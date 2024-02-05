@@ -28,8 +28,8 @@ export function TabStageSelectionScreen(): JSX.Element {
     [number, Dispatch<SetStateAction<number>>]
     = useState(0);
 
-    const [sssPage, setSssPage]:
-    [SssPage, Dispatch<SetStateAction<SssPage>>]
+    const [sssData, setSssData]:
+    [SssData, Dispatch<SetStateAction<SssData>>]
     = useState(null);
 
     async function getInfo(): Promise<void> {
@@ -73,21 +73,10 @@ export function TabStageSelectionScreen(): JSX.Element {
         }));
     }, [stages, sssPages]);
 
-    async function updateSssData(data: SssData): Promise<void> {
-        console.log("updateSssData");
-        setSssPages((prev: SssPage[]) => {
-            console.log(prev, activePage, data);
-            prev[activePage].data = data;
-            console.log(prev);
-            return prev;
-        });
-        await api.writeSssPages(sssPages);
-    }
-
     function stageDragAndDrop(from: DndData, to: DndData): void {
         console.log("stageDragAndDrop");
         console.log(from, to);
-        const newSssData: SssData = sssPages[activePage].data;
+        const newSssData: SssData = [...sssData];
         if (from.type == DndDataType.ssNumber) {
             if (to.type == DndDataType.ssNumber) {
                 newSssData[from.y][from.x] = to.number;
@@ -102,14 +91,25 @@ export function TabStageSelectionScreen(): JSX.Element {
                 return;
             }
         }
-        updateSssData(newSssData);
+        setSssData(newSssData);
     }
 
     useEffect(() => {
-        console.log("useEffect");
-        setSssPage(sssPages[activePage]);
+        console.log("sssPages, activePage updated");
+        if (sssPages[activePage] == undefined) return;
+        setSssData(sssPages[activePage].data);
         //FIXME: sssPages is an array of references and therefore does not trigger a re-render
     }, [sssPages, activePage]);
+
+    useEffect(() => {
+        console.log("sssData updated");
+        if (sssPages[activePage] == undefined) return;
+        //sssData == sssPages[activePage].data
+        const updatedPages: SssPage[] = [...sssPages];
+        updatedPages[activePage].data = sssData;
+        setSssPages(updatedPages);
+        api.writeSssPages(sssPages);
+    }, [sssData]);
 
     return (
         <section>
@@ -130,7 +130,7 @@ export function TabStageSelectionScreen(): JSX.Element {
                         <table id={"sss-table"}>
                             <tbody>
                                 <SssTableContents
-                                    sssPage={sssPage}
+                                    sssData={sssData}
                                     stageList={stageList}
                                     stageDragAndDrop={stageDragAndDrop}
                                 />
@@ -437,23 +437,23 @@ function SssPageDisplay({
 }
 
 function SssTableContents({
-    sssPage,
+    sssData,
     stageList,
     stageDragAndDrop
 }: {
-    sssPage: SssPage,
+    sssData: SssData,
     stageList: StageList,
     stageDragAndDrop: (from: DndData, to: DndData) => void
 }): JSX.Element {
-    return (sssPage == null || stageList == null) ? null : (
+    return (sssData == null || stageList == null) ? null : (
         <>
             <tr>
                 <th></th>
-                {sssPage.data[0].map((cell: string, index: number) =>
+                {sssData[0].map((cell: string, index: number) =>
                     <th key={index}>{index}</th>
                 )}
             </tr>
-            {sssPage.data.map((row: string[], yIndex: number) =>
+            {sssData.map((row: string[], yIndex: number) =>
                 <tr key={yIndex}>
                     <th key={yIndex}>{yIndex}</th>
                     {row.map((cell: string, xIndex: number) =>
@@ -527,11 +527,17 @@ function SssStageDisplay({
                     }}
                     onMouseEnter={(event: any) => {
                         // console.log(event);
-                        event.target
-                            .parentElement
-                            .nextElementSibling
-                            .firstElementChild
-                            .hidden = false;
+                        if (event.target.tagName == "DIV") {
+                            event.target
+                                .nextElementSibling
+                                .hidden = false;
+                        } else {
+                            event.target
+                                .parentElement
+                                .nextElementSibling
+                                .firstElementChild
+                                .hidden = false;
+                        }
                     }}
                 >
                     <img src={"img://" + stage.icon} draggable={false}/>
