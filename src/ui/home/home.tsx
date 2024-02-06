@@ -28,7 +28,7 @@ const LICENSE: string = (
     "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the " +
     "GNU General Public License for more details.\n\n" +
     "You should have received a copy of the GNU General Public License " + 
-    "along with this program. If not, see <https://www.gnu.org/licenses/>."
+    "along with this program. If not, see &lt;https://www.gnu.org/licenses/&gt;."
 );
 
 export async function AllowTabSwitchHome(): Promise<boolean> {
@@ -85,7 +85,10 @@ export function TabHome(): JSX.Element {
                     </div>
                     <div className={"center"}>
                         <button onClick={() => {
-                            alert(LICENSE)
+                            api.alert({
+                                title: "CMC Mod Manager License Notice",
+                                body: LICENSE
+                            });
                         }}>Show License (GNU GPLv3)</button>
                     </div>
                 </div>

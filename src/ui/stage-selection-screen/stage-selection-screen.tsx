@@ -6,6 +6,7 @@ import CycleIconButton from "../global/icon-button/cycle-icon-button";
 import {
     DndData, DndDataType, SortTypeOptions, SssData, SssPage, Stage, StageList, sortTypes
 } from "../../interfaces";
+import missing from "../../assets/missing.png";
 
 export function TabStageSelectionScreen(): JSX.Element {
     const [stages, setStages]:
@@ -333,7 +334,13 @@ function StageDisplay({
                     );
                 }}
             >
-                <img src={"img://" + stage.icon} draggable={false} />
+                <img
+                    src={"img://" + stage.icon}
+                    draggable={false}
+                    onError={(event: any) => {
+                        event.target.src = missing;
+                    }}
+                />
                 <div className={"excluded-display-name"}>
                     <span>{stage.menuName}</span>
                 </div>
@@ -540,7 +547,13 @@ function SssStageDisplay({
                         }
                     }}
                 >
-                    <img src={"img://" + stage.icon} draggable={false}/>
+                    <img
+                        src={"img://" + stage.icon}
+                        draggable={false}
+                        onError={(event: any) => {
+                            event.target.src = missing;
+                        }}
+                    />
                     <span>{stage.menuName}</span>
                 </div>
                 <div

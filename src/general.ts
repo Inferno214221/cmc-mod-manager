@@ -22,7 +22,7 @@ declare const global: {
 require.resolve("./unrar.wasm");
 const WASM_BINARY: Buffer = fs.readFileSync(path.join(__dirname, "unrar.wasm"));
 
-// import * as customDialogs from "./custom-dialogs";
+import * as customDialogs from "./custom-dialogs";
 import * as characters from "./characters";
 
 const SUPPORTED_VERSIONS: string[] = [
@@ -320,4 +320,16 @@ export async function runGame(dir: string = global.gameDir): Promise<void> {
 
 export function escapeRegex(str: string): string {
     return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+export async function alert(options: customDialogs.AlertOptions): Promise<void> {
+    return customDialogs.alert(global.win, options);
+}
+
+export async function confirm(options: customDialogs.ConfirmOptions): Promise<boolean> {
+    return customDialogs.confirm(global.win, options);
+}
+
+export async function prompt(options: customDialogs.PromptOptions): Promise<string> {
+    return customDialogs.prompt(global.win, options);
 }

@@ -4,6 +4,7 @@ import IconButton from "../global/icon-button/icon-button";
 import ToggleIconButton from "../global/icon-button/toggle-icon-button";
 import CycleIconButton from "../global/icon-button/cycle-icon-button";
 import { Alt, AppData, Character, SortTypeOptions, sortTypes } from "../../interfaces";
+import missing from "../../assets/missing.png";
 
 export function TabCharacters(): JSX.Element {
     const [filterInstallation, setFilterInstallation]:
@@ -317,7 +318,13 @@ function CharacterDisplay({
             <td>
                 <div className={"character-display-wrapper"}>
                     <div className={"character-display-mug"}>
-                        <img src={"img://" + character.mug} draggable={false}/>
+                        <img
+                            src={"img://" + character.mug}
+                            draggable={false}
+                            onError={(event: any) => {
+                                event.target.src = missing;
+                            }}
+                        />
                     </div>
                     <div className={"character-display-name"}>
                         <span>{character.menuName}</span>
@@ -390,7 +397,13 @@ function CharacterAltDisplay({
     return (
         <div className={"alt-display-wrapper"}>
             <div className={"alt-display-mug"}>
-                <img src={"img://" + alt.mug} draggable={false}/>
+                <img
+                    src={"img://" + alt.mug}
+                    draggable={false}
+                    onError={(event: any) => {
+                        event.target.src = missing;
+                    }}
+                />
             </div>
             <div className={"alt-display-name"}>
                 <span>{alt.menuName}</span>

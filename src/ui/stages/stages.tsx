@@ -4,6 +4,7 @@ import IconButton from "../global/icon-button/icon-button";
 import ToggleIconButton from "../global/icon-button/toggle-icon-button";
 import CycleIconButton from "../global/icon-button/cycle-icon-button";
 import { AppData, SortTypeOptions, Stage, sortTypes } from "../../interfaces";
+import missing from "../../assets/missing.png";
 
 export function TabStages(): JSX.Element {
     const [filterInstallation, setFilterInstallation]:
@@ -305,7 +306,13 @@ function StageDisplay({
             <td>
                 <div className={"stage-display-wrapper"}>
                     <div className={"stage-display-mug"}>
-                        <img src={"img://" + stage.icon} draggable={false}/>
+                        <img
+                            src={"img://" + stage.icon}
+                            draggable={false}
+                            onError={(event: any) => {
+                                event.target.src = missing;
+                            }}
+                        />
                     </div>
                     <div className={"stage-display-name"}>
                         <span>{stage.menuName}</span>

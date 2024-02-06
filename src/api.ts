@@ -2,6 +2,7 @@ import { ipcRenderer } from "electron";
 import {
     Alt, AppData, Character, CharacterDat, CssData, CssPage, Download, SssPage, Stage
 } from "./interfaces";
+import { AlertOptions, ConfirmOptions, PromptOptions } from "./custom-dialogs";
 
 export default {
     addAlt: ((...args: [
@@ -20,7 +21,15 @@ export default {
         dir?: string
     ]): Promise<void> => ipcRenderer.invoke("addSssPage", args)),
 
+    alert: ((...args: [
+        options: AlertOptions
+    ]): Promise<void> => ipcRenderer.invoke("alert", args)),
+
     checkForUpdates: ((): Promise<void> => ipcRenderer.invoke("checkForUpdates")),
+
+    confirm: ((...args: [
+        options: ConfirmOptions
+    ]): Promise<boolean> => ipcRenderer.invoke("confirm", args)),
 
     ensureAllAltsAreCharacters: ((...args: [
         areCharacter: boolean,
@@ -142,6 +151,10 @@ export default {
     pathJoin: ((...args: [
         ...paths: string[]
     ]): Promise<string> => ipcRenderer.invoke("pathJoin", args)),
+
+    prompt: ((...args: [
+        options: PromptOptions
+    ]): Promise<string> => ipcRenderer.invoke("prompt", args)),
 
     readAlts: ((...args: [
         dir?: string

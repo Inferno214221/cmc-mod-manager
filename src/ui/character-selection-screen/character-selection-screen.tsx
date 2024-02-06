@@ -6,6 +6,7 @@ import CycleIconButton from "../global/icon-button/cycle-icon-button";
 import {
     Character, CharacterList, CssData, CssPage, DndData, DndDataType, SortTypeOptions, sortTypes
 } from "../../interfaces";
+import missing from "../../assets/missing.png";
 
 export function TabCharacterSelectionScreen(): JSX.Element {
     const [characters, setCharacters]:
@@ -333,7 +334,13 @@ function CharacterDisplay({
                     );
                 }}
             >
-                <img src={"img://" + character.mug} draggable={false} />
+                <img
+                    src={"img://" + character.mug}
+                    draggable={false}
+                    onError={(event: any) => {
+                        event.target.src = missing;
+                    }}
+                />
                 <div className={"excluded-display-name"}>
                     <span>{character.menuName}</span>
                 </div>
@@ -575,7 +582,13 @@ function CssCharacterDisplay({
                             .hidden = false;
                     }}
                 >
-                    <img src={"img://" + character.mug} draggable={false}/>
+                    <img
+                        src={"img://" + character.mug}
+                        draggable={false}
+                        onError={(event: any) => {
+                            event.target.src = missing;
+                        }}
+                    />
                     <span>{character.menuName}</span>
                 </div>
                 <div
