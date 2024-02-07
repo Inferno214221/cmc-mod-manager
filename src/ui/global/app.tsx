@@ -22,6 +22,7 @@ import {
 import {
     TabSettings
 } from "../settings/settings";
+import ToggleIconButton from "./icon-button/toggle-icon-button";
 
 let root: Root;
 let activeTab: Tab = null;
@@ -136,6 +137,18 @@ export async function switchTabs(tab: Tab): Promise<void> {
         <>
             <Nav/>
             {tab.element}
+            <StatusPanel
+                displays={[
+                    {
+                        title: "Title",
+                        body: "Body Text"
+                    },
+                    {
+                        title: "Title",
+                        body: "Body Text"
+                    }
+                ]}
+            />
         </>
     );
     document.title = "CMC Mod Manager | " + tab.displayName;
@@ -202,6 +215,46 @@ export function NavButton({ info }: { info: NavButtonInfo }): JSX.Element {
             <div className={"tooltip"}>
                 <span>{info.displayName}</span>
             </div>
+        </div>
+    );
+}
+
+export interface StatusDisplayInfo {
+    title: string,
+    body: string
+}
+
+export function StatusPanel({ displays }: { displays: StatusDisplayInfo[] }): JSX.Element {
+    const [showPanel, setShowPanel]:
+    [boolean, Dispatch<SetStateAction<boolean>>]
+    = useState(false);
+
+    return (
+        <div className={"status-panel"}>
+            <div className={"status-panel-toggle"}>
+                <ToggleIconButton
+                    checked={showPanel}
+                    trueIcon={"keyboard_arrow_right"}
+                    trueTooltip={"Hide Active Operations"}
+                    falseIcon={"keyboard_arrow_left"}
+                    falseTooltip={"Show Active Operations"}
+                    iconSize={"30px"}
+                    setter={setShowPanel}
+                />
+            </div>
+            {showPanel ?
+                <div className={"status-display-box"}>
+                    <div className={"center"}>
+                        <h2 className={"status-panel-title"}>Active Operations</h2>
+                    </div>
+                    {displays.map((display: StatusDisplayInfo, index: number) =>
+                        <div className={"status-display"} key={index}>
+                            <h3>{display.title}</h3>
+                            <p>{display.body}</p>
+                        </div>
+                    )}
+                </div> : null
+            }
         </div>
     );
 }

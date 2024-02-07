@@ -712,7 +712,7 @@ export function getCharacterRegExps(
         wipString = wipString.replaceAll("<audio>", "(mp3|wav|ogg)");
         wipString = wipString.replaceAll("<palette>", "\\d+");
         wipString = wipString.replaceAll("<any>", "[^\\/\\\\]+");
-        files.push(new RegExp(wipString, "gm"));
+        files.push(new RegExp(wipString, "gmi"));
     });
     general.log("Get Character RegExps - Return:", files);
     return files;

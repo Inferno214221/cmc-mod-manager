@@ -134,7 +134,7 @@ export function getStageRegExps(
         wipString = general.escapeRegex(wipString);
         wipString += "$";
         wipString = wipString.replaceAll("<any>", "[^\\/\\\\]+");
-        files.push(new RegExp(wipString, "gm"));
+        files.push(new RegExp(wipString, "gmi"));
     });
     general.log("Get Stage RegExps - Return:", files);
     return files;

@@ -222,6 +222,11 @@ h2 {
     margin: 0px;
 }
 
+h3 {
+    font-size: 16px;
+    margin: 0px;
+}
+
 .flex-fill {
     flex-grow: 1;
 }
@@ -296,4 +301,65 @@ hr.vr {
     border-style: solid;
     border-radius: 5px;
     margin: 5px 0px 0px 5px;
+}
+
+.status-panel {
+    position: absolute;
+    z-index: 10;
+    right: 0px;
+    top: 0px;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    pointer-events: none;
+}
+
+.status-display-box {
+    display: flex;
+    flex-direction: column;
+    padding: 5px;
+    width: 200px;
+    background-color: var(--inf-grey2);
+    height: 100%;
+    pointer-events: all;
+    /* border-left: 1px solid var(--inf-grey2); */
+}
+
+.status-display {
+    background-color: var(--inf-grey4);
+    /* border-color: var(--inf-grey2);
+    border-width: 1px;
+    border-style: solid; */
+    border-radius: 3px;
+    padding: 5px;
+    margin-bottom: 5px;
+}
+
+.status-panel-title {
+    margin-bottom: 5px;
+}
+
+.status-panel-toggle {
+    display: inline-flex;
+    align-items: center;
+}
+
+.status-panel-toggle .icon-button-wrapper {
+    pointer-events: all;
+    background-color: var(--inf-grey2);
+    margin: 0px;
+    border-radius: 3px 0px 0px 3px;
+}
+
+.status-panel-toggle .icon-button-tooltip {
+    right: 30px;
+}
+
+.status-panel-toggle .icon-button-wrapper .icon-button:hover {
+    background-color: var(--inf-grey2);
+}
+
+.status-panel-toggle .icon-button-wrapper,
+.status-panel-toggle .icon-button-wrapper .icon-button {
+    height: 30px;
 }
