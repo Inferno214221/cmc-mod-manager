@@ -47,24 +47,27 @@ a {
 nav {
     background-color: var(--inf-grey1);
     width: 50px;
-    position: fixed;
-    top: 0px;
     height: 100%;
     z-index: 100;
     display: flex;
     flex-direction: column;
 }
 
+body {
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+    width: 100%;
+}
+
 section {
     background-color: var(--inf-grey4);
-    position: fixed;
-    top: 0px;
-    left: 50px;
-    width: calc(100% - 50px);
+    flex-grow: 1;
+    flex-shrink: 1;
     height: 100%;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
-    height: 100%;
 }
 
 hr {
@@ -304,13 +307,9 @@ hr.vr {
 }
 
 .status-panel {
-    position: absolute;
+    position: relative;
     z-index: 10;
-    right: 0px;
-    top: 0px;
     height: 100%;
-    display: flex;
-    flex-direction: row;
     pointer-events: none;
 }
 
@@ -340,8 +339,11 @@ hr.vr {
 }
 
 .status-panel-toggle {
+    position: absolute;
+    left: -30px;
     display: inline-flex;
     align-items: center;
+    height: 100%;
 }
 
 .status-panel-toggle .icon-button-wrapper {
