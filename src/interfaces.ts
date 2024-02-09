@@ -298,3 +298,8 @@ export interface SssPage {
 }
 
 export type SssData = string[][];
+
+export interface StatusDisplayInfo {
+    title: string,
+    body: string
+}

@@ -1,7 +1,12 @@
-// import { Dispatch, SetStateAction, useState, useEffect } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import "./settings.css";
+import { StatusDisplayInfo } from "../../interfaces";
 
-export function TabSettings(): JSX.Element {
+export function TabSettings({
+    setDisplays
+}: {
+    setDisplays: Dispatch<SetStateAction<StatusDisplayInfo[]>>
+}): JSX.Element {
     return (
         <section>
             <div id={"settings-div"}>

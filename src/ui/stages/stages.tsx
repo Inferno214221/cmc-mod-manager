@@ -3,10 +3,14 @@ import "./stages.css";
 import IconButton from "../global/icon-button/icon-button";
 import ToggleIconButton from "../global/icon-button/toggle-icon-button";
 import CycleIconButton from "../global/icon-button/cycle-icon-button";
-import { AppData, SortTypeOptions, Stage, sortTypes } from "../../interfaces";
+import { AppData, SortTypeOptions, Stage, StatusDisplayInfo, sortTypes } from "../../interfaces";
 import missing from "../../assets/missing.png";
 
-export function TabStages(): JSX.Element {
+export function TabStages({
+    setDisplays
+}: {
+    setDisplays: Dispatch<SetStateAction<StatusDisplayInfo[]>>
+}): JSX.Element {
     const [filterInstallation, setFilterInstallation]:
     [boolean, Dispatch<SetStateAction<boolean>>]
     = useState(null);

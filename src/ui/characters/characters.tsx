@@ -3,10 +3,16 @@ import "./characters.css";
 import IconButton from "../global/icon-button/icon-button";
 import ToggleIconButton from "../global/icon-button/toggle-icon-button";
 import CycleIconButton from "../global/icon-button/cycle-icon-button";
-import { Alt, AppData, Character, SortTypeOptions, sortTypes } from "../../interfaces";
+import {
+    Alt, AppData, Character, SortTypeOptions, StatusDisplayInfo, sortTypes
+} from "../../interfaces";
 import missing from "../../assets/missing.png";
 
-export function TabCharacters(): JSX.Element {
+export function TabCharacters({
+    setDisplays
+}: {
+    setDisplays: Dispatch<SetStateAction<StatusDisplayInfo[]>>
+}): JSX.Element {
     const [filterInstallation, setFilterInstallation]:
     [boolean, Dispatch<SetStateAction<boolean>>]
     = useState(null);

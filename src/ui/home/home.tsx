@@ -16,6 +16,7 @@ import {
     Tab,
     switchTabs
 } from "../global/app";
+import { StatusDisplayInfo } from "../../interfaces";
 
 const LICENSE: string = (
     "Copyright © 2023 Inferno214221\n\n" +
@@ -35,13 +36,25 @@ export async function AllowTabSwitchHome(): Promise<boolean> {
     return await api.isValidGameDir();
 }
 
-export function TabHome(): JSX.Element {
+export function TabHome({
+    setDisplays
+}: {
+    setDisplays: Dispatch<SetStateAction<StatusDisplayInfo[]>>
+}): JSX.Element {
     const [showDownloads, setShowDownloads]:
     [boolean, Dispatch<SetStateAction<boolean>>]
     = useState(false);
 
     useEffect(() => {
         checkURIAssociated();
+        setDisplays((prev: StatusDisplayInfo[]) => {
+            const newDisplays: StatusDisplayInfo[] = [...prev];
+            newDisplays.push({
+                title: "Another Title",
+                body: "New Body Text"
+            });
+            return newDisplays;
+        });
     }, []);
 
     async function checkURIAssociated(): Promise<void> {

@@ -4,11 +4,16 @@ import IconButton from "../global/icon-button/icon-button";
 import ToggleIconButton from "../global/icon-button/toggle-icon-button";
 import CycleIconButton from "../global/icon-button/cycle-icon-button";
 import {
-    DndData, DndDataType, SortTypeOptions, SssData, SssPage, Stage, StageList, sortTypes
+    DndData, DndDataType, SortTypeOptions, SssData, SssPage, Stage, StageList, StatusDisplayInfo,
+    sortTypes
 } from "../../interfaces";
 import missing from "../../assets/missing.png";
 
-export function TabStageSelectionScreen(): JSX.Element {
+export function TabStageSelectionScreen({
+    setDisplays
+}: {
+    setDisplays: Dispatch<SetStateAction<StatusDisplayInfo[]>>
+}): JSX.Element {
     const [stages, setStages]:
     [Stage[], Dispatch<SetStateAction<Stage[]>>]
     = useState([]);
