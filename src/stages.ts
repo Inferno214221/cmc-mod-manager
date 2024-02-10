@@ -180,7 +180,7 @@ export async function installStageDir(
     filterInstallation: boolean,
     updateStages: boolean,
     dir: string = global.gameDir
-): Promise<void> {
+): Promise<Stage | null> {
     general.log("Install Stage Dir - Start:", filterInstallation, updateStages, dir);
     const selected: OpenDialogReturnValue = await dialog.showOpenDialog(global.win, {
         properties: ["openDirectory"]
@@ -189,16 +189,17 @@ export async function installStageDir(
         general.log("Install Stage Dir - Exit: Selection Cancelled");
         return null;
     }
-    await installStage(selected.filePaths[0], filterInstallation, updateStages, dir);
-    general.log("Install Stage Dir - Return");
-    return;
+    const retVal: Stage | null =
+        await installStage(selected.filePaths[0], filterInstallation, updateStages, dir);
+    general.log("Install Stage Dir - Return:", retVal);
+    return retVal;
 }
 
 export async function installStageArchive(
     filterInstallation: boolean,
     updateStages: boolean,
     dir: string = global.gameDir
-): Promise<void> {
+): Promise<Stage | null> {
     general.log("Install Stage Archive - Start:", filterInstallation, updateStages, dir);
     const selected: OpenDialogReturnValue = await dialog.showOpenDialog(global.win, {
         properties: ["openFile"]
@@ -214,9 +215,10 @@ export async function installStageArchive(
         path.join(dir, "_temp")
     );
     general.log(output, filterInstallation);
-    await installStage(output, filterInstallation, updateStages, dir);
-    general.log("Install Stage Archive - Return");
-    return;
+    const retVal: Stage | null =
+        await installStage(output, filterInstallation, updateStages, dir);
+    general.log("Install Stage Archive - Return:", retVal);
+    return retVal;
 }
 
 export async function installStage(
@@ -224,7 +226,7 @@ export async function installStage(
     filterInstallation: boolean = true,
     updateStages: boolean = false,
     dir: string = global.gameDir
-): Promise<void> {
+): Promise<Stage | null> {
     general.log("Install Stage - Start:",
         stageDir, filterInstallation, updateStages, dir);
     const toResolve: Promise<void>[] = [];
@@ -246,8 +248,9 @@ export async function installStage(
     }
     if (!fs.readdirSync(correctedDir).includes("stage")) {
         //TODO: inform user
-        general.log("Install Stage - Exit: No Fighter Directory");
-        return;
+        general.log("Install Stage - Exit: No Stage Directory");
+        //TODO: error
+        return null;
     }
     general.log(correctedDir);
 
@@ -260,8 +263,9 @@ export async function installStage(
     const stageList: StageList = readStageList(dir);
     if (!updateStages && stageList.getStageByName(stageName) != undefined) {
         //TODO: inform user
-        general.log("Install Stage - Exit: Character Already Installed");
-        return;
+        general.log("Install Stage - Exit: Stage Already Installed");
+        //TODO: error
+        return null;
     }
 
     let stage: Stage;
@@ -315,15 +319,15 @@ export async function installStage(
     }
 
     if (stageList.getStageByName(stageName) != undefined) {
-        general.log("Install Character - Return: Character Already In List");
-        return;
+        general.log("Install Stage - Return: Stage Already In List:", stage);
+        return stageList.getStageByName(stageName);
     }
     stageList.addStage(stage);
     toResolve.push(writeStages(stageList.getAllStages(), dir));
     await Promise.allSettled(toResolve);
     fs.removeSync(path.join(dir, "info.json"));
-    general.log("Install Character - Return");
-    return;
+    general.log("Install Stage - Return:", stage);
+    return stage;
 }
 
 export async function extractStage(extract: string, dir: string = global.gameDir): Promise<void> {

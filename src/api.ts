@@ -107,31 +107,38 @@ export default {
         filterInstallation?: boolean,
         updateCharacters?: boolean,
         dir?: string
-    ]): Promise<void> => ipcRenderer.invoke("installCharacter", args)),
+    ]): Promise<Character> => ipcRenderer.invoke("installCharacter", args)),
 
     installCharacterArchive: ((...args: [
         filterInstallation: boolean,
         updateCharacters: boolean,
         dir?: string
-    ]): Promise<void> => ipcRenderer.invoke("installCharacterArchive", args)),
+    ]): Promise<Character> => ipcRenderer.invoke("installCharacterArchive", args)),
 
     installCharacterDir: ((...args: [
         filterInstallation: boolean,
         updateCharacters: boolean,
         dir?: string
-    ]): Promise<void> => ipcRenderer.invoke("installCharacterDir", args)),
+    ]): Promise<Character> => ipcRenderer.invoke("installCharacterDir", args)),
+
+    installStage: ((...args: [
+        stageDir: string,
+        filterInstallation?: boolean,
+        updateCharacters?: boolean,
+        dir?: string
+    ]): Promise<Stage | null> => ipcRenderer.invoke("installStage", args)),
 
     installStageArchive: ((...args: [
         filterInstallation: boolean,
         updateStages: boolean,
         dir?: string
-    ]): Promise<void> => ipcRenderer.invoke("installStageArchive", args)),
+    ]): Promise<Stage | null> => ipcRenderer.invoke("installStageArchive", args)),
 
     installStageDir: ((...args: [
         filterInstallation: boolean,
         updateStages: boolean,
         dir?: string
-    ]): Promise<void> => ipcRenderer.invoke("installStageDir", args)),
+    ]): Promise<Stage | null> => ipcRenderer.invoke("installStageDir", args)),
 
     isURIAssociated: ((): Promise<boolean> => ipcRenderer.invoke("isURIAssociated")),
 
@@ -162,10 +169,10 @@ export default {
 
     readAppData: ((): Promise<AppData> => ipcRenderer.invoke("readAppData")),
 
-    readCharacaterDat: ((...args: [
+    readCharacterDat: ((...args: [
         character: string,
         dir?: string
-    ]): Promise<CharacterDat> => ipcRenderer.invoke("readCharacaterDat", args)),
+    ]): Promise<CharacterDat> => ipcRenderer.invoke("readCharacterDat", args)),
 
     readCharacterDatPath: ((...args: [
         datPath: string,

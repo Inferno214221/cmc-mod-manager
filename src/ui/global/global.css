@@ -379,21 +379,19 @@ hr.vr {
     align-items: center;
 }
 
+.status-display-info div:not(.status-display-state) {
+    overflow: hidden;
+    word-wrap: break-word;
+}
+
 .status-display-info img {
     margin: 5px;
     width: 31px;
     height: 31px;
 }
 
-.loader {
-    width: max-content;
-    height: max-content;
-    border: 2px solid var(--inf-white3);
-    border-bottom-color: transparent;
-    border-radius: 50%;
-    display: inline-block;
-    /* box-sizing: border-box; */
-    animation: rotation 1s linear infinite;
+.animation-rotation {
+    animation: rotation 1s cubic-bezier(0, 0.4, 0.6, 1) infinite;
 }
 
 @keyframes rotation {
@@ -404,10 +402,6 @@ hr.vr {
     100% {
         transform: rotate(360deg);
     }
-}
-
-.animation-rotation {
-    animation: rotation 1s cubic-bezier(0, 0.4, 0.6, 1) infinite;
 }
 
 .animation-coin-flip {
@@ -426,29 +420,12 @@ hr.vr {
 
     50% {
         transform: rotateY(1800deg);
-        animation-timing-function: cubic-bezier(0, 0.5, 0.5, 1);
     }
 
     100% {
         transform: rotateY(3600deg);
     }
 }
-
-/* .animation-roll {
-    animation: roll 1.5s ease-in-out infinite alternate;
-}
-
-@keyframes roll {
-    0%,
-    10% {
-        transform: translateX(-150%) rotate(0deg);
-    }
-
-    90%,
-    100% {
-        transform: translateX(150%) rotate(360deg);
-    }
-} */
 
 .animation-flipX {
     animation: flipX 2s linear infinite;

@@ -4,7 +4,7 @@ import IconButton from "../global/icon-button/icon-button";
 import ToggleIconButton from "../global/icon-button/toggle-icon-button";
 import CycleIconButton from "../global/icon-button/cycle-icon-button";
 import {
-    Alt, AppData, Character, SortTypeOptions, StatusDisplayInfo, sortTypes
+    Alt, AppData, Character, SortTypeOptions, StatusDisplayInfo, StatusDisplayState, sortTypes
 } from "../../interfaces";
 import missing from "../../assets/missing.png";
 
@@ -184,6 +184,7 @@ export function TabCharacters({
                                             readCharacters={readCharacters}
                                             altTarget={altTarget}
                                             setAltTarget={setAltTarget}
+                                            setDisplays={setDisplays}
                                             key={character.name}
                                         />
                                     );
@@ -196,6 +197,7 @@ export function TabCharacters({
                                                 <SeriesDisplay
                                                     series={character.series}
                                                     readCharacters={readCharacters}
+                                                    setDisplays={setDisplays}
                                                 />
                                                 {characterDisplay}
                                             </>
@@ -211,6 +213,7 @@ export function TabCharacters({
                                         readCharacters={readCharacters}
                                         altTarget={altTarget}
                                         setAltTarget={setAltTarget}
+                                        setDisplays={setDisplays}
                                         key={character.name}
                                     />
                                 )
@@ -227,10 +230,35 @@ export function TabCharacters({
                         iconSize={"50px"}
                         tooltip={"Install Character From Directory"}
                         onClick={async () => {
-                            await api.installCharacterDir(
+                            let displayId: number;
+                            setDisplays((prev: StatusDisplayInfo[]) => {
+                                const newDisplays: StatusDisplayInfo[] = [...prev];
+                                displayId = newDisplays.push({
+                                    title: "Character Installation",
+                                    body: "Installing a character from a directory.",
+                                    state: StatusDisplayState.started,
+                                    icon: "folder_shared",
+                                    animation: Math.floor(Math.random() * 3)
+                                }) - 1;
+                                return newDisplays;
+                            });
+
+                            const character: Character = await api.installCharacterDir(
                                 filterInstallation,
                                 updateCharacters
                             );
+                            setDisplays((prev: StatusDisplayInfo[]) => {
+                                const newDisplays: StatusDisplayInfo[] = [...prev];
+                                if (character == null) {
+                                    newDisplays[displayId].state = StatusDisplayState.canceled;
+                                } else {
+                                    newDisplays[displayId].state = StatusDisplayState.finished;
+                                    newDisplays[displayId].body = "Installed character: '" +
+                                    character.name + "' from a directory.";
+                                    newDisplays[displayId].image = character.mug;
+                                }
+                                return newDisplays;
+                            });
                             readCharacters();
                         }}
                     />
@@ -239,10 +267,35 @@ export function TabCharacters({
                         iconSize={"50px"}
                         tooltip={"Install Character From Archive"}
                         onClick={async () => {
-                            await api.installCharacterArchive(
+                            let displayId: number;
+                            setDisplays((prev: StatusDisplayInfo[]) => {
+                                const newDisplays: StatusDisplayInfo[] = [...prev];
+                                displayId = newDisplays.push({
+                                    title: "Character Installation",
+                                    body: "Installing a character from an archive.",
+                                    state: StatusDisplayState.started,
+                                    icon: "contact_page",
+                                    animation: Math.floor(Math.random() * 3)
+                                }) - 1;
+                                return newDisplays;
+                            });
+
+                            const character: Character = await api.installCharacterArchive(
                                 filterInstallation,
                                 updateCharacters
                             );
+                            setDisplays((prev: StatusDisplayInfo[]) => {
+                                const newDisplays: StatusDisplayInfo[] = [...prev];
+                                if (character == null) {
+                                    newDisplays[displayId].state = StatusDisplayState.canceled;
+                                } else {
+                                    newDisplays[displayId].state = StatusDisplayState.finished;
+                                    newDisplays[displayId].body = "Installed character: '" +
+                                        character.name + "' from an archive.";
+                                    newDisplays[displayId].image = character.mug;
+                                }
+                                return newDisplays;
+                            });
                             readCharacters();
                         }}
                     />
@@ -302,12 +355,14 @@ function CharacterDisplay({
     character,
     readCharacters,
     altTarget,
-    setAltTarget
+    setAltTarget,
+    setDisplays
 }: {
     character: Character,
     readCharacters: () => Promise<void>,
     altTarget: Character,
-    setAltTarget: Dispatch<SetStateAction<Character>>
+    setAltTarget: Dispatch<SetStateAction<Character>>,
+    setDisplays: Dispatch<SetStateAction<StatusDisplayInfo[]>>
 }): JSX.Element {
     const [randomSelection, setRandomSelection]:
     [boolean, Dispatch<SetStateAction<boolean>>]
@@ -341,7 +396,28 @@ function CharacterDisplay({
                             iconSize={"30px"}
                             tooltip={"Delete Character"}
                             onClick={async () => {
+                                let displayId: number;
+                                setDisplays((prev: StatusDisplayInfo[]) => {
+                                    const newDisplays: StatusDisplayInfo[] = [...prev];
+                                    displayId = newDisplays.push({
+                                        title: "Character Deletion",
+                                        body: "Deleting character: '" + character.name + "'.",
+                                        image: character.mug,
+                                        state: StatusDisplayState.started,
+                                        icon: "delete",
+                                        animation: Math.floor(Math.random() * 3)
+                                    }) - 1;
+                                    return newDisplays;
+                                });
+
                                 await api.removeCharacter(character.name);
+                                setDisplays((prev: StatusDisplayInfo[]) => {
+                                    const newDisplays: StatusDisplayInfo[] = [...prev];
+                                    newDisplays[displayId].state = StatusDisplayState.finished;
+                                    newDisplays[displayId].body = "Deleted character: '" +
+                                        character.name + "'.";
+                                    return newDisplays;
+                                });
                                 readCharacters();
                             }}
                         />
@@ -349,8 +425,29 @@ function CharacterDisplay({
                             icon={"drive_file_move"}
                             iconSize={"30px"}
                             tooltip={"Extract Character"}
-                            onClick={() => {
-                                api.extractCharacter(character.name);
+                            onClick={async () => {
+                                let displayId: number;
+                                setDisplays((prev: StatusDisplayInfo[]) => {
+                                    const newDisplays: StatusDisplayInfo[] = [...prev];
+                                    displayId = newDisplays.push({
+                                        title: "Character Extraction",
+                                        body: "Extracting character: '" + character.name + "'.",
+                                        image: character.mug,
+                                        state: StatusDisplayState.started,
+                                        icon: "drive_file_move",
+                                        animation: Math.floor(Math.random() * 3)
+                                    }) - 1;
+                                    return newDisplays;
+                                });
+
+                                await api.extractCharacter(character.name);
+                                setDisplays((prev: StatusDisplayInfo[]) => {
+                                    const newDisplays: StatusDisplayInfo[] = [...prev];
+                                    newDisplays[displayId].state = StatusDisplayState.finished;
+                                    newDisplays[displayId].body = "Extracted character: '" +
+                                        character.name + "'.";
+                                    return newDisplays;
+                                });
                             }}
                         />
                         <ToggleIconButton
@@ -372,6 +469,7 @@ function CharacterDisplay({
                             altTarget={altTarget}
                             setAltTarget={setAltTarget}
                             readCharacters={readCharacters}
+                            setDisplays={setDisplays}
                         />
                     </div>
                 </div>
@@ -383,6 +481,7 @@ function CharacterDisplay({
                             <CharacterAltDisplay
                                 alt={alt}
                                 readCharacters={readCharacters}
+                                setDisplays={setDisplays}
                                 key={index}
                             />
                         )
@@ -395,10 +494,12 @@ function CharacterDisplay({
 
 function CharacterAltDisplay({
     alt,
-    readCharacters
+    readCharacters,
+    setDisplays
 }: {
     alt: Alt,
-    readCharacters: () => Promise<void>
+    readCharacters: () => Promise<void>,
+    setDisplays: Dispatch<SetStateAction<StatusDisplayInfo[]>>
 }): JSX.Element {
     return (
         <div className={"alt-display-wrapper"}>
@@ -420,7 +521,29 @@ function CharacterAltDisplay({
                     iconSize={"30px"}
                     tooltip={"Remove Alt"}
                     onClick={async () => {
+                        let displayId: number;
+                        setDisplays((prev: StatusDisplayInfo[]) => {
+                            const newDisplays: StatusDisplayInfo[] = [...prev];
+                            displayId = newDisplays.push({
+                                title: "Alt Removal",
+                                body: "Removing alt: '" + alt.alt + "' from character: '" +
+                                    alt.base + "'.",
+                                image: alt.mug,
+                                state: StatusDisplayState.started,
+                                icon: "group_remove",
+                                animation: Math.floor(Math.random() * 3)
+                            }) - 1;
+                            return newDisplays;
+                        });
+
                         await api.removeAlt(alt);
+                        setDisplays((prev: StatusDisplayInfo[]) => {
+                            const newDisplays: StatusDisplayInfo[] = [...prev];
+                            newDisplays[displayId].state = StatusDisplayState.finished;
+                            newDisplays[displayId].body = "Removed alt: '" + alt.alt +
+                                "' from character: '" + alt.base + "'.";
+                            return newDisplays;
+                        });
                         readCharacters();
                     }}
                 />
@@ -433,12 +556,14 @@ function AddAltButton({
     character,
     altTarget,
     setAltTarget,
-    readCharacters
+    readCharacters,
+    setDisplays
 }: {
     character: Character,
     altTarget: Character,
     setAltTarget: Dispatch<SetStateAction<Character>>,
-    readCharacters: () => Promise<void>
+    readCharacters: () => Promise<void>,
+    setDisplays: Dispatch<SetStateAction<StatusDisplayInfo[]>>
 }): JSX.Element {
     if (altTarget == null) {
         return (
@@ -470,8 +595,30 @@ function AddAltButton({
             iconSize={"30px"}
             tooltip={"Add As Alt To Selected Character"}
             onClick={async () => {
+                let displayId: number;
+                setDisplays((prev: StatusDisplayInfo[]) => {
+                    const newDisplays: StatusDisplayInfo[] = [...prev];
+                    displayId = newDisplays.push({
+                        title: "Alt Addition",
+                        body: "Adding alt: '" + character.name + "' to character: '" +
+                            altTarget.name + "'.",
+                        image: character.mug,
+                        state: StatusDisplayState.started,
+                        icon: "person_add",
+                        animation: Math.floor(Math.random() * 3)
+                    }) - 1;
+                    return newDisplays;
+                });
+
                 await api.addAlt(altTarget, character);
                 setAltTarget(null);
+                setDisplays((prev: StatusDisplayInfo[]) => {
+                    const newDisplays: StatusDisplayInfo[] = [...prev];
+                    newDisplays[displayId].state = StatusDisplayState.finished;
+                    newDisplays[displayId].body = "Added alt: '" + character.name +
+                        "' to character: '" + altTarget.name + "'.";
+                    return newDisplays;
+                });
                 readCharacters();
             }}
         />
@@ -480,10 +627,12 @@ function AddAltButton({
 
 function SeriesDisplay({
     series,
-    readCharacters
+    readCharacters,
+    setDisplays
 }: {
     series: string,
-    readCharacters: () => Promise<void>
+    readCharacters: () => Promise<void>,
+    setDisplays: Dispatch<SetStateAction<StatusDisplayInfo[]>>
 }): JSX.Element {
     return (
         <tr>
@@ -496,7 +645,38 @@ function SeriesDisplay({
                     iconSize={"30px"}
                     tooltip={"Delete All Characters In Series"}
                     onClick={async () => {
+                        let displayId: number;
+                        setDisplays((prev: StatusDisplayInfo[]) => {
+                            const newDisplays: StatusDisplayInfo[] = [...prev];
+                            displayId = newDisplays.push({
+                                title: "Series Deletion",
+                                body: "Deleting all characters in series: '" + series + "'.",
+                                state: StatusDisplayState.started,
+                                icon: "delete_sweep",
+                                animation: Math.floor(Math.random() * 3)
+                            }) - 1;
+                            return newDisplays;
+                        });
+                        api.getGameDir().then((gameDir: string) => {
+                            api.pathJoin(
+                                gameDir, "gfx", "seriesicon", series + ".png"
+                            ).then((path: string) => {
+                                setDisplays((prev: StatusDisplayInfo[]) => {
+                                    const newDisplays: StatusDisplayInfo[] = [...prev];
+                                    newDisplays[displayId].image = path;
+                                    return newDisplays;
+                                });
+                            });
+                        });
+
                         await api.removeSeriesCharacters(series);
+                        setDisplays((prev: StatusDisplayInfo[]) => {
+                            const newDisplays: StatusDisplayInfo[] = [...prev];
+                            newDisplays[displayId].state = StatusDisplayState.finished;
+                            newDisplays[displayId].body = "Deleted all characters in series: '" +
+                                series + "'.";
+                            return newDisplays;
+                        });
                         readCharacters();
                     }}
                 />

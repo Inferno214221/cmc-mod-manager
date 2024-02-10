@@ -5,6 +5,7 @@ import ToggleIconButton from "../global/icon-button/toggle-icon-button";
 import CycleIconButton from "../global/icon-button/cycle-icon-button";
 import {
     DndData, DndDataType, SortTypeOptions, SssData, SssPage, Stage, StageList, StatusDisplayInfo,
+    StatusDisplayState,
     sortTypes
 } from "../../interfaces";
 import missing from "../../assets/missing.png";
@@ -126,6 +127,7 @@ export function TabStageSelectionScreen({
                         activePage={activePage}
                         setActivePage={setActivePage}
                         getPages={getPages}
+                        setDisplays={setDisplays}
                     />
                 </div>
             </div>
@@ -361,12 +363,14 @@ function SssPages({
     sssPages,
     activePage,
     setActivePage,
-    getPages
+    getPages,
+    setDisplays
 }: {
     sssPages: SssPage[],
     activePage: number,
     setActivePage: Dispatch<SetStateAction<number>>,
-    getPages: () => Promise<void>
+    getPages: () => Promise<void>,
+    setDisplays: Dispatch<SetStateAction<StatusDisplayInfo[]>>
 }): JSX.Element {
     const [newPageName, setNewPageName]:
     [string, Dispatch<SetStateAction<string>>]
@@ -381,6 +385,7 @@ function SssPages({
                     activePage={activePage}
                     setActivePage={setActivePage}
                     getPages={getPages}
+                    setDisplays={setDisplays}
                     key={page.name}
                 />
             )}
@@ -399,7 +404,27 @@ function SssPages({
                     tooltip={"Add Page"}
                     onClick={async () => {
                         if (newPageName != "") {
+                            let displayId: number;
+                            setDisplays((prev: StatusDisplayInfo[]) => {
+                                const newDisplays: StatusDisplayInfo[] = [...prev];
+                                displayId = newDisplays.push({
+                                    title: "SSS Page Addition",
+                                    body: "Adding new SSS page: '" + newPageName + "'.",
+                                    state: StatusDisplayState.started,
+                                    icon: "add",
+                                    animation: Math.floor(Math.random() * 3)
+                                }) - 1;
+                                return newDisplays;
+                            });
+
                             await api.addSssPage(newPageName);
+                            setDisplays((prev: StatusDisplayInfo[]) => {
+                                const newDisplays: StatusDisplayInfo[] = [...prev];
+                                newDisplays[displayId].state = StatusDisplayState.finished;
+                                newDisplays[displayId].body = "Added new SSS page: '" +
+                                    newPageName + "'.";
+                                return newDisplays;
+                            });
                             getPages();
                         }
                     }}
@@ -414,13 +439,15 @@ function SssPageDisplay({
     sssPages,
     activePage,
     setActivePage,
-    getPages
+    getPages,
+    setDisplays
 }: {
     page: SssPage,
     sssPages: SssPage[],
     activePage: number,
     setActivePage: Dispatch<SetStateAction<number>>,
-    getPages: () => Promise<void>
+    getPages: () => Promise<void>,
+    setDisplays: Dispatch<SetStateAction<StatusDisplayInfo[]>>
 }): JSX.Element {
     console.log(sssPages[activePage].pageNumber == page.pageNumber);
     return (
@@ -440,7 +467,26 @@ function SssPageDisplay({
                 iconSize={"18px"}
                 tooltip={"Delete Page"}
                 onClick={async () => {
+                    let displayId: number;
+                    setDisplays((prev: StatusDisplayInfo[]) => {
+                        const newDisplays: StatusDisplayInfo[] = [...prev];
+                        displayId = newDisplays.push({
+                            title: "SSS Page Deletion",
+                            body: "Deleting SSS page: '" + page.name + "'.",
+                            state: StatusDisplayState.started,
+                            icon: "delete",
+                            animation: Math.floor(Math.random() * 3)
+                        }) - 1;
+                        return newDisplays;
+                    });
+
                     await api.removeSssPage(page);
+                    setDisplays((prev: StatusDisplayInfo[]) => {
+                        const newDisplays: StatusDisplayInfo[] = [...prev];
+                        newDisplays[displayId].state = StatusDisplayState.finished;
+                        newDisplays[displayId].body = "Deleted SSS page: '" + page.name + "'.";
+                        return newDisplays;
+                    });
                     getPages()
                 }}
             />

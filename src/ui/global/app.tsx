@@ -236,7 +236,6 @@ export function NavButton({ info }: { info: NavButtonInfo }): JSX.Element {
 const ANIMATIONS: string[] = [
     "animation-rotation",
     "animation-coin-flip",
-    // "animation-roll",
     "animation-flipX"
 ];
 
@@ -289,14 +288,14 @@ export function StatusDisplay({ display }: { display: StatusDisplayInfo }): JSX.
     let icon: string = display.icon;
     let classes: string = "mat-icon";
     if (display.state == StatusDisplayState.started) {
-        classes += " " + ANIMATIONS[Math.floor(display.animation * 3)];
+        classes += " " + ANIMATIONS[display.animation];
     } else {
         switch (display.state) {
             case (StatusDisplayState.finished):
                 icon = "done";
                 break;
             case (StatusDisplayState.canceled):
-                icon = "cancel";
+                icon = "close";
                 break;
             case (StatusDisplayState.error):
                 icon = "error_outline";

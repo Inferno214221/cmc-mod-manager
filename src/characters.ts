@@ -476,7 +476,7 @@ export async function installCharacterDir(
     filterInstallation: boolean,
     updateCharacters: boolean,
     dir: string = global.gameDir
-): Promise<void> {
+): Promise<Character> {
     general.log("Install Character Dir - Start:", filterInstallation, updateCharacters, dir);
     const selected: OpenDialogReturnValue = await dialog.showOpenDialog(global.win, {
         properties: ["openDirectory"]
@@ -485,16 +485,17 @@ export async function installCharacterDir(
         general.log("Install Character Dir - Exit: Selection Cancelled");
         return null;
     }
-    await installCharacter(selected.filePaths[0], filterInstallation, updateCharacters, dir);
-    general.log("Install Character Dir - Return");
-    return;
+    const retVal: Character =
+        await installCharacter(selected.filePaths[0], filterInstallation, updateCharacters, dir);
+    general.log("Install Character Dir - Return:", retVal);
+    return retVal;
 }
 
 export async function installCharacterArchive(
     filterInstallation: boolean,
     updateCharacters: boolean,
     dir: string = global.gameDir
-): Promise<void> {
+): Promise<Character> {
     general.log("Install Character Archive - Start:", filterInstallation, updateCharacters, dir);
     const selected: OpenDialogReturnValue = await dialog.showOpenDialog(global.win, {
         properties: ["openFile"]
@@ -510,9 +511,10 @@ export async function installCharacterArchive(
         path.join(dir, "_temp")
     );
     general.log(output, filterInstallation);
-    await installCharacter(output, filterInstallation, updateCharacters, dir);
-    general.log("Install Character Archive - Return");
-    return;
+    const retVal: Character =
+        await installCharacter(output, filterInstallation, updateCharacters, dir);
+    general.log("Install Character Archive - Return:", retVal);
+    return retVal;
 }
 
 export async function installCharacter(
@@ -520,7 +522,7 @@ export async function installCharacter(
     filterInstallation: boolean = true,
     updateCharacters: boolean = false,
     dir: string = global.gameDir
-): Promise<void> {
+): Promise<Character> {
     general.log("Install Character - Start:",
         characterDir, filterInstallation, updateCharacters, dir);
     const toResolve: Promise<void>[] = [];
@@ -543,39 +545,42 @@ export async function installCharacter(
     if (!fs.readdirSync(correctedDir).includes("fighter")) {
         //TODO: inform user
         general.log("Install Character - Exit: No Fighter Directory");
-        return;
+        //TODO: error
+        return null;
     }
     general.log(correctedDir);
 
-    const character: string = fs.readdirSync(path.join(correctedDir, "fighter"))
+    const characterName: string = fs.readdirSync(path.join(correctedDir, "fighter"))
         .filter((file: string) => {
             return file.endsWith(".bin") || !file.includes(".");
         })[0].split(".")[0];
-    general.log(character);
+    general.log(characterName);
 
     let characterDat: CharacterDat;
-    if (fs.existsSync(path.join(correctedDir, "data", "dats", character + ".dat"))) {
+    if (fs.existsSync(path.join(correctedDir, "data", "dats", characterName + ".dat"))) {
         characterDat = readCharacterDatPath(
-            path.join(correctedDir, "data", "dats", character + ".dat"),
-            character
+            path.join(correctedDir, "data", "dats", characterName + ".dat"),
+            characterName
         );
-    } else if (fs.existsSync(path.join(correctedDir, "data", character + ".dat"))) {
+    } else if (fs.existsSync(path.join(correctedDir, "data", characterName + ".dat"))) {
         characterDat = readCharacterDatPath(
-            path.join(correctedDir, "data", character + ".dat"),
-            character
+            path.join(correctedDir, "data", characterName + ".dat"),
+            characterName
         );
     } else {
         //TODO: inform user
         general.log("Install Character - Exit: No Dat File");
-        return;
+        //TODO: error
+        return null;
     }
     general.log(characterDat);
 
     const characters: CharacterList = readCharacterList(dir);
-    if (!updateCharacters && characters.getCharacterByName(character) != undefined) {
+    if (!updateCharacters && characters.getCharacterByName(characterName) != undefined) {
         //TODO: inform user
         general.log("Install Character - Exit: Character Already Installed");
-        return;
+        //TODO: error
+        return null;
     }
 
     if (filterInstallation) {
@@ -603,23 +608,25 @@ export async function installCharacter(
         path.join(dir, "data", "dats")
     ));
 
-    if (characters.getCharacterByName(character) != undefined) {
-        general.log("Install Character - Return: Character Already In List");
-        return;
-    }
-    characters.addCharacter({
-        name: character,
+    const character: Character = {
+        name: characterName,
         menuName: characterDat.menuName,
         series: characterDat.series,
         randomSelection: true,
         number: characters.getNextNumber(),
         alts: [],
-        mug: path.join(dir, "gfx", "mugs", character + ".png")
-    });
+        mug: path.join(dir, "gfx", "mugs", characterName + ".png")
+    };
+
+    if (characters.getCharacterByName(characterName) != undefined) {
+        general.log("Install Character - Return: Character Already In List:", character);
+        return character;
+    }
+    characters.addCharacter(character);
     toResolve.push(writeCharacters(characters.getAllCharacters(), dir));
     await Promise.allSettled(toResolve);
-    general.log("Install Character - Return");
-    return;
+    general.log("Install Character - Return:", character);
+    return character;
 }
 
 export async function extractCharacter(
