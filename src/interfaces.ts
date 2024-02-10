@@ -301,5 +301,18 @@ export type SssData = string[][];
 
 export interface StatusDisplayInfo {
     title: string,
-    body: string
+    body: string,
+    image?: string,
+    state: StatusDisplayState,
+    // message?: string,
+    icon: string,
+    animation: number
+}
+
+export enum StatusDisplayState {
+    //TODO: queued = "Queued",
+    started = "Started",
+    finished = "Finished",
+    canceled = "Canceled",
+    error = "Error"
 }

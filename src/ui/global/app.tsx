@@ -23,7 +23,8 @@ import {
     TabSettings
 } from "../settings/settings";
 import ToggleIconButton from "./icon-button/toggle-icon-button";
-import { StatusDisplayInfo } from "../../interfaces";
+import { StatusDisplayInfo, StatusDisplayState } from "../../interfaces";
+import missing from "../../assets/missing.png";
 
 let root: Root;
 let activeTab: Tab = null;
@@ -152,16 +153,7 @@ export function App({ tab }: { tab: Tab }): JSX.Element {
 
     const [displays, setDisplays]:
     [StatusDisplayInfo[], Dispatch<SetStateAction<StatusDisplayInfo[]>>]
-    = useState([
-        {
-            title: "Title",
-            body: "Body Text"
-        },
-        {
-            title: "Title",
-            body: "Body Text"
-        }
-    ]);
+    = useState([]);
 
     return (
         <>
@@ -241,6 +233,13 @@ export function NavButton({ info }: { info: NavButtonInfo }): JSX.Element {
     );
 }
 
+const ANIMATIONS: string[] = [
+    "animation-rotation",
+    "animation-coin-flip",
+    // "animation-roll",
+    "animation-flipX"
+];
+
 export function StatusPanel({
     displays,
     showPanel,
@@ -250,15 +249,21 @@ export function StatusPanel({
     showPanel: boolean, 
     setShowPanel: Dispatch<SetStateAction<boolean>>
 }): JSX.Element {
+    useEffect(() => {
+        if (displays.length > 0) {
+            setShowPanel(true);
+        }
+    }, [displays])
+
     return (
         <div className={"status-panel"}>
             <div className={"status-panel-toggle"}>
                 <ToggleIconButton
                     checked={showPanel}
                     trueIcon={"keyboard_arrow_right"}
-                    trueTooltip={"Hide Active Operations"}
+                    trueTooltip={"Hide Operations"}
                     falseIcon={"keyboard_arrow_left"}
-                    falseTooltip={"Show Active Operations"}
+                    falseTooltip={"Show Operations"}
                     iconSize={"30px"}
                     setter={setShowPanel}
                 />
@@ -266,16 +271,61 @@ export function StatusPanel({
             {showPanel ?
                 <div className={"status-display-box"}>
                     <div className={"center"}>
-                        <h2 className={"status-panel-title"}>Active Operations</h2>
+                        <h2 className={"status-panel-title"}>Operations</h2>
                     </div>
-                    {displays.map((display: StatusDisplayInfo, index: number) =>
-                        <div className={"status-display"} key={index}>
-                            <h3>{display.title}</h3>
-                            <p>{display.body}</p>
-                        </div>
+                    {displays.toReversed().map((display: StatusDisplayInfo, index: number) =>
+                        <StatusDisplay
+                            display={display}
+                            key={index}
+                        />
                     )}
                 </div> : null
             }
+        </div>
+    );
+}
+
+export function StatusDisplay({ display }: { display: StatusDisplayInfo }): JSX.Element {
+    let icon: string = display.icon;
+    let classes: string = "mat-icon";
+    if (display.state == StatusDisplayState.started) {
+        classes += " " + ANIMATIONS[Math.floor(display.animation * 3)];
+    } else {
+        switch (display.state) {
+            case (StatusDisplayState.finished):
+                icon = "done";
+                break;
+            case (StatusDisplayState.canceled):
+                icon = "cancel";
+                break;
+            case (StatusDisplayState.error):
+                icon = "error_outline";
+                break;
+        }
+    }
+
+    return (
+        <div className={"status-display"}>
+            <h3>{display.title}</h3>
+            <div className={"status-display-info"}>
+                {display.image == null ? null :
+                    <img
+                        src={"img://" + display.image}
+                        draggable={false}
+                        onError={(event: any) => {
+                            event.target.src = missing;
+                        }}
+                    />
+                }
+                <div>
+                    <span>{display.body}</span>
+                </div>
+                <div className={"status-display-state"}>
+                    <span className={classes}>
+                        {icon}
+                    </span>
+                </div>
+            </div>
         </div>
     );
 }

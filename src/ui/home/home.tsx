@@ -47,14 +47,6 @@ export function TabHome({
 
     useEffect(() => {
         checkURIAssociated();
-        setDisplays((prev: StatusDisplayInfo[]) => {
-            const newDisplays: StatusDisplayInfo[] = [...prev];
-            newDisplays.push({
-                title: "Another Title",
-                body: "New Body Text"
-            });
-            return newDisplays;
-        });
     }, []);
 
     async function checkURIAssociated(): Promise<void> {

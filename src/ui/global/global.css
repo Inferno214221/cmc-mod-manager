@@ -366,3 +366,112 @@ hr.vr {
 .status-panel-toggle .icon-button-wrapper .icon-button {
     height: 30px;
 }
+
+.status-display-state {
+    font-size: 30px;
+    width: 30px;
+    height: 30px;
+}
+
+.status-display-info {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.status-display-info img {
+    margin: 5px;
+    width: 31px;
+    height: 31px;
+}
+
+.loader {
+    width: max-content;
+    height: max-content;
+    border: 2px solid var(--inf-white3);
+    border-bottom-color: transparent;
+    border-radius: 50%;
+    display: inline-block;
+    /* box-sizing: border-box; */
+    animation: rotation 1s linear infinite;
+}
+
+@keyframes rotation {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.animation-rotation {
+    animation: rotation 1s cubic-bezier(0, 0.4, 0.6, 1) infinite;
+}
+
+.animation-coin-flip {
+    animation: coin-flip 4s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+}
+
+@keyframes coin-flip {
+    0%,
+    100% {
+        animation-timing-function: cubic-bezier(0.5, 0, 1, 0.5);
+    }
+
+    0% {
+        transform: rotateY(0deg);
+    }
+
+    50% {
+        transform: rotateY(1800deg);
+        animation-timing-function: cubic-bezier(0, 0.5, 0.5, 1);
+    }
+
+    100% {
+        transform: rotateY(3600deg);
+    }
+}
+
+/* .animation-roll {
+    animation: roll 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes roll {
+    0%,
+    10% {
+        transform: translateX(-150%) rotate(0deg);
+    }
+
+    90%,
+    100% {
+        transform: translateX(150%) rotate(360deg);
+    }
+} */
+
+.animation-flipX {
+    animation: flipX 2s linear infinite;
+}
+
+@keyframes flipX {
+    0% {
+        transform: perspective(200px) rotateX(0deg) rotateY(0deg);
+    }
+
+    25% {
+        transform: perspective(200px) rotateX(-180deg) rotateY(0deg);
+    }
+
+    50% {
+        transform: perspective(200px) rotateX(-180deg) rotateY(-180deg);
+    }
+
+    75% {
+        transform: perspective(200px) rotateX(0deg) rotateY(-180deg);
+    }
+
+    100% {
+        transform: perspective(200px) rotateX(0deg) rotateY(0deg);
+    }
+}
