@@ -83,6 +83,7 @@ app.on("activate", () => {
 });
 
 app.on("before-quit", () => {
+    fs.removeSync(path.join(app.getPath("userData"), "_temp"));
     if (global.log == "") return;
     const LOG_FILE: string = path.join(app.getPath("userData"), "log.txt");
     fs.ensureFileSync(LOG_FILE);

@@ -317,7 +317,7 @@ hr.vr {
     display: flex;
     flex-direction: column;
     padding: 5px;
-    width: 200px;
+    width: 210px;
     background-color: var(--inf-grey2);
     height: 100%;
     pointer-events: all;
@@ -432,7 +432,8 @@ hr.vr {
 }
 
 @keyframes flipX {
-    0% {
+    0%,
+    100% {
         transform: perspective(200px) rotateX(0deg) rotateY(0deg);
     }
 
@@ -446,9 +447,5 @@ hr.vr {
 
     75% {
         transform: perspective(200px) rotateX(0deg) rotateY(-180deg);
-    }
-
-    100% {
-        transform: perspective(200px) rotateX(0deg) rotateY(0deg);
     }
 }

@@ -91,7 +91,7 @@ export function TabHome({
                     <div className={"center"}>
                         <button onClick={() => {
                             api.alert({
-                                title: "CMC Mod Manager License Notice",
+                                title: "CMC Mod Manager | License Notice",
                                 body: LICENSE
                             });
                         }}>Show License (GNU GPLv3)</button>

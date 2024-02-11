@@ -1,4 +1,4 @@
-import { BrowserWindow, OpenDialogReturnValue, dialog } from "electron";
+import { BrowserWindow, OpenDialogReturnValue, app, dialog } from "electron";
 import fs from "fs-extra";
 import path from "path";
 import { AppData, Download, SssData, SssPage, Stage, StageList } from "./interfaces";
@@ -208,11 +208,9 @@ export async function installStageArchive(
         general.log("Install Stage Archive - Exit: Selection Cancelled");
         return null;
     }
-    fs.ensureDirSync(path.join(dir, "_temp"));
-    fs.emptyDirSync(path.join(dir, "_temp"));
     const output: string = await general.extractArchive(
         selected.filePaths[0],
-        path.join(dir, "_temp")
+        path.join(app.getPath("userData"), "_temp")
     );
     general.log(output, filterInstallation);
     const retVal: Stage | null =
@@ -255,9 +253,9 @@ export async function installStage(
     general.log(correctedDir);
 
     const stageName: string = fs.readdirSync(path.join(correctedDir, "stage"))
-        .filter((file: string) => {
-            return file.endsWith(".bin") || !file.includes(".");
-        })[0].split(".")[0];
+        .filter((file: string) =>
+            file.endsWith(".bin") || !file.includes(".")
+        )[0].split(".")[0];
     general.log(stageName);
 
     const stageList: StageList = readStageList(dir);
@@ -286,12 +284,60 @@ export async function installStage(
             icon: path.join(dir, "gfx", "stgicons", stageName + ".png")
         }
     } else {
-        //TODO: get text input
+        if (!(await general.confirm({
+            title: "CMC Mod Manager | Stage Installation",
+            body: "Because of CMC+'s current modding format, you will be required to enter some " +
+                "information about the stage you are installing. This information can usually be " +
+                "found in a txt file in the mod's top level directory."
+        }))) {
+            return null;
+        }
+
+        if (await general.confirm({
+            title: "CMC Mod Manager | Stage Installation",
+            body: "Would you like to open the mod's directory to find any txt files manually?",
+            okLabel: "Yes",
+            cancelLabel: "No"
+        })) {
+            general.openDir(correctedDir);
+        }
+
+        let menuName: string;
+        while (menuName == undefined || menuName == "") {
+            menuName = await general.prompt({
+                title: "CMC Mod Manager | Stage Installation",
+                body: "Please enter the stage's 'menu name'. (The name that will be displayed " +
+                    "on the stage selection screen.)",
+                placeholder: "Stage's Menu Name"
+            });
+        }
+
+        let source: string;
+        while (source == undefined || source == "") {
+            source = await general.prompt({
+                title: "CMC Mod Manager | Stage Installation",
+                body: "Please enter the stage's 'source'. (The name of the source content that " +
+                    "the stage is originally from, such as the title of the game.)",
+                placeholder: "Stage's Series"
+            });
+        }
+
+        let series: string;
+        while (series == undefined || series == "") {
+            series = await general.prompt({
+                title: "CMC Mod Manager | Stage Installation",
+                body: "Please enter the stage's 'series'. (This name will be used to select the " +
+                    "icon to use on the stage selection screen. This value is usually short and " +
+                    "in all lowercase letters.)",
+                placeholder: "Stage's Source"
+            });
+        }
+
         stage = {
             name: stageName,
-            menuName: "Missing",
-            source: "Missing",
-            series: "missing",
+            menuName: menuName,
+            source: source,
+            series: series,
             randomSelection: true,
             number: stageList.getNextNumber(),
             icon: path.join(dir, "gfx", "stgicons", stageName + ".png")

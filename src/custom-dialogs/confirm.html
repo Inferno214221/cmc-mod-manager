@@ -5,7 +5,17 @@
         <title>CMC Mod Manager</title>
         <link rel="stylesheet" href="./custom-dialogs.css" type="text/css">
     </head>
-    <body>
+    <body onkeyup="
+        switch (event.key) {
+            case ' ':
+            case 'Enter':
+                dialog.ok();
+                break;
+            case 'Escape':
+                dialog.cancel();
+                break;
+        }
+    ">
         <!-- <h1 id="title">Title</h1> -->
         <div class="center">
             <span id="body">Body</span>
@@ -21,6 +31,12 @@
                 document.getElementById("body").innerHTML = options.body;
                 if (options.title != undefined) {
                     document.title = options.title;
+                }
+                if (options.okLabel != undefined) {
+                    document.getElementById("ok").innerHTML = options.okLabel;
+                }
+                if (options.cancelLabel != undefined) {
+                    document.getElementById("cancel").innerHTML = options.cancelLabel;
                 }
                 dialog.resize(document.documentElement.getBoundingClientRect().height);
             });

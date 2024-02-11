@@ -18,7 +18,8 @@ const PRELOAD_SCRIPT: string = path.join(__dirname, "custom-dialogs/custom-dialo
 
 export type AlertOptions = {
     body: string,
-    title?: string
+    title?: string,
+    okLabel?: string
 };
 
 export async function alert(
@@ -35,7 +36,7 @@ export function alertSync(
     options: AlertOptions,
     callback?: (() => void)
 ): void {
-    const alertOptions: BrowserWindowConstructorOptions = {
+    const windowOptions: BrowserWindowConstructorOptions = {
         width: 360,
         height: 0,
         parent: parentWindow,
@@ -45,7 +46,7 @@ export function alertSync(
         }
     };
     const customDialogWin: BrowserWindow = new BrowserWindow(
-        Object.assign({}, WINDOW_OPTIONS, alertOptions)
+        Object.assign({}, WINDOW_OPTIONS, windowOptions)
     );
     customDialogWin.loadFile(path.join(
         __dirname,
@@ -74,7 +75,9 @@ export function alertSync(
 
 export type ConfirmOptions = {
     body: string,
-    title?: string
+    title?: string,
+    okLabel?: string,
+    cancelLabel?: string
 };
 
 export async function confirm(
@@ -91,7 +94,7 @@ export function confirmSync(
     options: ConfirmOptions,
     callback?: ((result: boolean) => void)
 ): void {
-    const alertOptions: BrowserWindowConstructorOptions = {
+    const windowOptions: BrowserWindowConstructorOptions = {
         width: 360,
         height: 0,
         parent: parentWindow,
@@ -101,7 +104,7 @@ export function confirmSync(
         }
     };
     const customDialogWin: BrowserWindow = new BrowserWindow(
-        Object.assign({}, WINDOW_OPTIONS, alertOptions)
+        Object.assign({}, WINDOW_OPTIONS, windowOptions)
     );
     customDialogWin.loadFile(path.join(
         __dirname,
@@ -136,9 +139,11 @@ export function confirmSync(
 
 export type PromptOptions = {
     body: string,
-    title?: string
+    title?: string,
     placeholder?: string,
     invalidCharacters?: RegExp,
+    okLabel?: string,
+    cancelLabel?: string
 };
 
 export async function prompt(
@@ -155,7 +160,7 @@ export function promptSync(
     options: PromptOptions,
     callback?: ((result: string) => void)
 ): void {
-    const alertOptions: BrowserWindowConstructorOptions = {
+    const windowOptions: BrowserWindowConstructorOptions = {
         width: 360,
         height: 0,
         parent: parentWindow,
@@ -165,7 +170,7 @@ export function promptSync(
         }
     };
     const customDialogWin: BrowserWindow = new BrowserWindow(
-        Object.assign({}, WINDOW_OPTIONS, alertOptions)
+        Object.assign({}, WINDOW_OPTIONS, windowOptions)
     );
     customDialogWin.loadFile(path.join(
         __dirname,

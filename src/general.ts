@@ -109,6 +109,8 @@ export function getAllFiles(dirPath: string, arrayOfFiles?: string[]): string[] 
 export async function extractArchive(archive: string, destination: string): Promise<string> {
     log("Extract Archive - Start:", archive, destination);
     const output: string = path.join(destination, path.parse(archive).name);
+    fs.ensureDirSync(destination);
+    fs.removeSync(output);
     switch (path.parse(archive).ext.toLowerCase()) {
         case ".zip":
             await extract(archive, {
@@ -178,9 +180,8 @@ export async function handleURI(uri: string): Promise<void> {
         state: DownloadState.queued
     }) - 1;
     const url: string = uri.replace("cmcmm:", "").split(",")[0];
-    const temp: string = path.join(global.gameDir, "_temp");
+    const temp: string = path.join(app.getPath("userData"), "_temp");
     fs.ensureDirSync(temp);
-    fs.emptyDirSync(temp);
     
     const infoPromise: Promise<void> = getDownloadInfo(uri, downloadId);
 
@@ -221,7 +222,8 @@ export async function handleURI(uri: string): Promise<void> {
             });
         });
     return;
-    // const output: string = await extractArchive(selected.filePaths[0], path.join(dir, "_temp"));
+    // const output: string =
+    //   await extractArchive(selected.filePaths[0], path.join(app.getPath("userData"), "_temp"));
 }
 
 export async function getDownloadInfo(uri: string, downloadId: number): Promise<void> {

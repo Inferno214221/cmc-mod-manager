@@ -1,4 +1,4 @@
-import { BrowserWindow, OpenDialogReturnValue, dialog } from "electron";
+import { BrowserWindow, OpenDialogReturnValue, app, dialog } from "electron";
 import fs from "fs-extra";
 import path from "path";
 import ini from "ini";
@@ -504,11 +504,9 @@ export async function installCharacterArchive(
         general.log("Install Character Archive - Exit: Selection Cancelled");
         return null;
     }
-    fs.ensureDirSync(path.join(dir, "_temp"));
-    fs.emptyDirSync(path.join(dir, "_temp"));
     const output: string = await general.extractArchive(
         selected.filePaths[0],
-        path.join(dir, "_temp")
+        path.join(app.getPath("userData"), "_temp")
     );
     general.log(output, filterInstallation);
     const retVal: Character =
@@ -551,9 +549,9 @@ export async function installCharacter(
     general.log(correctedDir);
 
     const characterName: string = fs.readdirSync(path.join(correctedDir, "fighter"))
-        .filter((file: string) => {
-            return file.endsWith(".bin") || !file.includes(".");
-        })[0].split(".")[0];
+        .filter((file: string) =>
+            file.endsWith(".bin") || !file.includes(".")
+        )[0].split(".")[0];
     general.log(characterName);
 
     let characterDat: CharacterDat;
