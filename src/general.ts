@@ -135,8 +135,7 @@ export async function extractArchive(archive: string, destination: string): Prom
             // await sevenZip.extractArchive(archive, output, {}, true);
             // break;
         default:
-            //TODO: Throw error
-            break;
+            throw new Error("Unsupported archive type: " + path.parse(archive).ext.toLowerCase());
     }
     log("Extract Archive - Return:", output);
     return output;

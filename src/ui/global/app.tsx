@@ -328,3 +328,16 @@ export function StatusDisplay({ display }: { display: StatusDisplayInfo }): JSX.
         </div>
     );
 }
+
+export function displayError(
+    error: any,
+    displayId: number,
+    setDisplays: Dispatch<SetStateAction<StatusDisplayInfo[]>>
+): void {
+    setDisplays((prev: StatusDisplayInfo[]) => {
+        const newDisplays: StatusDisplayInfo[] = [...prev];
+        newDisplays[displayId].state = StatusDisplayState.error;
+        newDisplays[displayId].body = error.message;
+        return newDisplays;
+    });
+}

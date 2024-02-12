@@ -9,6 +9,7 @@ import {
     sortTypes
 } from "../../interfaces";
 import missing from "../../assets/missing.png";
+import { displayError } from "../global/app";
 
 export function TabStageSelectionScreen({
     setDisplays
@@ -417,15 +418,19 @@ function SssPages({
                                 return newDisplays;
                             });
 
-                            await api.addSssPage(newPageName);
-                            setDisplays((prev: StatusDisplayInfo[]) => {
-                                const newDisplays: StatusDisplayInfo[] = [...prev];
-                                newDisplays[displayId].state = StatusDisplayState.finished;
-                                newDisplays[displayId].body = "Added new SSS page: '" +
-                                    newPageName + "'.";
-                                return newDisplays;
-                            });
-                            getPages();
+                            try {
+                                await api.addSssPage(newPageName);
+                                setDisplays((prev: StatusDisplayInfo[]) => {
+                                    const newDisplays: StatusDisplayInfo[] = [...prev];
+                                    newDisplays[displayId].state = StatusDisplayState.finished;
+                                    newDisplays[displayId].body = "Added new SSS page: '" +
+                                        newPageName + "'.";
+                                    return newDisplays;
+                                });
+                                getPages();
+                            } catch (error: any) {
+                                displayError(error, displayId, setDisplays);
+                            }
                         }
                     }}
                 />
@@ -480,14 +485,18 @@ function SssPageDisplay({
                         return newDisplays;
                     });
 
-                    await api.removeSssPage(page);
-                    setDisplays((prev: StatusDisplayInfo[]) => {
-                        const newDisplays: StatusDisplayInfo[] = [...prev];
-                        newDisplays[displayId].state = StatusDisplayState.finished;
-                        newDisplays[displayId].body = "Deleted SSS page: '" + page.name + "'.";
-                        return newDisplays;
-                    });
-                    getPages()
+                    try {
+                        await api.removeSssPage(page);
+                        setDisplays((prev: StatusDisplayInfo[]) => {
+                            const newDisplays: StatusDisplayInfo[] = [...prev];
+                            newDisplays[displayId].state = StatusDisplayState.finished;
+                            newDisplays[displayId].body = "Deleted SSS page: '" + page.name + "'.";
+                            return newDisplays;
+                        });
+                        getPages();
+                    } catch (error: any) {
+                        displayError(error, displayId, setDisplays);
+                    }
                 }}
             />
         </div>

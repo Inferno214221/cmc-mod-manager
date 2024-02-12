@@ -43,6 +43,7 @@
 .character-display-mug img,
 .alt-display-mug img {
     width: 62px;
+    object-fit: cover;
     height: 100%;
     display: inline;
 }

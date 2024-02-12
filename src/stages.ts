@@ -247,8 +247,7 @@ export async function installStage(
     if (!fs.readdirSync(correctedDir).includes("stage")) {
         //TODO: inform user
         general.log("Install Stage - Exit: No Stage Directory");
-        //TODO: error
-        return null;
+        throw new Error("No 'stage' subdirectory found.");
     }
     general.log(correctedDir);
 
@@ -262,8 +261,7 @@ export async function installStage(
     if (!updateStages && stageList.getStageByName(stageName) != undefined) {
         //TODO: inform user
         general.log("Install Stage - Exit: Stage Already Installed");
-        //TODO: error
-        return null;
+        throw new Error("Stage already installed, updates disabled.");
     }
 
     let stage: Stage;
@@ -288,7 +286,8 @@ export async function installStage(
             title: "CMC Mod Manager | Stage Installation",
             body: "Because of CMC+'s current modding format, you will be required to enter some " +
                 "information about the stage you are installing. This information can usually be " +
-                "found in a txt file in the mod's top level directory."
+                "found in a txt file in the mod's top level directory.",
+            okLabel: "Continue"
         }))) {
             return null;
         }
@@ -318,7 +317,7 @@ export async function installStage(
                 title: "CMC Mod Manager | Stage Installation",
                 body: "Please enter the stage's 'source'. (The name of the source content that " +
                     "the stage is originally from, such as the title of the game.)",
-                placeholder: "Stage's Series"
+                placeholder: "Stage's Source"
             });
         }
 
@@ -329,7 +328,7 @@ export async function installStage(
                 body: "Please enter the stage's 'series'. (This name will be used to select the " +
                     "icon to use on the stage selection screen. This value is usually short and " +
                     "in all lowercase letters.)",
-                placeholder: "Stage's Source"
+                placeholder: "Stage's Series"
             });
         }
 
@@ -487,7 +486,7 @@ export async function writeSssPages(pages: SssPage[], dir: string = global.gameD
                 page.data.map((row: string[]) => row.join(" ")).join("\r\n")
             ].join("\r\n")
         ).join("\r\n")
-    ].join("\r\n"); // + " ";
+    ].join("\r\n");
     fs.writeFileSync(
         path.join(dir, "data", "sss.txt"),
         output,

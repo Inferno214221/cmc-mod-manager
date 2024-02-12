@@ -7,6 +7,7 @@ import {
     AppData, SortTypeOptions, Stage, StatusDisplayInfo, StatusDisplayState, sortTypes
 } from "../../interfaces";
 import missing from "../../assets/missing.png";
+import { displayError } from "../global/app";
 
 export function TabStages({
     setDisplays
@@ -235,23 +236,27 @@ export function TabStages({
                                 return newDisplays;
                             });
 
-                            const stage: Stage = await api.installStageDir(
-                                filterInstallation,
-                                updateStages
-                            );
-                            setDisplays((prev: StatusDisplayInfo[]) => {
-                                const newDisplays: StatusDisplayInfo[] = [...prev];
-                                if (stage == null) {
-                                    newDisplays[displayId].state = StatusDisplayState.canceled;
-                                } else {
-                                    newDisplays[displayId].state = StatusDisplayState.finished;
-                                    newDisplays[displayId].body = "Installed stage: '" +
-                                    stage.name + "' from a directory.";
-                                    newDisplays[displayId].image = stage.icon;
-                                }
-                                return newDisplays;
-                            });
-                            readStages();
+                            try {
+                                const stage: Stage = await api.installStageDir(
+                                    filterInstallation,
+                                    updateStages
+                                );
+                                setDisplays((prev: StatusDisplayInfo[]) => {
+                                    const newDisplays: StatusDisplayInfo[] = [...prev];
+                                    if (stage == null) {
+                                        newDisplays[displayId].state = StatusDisplayState.canceled;
+                                    } else {
+                                        newDisplays[displayId].state = StatusDisplayState.finished;
+                                        newDisplays[displayId].body = "Installed stage: '" +
+                                        stage.name + "' from a directory.";
+                                        newDisplays[displayId].image = stage.icon;
+                                    }
+                                    return newDisplays;
+                                });
+                                readStages();
+                            } catch (error: any) {
+                                displayError(error, displayId, setDisplays);
+                            }
                         }}
                     />
                     <IconButton
@@ -272,23 +277,27 @@ export function TabStages({
                                 return newDisplays;
                             });
 
-                            const stage: Stage = await api.installStageArchive(
-                                filterInstallation,
-                                updateStages
-                            );
-                            setDisplays((prev: StatusDisplayInfo[]) => {
-                                const newDisplays: StatusDisplayInfo[] = [...prev];
-                                if (stage == null) {
-                                    newDisplays[displayId].state = StatusDisplayState.canceled;
-                                } else {
-                                    newDisplays[displayId].state = StatusDisplayState.finished;
-                                    newDisplays[displayId].body = "Installed stage: '" +
-                                    stage.name + "' from an archive.";
-                                    newDisplays[displayId].image = stage.icon;
-                                }
-                                return newDisplays;
-                            });
-                            readStages();
+                            try {
+                                const stage: Stage = await api.installStageArchive(
+                                    filterInstallation,
+                                    updateStages
+                                );
+                                setDisplays((prev: StatusDisplayInfo[]) => {
+                                    const newDisplays: StatusDisplayInfo[] = [...prev];
+                                    if (stage == null) {
+                                        newDisplays[displayId].state = StatusDisplayState.canceled;
+                                    } else {
+                                        newDisplays[displayId].state = StatusDisplayState.finished;
+                                        newDisplays[displayId].body = "Installed stage: '" +
+                                        stage.name + "' from an archive.";
+                                        newDisplays[displayId].image = stage.icon;
+                                    }
+                                    return newDisplays;
+                                });
+                                readStages();
+                            } catch (error: any) {
+                                displayError(error, displayId, setDisplays);
+                            }
                         }}
                     />
                     <IconButton
@@ -398,15 +407,19 @@ function StageDisplay({
                                     return newDisplays;
                                 });
 
-                                await api.removeStage(stage.name);
-                                setDisplays((prev: StatusDisplayInfo[]) => {
-                                    const newDisplays: StatusDisplayInfo[] = [...prev];
-                                    newDisplays[displayId].state = StatusDisplayState.finished;
-                                    newDisplays[displayId].body = "Deleted stage: '" + stage.name +
-                                        "'.";
-                                    return newDisplays;
-                                });
-                                readStages();
+                                try {
+                                    await api.removeStage(stage.name);
+                                    setDisplays((prev: StatusDisplayInfo[]) => {
+                                        const newDisplays: StatusDisplayInfo[] = [...prev];
+                                        newDisplays[displayId].state = StatusDisplayState.finished;
+                                        newDisplays[displayId].body = "Deleted stage: '" +
+                                            stage.name + "'.";
+                                        return newDisplays;
+                                    });
+                                    readStages();
+                                } catch (error: any) {
+                                    displayError(error, displayId, setDisplays);
+                                }
                             }}
                         />
                         <IconButton
@@ -428,14 +441,18 @@ function StageDisplay({
                                     return newDisplays;
                                 });
 
-                                await api.extractStage(stage.name);
-                                setDisplays((prev: StatusDisplayInfo[]) => {
-                                    const newDisplays: StatusDisplayInfo[] = [...prev];
-                                    newDisplays[displayId].state = StatusDisplayState.finished;
-                                    newDisplays[displayId].body = "Extracted stage: '" +
-                                        stage.name + "'.";
-                                    return newDisplays;
-                                });
+                                try {
+                                    await api.extractStage(stage.name);
+                                    setDisplays((prev: StatusDisplayInfo[]) => {
+                                        const newDisplays: StatusDisplayInfo[] = [...prev];
+                                        newDisplays[displayId].state = StatusDisplayState.finished;
+                                        newDisplays[displayId].body = "Extracted stage: '" +
+                                            stage.name + "'.";
+                                        return newDisplays;
+                                    });
+                                } catch (error: any) {
+                                    displayError(error, displayId, setDisplays);
+                                }
                             }}
                         />
                         <ToggleIconButton
@@ -498,15 +515,19 @@ function SeriesDisplay({
                             });
                         });
 
-                        await api.removeSeriesStages(series);
-                        setDisplays((prev: StatusDisplayInfo[]) => {
-                            const newDisplays: StatusDisplayInfo[] = [...prev];
-                            newDisplays[displayId].state = StatusDisplayState.finished;
-                            newDisplays[displayId].body = "Deleted all stages in series: '" +
-                                series + "'.";
-                            return newDisplays;
-                        });
-                        readStages();
+                        try {
+                            await api.removeSeriesStages(series);
+                            setDisplays((prev: StatusDisplayInfo[]) => {
+                                const newDisplays: StatusDisplayInfo[] = [...prev];
+                                newDisplays[displayId].state = StatusDisplayState.finished;
+                                newDisplays[displayId].body = "Deleted all stages in series: '" +
+                                    series + "'.";
+                                return newDisplays;
+                            });
+                            readStages();
+                        } catch (error: any) {
+                            displayError(error, displayId, setDisplays);
+                        }
                     }}
                 />
             </th>

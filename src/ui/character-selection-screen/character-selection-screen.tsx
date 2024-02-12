@@ -8,6 +8,7 @@ import {
     StatusDisplayInfo, StatusDisplayState, sortTypes
 } from "../../interfaces";
 import missing from "../../assets/missing.png";
+import { displayError } from "../global/app";
 
 export function TabCharacterSelectionScreen({
     setDisplays
@@ -415,15 +416,19 @@ function CssPages({
                                 return newDisplays;
                             });
 
-                            await api.addCssPage(newPageName);
-                            setDisplays((prev: StatusDisplayInfo[]) => {
-                                const newDisplays: StatusDisplayInfo[] = [...prev];
-                                newDisplays[displayId].state = StatusDisplayState.finished;
-                                newDisplays[displayId].body = "Added new CSS page: '" +
-                                    newPageName + "'.";
-                                return newDisplays;
-                            });
-                            getPages();
+                            try {
+                                await api.addCssPage(newPageName);
+                                setDisplays((prev: StatusDisplayInfo[]) => {
+                                    const newDisplays: StatusDisplayInfo[] = [...prev];
+                                    newDisplays[displayId].state = StatusDisplayState.finished;
+                                    newDisplays[displayId].body = "Added new CSS page: '" +
+                                        newPageName + "'.";
+                                    return newDisplays;
+                                });
+                                getPages();
+                            } catch (error: any) {
+                                displayError(error, displayId, setDisplays);
+                            }
                         }
                     }}
                 />
@@ -474,14 +479,18 @@ function CssPageDisplay({
                         return newDisplays;
                     });
 
-                    await api.removeCssPage(page);
-                    setDisplays((prev: StatusDisplayInfo[]) => {
-                        const newDisplays: StatusDisplayInfo[] = [...prev];
-                        newDisplays[displayId].state = StatusDisplayState.finished;
-                        newDisplays[displayId].body = "Deleted CSS page: '" + page.name + "'.";
-                        return newDisplays;
-                    });
-                    getPages()
+                    try {
+                        await api.removeCssPage(page);
+                        setDisplays((prev: StatusDisplayInfo[]) => {
+                            const newDisplays: StatusDisplayInfo[] = [...prev];
+                            newDisplays[displayId].state = StatusDisplayState.finished;
+                            newDisplays[displayId].body = "Deleted CSS page: '" + page.name + "'.";
+                            return newDisplays;
+                        });
+                        getPages();
+                    } catch (error: any) {
+                        displayError(error, displayId, setDisplays);
+                    }
                 }}
             />
         </div>

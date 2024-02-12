@@ -7,6 +7,7 @@ import {
     Alt, AppData, Character, SortTypeOptions, StatusDisplayInfo, StatusDisplayState, sortTypes
 } from "../../interfaces";
 import missing from "../../assets/missing.png";
+import { displayError } from "../global/app";
 
 export function TabCharacters({
     setDisplays
@@ -243,23 +244,27 @@ export function TabCharacters({
                                 return newDisplays;
                             });
 
-                            const character: Character = await api.installCharacterDir(
-                                filterInstallation,
-                                updateCharacters
-                            );
-                            setDisplays((prev: StatusDisplayInfo[]) => {
-                                const newDisplays: StatusDisplayInfo[] = [...prev];
-                                if (character == null) {
-                                    newDisplays[displayId].state = StatusDisplayState.canceled;
-                                } else {
-                                    newDisplays[displayId].state = StatusDisplayState.finished;
-                                    newDisplays[displayId].body = "Installed character: '" +
-                                    character.name + "' from a directory.";
-                                    newDisplays[displayId].image = character.mug;
-                                }
-                                return newDisplays;
-                            });
-                            readCharacters();
+                            try {
+                                const character: Character = await api.installCharacterDir(
+                                    filterInstallation,
+                                    updateCharacters
+                                );
+                                setDisplays((prev: StatusDisplayInfo[]) => {
+                                    const newDisplays: StatusDisplayInfo[] = [...prev];
+                                    if (character == null) {
+                                        newDisplays[displayId].state = StatusDisplayState.canceled;
+                                    } else {
+                                        newDisplays[displayId].state = StatusDisplayState.finished;
+                                        newDisplays[displayId].body = "Installed character: '" +
+                                        character.name + "' from a directory.";
+                                        newDisplays[displayId].image = character.mug;
+                                    }
+                                    return newDisplays;
+                                });
+                                readCharacters();
+                            } catch (error: any) {
+                                displayError(error, displayId, setDisplays);
+                            }
                         }}
                     />
                     <IconButton
@@ -280,23 +285,27 @@ export function TabCharacters({
                                 return newDisplays;
                             });
 
-                            const character: Character = await api.installCharacterArchive(
-                                filterInstallation,
-                                updateCharacters
-                            );
-                            setDisplays((prev: StatusDisplayInfo[]) => {
-                                const newDisplays: StatusDisplayInfo[] = [...prev];
-                                if (character == null) {
-                                    newDisplays[displayId].state = StatusDisplayState.canceled;
-                                } else {
-                                    newDisplays[displayId].state = StatusDisplayState.finished;
-                                    newDisplays[displayId].body = "Installed character: '" +
-                                        character.name + "' from an archive.";
-                                    newDisplays[displayId].image = character.mug;
-                                }
-                                return newDisplays;
-                            });
-                            readCharacters();
+                            try {
+                                const character: Character = await api.installCharacterArchive(
+                                    filterInstallation,
+                                    updateCharacters
+                                );
+                                setDisplays((prev: StatusDisplayInfo[]) => {
+                                    const newDisplays: StatusDisplayInfo[] = [...prev];
+                                    if (character == null) {
+                                        newDisplays[displayId].state = StatusDisplayState.canceled;
+                                    } else {
+                                        newDisplays[displayId].state = StatusDisplayState.finished;
+                                        newDisplays[displayId].body = "Installed character: '" +
+                                            character.name + "' from an archive.";
+                                        newDisplays[displayId].image = character.mug;
+                                    }
+                                    return newDisplays;
+                                });
+                                readCharacters();
+                            } catch (error: any) {
+                                displayError(error, displayId, setDisplays);
+                            }
                         }}
                     />
                     <IconButton
@@ -410,15 +419,19 @@ function CharacterDisplay({
                                     return newDisplays;
                                 });
 
-                                await api.removeCharacter(character.name);
-                                setDisplays((prev: StatusDisplayInfo[]) => {
-                                    const newDisplays: StatusDisplayInfo[] = [...prev];
-                                    newDisplays[displayId].state = StatusDisplayState.finished;
-                                    newDisplays[displayId].body = "Deleted character: '" +
-                                        character.name + "'.";
-                                    return newDisplays;
-                                });
-                                readCharacters();
+                                try {
+                                    await api.removeCharacter(character.name);
+                                    setDisplays((prev: StatusDisplayInfo[]) => {
+                                        const newDisplays: StatusDisplayInfo[] = [...prev];
+                                        newDisplays[displayId].state = StatusDisplayState.finished;
+                                        newDisplays[displayId].body = "Deleted character: '" +
+                                            character.name + "'.";
+                                        return newDisplays;
+                                    });
+                                    readCharacters();
+                                } catch (error: any) {
+                                    displayError(error, displayId, setDisplays);
+                                }
                             }}
                         />
                         <IconButton
@@ -440,14 +453,18 @@ function CharacterDisplay({
                                     return newDisplays;
                                 });
 
-                                await api.extractCharacter(character.name);
-                                setDisplays((prev: StatusDisplayInfo[]) => {
-                                    const newDisplays: StatusDisplayInfo[] = [...prev];
-                                    newDisplays[displayId].state = StatusDisplayState.finished;
-                                    newDisplays[displayId].body = "Extracted character: '" +
-                                        character.name + "'.";
-                                    return newDisplays;
-                                });
+                                try {
+                                    await api.extractCharacter(character.name);
+                                    setDisplays((prev: StatusDisplayInfo[]) => {
+                                        const newDisplays: StatusDisplayInfo[] = [...prev];
+                                        newDisplays[displayId].state = StatusDisplayState.finished;
+                                        newDisplays[displayId].body = "Extracted character: '" +
+                                            character.name + "'.";
+                                        return newDisplays;
+                                    });
+                                } catch (error: any) {
+                                    displayError(error, displayId, setDisplays);
+                                }
                             }}
                         />
                         <ToggleIconButton
@@ -536,15 +553,19 @@ function CharacterAltDisplay({
                             return newDisplays;
                         });
 
-                        await api.removeAlt(alt);
-                        setDisplays((prev: StatusDisplayInfo[]) => {
-                            const newDisplays: StatusDisplayInfo[] = [...prev];
-                            newDisplays[displayId].state = StatusDisplayState.finished;
-                            newDisplays[displayId].body = "Removed alt: '" + alt.alt +
-                                "' from character: '" + alt.base + "'.";
-                            return newDisplays;
-                        });
-                        readCharacters();
+                        try {
+                            await api.removeAlt(alt);
+                            setDisplays((prev: StatusDisplayInfo[]) => {
+                                const newDisplays: StatusDisplayInfo[] = [...prev];
+                                newDisplays[displayId].state = StatusDisplayState.finished;
+                                newDisplays[displayId].body = "Removed alt: '" + alt.alt +
+                                    "' from character: '" + alt.base + "'.";
+                                return newDisplays;
+                            });
+                            readCharacters();
+                        } catch (error: any) {
+                            displayError(error, displayId, setDisplays);
+                        }
                     }}
                 />
             </div>
@@ -610,16 +631,20 @@ function AddAltButton({
                     return newDisplays;
                 });
 
-                await api.addAlt(altTarget, character);
-                setAltTarget(null);
-                setDisplays((prev: StatusDisplayInfo[]) => {
-                    const newDisplays: StatusDisplayInfo[] = [...prev];
-                    newDisplays[displayId].state = StatusDisplayState.finished;
-                    newDisplays[displayId].body = "Added alt: '" + character.name +
-                        "' to character: '" + altTarget.name + "'.";
-                    return newDisplays;
-                });
-                readCharacters();
+                try {
+                    await api.addAlt(altTarget, character);
+                    setAltTarget(null);
+                    setDisplays((prev: StatusDisplayInfo[]) => {
+                        const newDisplays: StatusDisplayInfo[] = [...prev];
+                        newDisplays[displayId].state = StatusDisplayState.finished;
+                        newDisplays[displayId].body = "Added alt: '" + character.name +
+                            "' to character: '" + altTarget.name + "'.";
+                        return newDisplays;
+                    });
+                    readCharacters();
+                } catch (error: any) {
+                    displayError(error, displayId, setDisplays);
+                }
             }}
         />
     );
@@ -669,15 +694,19 @@ function SeriesDisplay({
                             });
                         });
 
-                        await api.removeSeriesCharacters(series);
-                        setDisplays((prev: StatusDisplayInfo[]) => {
-                            const newDisplays: StatusDisplayInfo[] = [...prev];
-                            newDisplays[displayId].state = StatusDisplayState.finished;
-                            newDisplays[displayId].body = "Deleted all characters in series: '" +
-                                series + "'.";
-                            return newDisplays;
-                        });
-                        readCharacters();
+                        try {
+                            await api.removeSeriesCharacters(series);
+                            setDisplays((prev: StatusDisplayInfo[]) => {
+                                const newDisplays: StatusDisplayInfo[] = [...prev];
+                                newDisplays[displayId].state = StatusDisplayState.finished;
+                                newDisplays[displayId].body = "Deleted all characters in series: " +
+                                    "'" + series + "'.";
+                                return newDisplays;
+                            });
+                            readCharacters();
+                        } catch (error: any) {
+                            displayError(error, displayId, setDisplays);
+                        }
                     }}
                 />
             </th>

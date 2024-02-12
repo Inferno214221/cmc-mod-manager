@@ -62,6 +62,7 @@
 .excluded-display-mug,
 .excluded-display-mug img {
     height: 62px;
+    object-fit: cover;
     width: 100%;
 }
 
@@ -147,6 +148,7 @@
     display: block;
     width: 40px;
     height: 40px;
+    object-fit: cover;
 }
 
 .sss-stage-display span:not(.sss-stage-display .sss-tooltip span) {

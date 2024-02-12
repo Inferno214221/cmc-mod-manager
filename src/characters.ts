@@ -367,13 +367,8 @@ export function readCharacterDatPath(
     let menuName: string;
     let battleName: string;
     let series: string;
-    // TODO: get input for 
-    if (isVanilla) {
-        displayName = "TODO";
-        menuName = "TODO";
-        battleName = "TODO";
-        series = "TODO";
-    } else {
+    
+    if (!isVanilla) {
         displayName = characterDatTxt[0];
         menuName = characterDatTxt[1];
         battleName = characterDatTxt[2];
@@ -543,8 +538,7 @@ export async function installCharacter(
     if (!fs.readdirSync(correctedDir).includes("fighter")) {
         //TODO: inform user
         general.log("Install Character - Exit: No Fighter Directory");
-        //TODO: error
-        return null;
+        throw new Error("No 'fighter' subdirectory found.");
     }
     general.log(correctedDir);
 
@@ -553,6 +547,13 @@ export async function installCharacter(
             file.endsWith(".bin") || !file.includes(".")
         )[0].split(".")[0];
     general.log(characterName);
+
+    const characters: CharacterList = readCharacterList(dir);
+    if (!updateCharacters && characters.getCharacterByName(characterName) != undefined) {
+        //TODO: inform user
+        general.log("Install Character - Exit: Character Already Installed");
+        throw new Error("Character already installed, updates disabled.");
+    }
 
     let characterDat: CharacterDat;
     if (fs.existsSync(path.join(correctedDir, "data", "dats", characterName + ".dat"))) {
@@ -568,18 +569,75 @@ export async function installCharacter(
     } else {
         //TODO: inform user
         general.log("Install Character - Exit: No Dat File");
-        //TODO: error
-        return null;
+        throw new Error("No dat file found.");
+    }
+
+    if (
+        characterDat.displayName == undefined ||
+        characterDat.menuName == undefined ||
+        characterDat.battleName == undefined ||
+        characterDat.series == undefined
+    ) {
+        if (!(await general.confirm({
+            title: "CMC Mod Manager | Character Installation",
+            body: "The character that is being installed's dat file uses the vanilla format and " +
+                "you will be required to enter some information for the installation. This " +
+                "information can usually be found in a txt file in the mod's top level directory.",
+            okLabel: "Continue"
+        }))) {
+            return null;
+        }
+
+        if (await general.confirm({
+            title: "CMC Mod Manager | Character Installation",
+            body: "Would you like to open the mod's directory to find any txt files manually?",
+            okLabel: "Yes",
+            cancelLabel: "No"
+        })) {
+            general.openDir(correctedDir);
+        }
+
+        // while (characterDat.displayName == undefined || characterDat.displayName == "") {
+        //     characterDat.displayName = await general.prompt({
+        //         title: "CMC Mod Manager | Character Installation",
+        //         body: "Please enter the character's 'display name'.",
+        //         placeholder: "Character's Display Name"
+        //     });
+        // }
+
+        while (characterDat.menuName == undefined || characterDat.menuName == "") {
+            characterDat.menuName = await general.prompt({
+                title: "CMC Mod Manager | Character Installation",
+                body: "Please enter the character's 'menu name'. (This is the name displayed " +
+                    "on the when the character is selected on the character selection screen.)",
+                placeholder: "Character's Menu Name"
+            });
+        }
+
+        if (characterDat.displayName == undefined || characterDat.displayName == "") {
+            characterDat.displayName = characterDat.menuName;
+        }
+
+        while (characterDat.battleName == undefined || characterDat.battleName == "") {
+            characterDat.battleName = await general.prompt({
+                title: "CMC Mod Manager | Character Installation",
+                body: "Please enter the character's 'battle name'. (This is the name displayed " +
+                    "as a part of the HUD during a match.)",
+                placeholder: "Character's Battle Name"
+            });
+        }
+
+        while (characterDat.series == undefined || characterDat.series == "") {
+            characterDat.series = await general.prompt({
+                title: "CMC Mod Manager | Character Installation",
+                body: "Please enter the character's 'series'. (This name will be used to select " +
+                "the icon to use on the character selection screen. This value is usually short " +
+                "and in all lowercase letters.)",
+                placeholder: "Character's Series"
+            });
+        }
     }
     general.log(characterDat);
-
-    const characters: CharacterList = readCharacterList(dir);
-    if (!updateCharacters && characters.getCharacterByName(characterName) != undefined) {
-        //TODO: inform user
-        general.log("Install Character - Exit: Character Already Installed");
-        //TODO: error
-        return null;
-    }
 
     if (filterInstallation) {
         getCharacterFiles(characterDat, false, false, correctedDir).forEach((file: string) => {
@@ -849,6 +907,9 @@ export async function addCssPage(pageName: string, dir: string = global.gameDir)
     const pages: CssPage[] = readCssPages(dir);
     pages.push({ name: pageName, path: pagePath });
     writeCssPages(pages, dir);
+    if (fs.existsSync(pagePath)) {
+        throw new Error("File already exists with the same names as the new CSS page.");
+    }
     fs.ensureFileSync(pagePath);
     fs.writeFileSync(
         pagePath,
