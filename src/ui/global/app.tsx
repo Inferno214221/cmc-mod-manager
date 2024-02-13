@@ -337,7 +337,7 @@ export function displayError(
     setDisplays((prev: StatusDisplayInfo[]) => {
         const newDisplays: StatusDisplayInfo[] = [...prev];
         newDisplays[displayId].state = StatusDisplayState.error;
-        newDisplays[displayId].body = error.message;
+        newDisplays[displayId].body = error.message.replace(/(Error: Error)[\w:' ]*(?=Error)/, "");
         return newDisplays;
     });
 }

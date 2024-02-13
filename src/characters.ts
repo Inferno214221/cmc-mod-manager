@@ -1,4 +1,4 @@
-import { BrowserWindow, OpenDialogReturnValue, app, dialog } from "electron";
+import { BrowserWindow, OpenDialogReturnValue, dialog } from "electron";
 import fs from "fs-extra";
 import path from "path";
 import ini from "ini";
@@ -12,7 +12,8 @@ declare const global: {
     gameDir: string,
     log: string,
     appData: AppData,
-    downloads: Download[]
+    downloads: Download[],
+    temp: string
 };
 
 import * as general from "./general";
@@ -501,7 +502,7 @@ export async function installCharacterArchive(
     }
     const output: string = await general.extractArchive(
         selected.filePaths[0],
-        path.join(app.getPath("userData"), "_temp")
+        global.temp
     );
     general.log(output, filterInstallation);
     const retVal: Character =

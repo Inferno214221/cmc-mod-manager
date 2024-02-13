@@ -16,7 +16,8 @@ declare const global: {
     gameDir: string,
     log: string,
     appData: AppData,
-    downloads: Download[]
+    downloads: Download[],
+    temp: string
 };
 
 require.resolve("./unrar.wasm");
@@ -149,17 +150,44 @@ export async function checkForUpdates(): Promise<void> {
             "Accept": "application/vnd.github.v3+json",
             "User-Agent": "CMC-Mod-Manager",
         }
-    }, (error: any, res: http.IncomingMessage, body: string) => {
+    }, async (error: any, res: http.IncomingMessage, body: string) => {
         if (error != null) return;
         const latestVersion: string = semver.clean(JSON.parse(body).tag_name);
         console.log("Latest Version: " + latestVersion);
         if (semver.lt(currentVersion, latestVersion)) {
             console.log("Update Required");
-            //TODO:
+            if (await confirm({
+                title: "CMC Mod Manager | Program Update",
+                body: "CMC Mod Manager requires an update. This update will now be installed " +
+                    "automatically, please do not close the program. After the update is " +
+                    "installed the program will need to be launched again manually.",
+                okLabel: "Continue"
+            })) {
+                if (app.isPackaged) {
+                    downloadUpdate(JSON.parse(body).tag_name);
+                }
+                //TODO: prevent interaction with CMC MM?
+            }
             return;
         }
         handleURI(process.argv.find((arg: string) => arg.startsWith("cmcmm:")));
     });
+}
+
+export async function downloadUpdate(tagName: string): Promise<void> {
+    const buildInfo: any = JSON.parse(fs.readFileSync(
+        path.join(__dirname, "..", "..", "build.json"),
+        "utf-8"
+    ));
+    const targetPath: string = path.join(global.temp, "update.zip");
+    fs.createFileSync(targetPath);
+    request.get("https://github.com/Inferno214221/cmc-mod-manager/releases/download/" + tagName +
+        "/cmc-mod-manager-" + buildInfo.platform + "-" + buildInfo.arch + ".zip")
+        .pipe(fs.createWriteStream(targetPath)).on("close", async () => {
+            const output: string = await extractArchive(targetPath, global.temp);
+            console.log(output);
+            //TODO: install output
+        });
 }
 
 export function isURIAssociated(): boolean {
@@ -179,7 +207,7 @@ export async function handleURI(uri: string): Promise<void> {
         state: DownloadState.queued
     }) - 1;
     const url: string = uri.replace("cmcmm:", "").split(",")[0];
-    const temp: string = path.join(app.getPath("userData"), "_temp");
+    const temp: string = global.temp;
     fs.ensureDirSync(temp);
     
     const infoPromise: Promise<void> = getDownloadInfo(uri, downloadId);
@@ -221,8 +249,6 @@ export async function handleURI(uri: string): Promise<void> {
             });
         });
     return;
-    // const output: string =
-    //   await extractArchive(selected.filePaths[0], path.join(app.getPath("userData"), "_temp"));
 }
 
 export async function getDownloadInfo(uri: string, downloadId: number): Promise<void> {

@@ -88,11 +88,14 @@ const config: ForgeConfig = {
                 path.join(packageResult.outputPaths[0], "LICENSE"),
                 { overwrite: true }
             );
-            // let dataFile = 
-            //     path.join(packageResult.outputPaths[0], "resources", "app", "data.json");
-            // let data = require(dataFile);
-            // data.platform = packageResult.platform + "-" + packageResult.arch;
-            // fs.writeFileSync(dataFile, JSON.stringify(data, null, 2), "utf-8");
+            fs.writeFileSync(
+                path.join(packageResult.outputPaths[0], "resources", "app", "build.json"),
+                JSON.stringify({
+                    platform: packageResult.platform,
+                    arch: packageResult.arch
+                }, null, 2),
+                { encoding: "utf-8" }
+            );
         },
     },
 };

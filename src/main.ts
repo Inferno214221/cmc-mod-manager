@@ -14,7 +14,8 @@ declare const global: {
     gameDir: string,
     log: string,
     appData: AppData,
-    downloads: Download[]
+    downloads: Download[],
+    temp: string
 };
 
 global.win = null;
@@ -22,6 +23,7 @@ global.gameDir = "";
 global.log = "";
 global.appData = null;
 global.downloads = [];
+global.temp = path.join(app.getPath("temp"), "cmc-mod-manager");
 
 import * as general from "./general";
 import * as characters from "./characters";
@@ -83,7 +85,7 @@ app.on("activate", () => {
 });
 
 app.on("before-quit", () => {
-    fs.removeSync(path.join(app.getPath("userData"), "_temp"));
+    fs.removeSync(global.temp);
     if (global.log == "") return;
     const LOG_FILE: string = path.join(app.getPath("userData"), "log.txt");
     fs.ensureFileSync(LOG_FILE);
