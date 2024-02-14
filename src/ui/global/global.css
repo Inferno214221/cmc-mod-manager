@@ -306,14 +306,14 @@ hr.vr {
     margin: 5px 0px 0px 5px;
 }
 
-.status-panel {
+.operation-panel {
     position: relative;
     z-index: 10;
     height: 100%;
     pointer-events: none;
 }
 
-.status-display-box {
+.operation-display-box {
     display: flex;
     flex-direction: column;
     padding: 5px;
@@ -325,7 +325,7 @@ hr.vr {
     /* border-left: 1px solid var(--inf-grey2); */
 }
 
-.status-display {
+.operation-display {
     background-color: var(--inf-grey4);
     /* border-color: var(--inf-grey2);
     border-width: 1px;
@@ -335,11 +335,11 @@ hr.vr {
     margin-bottom: 5px;
 }
 
-.status-panel-title {
+.operation-panel-title {
     margin-bottom: 5px;
 }
 
-.status-panel-toggle {
+.operation-panel-toggle {
     position: absolute;
     left: -30px;
     display: inline-flex;
@@ -347,44 +347,44 @@ hr.vr {
     height: 100%;
 }
 
-.status-panel-toggle .icon-button-wrapper {
+.operation-panel-toggle .icon-button-wrapper {
     pointer-events: all;
     background-color: var(--inf-grey2);
     margin: 0px;
     border-radius: 3px 0px 0px 3px;
 }
 
-.status-panel-toggle .icon-button-tooltip {
+.operation-panel-toggle .icon-button-tooltip {
     right: 30px;
 }
 
-.status-panel-toggle .icon-button-wrapper .icon-button:hover {
+.operation-panel-toggle .icon-button-wrapper .icon-button:hover {
     background-color: var(--inf-grey2);
 }
 
-.status-panel-toggle .icon-button-wrapper,
-.status-panel-toggle .icon-button-wrapper .icon-button {
+.operation-panel-toggle .icon-button-wrapper,
+.operation-panel-toggle .icon-button-wrapper .icon-button {
     height: 30px;
 }
 
-.status-display-state {
+.operation-display-state {
     font-size: 30px;
     width: 30px;
     height: 30px;
 }
 
-.status-display-info {
+.operation-display-info {
     display: flex;
     flex-direction: row;
     align-items: center;
 }
 
-.status-display-info div:not(.status-display-state) {
+.operation-display-info div:not(.operation-display-state) {
     overflow: hidden;
     word-wrap: break-word;
 }
 
-.status-display-info img {
+.operation-display-info img {
     margin: 5px;
     width: 31px;
     height: 31px;

@@ -299,18 +299,19 @@ export interface SssPage {
 
 export type SssData = string[][];
 
-export interface StatusDisplayInfo {
+export interface Operation {
     title: string,
     body: string,
     image?: string,
-    state: StatusDisplayState,
-    // message?: string,
+    state: OperationState,
     icon: string,
-    animation: number
+    animation: number,
+    dependencies: string[],
+    call?: () => Promise<void>
 }
 
-export enum StatusDisplayState {
-    //TODO: queued = "Queued",
+export enum OperationState {
+    queued = "Queued",
     started = "Started",
     finished = "Finished",
     canceled = "Canceled",

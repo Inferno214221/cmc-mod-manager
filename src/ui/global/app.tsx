@@ -23,7 +23,7 @@ import {
     TabSettings
 } from "../settings/settings";
 import ToggleIconButton from "./icon-button/toggle-icon-button";
-import { StatusDisplayInfo, StatusDisplayState } from "../../interfaces";
+import { Operation, OperationState } from "../../interfaces";
 import missing from "../../assets/missing.png";
 
 let root: Root;
@@ -37,31 +37,31 @@ export interface Tab {
     name: string,
     displayName: string,
     icon: string,
-    element: (setDisplays: Dispatch<SetStateAction<StatusDisplayInfo[]>>) => JSX.Element,
+    element: (setOperations: Dispatch<SetStateAction<Operation[]>>) => JSX.Element,
     allowTabSwitch: () => Promise<boolean>
 }
 export const HOME: Tab = {
     name: "home",
     displayName: "Home",
     icon: "home",
-    element: (setDisplays: Dispatch<SetStateAction<StatusDisplayInfo[]>>) =>
-        <TabHome setDisplays={setDisplays}/>,
+    element: (setOperations: Dispatch<SetStateAction<Operation[]>>) =>
+        <TabHome setOperations={setOperations}/>,
     allowTabSwitch: AllowTabSwitchHome
 };
 export const CHARACTERS: Tab = {
     name: "characters",
     displayName: "Characters",
     icon: "groups",
-    element: (setDisplays: Dispatch<SetStateAction<StatusDisplayInfo[]>>) =>
-        <TabCharacters setDisplays={setDisplays}/>,
+    element: (setOperations: Dispatch<SetStateAction<Operation[]>>) =>
+        <TabCharacters setOperations={setOperations}/>,
     allowTabSwitch: null
 };
 export const CHARACTER_SELECTION_SCREEN: Tab = {
     name: "characterSelectionScreen",
     displayName: "Character Selection Screen",
     icon: "pan_tool_alt",
-    element: (setDisplays: Dispatch<SetStateAction<StatusDisplayInfo[]>>) =>
-        <TabCharacterSelectionScreen setDisplays={setDisplays}/>,
+    element: (setOperations: Dispatch<SetStateAction<Operation[]>>) =>
+        <TabCharacterSelectionScreen setOperations={setOperations}/>,
     allowTabSwitch: null
 };
 export const PORT_CHARACTERS: Tab = {
@@ -75,32 +75,32 @@ export const STAGES: Tab = {
     name: "stages",
     displayName: "Stages",
     icon: "terrain",
-    element: (setDisplays: Dispatch<SetStateAction<StatusDisplayInfo[]>>) =>
-        <TabStages setDisplays={setDisplays}/>,
+    element: (setOperations: Dispatch<SetStateAction<Operation[]>>) =>
+        <TabStages setOperations={setOperations}/>,
     allowTabSwitch: null
 };
 export const STAGE_SELECTION_SCREEN: Tab = {
     name: "stageSelectionScreen",
     displayName: "Stage Selection Screen",
     icon: "location_pin",
-    element: (setDisplays: Dispatch<SetStateAction<StatusDisplayInfo[]>>) =>
-        <TabStageSelectionScreen setDisplays={setDisplays}/>,
+    element: (setOperations: Dispatch<SetStateAction<Operation[]>>) =>
+        <TabStageSelectionScreen setOperations={setOperations}/>,
     allowTabSwitch: null
 };
 export const DOWNLOADS: Tab = {
     name: "downloads",
     displayName: "Downloads",
     icon: "download",
-    element: (setDisplays: Dispatch<SetStateAction<StatusDisplayInfo[]>>) =>
-        <TabDownloads setDisplays={setDisplays}/>,
+    element: (setOperations: Dispatch<SetStateAction<Operation[]>>) =>
+        <TabDownloads setOperations={setOperations}/>,
     allowTabSwitch: AllowTabSwitchDownloads
 };
 export const SETTINGS: Tab = {
     name: "settings",
     displayName: "Settings",
     icon: "settings",
-    element: (setDisplays: Dispatch<SetStateAction<StatusDisplayInfo[]>>) =>
-        <TabSettings setDisplays={setDisplays}/>,
+    element: (setOperations: Dispatch<SetStateAction<Operation[]>>) =>
+        <TabSettings setOperations={setOperations}/>,
     allowTabSwitch: null
 };
 
@@ -151,16 +151,22 @@ export function App({ tab }: { tab: Tab }): JSX.Element {
     [boolean, Dispatch<SetStateAction<boolean>>]
     = useState(false);
 
-    const [displays, setDisplays]:
-    [StatusDisplayInfo[], Dispatch<SetStateAction<StatusDisplayInfo[]>>]
+    const [operations, setOperations]:
+    [Operation[], Dispatch<SetStateAction<Operation[]>>]
     = useState([]);
+
+    useEffect(() => {
+        console.log(operations);
+        callQueuedOperations(operations);
+        console.log(operations);
+    }, [operations]);
 
     return (
         <>
             <Nav/>
-            {tab.element(setDisplays)}
-            <StatusPanel
-                displays={displays}
+            {tab.element(setOperations)}
+            <OperationPanel
+                operations={operations}
                 showPanel={showPanel}
                 setShowPanel={setShowPanel}
             />
@@ -239,24 +245,24 @@ const ANIMATIONS: string[] = [
     "animation-flipX"
 ];
 
-export function StatusPanel({
-    displays,
+export function OperationPanel({
+    operations,
     showPanel,
     setShowPanel
 }: {
-    displays: StatusDisplayInfo[],
+    operations: Operation[],
     showPanel: boolean, 
     setShowPanel: Dispatch<SetStateAction<boolean>>
 }): JSX.Element {
     useEffect(() => {
-        if (displays.length > 0) {
+        if (operations.length > 0) {
             setShowPanel(true);
         }
-    }, [displays])
+    }, [operations])
 
     return (
-        <div className={"status-panel"}>
-            <div className={"status-panel-toggle"}>
+        <div className={"operation-panel"}>
+            <div className={"operation-panel-toggle"}>
                 <ToggleIconButton
                     checked={showPanel}
                     trueIcon={"keyboard_arrow_right"}
@@ -268,12 +274,12 @@ export function StatusPanel({
                 />
             </div>
             {showPanel ?
-                <div className={"status-display-box"}>
+                <div className={"operation-display-box"}>
                     <div className={"center"}>
-                        <h2 className={"status-panel-title"}>Operations</h2>
+                        <h2 className={"operation-panel-title"}>Operations</h2>
                     </div>
-                    {displays.toReversed().map((display: StatusDisplayInfo, index: number) =>
-                        <StatusDisplay
+                    {operations.toReversed().map((display: Operation, index: number) =>
+                        <OperationDisplay
                             display={display}
                             key={index}
                         />
@@ -284,29 +290,32 @@ export function StatusPanel({
     );
 }
 
-export function StatusDisplay({ display }: { display: StatusDisplayInfo }): JSX.Element {
+export function OperationDisplay({ display }: { display: Operation }): JSX.Element {
     let icon: string = display.icon;
     let classes: string = "mat-icon";
-    if (display.state == StatusDisplayState.started) {
+    if (display.state == OperationState.started) {
         classes += " " + ANIMATIONS[display.animation];
     } else {
         switch (display.state) {
-            case (StatusDisplayState.finished):
+            case (OperationState.queued):
+                icon = "pending";
+                break;
+            case (OperationState.finished):
                 icon = "done";
                 break;
-            case (StatusDisplayState.canceled):
+            case (OperationState.canceled):
                 icon = "close";
                 break;
-            case (StatusDisplayState.error):
+            case (OperationState.error):
                 icon = "error_outline";
                 break;
         }
     }
 
     return (
-        <div className={"status-display"}>
+        <div className={"operation-display"}>
             <h3>{display.title}</h3>
-            <div className={"status-display-info"}>
+            <div className={"operation-display-info"}>
                 {display.image == null ? null :
                     <img
                         src={"img://" + display.image}
@@ -319,7 +328,7 @@ export function StatusDisplay({ display }: { display: StatusDisplayInfo }): JSX.
                 <div>
                     <span>{display.body}</span>
                 </div>
-                <div className={"status-display-state"}>
+                <div className={"operation-display-state"}>
                     <span className={classes}>
                         {icon}
                     </span>
@@ -332,12 +341,42 @@ export function StatusDisplay({ display }: { display: StatusDisplayInfo }): JSX.
 export function displayError(
     error: any,
     displayId: number,
-    setDisplays: Dispatch<SetStateAction<StatusDisplayInfo[]>>
+    setOperations: Dispatch<SetStateAction<Operation[]>>
 ): void {
-    setDisplays((prev: StatusDisplayInfo[]) => {
-        const newDisplays: StatusDisplayInfo[] = [...prev];
-        newDisplays[displayId].state = StatusDisplayState.error;
+    setOperations((prev: Operation[]) => {
+        const newDisplays: Operation[] = [...prev];
+        newDisplays[displayId].state = OperationState.error;
         newDisplays[displayId].body = error.message.replace(/(Error: Error)[\w:' ]*(?=Error)/, "");
         return newDisplays;
     });
+}
+
+export function callQueuedOperations(
+    operations: Operation[]
+): void {
+    const filesInUse: string[] = [];
+    operations.forEach((operation: Operation) => {
+        if (operation.state == OperationState.started) {
+            operation.dependencies.forEach((dep: string) => {
+                filesInUse.push(dep);
+            });
+        }
+    });
+    const toStart: Operation[] = operations.toReversed().filter((operation: Operation) => {
+        if (operation.state == OperationState.queued) {
+            if (
+                operation.dependencies.map(
+                    (dep: string) => filesInUse.includes(dep)
+                ).includes(true)
+            ) {
+                operation.dependencies.forEach((dep: string) => {
+                    filesInUse.push(dep);
+                });
+                return true;
+            }
+        }
+        return false;
+    });
+    console.log(toStart);
+    //set object properties without updating the array
 }

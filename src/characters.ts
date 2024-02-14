@@ -228,6 +228,7 @@ export async function addAlt(
     const characterList: CharacterList = readCharacterList(dir);
     characterList.removeCharacterByName(newAlt.name);
     toResolve.push(writeCharacters(characterList.getAllCharacters(), dir));
+    toResolve.push(removeCharacterCss(newAlt, dir));
     toResolve.push(writeCharacterRandom(newAlt.name, true, dir));
     await Promise.allSettled(toResolve);
     general.log("Add Alt - Return: Alt Is No Longer A Character");

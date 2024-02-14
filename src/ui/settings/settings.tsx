@@ -1,11 +1,11 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import "./settings.css";
-import { StatusDisplayInfo } from "../../interfaces";
+import { Operation } from "../../interfaces";
 
 export function TabSettings({
-    setDisplays
+    setOperations
 }: {
-    setDisplays: Dispatch<SetStateAction<StatusDisplayInfo[]>>
+    setOperations: Dispatch<SetStateAction<Operation[]>>
 }): JSX.Element {
     return (
         <section>

@@ -4,15 +4,15 @@ import IconButton from "../global/icon-button/icon-button";
 import ToggleIconButton from "../global/icon-button/toggle-icon-button";
 import CycleIconButton from "../global/icon-button/cycle-icon-button";
 import {
-    AppData, SortTypeOptions, Stage, StatusDisplayInfo, StatusDisplayState, sortTypes
+    AppData, Operation, OperationState, SortTypeOptions, Stage, sortTypes
 } from "../../interfaces";
 import missing from "../../assets/missing.png";
 import { displayError } from "../global/app";
 
 export function TabStages({
-    setDisplays
+    setOperations
 }: {
-    setDisplays: Dispatch<SetStateAction<StatusDisplayInfo[]>>
+    setOperations: Dispatch<SetStateAction<Operation[]>>
 }): JSX.Element {
     const [filterInstallation, setFilterInstallation]:
     [boolean, Dispatch<SetStateAction<boolean>>]
@@ -179,7 +179,7 @@ export function TabStages({
                                         <StageDisplay
                                             stage={stage}
                                             readStages={readStages}
-                                            setDisplays={setDisplays}
+                                            setOperations={setOperations}
                                             key={stage.name}
                                         />
                                     );
@@ -192,7 +192,7 @@ export function TabStages({
                                                 <SeriesDisplay
                                                     series={stage.series}
                                                     readStages={readStages}
-                                                    setDisplays={setDisplays}
+                                                    setOperations={setOperations}
                                                 />
                                                 {stageDisplay}
                                             </>
@@ -206,7 +206,7 @@ export function TabStages({
                                     <StageDisplay
                                         stage={stage}
                                         readStages={readStages}
-                                        setDisplays={setDisplays}
+                                        setOperations={setOperations}
                                         key={stage.name}
                                     />
                                 )
@@ -224,14 +224,15 @@ export function TabStages({
                         tooltip={"Install Stage From Directory"}
                         onClick={async () => {
                             let displayId: number;
-                            setDisplays((prev: StatusDisplayInfo[]) => {
-                                const newDisplays: StatusDisplayInfo[] = [...prev];
+                            setOperations((prev: Operation[]) => {
+                                const newDisplays: Operation[] = [...prev];
                                 displayId = newDisplays.push({
                                     title: "Stage Installation",
                                     body: "Installing a stage from a directory.",
-                                    state: StatusDisplayState.started,
+                                    state: OperationState.queued,
                                     icon: "create_new_folder",
-                                    animation: Math.floor(Math.random() * 3)
+                                    animation: Math.floor(Math.random() * 3),
+                                    dependencies: ["stages"]
                                 }) - 1;
                                 return newDisplays;
                             });
@@ -241,12 +242,12 @@ export function TabStages({
                                     filterInstallation,
                                     updateStages
                                 );
-                                setDisplays((prev: StatusDisplayInfo[]) => {
-                                    const newDisplays: StatusDisplayInfo[] = [...prev];
+                                setOperations((prev: Operation[]) => {
+                                    const newDisplays: Operation[] = [...prev];
                                     if (stage == null) {
-                                        newDisplays[displayId].state = StatusDisplayState.canceled;
+                                        newDisplays[displayId].state = OperationState.canceled;
                                     } else {
-                                        newDisplays[displayId].state = StatusDisplayState.finished;
+                                        newDisplays[displayId].state = OperationState.finished;
                                         newDisplays[displayId].body = "Installed stage: '" +
                                         stage.name + "' from a directory.";
                                         newDisplays[displayId].image = stage.icon;
@@ -255,7 +256,7 @@ export function TabStages({
                                 });
                                 readStages();
                             } catch (error: any) {
-                                displayError(error, displayId, setDisplays);
+                                displayError(error, displayId, setOperations);
                             }
                         }}
                     />
@@ -265,14 +266,15 @@ export function TabStages({
                         tooltip={"Install Stage From Archive"}
                         onClick={async () => {
                             let displayId: number;
-                            setDisplays((prev: StatusDisplayInfo[]) => {
-                                const newDisplays: StatusDisplayInfo[] = [...prev];
+                            setOperations((prev: Operation[]) => {
+                                const newDisplays: Operation[] = [...prev];
                                 displayId = newDisplays.push({
                                     title: "Stage Installation",
                                     body: "Installing a stage from an archive.",
-                                    state: StatusDisplayState.started,
+                                    state: OperationState.queued,
                                     icon: "note_add",
-                                    animation: Math.floor(Math.random() * 3)
+                                    animation: Math.floor(Math.random() * 3),
+                                    dependencies: ["stages"]
                                 }) - 1;
                                 return newDisplays;
                             });
@@ -282,12 +284,12 @@ export function TabStages({
                                     filterInstallation,
                                     updateStages
                                 );
-                                setDisplays((prev: StatusDisplayInfo[]) => {
-                                    const newDisplays: StatusDisplayInfo[] = [...prev];
+                                setOperations((prev: Operation[]) => {
+                                    const newDisplays: Operation[] = [...prev];
                                     if (stage == null) {
-                                        newDisplays[displayId].state = StatusDisplayState.canceled;
+                                        newDisplays[displayId].state = OperationState.canceled;
                                     } else {
-                                        newDisplays[displayId].state = StatusDisplayState.finished;
+                                        newDisplays[displayId].state = OperationState.finished;
                                         newDisplays[displayId].body = "Installed stage: '" +
                                         stage.name + "' from an archive.";
                                         newDisplays[displayId].image = stage.icon;
@@ -296,7 +298,7 @@ export function TabStages({
                                 });
                                 readStages();
                             } catch (error: any) {
-                                displayError(error, displayId, setDisplays);
+                                displayError(error, displayId, setOperations);
                             }
                         }}
                     />
@@ -355,11 +357,11 @@ export function TabStages({
 function StageDisplay({
     stage,
     readStages,
-    setDisplays
+    setOperations
 }: {
     stage: Stage,
     readStages: () => Promise<void>
-    setDisplays: Dispatch<SetStateAction<StatusDisplayInfo[]>>
+    setOperations: Dispatch<SetStateAction<Operation[]>>
 }): JSX.Element {
     const [randomSelection, setRandomSelection]:
     [boolean, Dispatch<SetStateAction<boolean>>]
@@ -394,31 +396,32 @@ function StageDisplay({
                             tooltip={"Delete Stage"}
                             onClick={async () => {
                                 let displayId: number;
-                                setDisplays((prev: StatusDisplayInfo[]) => {
-                                    const newDisplays: StatusDisplayInfo[] = [...prev];
+                                setOperations((prev: Operation[]) => {
+                                    const newDisplays: Operation[] = [...prev];
                                     displayId = newDisplays.push({
                                         title: "Stage Deletion",
                                         body: "Deleting stage: '" + stage.name + "'.",
                                         image: stage.icon,
-                                        state: StatusDisplayState.started,
+                                        state: OperationState.queued,
                                         icon: "delete",
-                                        animation: Math.floor(Math.random() * 3)
+                                        animation: Math.floor(Math.random() * 3),
+                                        dependencies: ["stages", "stage_lock", "sss"]
                                     }) - 1;
                                     return newDisplays;
                                 });
 
                                 try {
                                     await api.removeStage(stage.name);
-                                    setDisplays((prev: StatusDisplayInfo[]) => {
-                                        const newDisplays: StatusDisplayInfo[] = [...prev];
-                                        newDisplays[displayId].state = StatusDisplayState.finished;
+                                    setOperations((prev: Operation[]) => {
+                                        const newDisplays: Operation[] = [...prev];
+                                        newDisplays[displayId].state = OperationState.finished;
                                         newDisplays[displayId].body = "Deleted stage: '" +
                                             stage.name + "'.";
                                         return newDisplays;
                                     });
                                     readStages();
                                 } catch (error: any) {
-                                    displayError(error, displayId, setDisplays);
+                                    displayError(error, displayId, setOperations);
                                 }
                             }}
                         />
@@ -428,30 +431,31 @@ function StageDisplay({
                             tooltip={"Extract Stage"}
                             onClick={async () => {
                                 let displayId: number;
-                                setDisplays((prev: StatusDisplayInfo[]) => {
-                                    const newDisplays: StatusDisplayInfo[] = [...prev];
+                                setOperations((prev: Operation[]) => {
+                                    const newDisplays: Operation[] = [...prev];
                                     displayId = newDisplays.push({
                                         title: "Stage Extraction",
                                         body: "Extracting stage: '" + stage.name + "'.",
                                         image: stage.icon,
-                                        state: StatusDisplayState.started,
+                                        state: OperationState.queued,
                                         icon: "drive_file_move",
-                                        animation: Math.floor(Math.random() * 3)
+                                        animation: Math.floor(Math.random() * 3),
+                                        dependencies: ["stages"]
                                     }) - 1;
                                     return newDisplays;
                                 });
 
                                 try {
                                     await api.extractStage(stage.name);
-                                    setDisplays((prev: StatusDisplayInfo[]) => {
-                                        const newDisplays: StatusDisplayInfo[] = [...prev];
-                                        newDisplays[displayId].state = StatusDisplayState.finished;
+                                    setOperations((prev: Operation[]) => {
+                                        const newDisplays: Operation[] = [...prev];
+                                        newDisplays[displayId].state = OperationState.finished;
                                         newDisplays[displayId].body = "Extracted stage: '" +
                                             stage.name + "'.";
                                         return newDisplays;
                                     });
                                 } catch (error: any) {
-                                    displayError(error, displayId, setDisplays);
+                                    displayError(error, displayId, setOperations);
                                 }
                             }}
                         />
@@ -474,11 +478,11 @@ function StageDisplay({
 function SeriesDisplay({
     series,
     readStages,
-    setDisplays
+    setOperations
 }: {
     series: string,
     readStages: () => Promise<void>,
-    setDisplays: Dispatch<SetStateAction<StatusDisplayInfo[]>>
+    setOperations: Dispatch<SetStateAction<Operation[]>>
 }): JSX.Element {
     return (
         <tr>
@@ -492,14 +496,15 @@ function SeriesDisplay({
                     tooltip={"Delete All Stages In Series"}
                     onClick={async () => {
                         let displayId: number;
-                        setDisplays((prev: StatusDisplayInfo[]) => {
-                            const newDisplays: StatusDisplayInfo[] = [...prev];
+                        setOperations((prev: Operation[]) => {
+                            const newDisplays: Operation[] = [...prev];
                             displayId = newDisplays.push({
                                 title: "Series Deletion",
                                 body: "Deleting all stages in series: '" + series + "'.",
-                                state: StatusDisplayState.started,
+                                state: OperationState.queued,
                                 icon: "delete_sweep",
-                                animation: Math.floor(Math.random() * 3)
+                                animation: Math.floor(Math.random() * 3),
+                                dependencies: ["stages", "stage_lock", "sss"]
                             }) - 1;
                             return newDisplays;
                         });
@@ -507,8 +512,8 @@ function SeriesDisplay({
                             api.pathJoin(
                                 gameDir, "gfx", "seriesicon", series + ".png"
                             ).then((path: string) => {
-                                setDisplays((prev: StatusDisplayInfo[]) => {
-                                    const newDisplays: StatusDisplayInfo[] = [...prev];
+                                setOperations((prev: Operation[]) => {
+                                    const newDisplays: Operation[] = [...prev];
                                     newDisplays[displayId].image = path;
                                     return newDisplays;
                                 });
@@ -517,16 +522,16 @@ function SeriesDisplay({
 
                         try {
                             await api.removeSeriesStages(series);
-                            setDisplays((prev: StatusDisplayInfo[]) => {
-                                const newDisplays: StatusDisplayInfo[] = [...prev];
-                                newDisplays[displayId].state = StatusDisplayState.finished;
+                            setOperations((prev: Operation[]) => {
+                                const newDisplays: Operation[] = [...prev];
+                                newDisplays[displayId].state = OperationState.finished;
                                 newDisplays[displayId].body = "Deleted all stages in series: '" +
                                     series + "'.";
                                 return newDisplays;
                             });
                             readStages();
                         } catch (error: any) {
-                            displayError(error, displayId, setDisplays);
+                            displayError(error, displayId, setOperations);
                         }
                     }}
                 />

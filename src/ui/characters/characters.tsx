@@ -4,15 +4,15 @@ import IconButton from "../global/icon-button/icon-button";
 import ToggleIconButton from "../global/icon-button/toggle-icon-button";
 import CycleIconButton from "../global/icon-button/cycle-icon-button";
 import {
-    Alt, AppData, Character, SortTypeOptions, StatusDisplayInfo, StatusDisplayState, sortTypes
+    Alt, AppData, Character, Operation, OperationState, SortTypeOptions, sortTypes
 } from "../../interfaces";
 import missing from "../../assets/missing.png";
 import { displayError } from "../global/app";
 
 export function TabCharacters({
-    setDisplays
+    setOperations
 }: {
-    setDisplays: Dispatch<SetStateAction<StatusDisplayInfo[]>>
+    setOperations: Dispatch<SetStateAction<Operation[]>>
 }): JSX.Element {
     const [filterInstallation, setFilterInstallation]:
     [boolean, Dispatch<SetStateAction<boolean>>]
@@ -185,7 +185,7 @@ export function TabCharacters({
                                             readCharacters={readCharacters}
                                             altTarget={altTarget}
                                             setAltTarget={setAltTarget}
-                                            setDisplays={setDisplays}
+                                            setOperations={setOperations}
                                             key={character.name}
                                         />
                                     );
@@ -198,7 +198,7 @@ export function TabCharacters({
                                                 <SeriesDisplay
                                                     series={character.series}
                                                     readCharacters={readCharacters}
-                                                    setDisplays={setDisplays}
+                                                    setOperations={setOperations}
                                                 />
                                                 {characterDisplay}
                                             </>
@@ -214,7 +214,7 @@ export function TabCharacters({
                                         readCharacters={readCharacters}
                                         altTarget={altTarget}
                                         setAltTarget={setAltTarget}
-                                        setDisplays={setDisplays}
+                                        setOperations={setOperations}
                                         key={character.name}
                                     />
                                 )
@@ -232,14 +232,15 @@ export function TabCharacters({
                         tooltip={"Install Character From Directory"}
                         onClick={async () => {
                             let displayId: number;
-                            setDisplays((prev: StatusDisplayInfo[]) => {
-                                const newDisplays: StatusDisplayInfo[] = [...prev];
+                            setOperations((prev: Operation[]) => {
+                                const newDisplays: Operation[] = [...prev];
                                 displayId = newDisplays.push({
                                     title: "Character Installation",
                                     body: "Installing a character from a directory.",
-                                    state: StatusDisplayState.started,
+                                    state: OperationState.queued,
                                     icon: "folder_shared",
-                                    animation: Math.floor(Math.random() * 3)
+                                    animation: Math.floor(Math.random() * 3),
+                                    dependencies: ["data/fighters.txt"]
                                 }) - 1;
                                 return newDisplays;
                             });
@@ -249,12 +250,12 @@ export function TabCharacters({
                                     filterInstallation,
                                     updateCharacters
                                 );
-                                setDisplays((prev: StatusDisplayInfo[]) => {
-                                    const newDisplays: StatusDisplayInfo[] = [...prev];
+                                setOperations((prev: Operation[]) => {
+                                    const newDisplays: Operation[] = [...prev];
                                     if (character == null) {
-                                        newDisplays[displayId].state = StatusDisplayState.canceled;
+                                        newDisplays[displayId].state = OperationState.canceled;
                                     } else {
-                                        newDisplays[displayId].state = StatusDisplayState.finished;
+                                        newDisplays[displayId].state = OperationState.finished;
                                         newDisplays[displayId].body = "Installed character: '" +
                                         character.name + "' from a directory.";
                                         newDisplays[displayId].image = character.mug;
@@ -263,7 +264,7 @@ export function TabCharacters({
                                 });
                                 readCharacters();
                             } catch (error: any) {
-                                displayError(error, displayId, setDisplays);
+                                displayError(error, displayId, setOperations);
                             }
                         }}
                     />
@@ -273,14 +274,15 @@ export function TabCharacters({
                         tooltip={"Install Character From Archive"}
                         onClick={async () => {
                             let displayId: number;
-                            setDisplays((prev: StatusDisplayInfo[]) => {
-                                const newDisplays: StatusDisplayInfo[] = [...prev];
+                            setOperations((prev: Operation[]) => {
+                                const newDisplays: Operation[] = [...prev];
                                 displayId = newDisplays.push({
                                     title: "Character Installation",
                                     body: "Installing a character from an archive.",
-                                    state: StatusDisplayState.started,
+                                    state: OperationState.queued,
                                     icon: "contact_page",
-                                    animation: Math.floor(Math.random() * 3)
+                                    animation: Math.floor(Math.random() * 3),
+                                    dependencies: ["fighters"]
                                 }) - 1;
                                 return newDisplays;
                             });
@@ -290,12 +292,12 @@ export function TabCharacters({
                                     filterInstallation,
                                     updateCharacters
                                 );
-                                setDisplays((prev: StatusDisplayInfo[]) => {
-                                    const newDisplays: StatusDisplayInfo[] = [...prev];
+                                setOperations((prev: Operation[]) => {
+                                    const newDisplays: Operation[] = [...prev];
                                     if (character == null) {
-                                        newDisplays[displayId].state = StatusDisplayState.canceled;
+                                        newDisplays[displayId].state = OperationState.canceled;
                                     } else {
-                                        newDisplays[displayId].state = StatusDisplayState.finished;
+                                        newDisplays[displayId].state = OperationState.finished;
                                         newDisplays[displayId].body = "Installed character: '" +
                                             character.name + "' from an archive.";
                                         newDisplays[displayId].image = character.mug;
@@ -304,7 +306,7 @@ export function TabCharacters({
                                 });
                                 readCharacters();
                             } catch (error: any) {
-                                displayError(error, displayId, setDisplays);
+                                displayError(error, displayId, setOperations);
                             }
                         }}
                     />
@@ -365,13 +367,13 @@ function CharacterDisplay({
     readCharacters,
     altTarget,
     setAltTarget,
-    setDisplays
+    setOperations
 }: {
     character: Character,
     readCharacters: () => Promise<void>,
     altTarget: Character,
     setAltTarget: Dispatch<SetStateAction<Character>>,
-    setDisplays: Dispatch<SetStateAction<StatusDisplayInfo[]>>
+    setOperations: Dispatch<SetStateAction<Operation[]>>
 }): JSX.Element {
     const [randomSelection, setRandomSelection]:
     [boolean, Dispatch<SetStateAction<boolean>>]
@@ -406,31 +408,32 @@ function CharacterDisplay({
                             tooltip={"Delete Character"}
                             onClick={async () => {
                                 let displayId: number;
-                                setDisplays((prev: StatusDisplayInfo[]) => {
-                                    const newDisplays: StatusDisplayInfo[] = [...prev];
+                                setOperations((prev: Operation[]) => {
+                                    const newDisplays: Operation[] = [...prev];
                                     displayId = newDisplays.push({
                                         title: "Character Deletion",
                                         body: "Deleting character: '" + character.name + "'.",
                                         image: character.mug,
-                                        state: StatusDisplayState.started,
+                                        state: OperationState.queued,
                                         icon: "delete",
-                                        animation: Math.floor(Math.random() * 3)
+                                        animation: Math.floor(Math.random() * 3),
+                                        dependencies: ["fighters", "alts", "fighter_lock", "css"]
                                     }) - 1;
                                     return newDisplays;
                                 });
 
                                 try {
                                     await api.removeCharacter(character.name);
-                                    setDisplays((prev: StatusDisplayInfo[]) => {
-                                        const newDisplays: StatusDisplayInfo[] = [...prev];
-                                        newDisplays[displayId].state = StatusDisplayState.finished;
+                                    setOperations((prev: Operation[]) => {
+                                        const newDisplays: Operation[] = [...prev];
+                                        newDisplays[displayId].state = OperationState.finished;
                                         newDisplays[displayId].body = "Deleted character: '" +
                                             character.name + "'.";
                                         return newDisplays;
                                     });
                                     readCharacters();
                                 } catch (error: any) {
-                                    displayError(error, displayId, setDisplays);
+                                    displayError(error, displayId, setOperations);
                                 }
                             }}
                         />
@@ -440,30 +443,31 @@ function CharacterDisplay({
                             tooltip={"Extract Character"}
                             onClick={async () => {
                                 let displayId: number;
-                                setDisplays((prev: StatusDisplayInfo[]) => {
-                                    const newDisplays: StatusDisplayInfo[] = [...prev];
+                                setOperations((prev: Operation[]) => {
+                                    const newDisplays: Operation[] = [...prev];
                                     displayId = newDisplays.push({
                                         title: "Character Extraction",
                                         body: "Extracting character: '" + character.name + "'.",
                                         image: character.mug,
-                                        state: StatusDisplayState.started,
+                                        state: OperationState.queued,
                                         icon: "drive_file_move",
-                                        animation: Math.floor(Math.random() * 3)
+                                        animation: Math.floor(Math.random() * 3),
+                                        dependencies: ["fighters"]
                                     }) - 1;
                                     return newDisplays;
                                 });
 
                                 try {
                                     await api.extractCharacter(character.name);
-                                    setDisplays((prev: StatusDisplayInfo[]) => {
-                                        const newDisplays: StatusDisplayInfo[] = [...prev];
-                                        newDisplays[displayId].state = StatusDisplayState.finished;
+                                    setOperations((prev: Operation[]) => {
+                                        const newDisplays: Operation[] = [...prev];
+                                        newDisplays[displayId].state = OperationState.finished;
                                         newDisplays[displayId].body = "Extracted character: '" +
                                             character.name + "'.";
                                         return newDisplays;
                                     });
                                 } catch (error: any) {
-                                    displayError(error, displayId, setDisplays);
+                                    displayError(error, displayId, setOperations);
                                 }
                             }}
                         />
@@ -486,7 +490,7 @@ function CharacterDisplay({
                             altTarget={altTarget}
                             setAltTarget={setAltTarget}
                             readCharacters={readCharacters}
-                            setDisplays={setDisplays}
+                            setOperations={setOperations}
                         />
                     </div>
                 </div>
@@ -498,7 +502,7 @@ function CharacterDisplay({
                             <CharacterAltDisplay
                                 alt={alt}
                                 readCharacters={readCharacters}
-                                setDisplays={setDisplays}
+                                setOperations={setOperations}
                                 key={index}
                             />
                         )
@@ -512,11 +516,11 @@ function CharacterDisplay({
 function CharacterAltDisplay({
     alt,
     readCharacters,
-    setDisplays
+    setOperations
 }: {
     alt: Alt,
     readCharacters: () => Promise<void>,
-    setDisplays: Dispatch<SetStateAction<StatusDisplayInfo[]>>
+    setOperations: Dispatch<SetStateAction<Operation[]>>
 }): JSX.Element {
     return (
         <div className={"alt-display-wrapper"}>
@@ -539,32 +543,33 @@ function CharacterAltDisplay({
                     tooltip={"Remove Alt"}
                     onClick={async () => {
                         let displayId: number;
-                        setDisplays((prev: StatusDisplayInfo[]) => {
-                            const newDisplays: StatusDisplayInfo[] = [...prev];
+                        setOperations((prev: Operation[]) => {
+                            const newDisplays: Operation[] = [...prev];
                             displayId = newDisplays.push({
                                 title: "Alt Removal",
                                 body: "Removing alt: '" + alt.alt + "' from character: '" +
                                     alt.base + "'.",
                                 image: alt.mug,
-                                state: StatusDisplayState.started,
+                                state: OperationState.queued,
                                 icon: "group_remove",
-                                animation: Math.floor(Math.random() * 3)
+                                animation: Math.floor(Math.random() * 3),
+                                dependencies: ["fighters", "alts"]
                             }) - 1;
                             return newDisplays;
                         });
 
                         try {
                             await api.removeAlt(alt);
-                            setDisplays((prev: StatusDisplayInfo[]) => {
-                                const newDisplays: StatusDisplayInfo[] = [...prev];
-                                newDisplays[displayId].state = StatusDisplayState.finished;
+                            setOperations((prev: Operation[]) => {
+                                const newDisplays: Operation[] = [...prev];
+                                newDisplays[displayId].state = OperationState.finished;
                                 newDisplays[displayId].body = "Removed alt: '" + alt.alt +
                                     "' from character: '" + alt.base + "'.";
                                 return newDisplays;
                             });
                             readCharacters();
                         } catch (error: any) {
-                            displayError(error, displayId, setDisplays);
+                            displayError(error, displayId, setOperations);
                         }
                     }}
                 />
@@ -578,13 +583,13 @@ function AddAltButton({
     altTarget,
     setAltTarget,
     readCharacters,
-    setDisplays
+    setOperations
 }: {
     character: Character,
     altTarget: Character,
     setAltTarget: Dispatch<SetStateAction<Character>>,
     readCharacters: () => Promise<void>,
-    setDisplays: Dispatch<SetStateAction<StatusDisplayInfo[]>>
+    setOperations: Dispatch<SetStateAction<Operation[]>>
 }): JSX.Element {
     if (altTarget == null) {
         return (
@@ -617,16 +622,17 @@ function AddAltButton({
             tooltip={"Add As Alt To Selected Character"}
             onClick={async () => {
                 let displayId: number;
-                setDisplays((prev: StatusDisplayInfo[]) => {
-                    const newDisplays: StatusDisplayInfo[] = [...prev];
+                setOperations((prev: Operation[]) => {
+                    const newDisplays: Operation[] = [...prev];
                     displayId = newDisplays.push({
                         title: "Alt Addition",
                         body: "Adding alt: '" + character.name + "' to character: '" +
                             altTarget.name + "'.",
                         image: character.mug,
-                        state: StatusDisplayState.started,
+                        state: OperationState.queued,
                         icon: "person_add",
-                        animation: Math.floor(Math.random() * 3)
+                        animation: Math.floor(Math.random() * 3),
+                        dependencies: ["fighters", "alts", "fighter_lock", "css"]
                     }) - 1;
                     return newDisplays;
                 });
@@ -634,16 +640,16 @@ function AddAltButton({
                 try {
                     await api.addAlt(altTarget, character);
                     setAltTarget(null);
-                    setDisplays((prev: StatusDisplayInfo[]) => {
-                        const newDisplays: StatusDisplayInfo[] = [...prev];
-                        newDisplays[displayId].state = StatusDisplayState.finished;
+                    setOperations((prev: Operation[]) => {
+                        const newDisplays: Operation[] = [...prev];
+                        newDisplays[displayId].state = OperationState.finished;
                         newDisplays[displayId].body = "Added alt: '" + character.name +
                             "' to character: '" + altTarget.name + "'.";
                         return newDisplays;
                     });
                     readCharacters();
                 } catch (error: any) {
-                    displayError(error, displayId, setDisplays);
+                    displayError(error, displayId, setOperations);
                 }
             }}
         />
@@ -653,11 +659,11 @@ function AddAltButton({
 function SeriesDisplay({
     series,
     readCharacters,
-    setDisplays
+    setOperations
 }: {
     series: string,
     readCharacters: () => Promise<void>,
-    setDisplays: Dispatch<SetStateAction<StatusDisplayInfo[]>>
+    setOperations: Dispatch<SetStateAction<Operation[]>>
 }): JSX.Element {
     return (
         <tr>
@@ -671,14 +677,15 @@ function SeriesDisplay({
                     tooltip={"Delete All Characters In Series"}
                     onClick={async () => {
                         let displayId: number;
-                        setDisplays((prev: StatusDisplayInfo[]) => {
-                            const newDisplays: StatusDisplayInfo[] = [...prev];
+                        setOperations((prev: Operation[]) => {
+                            const newDisplays: Operation[] = [...prev];
                             displayId = newDisplays.push({
                                 title: "Series Deletion",
                                 body: "Deleting all characters in series: '" + series + "'.",
-                                state: StatusDisplayState.started,
+                                state: OperationState.queued,
                                 icon: "delete_sweep",
-                                animation: Math.floor(Math.random() * 3)
+                                animation: Math.floor(Math.random() * 3),
+                                dependencies: ["fighters", "alts", "fighter_lock", "css"]
                             }) - 1;
                             return newDisplays;
                         });
@@ -686,8 +693,8 @@ function SeriesDisplay({
                             api.pathJoin(
                                 gameDir, "gfx", "seriesicon", series + ".png"
                             ).then((path: string) => {
-                                setDisplays((prev: StatusDisplayInfo[]) => {
-                                    const newDisplays: StatusDisplayInfo[] = [...prev];
+                                setOperations((prev: Operation[]) => {
+                                    const newDisplays: Operation[] = [...prev];
                                     newDisplays[displayId].image = path;
                                     return newDisplays;
                                 });
@@ -696,16 +703,16 @@ function SeriesDisplay({
 
                         try {
                             await api.removeSeriesCharacters(series);
-                            setDisplays((prev: StatusDisplayInfo[]) => {
-                                const newDisplays: StatusDisplayInfo[] = [...prev];
-                                newDisplays[displayId].state = StatusDisplayState.finished;
+                            setOperations((prev: Operation[]) => {
+                                const newDisplays: Operation[] = [...prev];
+                                newDisplays[displayId].state = OperationState.finished;
                                 newDisplays[displayId].body = "Deleted all characters in series: " +
                                     "'" + series + "'.";
                                 return newDisplays;
                             });
                             readCharacters();
                         } catch (error: any) {
-                            displayError(error, displayId, setDisplays);
+                            displayError(error, displayId, setOperations);
                         }
                     }}
                 />

@@ -1,15 +1,15 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import "./downloads.css";
-import { Download, StatusDisplayInfo } from "../../interfaces";
+import { Download, Operation } from "../../interfaces";
 
 export async function AllowTabSwitchDownloads(): Promise<boolean> {
     return true;//TODO:
 }
 
 export function TabDownloads({
-    setDisplays
+    setOperations
 }: {
-    setDisplays: Dispatch<SetStateAction<StatusDisplayInfo[]>>
+    setOperations: Dispatch<SetStateAction<Operation[]>>
 }): JSX.Element {
     const [downloads, setDownloads]:
     [Download[], Dispatch<SetStateAction<Download[]>>]

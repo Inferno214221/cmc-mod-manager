@@ -4,16 +4,16 @@ import IconButton from "../global/icon-button/icon-button";
 import ToggleIconButton from "../global/icon-button/toggle-icon-button";
 import CycleIconButton from "../global/icon-button/cycle-icon-button";
 import {
-    Character, CharacterList, CssData, CssPage, DndData, DndDataType, SortTypeOptions,
-    StatusDisplayInfo, StatusDisplayState, sortTypes
+    Character, CharacterList, CssData, CssPage, DndData, DndDataType, Operation,
+    OperationState, SortTypeOptions, sortTypes
 } from "../../interfaces";
 import missing from "../../assets/missing.png";
 import { displayError } from "../global/app";
 
 export function TabCharacterSelectionScreen({
-    setDisplays
+    setOperations
 }: {
-    setDisplays: Dispatch<SetStateAction<StatusDisplayInfo[]>>
+    setOperations: Dispatch<SetStateAction<Operation[]>>
 }): JSX.Element {
     const [characters, setCharacters]:
     [Character[], Dispatch<SetStateAction<Character[]>>]
@@ -125,7 +125,7 @@ export function TabCharacterSelectionScreen({
                         activePage={activePage}
                         setActivePage={setActivePage}
                         getPages={getPages}
-                        setDisplays={setDisplays}
+                        setOperations={setOperations}
                     />
                 </div>
             </div>
@@ -364,13 +364,13 @@ function CssPages({
     activePage,
     setActivePage,
     getPages,
-    setDisplays
+    setOperations
 }: {
     cssPages: CssPage[],
     activePage: CssPage,
     setActivePage: Dispatch<SetStateAction<CssPage>>,
     getPages: () => Promise<void>,
-    setDisplays: Dispatch<SetStateAction<StatusDisplayInfo[]>>
+    setOperations: Dispatch<SetStateAction<Operation[]>>
 }): JSX.Element {
     const [newPageName, setNewPageName]:
     [string, Dispatch<SetStateAction<string>>]
@@ -384,7 +384,7 @@ function CssPages({
                     activePage={activePage}
                     setActivePage={setActivePage}
                     getPages={getPages}
-                    setDisplays={setDisplays}
+                    setOperations={setOperations}
                     key={page.name}
                 />
             )}
@@ -404,30 +404,31 @@ function CssPages({
                     onClick={async () => {
                         if (newPageName != "") {
                             let displayId: number;
-                            setDisplays((prev: StatusDisplayInfo[]) => {
-                                const newDisplays: StatusDisplayInfo[] = [...prev];
+                            setOperations((prev: Operation[]) => {
+                                const newDisplays: Operation[] = [...prev];
                                 displayId = newDisplays.push({
                                     title: "CSS Page Addition",
                                     body: "Adding new CSS page: '" + newPageName + "'.",
-                                    state: StatusDisplayState.started,
+                                    state: OperationState.queued,
                                     icon: "add",
-                                    animation: Math.floor(Math.random() * 3)
+                                    animation: Math.floor(Math.random() * 3),
+                                    dependencies: ["css", "game_settings"]
                                 }) - 1;
                                 return newDisplays;
                             });
 
                             try {
                                 await api.addCssPage(newPageName);
-                                setDisplays((prev: StatusDisplayInfo[]) => {
-                                    const newDisplays: StatusDisplayInfo[] = [...prev];
-                                    newDisplays[displayId].state = StatusDisplayState.finished;
+                                setOperations((prev: Operation[]) => {
+                                    const newDisplays: Operation[] = [...prev];
+                                    newDisplays[displayId].state = OperationState.finished;
                                     newDisplays[displayId].body = "Added new CSS page: '" +
                                         newPageName + "'.";
                                     return newDisplays;
                                 });
                                 getPages();
                             } catch (error: any) {
-                                displayError(error, displayId, setDisplays);
+                                displayError(error, displayId, setOperations);
                             }
                         }
                     }}
@@ -442,13 +443,13 @@ function CssPageDisplay({
     activePage,
     setActivePage,
     getPages,
-    setDisplays
+    setOperations
 }: {
     page: CssPage,
     activePage: CssPage,
     setActivePage: (state: CssPage) => void,
     getPages: () => Promise<void>,
-    setDisplays: Dispatch<SetStateAction<StatusDisplayInfo[]>>
+    setOperations: Dispatch<SetStateAction<Operation[]>>
 }): JSX.Element {
     return (
         <div className={"css-page" + (activePage.path == page.path ? " css-page-active" : "")}>
@@ -467,29 +468,30 @@ function CssPageDisplay({
                 tooltip={"Delete Page"}
                 onClick={async () => {
                     let displayId: number;
-                    setDisplays((prev: StatusDisplayInfo[]) => {
-                        const newDisplays: StatusDisplayInfo[] = [...prev];
+                    setOperations((prev: Operation[]) => {
+                        const newDisplays: Operation[] = [...prev];
                         displayId = newDisplays.push({
                             title: "CSS Page Deletion",
                             body: "Deleting CSS page: '" + page.name + "'.",
-                            state: StatusDisplayState.started,
+                            state: OperationState.queued,
                             icon: "delete",
-                            animation: Math.floor(Math.random() * 3)
+                            animation: Math.floor(Math.random() * 3),
+                            dependencies: ["css", "game_settings"]
                         }) - 1;
                         return newDisplays;
                     });
 
                     try {
                         await api.removeCssPage(page);
-                        setDisplays((prev: StatusDisplayInfo[]) => {
-                            const newDisplays: StatusDisplayInfo[] = [...prev];
-                            newDisplays[displayId].state = StatusDisplayState.finished;
+                        setOperations((prev: Operation[]) => {
+                            const newDisplays: Operation[] = [...prev];
+                            newDisplays[displayId].state = OperationState.finished;
                             newDisplays[displayId].body = "Deleted CSS page: '" + page.name + "'.";
                             return newDisplays;
                         });
                         getPages();
                     } catch (error: any) {
-                        displayError(error, displayId, setDisplays);
+                        displayError(error, displayId, setOperations);
                     }
                 }}
             />

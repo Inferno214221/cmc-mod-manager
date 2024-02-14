@@ -258,7 +258,7 @@ export async function getDownloadInfo(uri: string, downloadId: number): Promise<
         return;
     }
     global.downloads[downloadId].image = "https://gamebanana.com/mods/embeddables/" +
-        modId + "?type=large";
+        modId + "?type=medium_square";
     request.get(
         {
             url: "https://api.gamebanana.com/Core/Item/Data?itemtype=Mod&itemid=" +

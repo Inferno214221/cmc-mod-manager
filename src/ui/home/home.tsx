@@ -16,7 +16,7 @@ import {
     Tab,
     switchTabs
 } from "../global/app";
-import { StatusDisplayInfo } from "../../interfaces";
+import { Operation } from "../../interfaces";
 
 const LICENSE: string = (
     "Copyright © 2023 Inferno214221\n\n" +
@@ -37,9 +37,9 @@ export async function AllowTabSwitchHome(): Promise<boolean> {
 }
 
 export function TabHome({
-    setDisplays
+    setOperations
 }: {
-    setDisplays: Dispatch<SetStateAction<StatusDisplayInfo[]>>
+    setOperations: Dispatch<SetStateAction<Operation[]>>
 }): JSX.Element {
     const [showDownloads, setShowDownloads]:
     [boolean, Dispatch<SetStateAction<boolean>>]
