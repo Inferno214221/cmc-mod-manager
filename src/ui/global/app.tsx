@@ -363,7 +363,7 @@ export async function callQueuedOperations(
             });
         }
     });
-    const toStart: Operation[] = operations.toReversed().filter((operation: Operation) => {
+    const toStart: Operation[] = operations.filter((operation: Operation) => {
         if (operation.state == OpState.queued) {
             if (
                 !operation.dependencies.map(
@@ -379,21 +379,27 @@ export async function callQueuedOperations(
         return false;
     });
     console.log(toStart);
-    for (const operation of toStart) {
-        const operationId: number = operations.indexOf(operation);
-        try {
-            operation.state = OpState.started;
-            console.log("Started: " + operation.title);
-            await operation.call();
-            console.log("Finished: " + operation.title);
-        } catch (error: any) {
-            setOperations((prev: Operation[]) => {
-                const newOperations: Operation[] = [...prev];
-                newOperations[operationId].state = OpState.error;
-                newOperations[operationId].body =
-                    error.message.replace(/(Error: Error)[\w:' ]*(?=Error)/, "");
-                return newOperations;
-            });
-        }
+    // for (const operation of toStart) {
+    if (toStart.length < 1) return;
+    const operation: Operation = toStart[0];
+    const operationId: number = operations.indexOf(operation);
+    try {
+        console.log("Started: " + operation.title);
+        setOperations((prev: Operation[]) => {
+            const newOperations: Operation[] = [...prev];
+            newOperations[operationId].state = OpState.started;
+            return newOperations;
+        });
+        await operation.call();
+        console.log("Finished: " + operation.title);
+    } catch (error: any) {
+        setOperations((prev: Operation[]) => {
+            const newOperations: Operation[] = [...prev];
+            newOperations[operationId].state = OpState.error;
+            newOperations[operationId].body =
+                error.message.replace(/(Error: Error)[\w:' ]*(?=Error)/, "");
+            return newOperations;
+        });
     }
+    // }
 }
