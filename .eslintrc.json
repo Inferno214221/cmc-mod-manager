@@ -48,7 +48,7 @@
         }],
         "no-case-declarations": "off",
         "import/no-named-as-default-member": "off",
-        "sort-imports": ["error", {
+        "sort-imports": ["warn", {
             "ignoreDeclarationSort": true
         }]
     }

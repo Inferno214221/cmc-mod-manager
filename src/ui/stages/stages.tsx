@@ -4,10 +4,9 @@ import IconButton from "../global/icon-button/icon-button";
 import ToggleIconButton from "../global/icon-button/toggle-icon-button";
 import CycleIconButton from "../global/icon-button/cycle-icon-button";
 import {
-    AppData, Operation, OperationState, SortTypeOptions, Stage, sortTypes
+    AppData, OpState, Operation, SortTypeOptions, Stage, sortTypes
 } from "../../interfaces";
 import missing from "../../assets/missing.png";
-import { displayError } from "../global/app";
 
 export function TabStages({
     setOperations
@@ -223,41 +222,38 @@ export function TabStages({
                         iconSize={"50px"}
                         tooltip={"Install Stage From Directory"}
                         onClick={async () => {
-                            let displayId: number;
+                            let operationId: number;
                             setOperations((prev: Operation[]) => {
-                                const newDisplays: Operation[] = [...prev];
-                                displayId = newDisplays.push({
+                                const newOperations: Operation[] = [...prev];
+                                operationId = newOperations.push({
                                     title: "Stage Installation",
                                     body: "Installing a stage from a directory.",
-                                    state: OperationState.queued,
+                                    state: OpState.queued,
                                     icon: "create_new_folder",
                                     animation: Math.floor(Math.random() * 3),
-                                    dependencies: ["stages"]
-                                }) - 1;
-                                return newDisplays;
-                            });
-
-                            try {
-                                const stage: Stage = await api.installStageDir(
-                                    filterInstallation,
-                                    updateStages
-                                );
-                                setOperations((prev: Operation[]) => {
-                                    const newDisplays: Operation[] = [...prev];
-                                    if (stage == null) {
-                                        newDisplays[displayId].state = OperationState.canceled;
-                                    } else {
-                                        newDisplays[displayId].state = OperationState.finished;
-                                        newDisplays[displayId].body = "Installed stage: '" +
-                                        stage.name + "' from a directory.";
-                                        newDisplays[displayId].image = stage.icon;
+                                    dependencies: ["stages"],
+                                    call: async () => {
+                                        const stage: Stage = await api.installStageDir(
+                                            filterInstallation,
+                                            updateStages
+                                        );
+                                        setOperations((prev: Operation[]) => {
+                                            const newOperations: Operation[] = [...prev];
+                                            if (stage == null) {
+                                                newOperations[operationId].state = OpState.canceled;
+                                            } else {
+                                                newOperations[operationId].state = OpState.finished;
+                                                newOperations[operationId].body = "Installed " +
+                                                    "stage: '" + stage.name + "' from a directory.";
+                                                newOperations[operationId].image = stage.icon;
+                                            }
+                                            return newOperations;
+                                        });
+                                        readStages();
                                     }
-                                    return newDisplays;
-                                });
-                                readStages();
-                            } catch (error: any) {
-                                displayError(error, displayId, setOperations);
-                            }
+                                }) - 1;
+                                return newOperations;
+                            });
                         }}
                     />
                     <IconButton
@@ -265,41 +261,38 @@ export function TabStages({
                         iconSize={"50px"}
                         tooltip={"Install Stage From Archive"}
                         onClick={async () => {
-                            let displayId: number;
+                            let operationId: number;
                             setOperations((prev: Operation[]) => {
-                                const newDisplays: Operation[] = [...prev];
-                                displayId = newDisplays.push({
+                                const newOperations: Operation[] = [...prev];
+                                operationId = newOperations.push({
                                     title: "Stage Installation",
                                     body: "Installing a stage from an archive.",
-                                    state: OperationState.queued,
+                                    state: OpState.queued,
                                     icon: "note_add",
                                     animation: Math.floor(Math.random() * 3),
-                                    dependencies: ["stages"]
-                                }) - 1;
-                                return newDisplays;
-                            });
-
-                            try {
-                                const stage: Stage = await api.installStageArchive(
-                                    filterInstallation,
-                                    updateStages
-                                );
-                                setOperations((prev: Operation[]) => {
-                                    const newDisplays: Operation[] = [...prev];
-                                    if (stage == null) {
-                                        newDisplays[displayId].state = OperationState.canceled;
-                                    } else {
-                                        newDisplays[displayId].state = OperationState.finished;
-                                        newDisplays[displayId].body = "Installed stage: '" +
-                                        stage.name + "' from an archive.";
-                                        newDisplays[displayId].image = stage.icon;
+                                    dependencies: ["stages"],
+                                    call: async () => {
+                                        const stage: Stage = await api.installStageArchive(
+                                            filterInstallation,
+                                            updateStages
+                                        );
+                                        setOperations((prev: Operation[]) => {
+                                            const newOperations: Operation[] = [...prev];
+                                            if (stage == null) {
+                                                newOperations[operationId].state = OpState.canceled;
+                                            } else {
+                                                newOperations[operationId].state = OpState.finished;
+                                                newOperations[operationId].body = "Installed " +
+                                                    "stage: '" + stage.name + "' from an archive.";
+                                                newOperations[operationId].image = stage.icon;
+                                            }
+                                            return newOperations;
+                                        });
+                                        readStages();
                                     }
-                                    return newDisplays;
-                                });
-                                readStages();
-                            } catch (error: any) {
-                                displayError(error, displayId, setOperations);
-                            }
+                                }) - 1;
+                                return newOperations;
+                            });
                         }}
                     />
                     <IconButton
@@ -369,8 +362,32 @@ function StageDisplay({
 
     useEffect(() => {
         if (randomSelection == stage.randomSelection) return;
-        api.writeStageRandom(stage.name, randomSelection);
-        stage.randomSelection = randomSelection;
+        let operationId: number;
+        setOperations((prev: Operation[]) => {
+            const newOperations: Operation[] = [...prev];
+            operationId = newOperations.push({
+                title: "Stage Selection",
+                body: "Toggling the ability for stage: '" + stage.name + "' to be " +
+                    "selected at random.",
+                image: stage.icon,
+                state: OpState.queued,
+                icon: randomSelection ? "help" : "help_outline",
+                animation: Math.floor(Math.random() * 3),
+                dependencies: ["stage_lock"],
+                call: async () => {
+                    api.writeStageRandom(stage.name, randomSelection);
+                    stage.randomSelection = randomSelection;
+                    setOperations((prev: Operation[]) => {
+                        const newOperations: Operation[] = [...prev];
+                        newOperations[operationId].state = OpState.finished;
+                        newOperations[operationId].body = "Toggled the ability for stage: '" +
+                            stage.name + "' to be selected at random."
+                        return newOperations;
+                    });
+                }
+            }) - 1;
+            return newOperations;
+        });
     }, [randomSelection]);
 
     return (
@@ -395,34 +412,31 @@ function StageDisplay({
                             iconSize={"30px"}
                             tooltip={"Delete Stage"}
                             onClick={async () => {
-                                let displayId: number;
+                                let operationId: number;
                                 setOperations((prev: Operation[]) => {
-                                    const newDisplays: Operation[] = [...prev];
-                                    displayId = newDisplays.push({
+                                    const newOperations: Operation[] = [...prev];
+                                    operationId = newOperations.push({
                                         title: "Stage Deletion",
                                         body: "Deleting stage: '" + stage.name + "'.",
                                         image: stage.icon,
-                                        state: OperationState.queued,
+                                        state: OpState.queued,
                                         icon: "delete",
                                         animation: Math.floor(Math.random() * 3),
-                                        dependencies: ["stages", "stage_lock", "sss"]
+                                        dependencies: ["stages", "stage_lock", "sss"],
+                                        call: async () => {
+                                            await api.removeStage(stage.name);
+                                            setOperations((prev: Operation[]) => {
+                                                const newOperations: Operation[] = [...prev];
+                                                newOperations[operationId].state = OpState.finished;
+                                                newOperations[operationId].body = "Deleted " +
+                                                    "stage: '" + stage.name + "'.";
+                                                return newOperations;
+                                            });
+                                            readStages();
+                                        }
                                     }) - 1;
-                                    return newDisplays;
+                                    return newOperations;
                                 });
-
-                                try {
-                                    await api.removeStage(stage.name);
-                                    setOperations((prev: Operation[]) => {
-                                        const newDisplays: Operation[] = [...prev];
-                                        newDisplays[displayId].state = OperationState.finished;
-                                        newDisplays[displayId].body = "Deleted stage: '" +
-                                            stage.name + "'.";
-                                        return newDisplays;
-                                    });
-                                    readStages();
-                                } catch (error: any) {
-                                    displayError(error, displayId, setOperations);
-                                }
                             }}
                         />
                         <IconButton
@@ -430,33 +444,30 @@ function StageDisplay({
                             iconSize={"30px"}
                             tooltip={"Extract Stage"}
                             onClick={async () => {
-                                let displayId: number;
+                                let operationId: number;
                                 setOperations((prev: Operation[]) => {
-                                    const newDisplays: Operation[] = [...prev];
-                                    displayId = newDisplays.push({
+                                    const newOperations: Operation[] = [...prev];
+                                    operationId = newOperations.push({
                                         title: "Stage Extraction",
                                         body: "Extracting stage: '" + stage.name + "'.",
                                         image: stage.icon,
-                                        state: OperationState.queued,
+                                        state: OpState.queued,
                                         icon: "drive_file_move",
                                         animation: Math.floor(Math.random() * 3),
-                                        dependencies: ["stages"]
+                                        dependencies: ["stages"],
+                                        call: async () => {
+                                            await api.extractStage(stage.name);
+                                            setOperations((prev: Operation[]) => {
+                                                const newOperations: Operation[] = [...prev];
+                                                newOperations[operationId].state = OpState.finished;
+                                                newOperations[operationId].body = "Extracted " +
+                                                    "stage: '" + stage.name + "'.";
+                                                return newOperations;
+                                            });
+                                        }
                                     }) - 1;
-                                    return newDisplays;
+                                    return newOperations;
                                 });
-
-                                try {
-                                    await api.extractStage(stage.name);
-                                    setOperations((prev: Operation[]) => {
-                                        const newDisplays: Operation[] = [...prev];
-                                        newDisplays[displayId].state = OperationState.finished;
-                                        newDisplays[displayId].body = "Extracted stage: '" +
-                                            stage.name + "'.";
-                                        return newDisplays;
-                                    });
-                                } catch (error: any) {
-                                    displayError(error, displayId, setOperations);
-                                }
                             }}
                         />
                         <ToggleIconButton
@@ -495,44 +506,41 @@ function SeriesDisplay({
                     iconSize={"30px"}
                     tooltip={"Delete All Stages In Series"}
                     onClick={async () => {
-                        let displayId: number;
+                        let operationId: number;
                         setOperations((prev: Operation[]) => {
-                            const newDisplays: Operation[] = [...prev];
-                            displayId = newDisplays.push({
+                            const newOperations: Operation[] = [...prev];
+                            operationId = newOperations.push({
                                 title: "Series Deletion",
                                 body: "Deleting all stages in series: '" + series + "'.",
-                                state: OperationState.queued,
+                                state: OpState.queued,
                                 icon: "delete_sweep",
                                 animation: Math.floor(Math.random() * 3),
-                                dependencies: ["stages", "stage_lock", "sss"]
+                                dependencies: ["stages", "stage_lock", "sss"],
+                                call: async () => {
+                                    await api.removeSeriesStages(series);
+                                    setOperations((prev: Operation[]) => {
+                                        const newOperations: Operation[] = [...prev];
+                                        newOperations[operationId].state = OpState.finished;
+                                        newOperations[operationId].body = "Deleted all stages " +
+                                            "in series: '" + series + "'.";
+                                        return newOperations;
+                                    });
+                                    readStages();
+                                }
                             }) - 1;
-                            return newDisplays;
+                            return newOperations;
                         });
                         api.getGameDir().then((gameDir: string) => {
                             api.pathJoin(
                                 gameDir, "gfx", "seriesicon", series + ".png"
                             ).then((path: string) => {
                                 setOperations((prev: Operation[]) => {
-                                    const newDisplays: Operation[] = [...prev];
-                                    newDisplays[displayId].image = path;
-                                    return newDisplays;
+                                    const newOperations: Operation[] = [...prev];
+                                    newOperations[operationId].image = path;
+                                    return newOperations;
                                 });
                             });
                         });
-
-                        try {
-                            await api.removeSeriesStages(series);
-                            setOperations((prev: Operation[]) => {
-                                const newDisplays: Operation[] = [...prev];
-                                newDisplays[displayId].state = OperationState.finished;
-                                newDisplays[displayId].body = "Deleted all stages in series: '" +
-                                    series + "'.";
-                                return newDisplays;
-                            });
-                            readStages();
-                        } catch (error: any) {
-                            displayError(error, displayId, setOperations);
-                        }
                     }}
                 />
             </th>

@@ -4,12 +4,11 @@ import IconButton from "../global/icon-button/icon-button";
 import ToggleIconButton from "../global/icon-button/toggle-icon-button";
 import CycleIconButton from "../global/icon-button/cycle-icon-button";
 import {
-    DndData, DndDataType, Operation, OperationState, SortTypeOptions, SssData, SssPage, Stage,
+    DndData, DndDataType, OpState, Operation, SortTypeOptions, SssData, SssPage, Stage,
     StageList,
     sortTypes
 } from "../../interfaces";
 import missing from "../../assets/missing.png";
-import { displayError } from "../global/app";
 
 export function TabStageSelectionScreen({
     setOperations
@@ -106,7 +105,6 @@ export function TabStageSelectionScreen({
         console.log("sssPages, activePage updated");
         if (sssPages[activePage] == undefined) return;
         setSssData(sssPages[activePage].data);
-        //FIXME: sssPages is an array of references and therefore does not trigger a re-render
     }, [sssPages, activePage]);
 
     useEffect(() => {
@@ -116,7 +114,29 @@ export function TabStageSelectionScreen({
         const updatedPages: SssPage[] = [...sssPages];
         updatedPages[activePage].data = sssData;
         setSssPages(updatedPages);
-        api.writeSssPages(sssPages);
+        let operationId: number;
+        setOperations((prev: Operation[]) => {
+            const newOperations: Operation[] = [...prev];
+            operationId = newOperations.push({
+                title: "Write SSS Data",
+                body: "Writing modified SSS data to page: '" + sssPages[activePage].name + "'.",
+                state: OpState.queued,
+                icon: "location_pin",
+                animation: Math.floor(Math.random() * 3),
+                dependencies: ["sss"],
+                call: async () => {
+                    await api.writeSssPages(sssPages);
+                    setOperations((prev: Operation[]) => {
+                        const newOperations: Operation[] = [...prev];
+                        newOperations[operationId].state = OpState.finished;
+                        newOperations[operationId].body = "Wrote modified SSS data to page: '" +
+                            sssPages[activePage].name + "'.";
+                        return newOperations;
+                    });
+                }
+            }) - 1;
+            return newOperations;
+        });
     }, [sssData]);
 
     return (
@@ -405,33 +425,30 @@ function SssPages({
                     tooltip={"Add Page"}
                     onClick={async () => {
                         if (newPageName != "") {
-                            let displayId: number;
+                            let operationId: number;
                             setOperations((prev: Operation[]) => {
-                                const newDisplays: Operation[] = [...prev];
-                                displayId = newDisplays.push({
+                                const newOperations: Operation[] = [...prev];
+                                operationId = newOperations.push({
                                     title: "SSS Page Addition",
                                     body: "Adding new SSS page: '" + newPageName + "'.",
-                                    state: OperationState.queued,
+                                    state: OpState.queued,
                                     icon: "add",
                                     animation: Math.floor(Math.random() * 3),
-                                    dependencies: ["sss"]
+                                    dependencies: ["sss"],
+                                    call: async () => {
+                                        await api.addSssPage(newPageName);
+                                        setOperations((prev: Operation[]) => {
+                                            const newOperations: Operation[] = [...prev];
+                                            newOperations[operationId].state = OpState.finished;
+                                            newOperations[operationId].body = "Added new SSS " +
+                                                "page: '" + newPageName + "'.";
+                                            return newOperations;
+                                        });
+                                        getPages();
+                                    }
                                 }) - 1;
-                                return newDisplays;
+                                return newOperations;
                             });
-
-                            try {
-                                await api.addSssPage(newPageName);
-                                setOperations((prev: Operation[]) => {
-                                    const newDisplays: Operation[] = [...prev];
-                                    newDisplays[displayId].state = OperationState.finished;
-                                    newDisplays[displayId].body = "Added new SSS page: '" +
-                                        newPageName + "'.";
-                                    return newDisplays;
-                                });
-                                getPages();
-                            } catch (error: any) {
-                                displayError(error, displayId, setOperations);
-                            }
                         }
                     }}
                 />
@@ -473,32 +490,30 @@ function SssPageDisplay({
                 iconSize={"18px"}
                 tooltip={"Delete Page"}
                 onClick={async () => {
-                    let displayId: number;
+                    let operationId: number;
                     setOperations((prev: Operation[]) => {
-                        const newDisplays: Operation[] = [...prev];
-                        displayId = newDisplays.push({
+                        const newOperations: Operation[] = [...prev];
+                        operationId = newOperations.push({
                             title: "SSS Page Deletion",
                             body: "Deleting SSS page: '" + page.name + "'.",
-                            state: OperationState.queued,
+                            state: OpState.queued,
                             icon: "delete",
                             animation: Math.floor(Math.random() * 3),
-                            dependencies: ["sss"]
+                            dependencies: ["sss"],
+                            call: async () => {
+                                await api.removeSssPage(page);
+                                setOperations((prev: Operation[]) => {
+                                    const newOperations: Operation[] = [...prev];
+                                    newOperations[operationId].state = OpState.finished;
+                                    newOperations[operationId].body = "Deleted SSS page: '" +
+                                        page.name + "'.";
+                                    return newOperations;
+                                });
+                                getPages();
+                            }
                         }) - 1;
-                        return newDisplays;
+                        return newOperations;
                     });
-
-                    try {
-                        await api.removeSssPage(page);
-                        setOperations((prev: Operation[]) => {
-                            const newDisplays: Operation[] = [...prev];
-                            newDisplays[displayId].state = OperationState.finished;
-                            newDisplays[displayId].body = "Deleted SSS page: '" + page.name + "'.";
-                            return newDisplays;
-                        });
-                        getPages();
-                    } catch (error: any) {
-                        displayError(error, displayId, setOperations);
-                    }
                 }}
             />
         </div>

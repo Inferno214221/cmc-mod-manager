@@ -23,7 +23,7 @@ import {
     TabSettings
 } from "../settings/settings";
 import ToggleIconButton from "./icon-button/toggle-icon-button";
-import { Operation, OperationState } from "../../interfaces";
+import { OpState, Operation } from "../../interfaces";
 import missing from "../../assets/missing.png";
 
 let root: Root;
@@ -156,9 +156,7 @@ export function App({ tab }: { tab: Tab }): JSX.Element {
     = useState([]);
 
     useEffect(() => {
-        console.log(operations);
-        callQueuedOperations(operations);
-        console.log(operations);
+        callQueuedOperations(operations, setOperations);
     }, [operations]);
 
     return (
@@ -293,20 +291,20 @@ export function OperationPanel({
 export function OperationDisplay({ display }: { display: Operation }): JSX.Element {
     let icon: string = display.icon;
     let classes: string = "mat-icon";
-    if (display.state == OperationState.started) {
+    if (display.state == OpState.started) {
         classes += " " + ANIMATIONS[display.animation];
     } else {
         switch (display.state) {
-            case (OperationState.queued):
+            case (OpState.queued):
                 icon = "pending";
                 break;
-            case (OperationState.finished):
+            case (OpState.finished):
                 icon = "done";
                 break;
-            case (OperationState.canceled):
+            case (OpState.canceled):
                 icon = "close";
                 break;
-            case (OperationState.error):
+            case (OpState.error):
                 icon = "error_outline";
                 break;
         }
@@ -340,32 +338,35 @@ export function OperationDisplay({ display }: { display: Operation }): JSX.Eleme
 
 export function displayError(
     error: any,
-    displayId: number,
+    operationId: number,
     setOperations: Dispatch<SetStateAction<Operation[]>>
 ): void {
     setOperations((prev: Operation[]) => {
-        const newDisplays: Operation[] = [...prev];
-        newDisplays[displayId].state = OperationState.error;
-        newDisplays[displayId].body = error.message.replace(/(Error: Error)[\w:' ]*(?=Error)/, "");
-        return newDisplays;
+        const newOperations: Operation[] = [...prev];
+        newOperations[operationId].state = OpState.error;
+        newOperations[operationId].body =
+            error.message.replace(/(Error: Error)[\w:' ]*(?=Error)/, "");
+        return newOperations;
     });
 }
 
-export function callQueuedOperations(
-    operations: Operation[]
-): void {
+export async function callQueuedOperations(
+    operations: Operation[],
+    setOperations: Dispatch<SetStateAction<Operation[]>>
+): Promise<void> {
+    console.log("callQueuedOperations");
     const filesInUse: string[] = [];
     operations.forEach((operation: Operation) => {
-        if (operation.state == OperationState.started) {
+        if (operation.state == OpState.started) {
             operation.dependencies.forEach((dep: string) => {
                 filesInUse.push(dep);
             });
         }
     });
     const toStart: Operation[] = operations.toReversed().filter((operation: Operation) => {
-        if (operation.state == OperationState.queued) {
+        if (operation.state == OpState.queued) {
             if (
-                operation.dependencies.map(
+                !operation.dependencies.map(
                     (dep: string) => filesInUse.includes(dep)
                 ).includes(true)
             ) {
@@ -378,5 +379,21 @@ export function callQueuedOperations(
         return false;
     });
     console.log(toStart);
-    //set object properties without updating the array
+    for (const operation of toStart) {
+        const operationId: number = operations.indexOf(operation);
+        try {
+            operation.state = OpState.started;
+            console.log("Started: " + operation.title);
+            await operation.call();
+            console.log("Finished: " + operation.title);
+        } catch (error: any) {
+            setOperations((prev: Operation[]) => {
+                const newOperations: Operation[] = [...prev];
+                newOperations[operationId].state = OpState.error;
+                newOperations[operationId].body =
+                    error.message.replace(/(Error: Error)[\w:' ]*(?=Error)/, "");
+                return newOperations;
+            });
+        }
+    }
 }

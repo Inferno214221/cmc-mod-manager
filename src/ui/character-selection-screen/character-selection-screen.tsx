@@ -4,11 +4,10 @@ import IconButton from "../global/icon-button/icon-button";
 import ToggleIconButton from "../global/icon-button/toggle-icon-button";
 import CycleIconButton from "../global/icon-button/cycle-icon-button";
 import {
-    Character, CharacterList, CssData, CssPage, DndData, DndDataType, Operation,
-    OperationState, SortTypeOptions, sortTypes
+    Character, CharacterList, CssData, CssPage, DndData, DndDataType, OpState,
+    Operation, SortTypeOptions, sortTypes
 } from "../../interfaces";
 import missing from "../../assets/missing.png";
-import { displayError } from "../global/app";
 
 export function TabCharacterSelectionScreen({
     setOperations
@@ -92,8 +91,30 @@ export function TabCharacterSelectionScreen({
     }, [characters, cssData]);
 
     async function updateCssData(data: CssData): Promise<void> {
-        await api.writeCssData(activePage, data);
-        getCssData();
+        let operationId: number;
+        setOperations((prev: Operation[]) => {
+            const newOperations: Operation[] = [...prev];
+            operationId = newOperations.push({
+                title: "Write CSS Data",
+                body: "Writing modified CSS data to page: '" + activePage.name + "'.",
+                state: OpState.queued,
+                icon: "pan_tool_alt",
+                animation: Math.floor(Math.random() * 3),
+                dependencies: ["css"],
+                call: async () => {
+                    await api.writeCssData(activePage, data);
+                    getCssData();
+                    setOperations((prev: Operation[]) => {
+                        const newOperations: Operation[] = [...prev];
+                        newOperations[operationId].state = OpState.finished;
+                        newOperations[operationId].body = "Wrote modified CSS data to page: '" +
+                            activePage.name + "'.";
+                        return newOperations;
+                    });
+                }
+            }) - 1;
+            return newOperations;
+        });
     }
 
     function characterDragAndDrop(from: DndData, to: DndData): void {
@@ -403,33 +424,30 @@ function CssPages({
                     tooltip={"Add Page"}
                     onClick={async () => {
                         if (newPageName != "") {
-                            let displayId: number;
+                            let operationId: number;
                             setOperations((prev: Operation[]) => {
-                                const newDisplays: Operation[] = [...prev];
-                                displayId = newDisplays.push({
+                                const newOperations: Operation[] = [...prev];
+                                operationId = newOperations.push({
                                     title: "CSS Page Addition",
                                     body: "Adding new CSS page: '" + newPageName + "'.",
-                                    state: OperationState.queued,
+                                    state: OpState.queued,
                                     icon: "add",
                                     animation: Math.floor(Math.random() * 3),
-                                    dependencies: ["css", "game_settings"]
+                                    dependencies: ["css", "game_settings"],
+                                    call: async () => {
+                                        await api.addCssPage(newPageName);
+                                        setOperations((prev: Operation[]) => {
+                                            const newOperations: Operation[] = [...prev];
+                                            newOperations[operationId].state = OpState.finished;
+                                            newOperations[operationId].body = "Added new CSS " +
+                                                "page: '" + newPageName + "'.";
+                                            return newOperations;
+                                        });
+                                        getPages();
+                                    }
                                 }) - 1;
-                                return newDisplays;
+                                return newOperations;
                             });
-
-                            try {
-                                await api.addCssPage(newPageName);
-                                setOperations((prev: Operation[]) => {
-                                    const newDisplays: Operation[] = [...prev];
-                                    newDisplays[displayId].state = OperationState.finished;
-                                    newDisplays[displayId].body = "Added new CSS page: '" +
-                                        newPageName + "'.";
-                                    return newDisplays;
-                                });
-                                getPages();
-                            } catch (error: any) {
-                                displayError(error, displayId, setOperations);
-                            }
                         }
                     }}
                 />
@@ -467,32 +485,30 @@ function CssPageDisplay({
                 iconSize={"18px"}
                 tooltip={"Delete Page"}
                 onClick={async () => {
-                    let displayId: number;
+                    let operationId: number;
                     setOperations((prev: Operation[]) => {
-                        const newDisplays: Operation[] = [...prev];
-                        displayId = newDisplays.push({
+                        const newOperations: Operation[] = [...prev];
+                        operationId = newOperations.push({
                             title: "CSS Page Deletion",
                             body: "Deleting CSS page: '" + page.name + "'.",
-                            state: OperationState.queued,
+                            state: OpState.queued,
                             icon: "delete",
                             animation: Math.floor(Math.random() * 3),
-                            dependencies: ["css", "game_settings"]
+                            dependencies: ["css", "game_settings"],
+                            call: async () => {
+                                await api.removeCssPage(page);
+                                setOperations((prev: Operation[]) => {
+                                    const newOperations: Operation[] = [...prev];
+                                    newOperations[operationId].state = OpState.finished;
+                                    newOperations[operationId].body = "Deleted CSS page: '" +
+                                        page.name + "'.";
+                                    return newOperations;
+                                });
+                                getPages();
+                            }
                         }) - 1;
-                        return newDisplays;
+                        return newOperations;
                     });
-
-                    try {
-                        await api.removeCssPage(page);
-                        setOperations((prev: Operation[]) => {
-                            const newDisplays: Operation[] = [...prev];
-                            newDisplays[displayId].state = OperationState.finished;
-                            newDisplays[displayId].body = "Deleted CSS page: '" + page.name + "'.";
-                            return newDisplays;
-                        });
-                        getPages();
-                    } catch (error: any) {
-                        displayError(error, displayId, setOperations);
-                    }
                 }}
             />
         </div>

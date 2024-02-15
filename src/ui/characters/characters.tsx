@@ -4,10 +4,9 @@ import IconButton from "../global/icon-button/icon-button";
 import ToggleIconButton from "../global/icon-button/toggle-icon-button";
 import CycleIconButton from "../global/icon-button/cycle-icon-button";
 import {
-    Alt, AppData, Character, Operation, OperationState, SortTypeOptions, sortTypes
+    Alt, AppData, Character, OpState, Operation, SortTypeOptions, sortTypes
 } from "../../interfaces";
 import missing from "../../assets/missing.png";
-import { displayError } from "../global/app";
 
 export function TabCharacters({
     setOperations
@@ -231,41 +230,39 @@ export function TabCharacters({
                         iconSize={"50px"}
                         tooltip={"Install Character From Directory"}
                         onClick={async () => {
-                            let displayId: number;
+                            let operationId: number;
                             setOperations((prev: Operation[]) => {
-                                const newDisplays: Operation[] = [...prev];
-                                displayId = newDisplays.push({
+                                const newOperations: Operation[] = [...prev];
+                                operationId = newOperations.push({
                                     title: "Character Installation",
                                     body: "Installing a character from a directory.",
-                                    state: OperationState.queued,
+                                    state: OpState.queued,
                                     icon: "folder_shared",
                                     animation: Math.floor(Math.random() * 3),
-                                    dependencies: ["data/fighters.txt"]
-                                }) - 1;
-                                return newDisplays;
-                            });
-
-                            try {
-                                const character: Character = await api.installCharacterDir(
-                                    filterInstallation,
-                                    updateCharacters
-                                );
-                                setOperations((prev: Operation[]) => {
-                                    const newDisplays: Operation[] = [...prev];
-                                    if (character == null) {
-                                        newDisplays[displayId].state = OperationState.canceled;
-                                    } else {
-                                        newDisplays[displayId].state = OperationState.finished;
-                                        newDisplays[displayId].body = "Installed character: '" +
-                                        character.name + "' from a directory.";
-                                        newDisplays[displayId].image = character.mug;
+                                    dependencies: ["data/fighters.txt"],
+                                    call: async () => {
+                                        const character: Character = await api.installCharacterDir(
+                                            filterInstallation,
+                                            updateCharacters
+                                        );
+                                        setOperations((prev: Operation[]) => {
+                                            const newOperations: Operation[] = [...prev];
+                                            if (character == null) {
+                                                newOperations[operationId].state = OpState.canceled;
+                                            } else {
+                                                newOperations[operationId].state = OpState.finished;
+                                                newOperations[operationId].body = "Installed " +
+                                                    "character: '" + character.name +
+                                                    "' from a directory.";
+                                                newOperations[operationId].image = character.mug;
+                                            }
+                                            return newOperations;
+                                        });
+                                        readCharacters();
                                     }
-                                    return newDisplays;
-                                });
-                                readCharacters();
-                            } catch (error: any) {
-                                displayError(error, displayId, setOperations);
-                            }
+                                }) - 1;
+                                return newOperations;
+                            });
                         }}
                     />
                     <IconButton
@@ -273,41 +270,40 @@ export function TabCharacters({
                         iconSize={"50px"}
                         tooltip={"Install Character From Archive"}
                         onClick={async () => {
-                            let displayId: number;
+                            let operationId: number;
                             setOperations((prev: Operation[]) => {
-                                const newDisplays: Operation[] = [...prev];
-                                displayId = newDisplays.push({
+                                const newOperations: Operation[] = [...prev];
+                                operationId = newOperations.push({
                                     title: "Character Installation",
                                     body: "Installing a character from an archive.",
-                                    state: OperationState.queued,
+                                    state: OpState.queued,
                                     icon: "contact_page",
                                     animation: Math.floor(Math.random() * 3),
-                                    dependencies: ["fighters"]
-                                }) - 1;
-                                return newDisplays;
-                            });
-
-                            try {
-                                const character: Character = await api.installCharacterArchive(
-                                    filterInstallation,
-                                    updateCharacters
-                                );
-                                setOperations((prev: Operation[]) => {
-                                    const newDisplays: Operation[] = [...prev];
-                                    if (character == null) {
-                                        newDisplays[displayId].state = OperationState.canceled;
-                                    } else {
-                                        newDisplays[displayId].state = OperationState.finished;
-                                        newDisplays[displayId].body = "Installed character: '" +
-                                            character.name + "' from an archive.";
-                                        newDisplays[displayId].image = character.mug;
+                                    dependencies: ["fighters"],
+                                    call: async () => {
+                                        const character: Character =
+                                            await api.installCharacterArchive(
+                                                filterInstallation,
+                                                updateCharacters
+                                            );
+                                        setOperations((prev: Operation[]) => {
+                                            const newOperations: Operation[] = [...prev];
+                                            if (character == null) {
+                                                newOperations[operationId].state = OpState.canceled;
+                                            } else {
+                                                newOperations[operationId].state = OpState.finished;
+                                                newOperations[operationId].body = "Installed " +
+                                                    "character: '" + character.name +
+                                                    "' from an archive.";
+                                                newOperations[operationId].image = character.mug;
+                                            }
+                                            return newOperations;
+                                        });
+                                        readCharacters();
                                     }
-                                    return newDisplays;
-                                });
-                                readCharacters();
-                            } catch (error: any) {
-                                displayError(error, displayId, setOperations);
-                            }
+                                }) - 1;
+                                return newOperations;
+                            });
                         }}
                     />
                     <IconButton
@@ -381,8 +377,32 @@ function CharacterDisplay({
 
     useEffect(() => {
         if (randomSelection == character.randomSelection) return;
-        api.writeCharacterRandom(character.name, randomSelection);
-        character.randomSelection = randomSelection;
+        let operationId: number;
+        setOperations((prev: Operation[]) => {
+            const newOperations: Operation[] = [...prev];
+            operationId = newOperations.push({
+                title: "Character Selection",
+                body: "Toggling the ability for character: '" + character.name + "' to be " +
+                    "selected at random.",
+                image: character.mug,
+                state: OpState.queued,
+                icon: randomSelection ? "help" : "help_outline",
+                animation: Math.floor(Math.random() * 3),
+                dependencies: ["fighter_lock"],
+                call: async () => {
+                    api.writeCharacterRandom(character.name, randomSelection);
+                    character.randomSelection = randomSelection;
+                    setOperations((prev: Operation[]) => {
+                        const newOperations: Operation[] = [...prev];
+                        newOperations[operationId].state = OpState.finished;
+                        newOperations[operationId].body = "Toggled the ability for character: '" +
+                            character.name + "' to be selected at random."
+                        return newOperations;
+                    });
+                }
+            }) - 1;
+            return newOperations;
+        });
     }, [randomSelection]);
 
     return (
@@ -407,34 +427,31 @@ function CharacterDisplay({
                             iconSize={"30px"}
                             tooltip={"Delete Character"}
                             onClick={async () => {
-                                let displayId: number;
+                                let operationId: number;
                                 setOperations((prev: Operation[]) => {
-                                    const newDisplays: Operation[] = [...prev];
-                                    displayId = newDisplays.push({
+                                    const newOperations: Operation[] = [...prev];
+                                    operationId = newOperations.push({
                                         title: "Character Deletion",
                                         body: "Deleting character: '" + character.name + "'.",
                                         image: character.mug,
-                                        state: OperationState.queued,
+                                        state: OpState.queued,
                                         icon: "delete",
                                         animation: Math.floor(Math.random() * 3),
-                                        dependencies: ["fighters", "alts", "fighter_lock", "css"]
+                                        dependencies: ["fighters", "alts", "fighter_lock", "css"],
+                                        call: async () => {
+                                            await api.removeCharacter(character.name);
+                                            setOperations((prev: Operation[]) => {
+                                                const newOperations: Operation[] = [...prev];
+                                                newOperations[operationId].state = OpState.finished;
+                                                newOperations[operationId].body = "Deleted " +
+                                                    "character: '" + character.name + "'.";
+                                                return newOperations;
+                                            });
+                                            readCharacters();
+                                        }
                                     }) - 1;
-                                    return newDisplays;
+                                    return newOperations;
                                 });
-
-                                try {
-                                    await api.removeCharacter(character.name);
-                                    setOperations((prev: Operation[]) => {
-                                        const newDisplays: Operation[] = [...prev];
-                                        newDisplays[displayId].state = OperationState.finished;
-                                        newDisplays[displayId].body = "Deleted character: '" +
-                                            character.name + "'.";
-                                        return newDisplays;
-                                    });
-                                    readCharacters();
-                                } catch (error: any) {
-                                    displayError(error, displayId, setOperations);
-                                }
                             }}
                         />
                         <IconButton
@@ -442,33 +459,30 @@ function CharacterDisplay({
                             iconSize={"30px"}
                             tooltip={"Extract Character"}
                             onClick={async () => {
-                                let displayId: number;
+                                let operationId: number;
                                 setOperations((prev: Operation[]) => {
-                                    const newDisplays: Operation[] = [...prev];
-                                    displayId = newDisplays.push({
+                                    const newOperations: Operation[] = [...prev];
+                                    operationId = newOperations.push({
                                         title: "Character Extraction",
                                         body: "Extracting character: '" + character.name + "'.",
                                         image: character.mug,
-                                        state: OperationState.queued,
+                                        state: OpState.queued,
                                         icon: "drive_file_move",
                                         animation: Math.floor(Math.random() * 3),
-                                        dependencies: ["fighters"]
+                                        dependencies: ["fighters"],
+                                        call: async () => {
+                                            await api.extractCharacter(character.name);
+                                            setOperations((prev: Operation[]) => {
+                                                const newOperations: Operation[] = [...prev];
+                                                newOperations[operationId].state = OpState.finished;
+                                                newOperations[operationId].body = "Extracted " +
+                                                    "character: '" + character.name + "'.";
+                                                return newOperations;
+                                            });
+                                        }
                                     }) - 1;
-                                    return newDisplays;
+                                    return newOperations;
                                 });
-
-                                try {
-                                    await api.extractCharacter(character.name);
-                                    setOperations((prev: Operation[]) => {
-                                        const newDisplays: Operation[] = [...prev];
-                                        newDisplays[displayId].state = OperationState.finished;
-                                        newDisplays[displayId].body = "Extracted character: '" +
-                                            character.name + "'.";
-                                        return newDisplays;
-                                    });
-                                } catch (error: any) {
-                                    displayError(error, displayId, setOperations);
-                                }
                             }}
                         />
                         <ToggleIconButton
@@ -542,35 +556,32 @@ function CharacterAltDisplay({
                     iconSize={"30px"}
                     tooltip={"Remove Alt"}
                     onClick={async () => {
-                        let displayId: number;
+                        let operationId: number;
                         setOperations((prev: Operation[]) => {
-                            const newDisplays: Operation[] = [...prev];
-                            displayId = newDisplays.push({
+                            const newOperations: Operation[] = [...prev];
+                            operationId = newOperations.push({
                                 title: "Alt Removal",
                                 body: "Removing alt: '" + alt.alt + "' from character: '" +
                                     alt.base + "'.",
                                 image: alt.mug,
-                                state: OperationState.queued,
+                                state: OpState.queued,
                                 icon: "group_remove",
                                 animation: Math.floor(Math.random() * 3),
-                                dependencies: ["fighters", "alts"]
+                                dependencies: ["fighters", "alts"],
+                                call: async () => {
+                                    await api.removeAlt(alt);
+                                    setOperations((prev: Operation[]) => {
+                                        const newOperations: Operation[] = [...prev];
+                                        newOperations[operationId].state = OpState.finished;
+                                        newOperations[operationId].body = "Removed alt: '" +
+                                            alt.alt + "' from character: '" + alt.base + "'.";
+                                        return newOperations;
+                                    });
+                                    readCharacters();
+                                }
                             }) - 1;
-                            return newDisplays;
+                            return newOperations;
                         });
-
-                        try {
-                            await api.removeAlt(alt);
-                            setOperations((prev: Operation[]) => {
-                                const newDisplays: Operation[] = [...prev];
-                                newDisplays[displayId].state = OperationState.finished;
-                                newDisplays[displayId].body = "Removed alt: '" + alt.alt +
-                                    "' from character: '" + alt.base + "'.";
-                                return newDisplays;
-                            });
-                            readCharacters();
-                        } catch (error: any) {
-                            displayError(error, displayId, setOperations);
-                        }
                     }}
                 />
             </div>
@@ -621,36 +632,33 @@ function AddAltButton({
             iconSize={"30px"}
             tooltip={"Add As Alt To Selected Character"}
             onClick={async () => {
-                let displayId: number;
+                let operationId: number;
                 setOperations((prev: Operation[]) => {
-                    const newDisplays: Operation[] = [...prev];
-                    displayId = newDisplays.push({
+                    const newOperations: Operation[] = [...prev];
+                    operationId = newOperations.push({
                         title: "Alt Addition",
                         body: "Adding alt: '" + character.name + "' to character: '" +
                             altTarget.name + "'.",
                         image: character.mug,
-                        state: OperationState.queued,
+                        state: OpState.queued,
                         icon: "person_add",
                         animation: Math.floor(Math.random() * 3),
-                        dependencies: ["fighters", "alts", "fighter_lock", "css"]
+                        dependencies: ["fighters", "alts", "fighter_lock", "css"],
+                        call: async () => {
+                            await api.addAlt(altTarget, character);
+                            setAltTarget(null);
+                            setOperations((prev: Operation[]) => {
+                                const newOperations: Operation[] = [...prev];
+                                newOperations[operationId].state = OpState.finished;
+                                newOperations[operationId].body = "Added alt: '" + character.name +
+                                    "' to character: '" + altTarget.name + "'.";
+                                return newOperations;
+                            });
+                            readCharacters();
+                        }
                     }) - 1;
-                    return newDisplays;
+                    return newOperations;
                 });
-
-                try {
-                    await api.addAlt(altTarget, character);
-                    setAltTarget(null);
-                    setOperations((prev: Operation[]) => {
-                        const newDisplays: Operation[] = [...prev];
-                        newDisplays[displayId].state = OperationState.finished;
-                        newDisplays[displayId].body = "Added alt: '" + character.name +
-                            "' to character: '" + altTarget.name + "'.";
-                        return newDisplays;
-                    });
-                    readCharacters();
-                } catch (error: any) {
-                    displayError(error, displayId, setOperations);
-                }
             }}
         />
     );
@@ -676,44 +684,41 @@ function SeriesDisplay({
                     iconSize={"30px"}
                     tooltip={"Delete All Characters In Series"}
                     onClick={async () => {
-                        let displayId: number;
+                        let operationId: number;
                         setOperations((prev: Operation[]) => {
-                            const newDisplays: Operation[] = [...prev];
-                            displayId = newDisplays.push({
+                            const newOperations: Operation[] = [...prev];
+                            operationId = newOperations.push({
                                 title: "Series Deletion",
                                 body: "Deleting all characters in series: '" + series + "'.",
-                                state: OperationState.queued,
+                                state: OpState.queued,
                                 icon: "delete_sweep",
                                 animation: Math.floor(Math.random() * 3),
-                                dependencies: ["fighters", "alts", "fighter_lock", "css"]
+                                dependencies: ["fighters", "alts", "fighter_lock", "css"],
+                                call: async () => {
+                                    await api.removeSeriesCharacters(series);
+                                    setOperations((prev: Operation[]) => {
+                                        const newOperations: Operation[] = [...prev];
+                                        newOperations[operationId].state = OpState.finished;
+                                        newOperations[operationId].body = "Deleted all " +
+                                            "characters in series: '" + series + "'.";
+                                        return newOperations;
+                                    });
+                                    readCharacters();
+                                }
                             }) - 1;
-                            return newDisplays;
+                            return newOperations;
                         });
                         api.getGameDir().then((gameDir: string) => {
                             api.pathJoin(
                                 gameDir, "gfx", "seriesicon", series + ".png"
                             ).then((path: string) => {
                                 setOperations((prev: Operation[]) => {
-                                    const newDisplays: Operation[] = [...prev];
-                                    newDisplays[displayId].image = path;
-                                    return newDisplays;
+                                    const newOperations: Operation[] = [...prev];
+                                    newOperations[operationId].image = path;
+                                    return newOperations;
                                 });
                             });
                         });
-
-                        try {
-                            await api.removeSeriesCharacters(series);
-                            setOperations((prev: Operation[]) => {
-                                const newDisplays: Operation[] = [...prev];
-                                newDisplays[displayId].state = OperationState.finished;
-                                newDisplays[displayId].body = "Deleted all characters in series: " +
-                                    "'" + series + "'.";
-                                return newDisplays;
-                            });
-                            readCharacters();
-                        } catch (error: any) {
-                            displayError(error, displayId, setOperations);
-                        }
                     }}
                 />
             </th>

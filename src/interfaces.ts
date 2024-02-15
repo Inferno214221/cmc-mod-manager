@@ -303,14 +303,14 @@ export interface Operation {
     title: string,
     body: string,
     image?: string,
-    state: OperationState,
+    state: OpState,
     icon: string,
     animation: number,
     dependencies: string[],
-    call?: () => Promise<void>
+    call: () => Promise<void>
 }
 
-export enum OperationState {
+export enum OpState {
     queued = "Queued",
     started = "Started",
     finished = "Finished",
