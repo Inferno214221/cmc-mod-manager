@@ -23,7 +23,7 @@ import {
     TabSettings
 } from "../settings/settings";
 import ToggleIconButton from "./icon-button/toggle-icon-button";
-import { OpState, Operation } from "../../interfaces";
+import { OpState, Operation, OperationUpdate } from "../../interfaces";
 import missing from "../../assets/missing.png";
 
 let root: Root;
@@ -154,6 +154,27 @@ export function App({ tab }: { tab: Tab }): JSX.Element {
     const [operations, setOperations]:
     [Operation[], Dispatch<SetStateAction<Operation[]>>]
     = useState([]);
+
+    api.addOperation((operation: Operation) => {
+        setOperations((prev: Operation[]) => {
+            const newOperations: Operation[] = [...prev];
+            newOperations.push(operation);
+            return newOperations;
+        });
+    });
+    api.updateOperation((update: OperationUpdate) => {
+        setOperations((prev: Operation[]) => {
+            const newOperations: Operation[] = [...prev];
+            const filtered: Operation[] = newOperations.filter(
+                (operation: Operation) => operation.uid == update.uid
+            );
+            if (filtered.length < 1) return;
+            const operation: Operation = filtered[0];
+            Object.assign(operation, update);
+            return newOperations;
+        });
+    });
+    api.handleProcessArgs();
 
     useEffect(() => {
         callQueuedOperations(operations, setOperations);
@@ -354,7 +375,7 @@ export async function callQueuedOperations(
     operations: Operation[],
     setOperations: Dispatch<SetStateAction<Operation[]>>
 ): Promise<void> {
-    console.log("callQueuedOperations");
+    // console.log("callQueuedOperations");
     const filesInUse: string[] = [];
     operations.forEach((operation: Operation) => {
         if (operation.state == OpState.started) {
@@ -378,8 +399,7 @@ export async function callQueuedOperations(
         }
         return false;
     });
-    console.log(toStart);
-    // for (const operation of toStart) {
+    // console.log(toStart);
     if (toStart.length < 1) return;
     const operation: Operation = toStart[0];
     const operationId: number = operations.indexOf(operation);
@@ -390,7 +410,13 @@ export async function callQueuedOperations(
             newOperations[operationId].state = OpState.started;
             return newOperations;
         });
-        await operation.call();
+        if (typeof operation.call == "function") {
+            await operation.call();
+        } else {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore: expression of type 'string' can't be used to index type
+            await api[operation.call.name](...operation.call.args);
+        }
         console.log("Finished: " + operation.title);
     } catch (error: any) {
         setOperations((prev: Operation[]) => {
@@ -401,5 +427,4 @@ export async function callQueuedOperations(
             return newOperations;
         });
     }
-    // }
 }

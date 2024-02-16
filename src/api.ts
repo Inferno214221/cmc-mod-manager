@@ -1,6 +1,7 @@
-import { ipcRenderer } from "electron";
+import { IpcRendererEvent, ipcRenderer } from "electron";
 import {
-    Alt, AppData, Character, CharacterDat, CssData, CssPage, Download, SssPage, Stage
+    Alt, AppData, Character, CharacterDat, CssData, CssPage, Download, Operation, OperationUpdate,
+    SssPage, Stage
 } from "./interfaces";
 import { AlertOptions, ConfirmOptions, PromptOptions } from "./custom-dialogs";
 
@@ -30,6 +31,10 @@ export default {
     confirm: ((...args: [
         options: ConfirmOptions
     ]): Promise<boolean> => ipcRenderer.invoke("confirm", args)),
+
+    downloadMod: ((...args: [
+        uri: string
+    ]): Promise<void> => ipcRenderer.invoke("downloadMod", args)),
 
     ensureAllAltsAreCharacters: ((...args: [
         areCharacter: boolean,
@@ -101,6 +106,8 @@ export default {
     handleURI: ((... args: [
         uri: string
     ]): Promise<void> => ipcRenderer.invoke("handleURI", args)),
+
+    handleProcessArgs: ((): Promise<void> => ipcRenderer.invoke("handleProcessArgs")),
 
     installCharacter: ((...args: [
         characterDir: string,
@@ -245,7 +252,6 @@ export default {
         dir?: string
     ]): Promise<void> => ipcRenderer.invoke("removeStage", args)),
 
-
     removeStageSss: ((...args: [
         page: SssPage,
         dir?: string
@@ -301,5 +307,25 @@ export default {
         stage: string,
         randomSelection: boolean,
         dir?: string
-    ]): Promise<void> => ipcRenderer.invoke("writeStageRandom", args))
+    ]): Promise<void> => ipcRenderer.invoke("writeStageRandom", args)),
+
+    addOperation: (
+        callback: ((operation: Operation) => void)
+    ) => {
+        ipcRenderer.removeAllListeners("addOperation");
+        ipcRenderer.on("addOperation", (
+            _event: IpcRendererEvent,
+            operation: Operation
+        ) => callback(operation));
+    },
+
+    updateOperation: (
+        callback: ((operation: OperationUpdate) => void)
+    ) => {
+        ipcRenderer.removeAllListeners("updateOperation");
+        ipcRenderer.on("updateOperation", (
+            _event: IpcRendererEvent,
+            operation: OperationUpdate
+        ) => callback(operation));
+    }
 }

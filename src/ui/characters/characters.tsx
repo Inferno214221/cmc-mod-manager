@@ -239,7 +239,7 @@ export function TabCharacters({
                                     state: OpState.queued,
                                     icon: "folder_shared",
                                     animation: Math.floor(Math.random() * 3),
-                                    dependencies: ["data/fighters.txt"],
+                                    dependencies: ["fighters"],
                                     call: async () => {
                                         const character: Character = await api.installCharacterDir(
                                             filterInstallation,

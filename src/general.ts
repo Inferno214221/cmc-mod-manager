@@ -5,7 +5,7 @@ import extract from "extract-zip";
 import { ArcFile, ArcFiles, Extractor, createExtractorFromFile } from "node-unrar-js/esm";
 // import sevenZip from "node-7z-archive";
 import { execFile } from "child_process";
-import { AppConfig, AppData, Download, DownloadState } from "./interfaces";
+import { AppConfig, AppData, Download, DownloadState, OpState } from "./interfaces";
 import request from "request";
 import http from "http";
 import util from "util";
@@ -170,7 +170,6 @@ export async function checkForUpdates(): Promise<void> {
             }
             return;
         }
-        handleURI(process.argv.find((arg: string) => arg.startsWith("cmcmm:")));
     });
 }
 
@@ -195,60 +194,87 @@ export function isURIAssociated(): boolean {
 }
 
 export async function handleURI(uri: string): Promise<void> {
+    // uri = "cmcmm:https://gamebanana.com/mmdl/1100547";
     if (uri == undefined || global.gameDir == null) {
         return;
     }
-    const downloadId: number = global.downloads.push({
-        filePath: null,
-        name: null,
-        image: null,
-        modType: null,
-        fileSize: null,
-        state: DownloadState.queued
-    }) - 1;
     const url: string = uri.replace("cmcmm:", "").split(",")[0];
-    const temp: string = global.temp;
-    fs.ensureDirSync(temp);
+    global.win.webContents.send("addOperation", {
+        uid: url,
+        title: "Mod Download",
+        body: "Downloading a mod from GameBanana.",
+        state: OpState.queued,
+        icon: "download",
+        animation: Math.floor(Math.random() * 3),
+        dependencies: ["download"],
+        call: {
+            name: "downloadMod",
+            args: [url]
+        }
+    });
+    // const downloadId: number = global.downloads.push({
+    //     filePath: null,
+    //     name: null,
+    //     image: null,
+    //     modType: null,
+    //     fileSize: null,
+    //     state: DownloadState.queued
+    // }) - 1;
+    // const url: string = uri.replace("cmcmm:", "").split(",")[0];
+    // const temp: string = global.temp;
+    // fs.ensureDirSync(temp);
     
-    const infoPromise: Promise<void> = getDownloadInfo(uri, downloadId);
+    // const infoPromise: Promise<void> = getDownloadInfo(uri, downloadId);
 
-    request.get(url)
-        .on("error", (error: Error) => { log(error) })
-        .on("response", async (res: request.Response) => {
-            let file: string = "download" + downloadId + ".";
-            global.downloads[downloadId].fileSize = parseInt(res.headers["content-length"]);
-            //FIXME: array might not work because removed elements will screw up later downloads
-            switch (res.headers["content-type"].split("/")[1]) {
-                case "zip":
-                    file += "zip";
-                    break;
-                case "rar":
-                case "x-rar-compressed":
-                    file += "rar";
-                    break;
-                default:
-                    //TODO: inform the user
-                    return;
-            }
-            const filePath: string = path.join(temp, file);
-            global.downloads[downloadId].filePath = filePath;
-            await Promise.resolve(infoPromise);
-            global.downloads[downloadId].state = DownloadState.started;
-            //TODO: progress tracking via writeStream.bytesWritten
-            request.get(
-                res.request.uri.href
-            ).pipe(fs.createWriteStream(filePath)).on("close", async () => {
-                const output: string = await extractArchive(filePath, temp);
-                fs.removeSync(filePath);
-                global.downloads[downloadId].filePath = output;
-                global.downloads[downloadId].state = DownloadState.finished;
-                log(output);
-                //TODO: switch between character and stage
-                // move 'fighters' folder search to more generic function
-                characters.installCharacter(output, true, false, global.gameDir);
-            });
-        });
+    // request.get(url)
+    //     .on("error", (error: Error) => { log(error) })
+    //     .on("response", async (res: request.Response) => {
+    //         let file: string = "download" + downloadId + ".";
+    //         global.downloads[downloadId].fileSize = parseInt(res.headers["content-length"]);
+    //         //FIXME: array might not work because removed elements will screw up later downloads
+    //         switch (res.headers["content-type"].split("/")[1]) {
+    //             case "zip":
+    //                 file += "zip";
+    //                 break;
+    //             case "rar":
+    //             case "x-rar-compressed":
+    //                 file += "rar";
+    //                 break;
+    //             default:
+    //                 //TODO: inform the user
+    //                 return;
+    //         }
+    //         const filePath: string = path.join(temp, file);
+    //         global.downloads[downloadId].filePath = filePath;
+    //         await Promise.resolve(infoPromise);
+    //         global.downloads[downloadId].state = DownloadState.started;
+    //         //TODO: progress tracking via writeStream.bytesWritten
+    //         request.get(
+    //             res.request.uri.href
+    //         ).pipe(fs.createWriteStream(filePath)).on("close", async () => {
+    //             const output: string = await extractArchive(filePath, temp);
+    //             fs.removeSync(filePath);
+    //             global.downloads[downloadId].filePath = output;
+    //             global.downloads[downloadId].state = DownloadState.finished;
+    //             log(output);
+    //             //TODO: switch between character and stage
+    //             // move 'fighters' folder search to more generic function
+    //             characters.installCharacter(output, true, false, global.gameDir);
+    //         });
+    //     });
     return;
+}
+
+export async function downloadMod(url: string): Promise<void> {
+    console.log(url);
+    setTimeout(() => {
+        global.win.webContents.send("updateOperation", {
+            uid: url,
+            title: "Mod Download",
+            body: "Downloaded a mod from GameBanana.",
+            state: OpState.finished,
+        });
+    }, 1000);
 }
 
 export async function getDownloadInfo(uri: string, downloadId: number): Promise<void> {

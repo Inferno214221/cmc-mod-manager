@@ -300,6 +300,7 @@ export interface SssPage {
 export type SssData = string[][];
 
 export interface Operation {
+    uid?: string,
     title: string,
     body: string,
     image?: string,
@@ -307,7 +308,15 @@ export interface Operation {
     icon: string,
     animation: number,
     dependencies: string[],
-    call: () => Promise<void>
+    call: (() => Promise<void>) | MainCall
+}
+
+export interface OperationUpdate {
+    uid: string,
+    title?: string,
+    body?: string,
+    image?: string,
+    state?: OpState
 }
 
 export enum OpState {
@@ -316,4 +325,9 @@ export enum OpState {
     finished = "Finished",
     canceled = "Canceled",
     error = "Error"
+}
+
+export interface MainCall {
+    name: string,
+    args: []
 }

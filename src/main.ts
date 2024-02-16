@@ -29,6 +29,21 @@ import * as general from "./general";
 import * as characters from "./characters";
 import * as stages from "./stages";
 
+if (!app.requestSingleInstanceLock()) {
+    console.log("No App Single Instance Lock");
+    app.exit();
+} else {
+    app.on("second-instance", (_event: Event, argv: string[]) => {
+        general.handleURI(argv.find((arg: string) => arg.startsWith("cmcmm:")));
+    });
+    if (global.win) {
+        if (global.win.isMinimized()) {
+            global.win.restore();
+        }
+        global.win.focus();
+    }
+}
+
 function createWindow(): void {
     global.win = new BrowserWindow({
         width: 1120,
@@ -46,13 +61,17 @@ function createWindow(): void {
     createHandlers(general);
     createHandlers(characters);
     createHandlers(stages);
-    ipcMain.handle("pathJoin", (
-        event: IpcMainInvokeEvent,
-        args: Parameters<typeof path.join>) => path.join(...args)
+    ipcMain.handle(
+        "pathJoin", (
+            event: IpcMainInvokeEvent,
+            args: Parameters<typeof path.join>
+        ) => path.join(...args)
     );
-    ipcMain.handle("openExternal", (
-        event: IpcMainInvokeEvent,
-        args: Parameters<typeof shell.openExternal>) => shell.openExternal(...args)
+    ipcMain.handle(
+        "openExternal", (
+            event: IpcMainInvokeEvent,
+            args: Parameters<typeof shell.openExternal>
+        ) => shell.openExternal(...args)
     );
 
     protocol.registerFileProtocol("img", (
@@ -64,6 +83,13 @@ function createWindow(): void {
     });
 
     general.checkForUpdates();
+    ipcMain.handleOnce(
+        "handleProcessArgs", () => {
+            console.log("handleProcessArgs");
+            general.handleURI(process.argv.find((arg: string) => arg.startsWith("cmcmm:")));
+            ipcMain.handle("handleProcessArgs", () => null);
+        }
+    );
 }
 
 if (require("electron-squirrel-startup")) {
