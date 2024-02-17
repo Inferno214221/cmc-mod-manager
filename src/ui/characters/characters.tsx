@@ -384,7 +384,7 @@ function CharacterDisplay({
                 title: "Character Selection",
                 body: "Toggling the ability for character: '" + character.name + "' to be " +
                     "selected at random.",
-                image: character.mug,
+                image: "img://" + character.mug,
                 state: OpState.queued,
                 icon: randomSelection ? "help" : "help_outline",
                 animation: Math.floor(Math.random() * 3),
@@ -433,7 +433,7 @@ function CharacterDisplay({
                                     operationId = newOperations.push({
                                         title: "Character Deletion",
                                         body: "Deleting character: '" + character.name + "'.",
-                                        image: character.mug,
+                                        image: "img://" + character.mug,
                                         state: OpState.queued,
                                         icon: "delete",
                                         animation: Math.floor(Math.random() * 3),
@@ -465,7 +465,7 @@ function CharacterDisplay({
                                     operationId = newOperations.push({
                                         title: "Character Extraction",
                                         body: "Extracting character: '" + character.name + "'.",
-                                        image: character.mug,
+                                        image: "img://" + character.mug,
                                         state: OpState.queued,
                                         icon: "drive_file_move",
                                         animation: Math.floor(Math.random() * 3),
@@ -563,7 +563,7 @@ function CharacterAltDisplay({
                                 title: "Alt Removal",
                                 body: "Removing alt: '" + alt.alt + "' from character: '" +
                                     alt.base + "'.",
-                                image: alt.mug,
+                                image: "img://" + alt.mug,
                                 state: OpState.queued,
                                 icon: "group_remove",
                                 animation: Math.floor(Math.random() * 3),
@@ -639,7 +639,7 @@ function AddAltButton({
                         title: "Alt Addition",
                         body: "Adding alt: '" + character.name + "' to character: '" +
                             altTarget.name + "'.",
-                        image: character.mug,
+                        image: "img://" + character.mug,
                         state: OpState.queued,
                         icon: "person_add",
                         animation: Math.floor(Math.random() * 3),

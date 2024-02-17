@@ -331,3 +331,8 @@ export interface MainCall {
     name: string,
     args: []
 }
+
+export enum ModType {
+    character = "Character",
+    stage = "Stage"
+}

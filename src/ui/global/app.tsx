@@ -17,9 +17,6 @@ import {
     TabStageSelectionScreen
 } from "../stage-selection-screen/stage-selection-screen";
 import {
-    AllowTabSwitchDownloads, TabDownloads
-} from "../downloads/downloads";
-import {
     TabSettings
 } from "../settings/settings";
 import ToggleIconButton from "./icon-button/toggle-icon-button";
@@ -86,14 +83,6 @@ export const STAGE_SELECTION_SCREEN: Tab = {
     element: (setOperations: Dispatch<SetStateAction<Operation[]>>) =>
         <TabStageSelectionScreen setOperations={setOperations}/>,
     allowTabSwitch: null
-};
-export const DOWNLOADS: Tab = {
-    name: "downloads",
-    displayName: "Downloads",
-    icon: "download",
-    element: (setOperations: Dispatch<SetStateAction<Operation[]>>) =>
-        <TabDownloads setOperations={setOperations}/>,
-    allowTabSwitch: AllowTabSwitchDownloads
 };
 export const SETTINGS: Tab = {
     name: "settings",
@@ -194,18 +183,6 @@ export function App({ tab }: { tab: Tab }): JSX.Element {
 }
 
 export function Nav(): JSX.Element {
-    const [showDownloads, setShowDownloads]:
-    [boolean, Dispatch<SetStateAction<boolean>>]
-    = useState(false);
-
-    useEffect(() => {
-        checkURIAssociated();
-    }, []);
-
-    async function checkURIAssociated(): Promise<void> {
-        setShowDownloads(await api.isURIAssociated());
-    }
-
     return (
         <nav>
             <NavTab info={HOME}/>
@@ -216,12 +193,6 @@ export function Nav(): JSX.Element {
             <hr/>
             <NavTab info={STAGES}/>
             <NavTab info={STAGE_SELECTION_SCREEN}/>
-            {showDownloads ?
-                <>
-                    <hr/>
-                    <NavTab info={DOWNLOADS}/>
-                </> : null
-            }
             <hr/>
             <NavTab info={SETTINGS}/>
             <div className={"flex-fill"}/>
@@ -337,7 +308,7 @@ export function OperationDisplay({ display }: { display: Operation }): JSX.Eleme
             <div className={"operation-display-info"}>
                 {display.image == null ? null :
                     <img
-                        src={"img://" + display.image}
+                        src={display.image}
                         draggable={false}
                         onError={(event: any) => {
                             event.target.src = missing;

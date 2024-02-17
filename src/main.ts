@@ -4,7 +4,7 @@ import {
 } from "electron";
 import path from "path";
 import fs from "fs-extra";
-import { AppData, Download } from "./interfaces";
+import { AppData } from "./interfaces";
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
@@ -14,7 +14,6 @@ declare const global: {
     gameDir: string,
     log: string,
     appData: AppData,
-    downloads: Download[],
     temp: string
 };
 
@@ -22,7 +21,6 @@ global.win = null;
 global.gameDir = "";
 global.log = "";
 global.appData = null;
-global.downloads = [];
 global.temp = path.join(app.getPath("temp"), "cmc-mod-manager");
 
 import * as general from "./general";

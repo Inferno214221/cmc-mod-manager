@@ -1,14 +1,13 @@
 import { BrowserWindow, OpenDialogReturnValue, dialog } from "electron";
 import fs from "fs-extra";
 import path from "path";
-import { AppData, Download, SssData, SssPage, Stage, StageList } from "./interfaces";
+import { AppData, SssData, SssPage, Stage, StageList } from "./interfaces";
 
 declare const global: {
     win: BrowserWindow,
     gameDir: string,
     log: string,
     appData: AppData,
-    downloads: Download[],
     temp: string
 };
 

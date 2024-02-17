@@ -8,7 +8,6 @@ import IconButton from "../global/icon-button/icon-button";
 import {
     CHARACTERS,
     CHARACTER_SELECTION_SCREEN,
-    DOWNLOADS,
     PORT_CHARACTERS,
     SETTINGS,
     STAGES,
@@ -41,18 +40,6 @@ export function TabHome({
 }: {
     setOperations: Dispatch<SetStateAction<Operation[]>>
 }): JSX.Element {
-    const [showDownloads, setShowDownloads]:
-    [boolean, Dispatch<SetStateAction<boolean>>]
-    = useState(false);
-
-    useEffect(() => {
-        checkURIAssociated();
-    }, []);
-
-    async function checkURIAssociated(): Promise<void> {
-        setShowDownloads(await api.isURIAssociated());
-    }
-
     return (
         <section>
             <div id={"about-div"} className={"vertical-outer-div"}>
@@ -129,12 +116,6 @@ export function TabHome({
                             tab={STAGE_SELECTION_SCREEN}
                             desc={"Modify CMC+'s stage selection screen."}
                         />
-                        {showDownloads ?
-                            <TabButton
-                                tab={DOWNLOADS}
-                                desc={"View current downloads."}
-                            /> : null
-                        }
                         <TabButton
                             tab={SETTINGS}
                             desc={"Configure the program and enable optional features."}

@@ -4,7 +4,7 @@ import path from "path";
 import ini from "ini";
 import {
     Alt, AppData, Character, CharacterDat, CharacterList, CharacterPalette, CssData,
-    CssPage, Download
+    CssPage
 } from "./interfaces";
 
 declare const global: {
@@ -12,7 +12,6 @@ declare const global: {
     gameDir: string,
     log: string,
     appData: AppData,
-    downloads: Download[],
     temp: string
 };
 

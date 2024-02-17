@@ -1,6 +1,6 @@
 import { IpcRendererEvent, ipcRenderer } from "electron";
 import {
-    Alt, AppData, Character, CharacterDat, CssData, CssPage, Download, Operation, OperationUpdate,
+    Alt, AppData, Character, CharacterDat, CssData, CssPage, Operation, OperationUpdate,
     SssPage, Stage
 } from "./interfaces";
 import { AlertOptions, ConfirmOptions, PromptOptions } from "./custom-dialogs";
@@ -33,7 +33,8 @@ export default {
     ]): Promise<boolean> => ipcRenderer.invoke("confirm", args)),
 
     downloadMod: ((...args: [
-        uri: string
+        url: string,
+        modId: string
     ]): Promise<void> => ipcRenderer.invoke("downloadMod", args)),
 
     ensureAllAltsAreCharacters: ((...args: [
@@ -76,11 +77,9 @@ export default {
     ]): Promise<RegExp[]> => ipcRenderer.invoke("getCharacterRegExps", args)),
 
     getDownloadInfo: ((...args: [
-        uri: string,
-        downloadId: number
+        url: string,
+        modIf: number
     ]): Promise<void> => ipcRenderer.invoke("getDownloadInfo", args)),
-
-    getDownloads: ((): Promise<Download[]> => ipcRenderer.invoke("getDownloads")),
 
     getExtractedDir: ((): Promise<string> => ipcRenderer.invoke("getExtractedDir")),
 
@@ -146,8 +145,6 @@ export default {
         updateStages: boolean,
         dir?: string
     ]): Promise<Stage | null> => ipcRenderer.invoke("installStageDir", args)),
-
-    isURIAssociated: ((): Promise<boolean> => ipcRenderer.invoke("isURIAssociated")),
 
     isValidGameDir: ((...args: [
         dir?: string

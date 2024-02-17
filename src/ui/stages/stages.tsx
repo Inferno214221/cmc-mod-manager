@@ -369,7 +369,7 @@ function StageDisplay({
                 title: "Stage Selection",
                 body: "Toggling the ability for stage: '" + stage.name + "' to be " +
                     "selected at random.",
-                image: stage.icon,
+                image: "img://" + stage.icon,
                 state: OpState.queued,
                 icon: randomSelection ? "help" : "help_outline",
                 animation: Math.floor(Math.random() * 3),
@@ -418,7 +418,7 @@ function StageDisplay({
                                     operationId = newOperations.push({
                                         title: "Stage Deletion",
                                         body: "Deleting stage: '" + stage.name + "'.",
-                                        image: stage.icon,
+                                        image: "img://" + stage.icon,
                                         state: OpState.queued,
                                         icon: "delete",
                                         animation: Math.floor(Math.random() * 3),
@@ -450,7 +450,7 @@ function StageDisplay({
                                     operationId = newOperations.push({
                                         title: "Stage Extraction",
                                         body: "Extracting stage: '" + stage.name + "'.",
-                                        image: stage.icon,
+                                        image: "img://" + stage.icon,
                                         state: OpState.queued,
                                         icon: "drive_file_move",
                                         animation: Math.floor(Math.random() * 3),
