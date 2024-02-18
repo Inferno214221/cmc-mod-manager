@@ -23,7 +23,6 @@ require.resolve("./unrar.wasm");
 const WASM_BINARY: Buffer = fs.readFileSync(path.join(__dirname, "unrar.wasm"));
 
 import * as customDialogs from "./custom-dialogs";
-import * as characters from "./characters";
 
 const SUPPORTED_VERSIONS: string[] = [
     "CMC_v8",
@@ -179,9 +178,15 @@ export async function downloadUpdate(tagName: string): Promise<void> {
     ));
     const targetPath: string = path.join(global.temp, "update.zip");
     fs.createFileSync(targetPath);
+    const targetStream: fs.WriteStream = fs.createWriteStream(targetPath);
     request.get("https://github.com/Inferno214221/cmc-mod-manager/releases/download/" + tagName +
         "/cmc-mod-manager-" + buildInfo.platform + "-" + buildInfo.arch + ".zip")
-        .pipe(fs.createWriteStream(targetPath)).on("close", async () => {
+        .on("error", (error: Error) => {
+            console.log(error);
+            targetStream.close();
+            // throw error;
+        }).pipe(targetStream).on("close", async () => {
+            if (targetStream.errored) return;
             const output: string = await extractArchive(targetPath, global.temp);
             console.log(output);
             //TODO: install output
@@ -219,11 +224,10 @@ export async function downloadMod(url: string, modId: string): Promise<void> {
         fs.ensureDirSync(temp);
         
         const infoPromise: Promise<string[]> = getDownloadInfo(modId);
-        let file: string = "download" + modId + ".";
+        let file: string = "download_" + modId + ".";
         request.get(url)
             .on("error", (error: Error) => { log(error) })
             .on("response", async (res: request.Response) => {
-                //FIXME: array might not work because removed elements will screw up later downloads
                 switch (res.headers["content-type"].split("/")[1]) {
                     case "zip":
                         file += "zip";
@@ -240,28 +244,33 @@ export async function downloadMod(url: string, modId: string): Promise<void> {
                 const filePath: string = path.join(temp, file);
                 const modInfo: string[] = await Promise.resolve(infoPromise);
                 let modType: ModType;
-                switch (modInfo[1]) {
-                    case "Characters":
+                switch (modInfo[1].toLowerCase()) {
+                    case "characters":
                         modType = ModType.character;
                         break;
-                    case "Stages":
+                    case "stages":
                         modType = ModType.stage;
                         break;
                     default:
-                        //TODO: error?
-                        return;
+                        throw new Error("Unknown mod type.");
                 }
+
+                const downloadSize: number = parseInt(res.headers["content-length"]);
                 global.win.webContents.send("updateOperation", {
                     uid: url,
                     title: modType + " Download",
-                    body: "Downloading mod: '" + modInfo[0] + "' (" +
-                        (Math.floor(parseInt(res.headers["content-length"]) / 10000) / 100)
-                        + " mb) from GameBanana.",
+                    body: "Downloading mod: '" + modInfo[0] + "' from GameBanana. (0 / " +
+                        toMb(downloadSize) + " mb)",
                 });
-                //TODO: progress tracking via writeStream.bytesWritten
+
+                const downloadStream: fs.WriteStream = fs.createWriteStream(filePath);
                 request.get(
                     res.request.uri.href
-                ).pipe(fs.createWriteStream(filePath)).on("close", async () => {
+                ).on("error", (error: Error) => {
+                    downloadStream.close();
+                    throw error;
+                }).pipe(downloadStream).on("close", async () => {
+                    if (downloadStream.errored) return;
                     const output: string = await extractArchive(filePath, temp);
                     fs.removeSync(filePath);                    
                     global.win.webContents.send("updateOperation", {
@@ -271,12 +280,70 @@ export async function downloadMod(url: string, modId: string): Promise<void> {
                     });
                     log(output);
                     resolve();
-                    //TODO: switch between character and stage
-                    // move 'fighters' folder search to more generic function
-                    // characters.installCharacter(output, true, false, global.gameDir);
+                    switch (modType) {
+                        case ModType.character:
+                            global.win.webContents.send("addOperation", {
+                                uid: output,
+                                title: "Character Installation",
+                                body: "Installing character from GameBanana.",
+                                image: "https://gamebanana.com/mods/embeddables/" + modId +
+                                    "?type=medium_square",
+                                state: OpState.queued,
+                                icon: "contact_page",
+                                animation: Math.floor(Math.random() * 3),
+                                dependencies: ["fighters"],
+                                call: {
+                                    name: "installDownloadedCharacter",
+                                    args: [output]
+                                }
+                            });
+                            break;
+                        case ModType.stage:
+                            global.win.webContents.send("addOperation", {
+                                uid: output,
+                                title: "Stage Installation",
+                                body: "Installing stage from GameBanana.",
+                                image: "https://gamebanana.com/mods/embeddables/" + modId +
+                                    "?type=medium_square",
+                                state: OpState.queued,
+                                icon: "note_add",
+                                animation: Math.floor(Math.random() * 3),
+                                dependencies: ["stages"],
+                                call: {
+                                    name: "installDownloadedStage",
+                                    args: [output]
+                                }
+                            });
+                            break;
+                    }
                 });
+
+                updateDownloadProgress(url, modInfo, downloadStream, downloadSize);
             });
     });
+}
+
+export function updateDownloadProgress(
+    url: string,
+    modInfo: string[],
+    downloadStream: fs.WriteStream,
+    downloadSize: number
+): void {
+    setTimeout(() => {
+        if (downloadStream.closed || downloadStream.errored) return;
+        if (downloadStream.bytesWritten < downloadSize) {
+            global.win.webContents.send("updateOperation", {
+                uid: url,
+                body: "Downloading mod: '" + modInfo[0] + "' from GameBanana. (" +
+                    toMb(downloadStream.bytesWritten) + " / " + toMb(downloadSize) + " mb)",
+            });
+            updateDownloadProgress(url, modInfo, downloadStream, downloadSize);
+        }
+    }, 1000);
+}
+
+export function toMb(bytes: number): number {
+    return Math.floor(bytes / 10000) / 100;
 }
 
 export async function getDownloadInfo(modId: string): Promise<string[]> {

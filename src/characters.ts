@@ -4,7 +4,8 @@ import path from "path";
 import ini from "ini";
 import {
     Alt, AppData, Character, CharacterDat, CharacterList, CharacterPalette, CssData,
-    CssPage
+    CssPage,
+    OpState
 } from "./interfaces";
 
 declare const global: {
@@ -684,6 +685,24 @@ export async function installCharacter(
     await Promise.allSettled(toResolve);
     general.log("Install Character - Return:", character);
     return character;
+}
+
+export async function installDownloadedCharacter(targetDir: string): Promise<void> {
+    const character: Character = await installCharacter(
+        targetDir,
+        true,
+        global.appData.config.updateCharacters,
+        global.gameDir
+    );
+    global.win.webContents.send("updateOperation", {
+        uid: targetDir,
+        title: "Character Installation",
+        body: "Installed character: '" + character.name + " from GameBanana.",
+        image: "img://" + character.mug,
+        state: OpState.finished
+    });
+    //TODO: reload page
+    return;
 }
 
 export async function extractCharacter(

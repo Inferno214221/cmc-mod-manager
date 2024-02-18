@@ -1,7 +1,7 @@
 import { BrowserWindow, OpenDialogReturnValue, dialog } from "electron";
 import fs from "fs-extra";
 import path from "path";
-import { AppData, SssData, SssPage, Stage, StageList } from "./interfaces";
+import { AppData, OpState, SssData, SssPage, Stage, StageList } from "./interfaces";
 
 declare const global: {
     win: BrowserWindow,
@@ -373,6 +373,24 @@ export async function installStage(
     fs.removeSync(path.join(dir, "info.json"));
     general.log("Install Stage - Return:", stage);
     return stage;
+}
+
+export async function installDownloadedStage(targetDir: string): Promise<void> {
+    const stage: Stage = await installStage(
+        targetDir,
+        true,
+        global.appData.config.updateStages,
+        global.gameDir
+    );
+    global.win.webContents.send("updateOperation", {
+        uid: targetDir,
+        title: "Stage Installation",
+        body: "Installed stage: '" + stage.name + " from GameBanana.",
+        image: "img://" + stage.icon,
+        state: OpState.finished
+    });
+    //TODO: reload page
+    return;
 }
 
 export async function extractStage(extract: string, dir: string = global.gameDir): Promise<void> {

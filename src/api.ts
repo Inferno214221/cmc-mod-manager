@@ -127,6 +127,14 @@ export default {
         dir?: string
     ]): Promise<Character> => ipcRenderer.invoke("installCharacterDir", args)),
 
+    installDownloadedCharacter: ((...args: [
+        targetDir: string
+    ]): Promise<void> => ipcRenderer.invoke("installDownloadedCharacter", args)),
+
+    installDownloadedStage: ((...args: [
+        targetDir: string
+    ]): Promise<void> => ipcRenderer.invoke("installDownloadedStage", args)),
+
     installStage: ((...args: [
         stageDir: string,
         filterInstallation?: boolean,
