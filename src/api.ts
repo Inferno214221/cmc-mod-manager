@@ -37,6 +37,10 @@ export default {
         modId: string
     ]): Promise<void> => ipcRenderer.invoke("downloadMod", args)),
 
+    downloadUpdate: ((...args: [
+        tagName: string
+    ]): Promise<void> => ipcRenderer.invoke("downloadUpdate", args)),
+
     ensureAllAltsAreCharacters: ((...args: [
         areCharacter: boolean,
         dir?: string

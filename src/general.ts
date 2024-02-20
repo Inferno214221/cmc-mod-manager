@@ -4,7 +4,7 @@ import path from "path";
 import extract from "extract-zip";
 import { ArcFile, ArcFiles, Extractor, createExtractorFromFile } from "node-unrar-js/esm";
 // import sevenZip from "node-7z-archive";
-import { execFile } from "child_process";
+import { execFile, fork } from "child_process";
 import { AppConfig, AppData, ModType, OpState } from "./interfaces";
 import request from "request";
 import http from "http";
@@ -154,24 +154,33 @@ export async function checkForUpdates(): Promise<void> {
         console.log("Latest Version: " + latestVersion);
         if (semver.lt(currentVersion, latestVersion)) {
             console.log("Update Required");
-            if (await confirm({
-                title: "CMC Mod Manager | Program Update",
-                body: "CMC Mod Manager requires an update. This update will now be installed " +
-                    "automatically, please do not close the program. After the update is " +
-                    "installed the program will need to be launched again manually.",
-                okLabel: "Continue"
-            })) {
-                if (app.isPackaged) {
-                    downloadUpdate(JSON.parse(body).tag_name);
+            global.win.webContents.send("addOperation", {
+                uid: "update",
+                title: "Download Update",
+                body: "Downloading the latest version of CMC Mod Manager.",
+                state: OpState.queued,
+                icon: "update",
+                animation: Math.floor(Math.random() * 3),
+                dependencies: ["update"],
+                call: {
+                    name: "downloadUpdate",
+                    args: [JSON.parse(body).tag_name]
                 }
-                //TODO: prevent interaction with CMC MM?
-            }
+            });
             return;
         }
     });
 }
 
 export async function downloadUpdate(tagName: string): Promise<void> {
+    if (!app.isPackaged) return;
+    if (!(await confirm({
+        title: "CMC Mod Manager | Program Update",
+        body: "CMC Mod Manager requires an update. This update will now be installed " +
+            "automatically, please do not close the program. After the update is " +
+            "installed the program will need to be launched again manually.",
+        okLabel: "Continue"
+    }))) return;
     const buildInfo: any = JSON.parse(fs.readFileSync(
         path.join(__dirname, "..", "..", "build.json"),
         "utf-8"
@@ -187,9 +196,19 @@ export async function downloadUpdate(tagName: string): Promise<void> {
             // throw error;
         }).pipe(targetStream).on("close", async () => {
             if (targetStream.errored) return;
-            const output: string = await extractArchive(targetPath, global.temp);
+            const output: string = await extractArchive(
+                targetPath,
+                path.join(__dirname, "..", "..", "..", "..", "update")
+            );
             console.log(output);
             //TODO: install output
+            fork(
+                path.join(__dirname, "..", "..", "..", "..", "cmc-mod-manager-updater", "index.js"),
+                { detached: true, stdio: ["ignore", "ignore", "ignore", "ipc"] }
+            ).unref();
+            // app.quit();
+            process.exit();
+            if (!app.isPackaged) throw new Error("Cannot update in dev mode.");
         });
 }
 

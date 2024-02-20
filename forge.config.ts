@@ -7,6 +7,7 @@ import type { ForgeConfig } from "@electron-forge/shared-types";
 import { WebpackPlugin } from "@electron-forge/plugin-webpack";
 import fs from "fs-extra";
 import path from "path";
+import { execSync } from "child_process";
 
 import { mainConfig } from "./webpack.main.config";
 import { rendererConfig } from "./webpack.renderer.config";
@@ -95,6 +96,17 @@ const config: ForgeConfig = {
                     arch: packageResult.arch
                 }, null, 2),
                 { encoding: "utf-8" }
+            );
+            execSync("tsc", { cwd: path.join(__dirname, "cmc-mod-manager-updater") });
+            fs.copySync(
+                path.join(__dirname, "cmc-mod-manager-updater", "dist"),
+                path.join(packageResult.outputPaths[0], "cmc-mod-manager-updater"),
+                { overwrite: true }
+            );
+            fs.copySync(
+                path.join(__dirname, "cmc-mod-manager-updater", "node_modules"),
+                path.join(packageResult.outputPaths[0], "cmc-mod-manager-updater", "node_modules"),
+                { overwrite: true }
             );
         },
     },
