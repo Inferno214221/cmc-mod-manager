@@ -4,7 +4,7 @@ import {
 } from "electron";
 import path from "path";
 import fs from "fs-extra";
-import { AppData } from "./interfaces";
+import { AppData, Operation } from "./interfaces";
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
@@ -88,6 +88,10 @@ function createWindow(): void {
             ipcMain.handle("handleProcessArgs", () => null);
         }
     );
+
+    setTimeout(async () => {
+        console.log(await getOperations());
+    }, 1000);
 }
 
 if (require("electron-squirrel-startup")) {
@@ -108,12 +112,15 @@ app.on("activate", () => {
     }
 });
 
-app.on("before-quit", () => {
-    fs.removeSync(global.temp);
+app.on("before-quit", async (event: { preventDefault: () => void }) => {
+    const toResolve: Promise<void>[] = [];
+    toResolve.push(fs.remove(global.temp));
     if (global.log == "") return;
     const LOG_FILE: string = path.join(app.getPath("userData"), "log.txt");
     fs.ensureFileSync(LOG_FILE);
-    fs.appendFile(LOG_FILE, global.log);
+    toResolve.push(fs.appendFile(LOG_FILE, global.log));
+    await Promise.allSettled(toResolve);
+    // return?
 });
 
 function createHandlers(module: any): void {
@@ -141,5 +148,17 @@ function createHandlers(module: any): void {
                 return module[func](...args);
             }
         );
+    });
+}
+
+export async function getOperations(): Promise<Operation[]> {
+    return new Promise((resolve: (value: Operation[]) => void) => {
+        ipcMain.removeHandler("getOperationsReturn");
+        ipcMain.handleOnce("getOperationsReturn",
+            (_event: IpcMainInvokeEvent, args: [Operation[]]) => {
+                resolve(...args);
+            }
+        );
+        global.win.webContents.send("getOperations");
     });
 }

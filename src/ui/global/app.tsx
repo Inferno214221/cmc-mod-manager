@@ -151,6 +151,9 @@ export function App({ tab }: { tab: Tab }): JSX.Element {
             return newOperations;
         });
     });
+    api.getOperations(() => {
+        return api.getOperationsReturn([...operations]);
+    });
     api.updateOperation((update: OperationUpdate) => {
         setOperations((prev: Operation[]) => {
             const newOperations: Operation[] = [...prev];

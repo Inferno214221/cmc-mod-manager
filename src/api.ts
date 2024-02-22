@@ -318,6 +318,8 @@ export default {
         dir?: string
     ]): Promise<void> => ipcRenderer.invoke("writeStageRandom", args)),
 
+    // The Following Functions Are For Communication From Main To Renderer & Back
+
     addOperation: (
         callback: ((operation: Operation) => void)
     ) => {
@@ -327,6 +329,17 @@ export default {
             operation: Operation
         ) => callback(operation));
     },
+
+    getOperations: (
+        callback: (() => void)
+    ) => {
+        ipcRenderer.removeAllListeners("getOperations");
+        ipcRenderer.on("getOperations", callback);
+    },
+
+    getOperationsReturn: ((... args: [
+        operations: Operation[]
+    ]): Promise<void> => ipcRenderer.invoke("getOperationsReturn", args)),
 
     updateOperation: (
         callback: ((operation: OperationUpdate) => void)
