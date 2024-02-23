@@ -4,7 +4,7 @@ import {
 } from "electron";
 import path from "path";
 import fs from "fs-extra";
-import { AppData, Operation } from "./interfaces";
+import { AppData, OpState, Operation } from "./interfaces";
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
@@ -14,7 +14,8 @@ declare const global: {
     gameDir: string,
     log: string,
     appData: AppData,
-    temp: string
+    temp: string,
+    confirmedClose: boolean
 };
 
 global.win = null;
@@ -22,6 +23,7 @@ global.gameDir = "";
 global.log = "";
 global.appData = null;
 global.temp = path.join(app.getPath("temp"), "cmc-mod-manager");
+global.confirmedClose = false;
 
 import * as general from "./general";
 import * as characters from "./characters";
@@ -89,9 +91,27 @@ function createWindow(): void {
         }
     );
 
-    setTimeout(async () => {
-        console.log(await getOperations());
-    }, 1000);
+    global.win.on("close", async (event: Event) => {
+        if (global.confirmedClose) return;
+        event.preventDefault();
+        console.log(event);
+        const operations: Operation[] = await getOperations();
+        if (operations.filter((operation: Operation) =>
+            operation.state == OpState.started || operation.state == OpState.queued
+        ).length > 0) {
+            if ((await general.confirm({
+                title: "CMC Mod Manager | Unfinished Operations",
+                body: "Are you sure you want to close CMC Mod Manager? Some operations are " +
+                    "unfinished and will be cancelled if you close (or reload) the program.",
+                okLabel: "Cancel",
+                cancelLabel: "Close Anyway"
+            }))) {
+                return;
+            }
+        }
+        global.confirmedClose = true;
+        app.quit();
+    });
 }
 
 if (require("electron-squirrel-startup")) {
@@ -112,7 +132,7 @@ app.on("activate", () => {
     }
 });
 
-app.on("before-quit", async (event: { preventDefault: () => void }) => {
+app.on("before-quit", async () => {
     const toResolve: Promise<void>[] = [];
     toResolve.push(fs.remove(global.temp));
     if (global.log == "") return;

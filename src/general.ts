@@ -204,7 +204,8 @@ export async function downloadUpdate(tagName: string): Promise<void> {
             //TODO: install output
             fork(
                 path.join(__dirname, "..", "..", "..", "..", "cmc-mod-manager-updater", "index.js"),
-                { detached: true, stdio: ["ignore", "ignore", "ignore", "ipc"] }
+                { detached: true }
+                // { detached: true, stdio: ["ignore", "ignore", "ignore", "ipc"] }
             ).unref();
             // app.quit();
             process.exit();
