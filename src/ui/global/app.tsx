@@ -152,7 +152,7 @@ export function App({ tab }: { tab: Tab }): JSX.Element {
         });
     });
     api.getOperations(() => {
-        return api.getOperationsReturn([...operations]);
+        return api.getOperationsReturn(JSON.stringify(operations));
     });
     api.updateOperation((update: OperationUpdate) => {
         setOperations((prev: Operation[]) => {

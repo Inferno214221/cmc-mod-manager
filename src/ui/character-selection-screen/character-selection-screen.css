@@ -212,3 +212,7 @@
 .add-css-page input[type="text"] {
     width: 150px;
 }
+
+.add-css-page .icon-button-tooltip {
+    right: 28px;
+}

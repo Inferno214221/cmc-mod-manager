@@ -212,3 +212,7 @@
 .add-sss-page input[type="text"] {
     width: 150px;
 }
+
+.add-sss-page .icon-button-tooltip {
+    right: 28px;
+}

@@ -96,6 +96,7 @@ function createWindow(): void {
         event.preventDefault();
         console.log(event);
         const operations: Operation[] = await getOperations();
+        console.log(operations);
         if (operations.filter((operation: Operation) =>
             operation.state == OpState.started || operation.state == OpState.queued
         ).length > 0) {
@@ -175,8 +176,8 @@ export async function getOperations(): Promise<Operation[]> {
     return new Promise((resolve: (value: Operation[]) => void) => {
         ipcMain.removeHandler("getOperationsReturn");
         ipcMain.handleOnce("getOperationsReturn",
-            (_event: IpcMainInvokeEvent, args: [Operation[]]) => {
-                resolve(...args);
+            (_event: IpcMainInvokeEvent, args: [string]) => {
+                resolve(JSON.parse(args[0]));
             }
         );
         global.win.webContents.send("getOperations");

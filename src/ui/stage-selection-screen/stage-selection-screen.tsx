@@ -110,7 +110,7 @@ export function TabStageSelectionScreen({
     useEffect(() => {
         console.log("sssData updated");
         if (sssPages[activePage] == undefined) return;
-        //sssData == sssPages[activePage].data
+        if (sssData == sssPages[activePage].data) return;
         const updatedPages: SssPage[] = [...sssPages];
         updatedPages[activePage].data = sssData;
         setSssPages(updatedPages);

@@ -338,7 +338,7 @@ export default {
     },
 
     getOperationsReturn: ((... args: [
-        operations: Operation[]
+        operations: string
     ]): Promise<void> => ipcRenderer.invoke("getOperationsReturn", args)),
 
     updateOperation: (
