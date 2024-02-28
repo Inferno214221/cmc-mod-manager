@@ -4,7 +4,7 @@ import path from "path";
 import extract from "extract-zip";
 import { ArcFile, ArcFiles, Extractor, createExtractorFromFile } from "node-unrar-js/esm";
 // import sevenZip from "node-7z-archive";
-import { execFile, fork } from "child_process";
+import { execFile, execSync, spawn } from "child_process";
 import { AppConfig, AppData, ModType, OpState } from "./interfaces";
 import request from "request";
 import http from "http";
@@ -196,17 +196,38 @@ export async function downloadUpdate(tagName: string): Promise<void> {
             // throw error;
         }).pipe(targetStream).on("close", async () => {
             if (targetStream.errored) return;
-            const output: string = await extractArchive(
-                targetPath,
-                path.join(__dirname, "..", "..", "..", "..", "update")
+            const updateDir: string = path.join(__dirname, "..", "..", "..", "..", "update");
+            let updateTemp: string = path.join(global.temp, "update");
+            await extractArchive(targetPath, updateTemp);
+            while (
+                fs.readdirSync(updateTemp).length == 1
+            ) {
+                updateTemp = path.join(updateTemp, fs.readdirSync(updateTemp)[0]);
+            }
+            fs.moveSync(updateTemp, updateDir, { overwrite: true });
+            
+            //FIXME: I should write a better way of finding the parent directory... this
+            //could lead to issues
+            //TODO: set flag and call this once the program exits
+            const updaterDir: string = path.join(
+                __dirname, "..", "..", "..", "..", "updater"
             );
-            console.log(output);
-            //TODO: install output
-            fork(
-                path.join(__dirname, "..", "..", "..", "..", "cmc-mod-manager-updater", "index.js"),
-                { detached: true }
-                // { detached: true, stdio: ["ignore", "ignore", "ignore", "ipc"] }
-            ).unref();
+            //TODO: update updater?
+            if (buildInfo.platform == "win32") {
+                spawn(path.join(updaterDir, "update.bat"), {
+                    cwd: updaterDir,
+                    detached: true,
+                    stdio: ["ignore", "ignore", "ignore"]
+                }).unref();
+            } else if (buildInfo.platform == "linux") {
+                execSync("chmod +x \"" + path.join(updaterDir, "update.sh") + "\"");
+                spawn(path.join(updaterDir, "update.sh"), {
+                    cwd: updaterDir,
+                    detached: true,
+                    stdio: ["ignore", "ignore", "ignore"]
+                }).unref();
+            }
+            //TODO: clean up update files on startup
             // app.quit();
             process.exit();
             if (!app.isPackaged) throw new Error("Cannot update in dev mode.");
@@ -214,6 +235,8 @@ export async function downloadUpdate(tagName: string): Promise<void> {
 }
 
 export async function handleURI(uri: string): Promise<void> {
+    // uri = "cmcmm:https://gamebanana.com/mmdl/1100547,idk,483478";
+    // uri = "cmcmm:https://gamebanana.com/mmdl/1137848,idk,495311";
     if (uri == undefined || global.gameDir == null) {
         return;
     }

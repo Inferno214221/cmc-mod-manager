@@ -50,8 +50,6 @@ jobs:
         run: git submodule update
       - name: Install Yarn Dependencies
         run: yarn
-      - name: Install Submodule Yarn Dependencies
-        run: yarn --cwd ./cmc-mod-manager-updater
       - name: Electron Forge Build
         run: yarn run make-win
       - name: Move Output Zip
@@ -107,8 +105,6 @@ jobs:
         run: git submodule update
       - name: Install Yarn Dependencies
         run: yarn
-      - name: Install Submodule Yarn Dependencies
-        run: yarn --cwd ./cmc-mod-manager-updater
       - name: Electron Forge Build
         run: yarn run make-linux-all
       - name: Move Output Zip
