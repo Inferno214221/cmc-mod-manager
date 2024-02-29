@@ -1,11 +1,13 @@
-import { BrowserWindow, OpenDialogReturnValue, app, dialog, shell } from "electron";
+import {
+    BrowserWindow, IpcMainInvokeEvent, OpenDialogReturnValue, app, dialog, ipcMain, shell
+} from "electron";
 import fs from "fs-extra";
 import path from "path";
 import extract from "extract-zip";
 import { ArcFile, ArcFiles, Extractor, createExtractorFromFile } from "node-unrar-js/esm";
 // import sevenZip from "node-7z-archive";
 import { execFile, execSync, spawn } from "child_process";
-import { AppConfig, AppData, ModType, OpState } from "./interfaces";
+import { AppConfig, AppData, ModType, OpState, Operation } from "./interfaces";
 import request from "request";
 import http from "http";
 import util from "util";
@@ -16,7 +18,9 @@ declare const global: {
     gameDir: string,
     log: string,
     appData: AppData,
-    temp: string
+    temp: string,
+    confirmedClose: boolean,
+    updateOnExit: boolean
 };
 
 require.resolve("./unrar.wasm");
@@ -153,7 +157,6 @@ export async function checkForUpdates(): Promise<void> {
         const latestVersion: string = semver.clean(JSON.parse(body).tag_name);
         console.log("Latest Version: " + latestVersion);
         if (semver.lt(currentVersion, latestVersion)) {
-            console.log("Update Required");
             global.win.webContents.send("addOperation", {
                 uid: "update",
                 title: "Download Update",
@@ -173,7 +176,7 @@ export async function checkForUpdates(): Promise<void> {
 }
 
 export async function downloadUpdate(tagName: string): Promise<void> {
-    if (!app.isPackaged) return;
+    //TODO: cancel/error operation properly
     if (!(await confirm({
         title: "CMC Mod Manager | Program Update",
         body: "CMC Mod Manager requires an update. This update will now be installed " +
@@ -193,9 +196,11 @@ export async function downloadUpdate(tagName: string): Promise<void> {
         .on("error", (error: Error) => {
             console.log(error);
             targetStream.close();
-            // throw error;
+            throw new Error("A stream error occured: \"" + error.message + "\"");
         }).pipe(targetStream).on("close", async () => {
             if (targetStream.errored) return;
+            //TODO: download progress
+            //TODO: move to install operation which depends on all
             const updateDir: string = path.join(__dirname, "..", "..", "..", "..", "update");
             let updateTemp: string = path.join(global.temp, "update");
             await extractArchive(targetPath, updateTemp);
@@ -205,33 +210,49 @@ export async function downloadUpdate(tagName: string): Promise<void> {
                 updateTemp = path.join(updateTemp, fs.readdirSync(updateTemp)[0]);
             }
             fs.moveSync(updateTemp, updateDir, { overwrite: true });
-            
-            //FIXME: I should write a better way of finding the parent directory... this
-            //could lead to issues
-            //TODO: set flag and call this once the program exits
-            const updaterDir: string = path.join(
-                __dirname, "..", "..", "..", "..", "updater"
-            );
-            //TODO: update updater?
-            if (buildInfo.platform == "win32") {
-                spawn(path.join(updaterDir, "update.bat"), {
-                    cwd: updaterDir,
-                    detached: true,
-                    stdio: ["ignore", "ignore", "ignore"]
-                }).unref();
-            } else if (buildInfo.platform == "linux") {
-                execSync("chmod +x \"" + path.join(updaterDir, "update.sh") + "\"");
-                spawn(path.join(updaterDir, "update.sh"), {
-                    cwd: updaterDir,
-                    detached: true,
-                    stdio: ["ignore", "ignore", "ignore"]
-                }).unref();
-            }
-            //TODO: clean up update files on startup
-            // app.quit();
-            process.exit();
-            if (!app.isPackaged) throw new Error("Cannot update in dev mode.");
+
+            global.updateOnExit = true;
+            app.quit();
+            return;
         });
+}
+
+export function runUpdater(): void {
+    if (!app.isPackaged) throw new Error("Cannot update in dev mode.");
+    const buildInfo: any = JSON.parse(fs.readFileSync(
+        path.join(__dirname, "..", "..", "build.json"),
+        "utf-8"
+    ));
+    //FIXME: I should write a better way of finding the parent directory... this
+    //could lead to issues
+    const updateDir: string = path.join(__dirname, "..", "..", "..", "..", "update");
+    const updaterDir: string = path.join(__dirname, "..", "..", "..", "..", "updater");
+    if (!fs.existsSync(path.join(updateDir))) throw new Error("Update files not found.");
+    if (
+        fs.existsSync(path.join(updateDir, "updater")) &&
+        fs.existsSync(path.join(updateDir, "updater", "update.sh")) &&
+        fs.existsSync(path.join(updateDir, "updater", "update.bat"))
+    ) {
+        fs.removeSync(updaterDir);
+        fs.copySync(path.join(updateDir, "updater"), updaterDir, { overwrite: true });
+    }
+    
+    if (buildInfo.platform == "win32") {
+        spawn(path.join(updaterDir, "update.bat"), {
+            cwd: updaterDir,
+            detached: true,
+            stdio: ["ignore", "ignore", "ignore"]
+        }).unref();
+    } else if (buildInfo.platform == "linux") {
+        execSync("chmod +x \"" + path.join(updaterDir, "update.sh")
+            .replaceAll("\"", "\\\"").replaceAll("'", "\\'") + "\"");
+        spawn(path.join(updaterDir, "update.sh"), {
+            cwd: updaterDir,
+            detached: true,
+            stdio: ["ignore", "ignore", "ignore"]
+        }).unref();
+    }
+    return;
 }
 
 export async function handleURI(uri: string): Promise<void> {
@@ -405,6 +426,18 @@ export async function getDownloadInfo(modId: string): Promise<string[]> {
                 resolve(JSON.parse(body));
             }
         );
+    });
+}
+
+export async function getOperations(): Promise<Operation[]> {
+    return new Promise((resolve: (value: Operation[]) => void) => {
+        ipcMain.removeHandler("getOperationsReturn");
+        ipcMain.handleOnce("getOperationsReturn",
+            (_event: IpcMainInvokeEvent, args: [string]) => {
+                resolve(JSON.parse(args[0]));
+            }
+        );
+        global.win.webContents.send("getOperations");
     });
 }
 

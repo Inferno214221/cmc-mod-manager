@@ -15,7 +15,8 @@ declare const global: {
     log: string,
     appData: AppData,
     temp: string,
-    confirmedClose: boolean
+    confirmedClose: boolean,
+    updateOnExit: boolean
 };
 
 global.win = null;
@@ -24,6 +25,7 @@ global.log = "";
 global.appData = null;
 global.temp = path.join(app.getPath("temp"), "cmc-mod-manager");
 global.confirmedClose = false;
+global.updateOnExit = false;
 
 import * as general from "./general";
 import * as characters from "./characters";
@@ -45,6 +47,12 @@ if (!app.requestSingleInstanceLock()) {
 }
 
 function createWindow(): void {
+    const updateDir: string = path.join(__dirname, "..", "..", "..", "..", "update");
+    if (fs.existsSync(updateDir)) {
+        console.log(updateDir);
+        fs.removeSync(updateDir);
+    }
+    
     global.win = new BrowserWindow({
         width: 1120,
         height: 630,
@@ -85,17 +93,19 @@ function createWindow(): void {
     general.checkForUpdates();
     ipcMain.handleOnce(
         "handleProcessArgs", () => {
-            console.log("handleProcessArgs");
             general.handleURI(process.argv.find((arg: string) => arg.startsWith("cmcmm:")));
             ipcMain.handle("handleProcessArgs", () => null);
         }
     );
 
     global.win.on("close", async (event: Event) => {
+        if (global.updateOnExit) {
+            general.runUpdater();
+            return;
+        }
         if (global.confirmedClose) return;
         event.preventDefault();
-        console.log(event);
-        const operations: Operation[] = await getOperations();
+        const operations: Operation[] = await general.getOperations();
         console.log(operations);
         if (operations.filter((operation: Operation) =>
             operation.state == OpState.started || operation.state == OpState.queued
@@ -141,14 +151,13 @@ app.on("before-quit", async () => {
     fs.ensureFileSync(LOG_FILE);
     toResolve.push(fs.appendFile(LOG_FILE, global.log));
     await Promise.allSettled(toResolve);
-    // return?
 });
 
 function createHandlers(module: any): void {
+    /* eslint-disable import/namespace */
+    /* eslint-disable @typescript-eslint/ban-ts-comment */
     Object.keys(module).forEach((func: string & keyof typeof module) => {
         // console.log("Creating Handler For: " + func);
-        /* eslint-disable import/namespace */
-        /* eslint-disable @typescript-eslint/ban-ts-comment */
         if (typeof module[func] != "function") return;
         if (module[func].length == 0) {
             ipcMain.handle(
@@ -169,17 +178,5 @@ function createHandlers(module: any): void {
                 return module[func](...args);
             }
         );
-    });
-}
-
-export async function getOperations(): Promise<Operation[]> {
-    return new Promise((resolve: (value: Operation[]) => void) => {
-        ipcMain.removeHandler("getOperationsReturn");
-        ipcMain.handleOnce("getOperationsReturn",
-            (_event: IpcMainInvokeEvent, args: [string]) => {
-                resolve(JSON.parse(args[0]));
-            }
-        );
-        global.win.webContents.send("getOperations");
     });
 }
