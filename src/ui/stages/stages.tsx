@@ -45,6 +45,9 @@ export function TabStages({
     [boolean, Dispatch<SetStateAction<boolean>>]
     = useState(false);
 
+    api.onInstallCharacter(() => null);
+    api.onInstallStage(readStages);
+
     useEffect(() => {
         readStages();
         readDefaultConfig();

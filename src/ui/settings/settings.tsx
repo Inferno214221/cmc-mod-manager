@@ -7,6 +7,9 @@ export function TabSettings({
 }: {
     setOperations: Dispatch<SetStateAction<Operation[]>>
 }): JSX.Element {
+    api.onInstallCharacter(() => null);
+    api.onInstallStage(() => null);
+    
     return (
         <section>
             <div id={"settings-div"}>

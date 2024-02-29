@@ -388,11 +388,11 @@ export async function installDownloadedStage(targetDir: string): Promise<void> {
     global.win.webContents.send("updateOperation", {
         uid: targetDir,
         title: "Stage Installation",
-        body: "Installed stage: '" + stage.name + " from GameBanana.",
+        body: "Installed stage: '" + stage.name + "' from GameBanana.",
         image: "img://" + stage.icon,
         state: OpState.finished
     });
-    //TODO: reload page
+    global.win.webContents.send("onInstallStage");
     return;
 }
 

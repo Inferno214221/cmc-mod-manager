@@ -308,8 +308,6 @@ export function runUpdater(): void {
 }
 
 export async function handleURI(uri: string): Promise<void> {
-    // uri = "cmcmm:https://gamebanana.com/mmdl/1100547,idk,483478";
-    // uri = "cmcmm:https://gamebanana.com/mmdl/1137848,idk,495311";
     if (uri == undefined || global.gameDir == null) {
         return;
     }

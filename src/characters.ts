@@ -700,11 +700,11 @@ export async function installDownloadedCharacter(targetDir: string): Promise<voi
     global.win.webContents.send("updateOperation", {
         uid: targetDir,
         title: "Character Installation",
-        body: "Installed character: '" + character.name + " from GameBanana.",
+        body: "Installed character: '" + character.name + "' from GameBanana.",
         image: "img://" + character.mug,
         state: OpState.finished
     });
-    //TODO: reload page
+    global.win.webContents.send("onInstallCharacter");
     return;
 }
 

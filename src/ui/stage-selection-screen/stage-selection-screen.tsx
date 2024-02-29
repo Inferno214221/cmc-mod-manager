@@ -39,6 +39,9 @@ export function TabStageSelectionScreen({
     [SssData, Dispatch<SetStateAction<SssData>>]
     = useState(null);
 
+    api.onInstallCharacter(() => null);
+    api.onInstallStage(getInfo);
+
     async function getInfo(): Promise<void> {
         const stages: Stage[] = await api.readStages();
         stages.push({

@@ -40,6 +40,9 @@ export function TabHome({
 }: {
     setOperations: Dispatch<SetStateAction<Operation[]>>
 }): JSX.Element {
+    api.onInstallCharacter(() => null);
+    api.onInstallStage(() => null);
+    
     return (
         <section>
             <div id={"about-div"} className={"vertical-outer-div"}>

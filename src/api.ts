@@ -343,6 +343,20 @@ export default {
         operations: string
     ]): Promise<void> => ipcRenderer.invoke("getOperationsReturn", args)),
 
+    onInstallCharacter: (
+        callback: (() => void)
+    ) => {
+        ipcRenderer.removeAllListeners("onInstallCharacter");
+        ipcRenderer.on("onInstallCharacter", () => callback());
+    },
+
+    onInstallStage: (
+        callback: (() => void)
+    ) => {
+        ipcRenderer.removeAllListeners("onInstallStage");
+        ipcRenderer.on("onInstallStage", () => callback());
+    },
+
     updateOperation: (
         callback: ((operation: OperationUpdate) => void)
     ) => {
