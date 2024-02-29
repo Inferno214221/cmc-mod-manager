@@ -20,7 +20,7 @@ import {
     TabSettings
 } from "../settings/settings";
 import ToggleIconButton from "./icon-button/toggle-icon-button";
-import { OpState, Operation, OperationUpdate } from "../../interfaces";
+import { OpDep, OpState, Operation, OperationUpdate } from "../../interfaces";
 import missing from "../../assets/missing.png";
 
 let root: Root;
@@ -350,10 +350,10 @@ export async function callQueuedOperations(
     setOperations: Dispatch<SetStateAction<Operation[]>>
 ): Promise<void> {
     // console.log("callQueuedOperations");
-    const filesInUse: string[] = [];
+    const filesInUse: OpDep[] = [];
     operations.forEach((operation: Operation) => {
         if (operation.state == OpState.started) {
-            operation.dependencies.forEach((dep: string) => {
+            operation.dependencies.forEach((dep: OpDep) => {
                 filesInUse.push(dep);
             });
         }
@@ -362,10 +362,10 @@ export async function callQueuedOperations(
         if (operation.state == OpState.queued) {
             if (
                 !operation.dependencies.map(
-                    (dep: string) => filesInUse.includes(dep)
+                    (dep: OpDep) => filesInUse.includes(dep)
                 ).includes(true)
             ) {
-                operation.dependencies.forEach((dep: string) => {
+                operation.dependencies.forEach((dep: OpDep) => {
                     filesInUse.push(dep);
                 });
                 return true;

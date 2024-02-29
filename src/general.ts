@@ -7,7 +7,7 @@ import extract from "extract-zip";
 import { ArcFile, ArcFiles, Extractor, createExtractorFromFile } from "node-unrar-js/esm";
 // import sevenZip from "node-7z-archive";
 import { execFile, execSync, spawn } from "child_process";
-import { AppConfig, AppData, ModType, OpState, Operation } from "./interfaces";
+import { AppConfig, AppData, ModType, OpDep, OpState, Operation } from "./interfaces";
 import request from "request";
 import http from "http";
 import util from "util";
@@ -18,6 +18,7 @@ declare const global: {
     gameDir: string,
     log: string,
     appData: AppData,
+    appDir: string,
     temp: string,
     confirmedClose: boolean,
     updateOnExit: boolean
@@ -158,13 +159,13 @@ export async function checkForUpdates(): Promise<void> {
         console.log("Latest Version: " + latestVersion);
         if (semver.lt(currentVersion, latestVersion)) {
             global.win.webContents.send("addOperation", {
-                uid: "update",
+                uid: "downloadUpdate",
                 title: "Download Update",
                 body: "Downloading the latest version of CMC Mod Manager.",
                 state: OpState.queued,
-                icon: "update",
+                icon: "download",
                 animation: Math.floor(Math.random() * 3),
-                dependencies: ["update"],
+                dependencies: [OpDep.update],
                 call: {
                     name: "downloadUpdate",
                     args: [JSON.parse(body).tag_name]
@@ -176,14 +177,19 @@ export async function checkForUpdates(): Promise<void> {
 }
 
 export async function downloadUpdate(tagName: string): Promise<void> {
-    //TODO: cancel/error operation properly
     if (!(await confirm({
         title: "CMC Mod Manager | Program Update",
         body: "CMC Mod Manager requires an update. This update will now be installed " +
             "automatically, please do not close the program. After the update is " +
             "installed the program will need to be launched again manually.",
         okLabel: "Continue"
-    }))) return;
+    }))) {
+        global.win.webContents.send("updateOperation", {
+            uid: "downloadUpdate",
+            state: OpState.canceled
+        });
+        return;
+    }
     const buildInfo: any = JSON.parse(fs.readFileSync(
         path.join(__dirname, "..", "..", "build.json"),
         "utf-8"
@@ -191,42 +197,75 @@ export async function downloadUpdate(tagName: string): Promise<void> {
     const targetPath: string = path.join(global.temp, "update.zip");
     fs.createFileSync(targetPath);
     const targetStream: fs.WriteStream = fs.createWriteStream(targetPath);
-    request.get("https://github.com/Inferno214221/cmc-mod-manager/releases/download/" + tagName +
-        "/cmc-mod-manager-" + buildInfo.platform + "-" + buildInfo.arch + ".zip")
+    const url: string = "https://github.com/Inferno214221/cmc-mod-manager/releases/download/" +
+        tagName + "/cmc-mod-manager-" + buildInfo.platform + "-" + buildInfo.arch + ".zip";
+    request.get(url)
         .on("error", (error: Error) => {
             console.log(error);
             targetStream.close();
             throw new Error("A stream error occured: \"" + error.message + "\"");
+        }).on("response", (res: request.Response) => {
+            const downloadSize: number = parseInt(res.headers["content-length"]);
+            updateDownloadProgress(
+                "downloadUpdate",
+                "Downloading the latest version of CMC Mod Manager.",
+                targetStream,
+                downloadSize
+            );
         }).pipe(targetStream).on("close", async () => {
             if (targetStream.errored) return;
-            //TODO: download progress
-            //TODO: move to install operation which depends on all
-            const updateDir: string = path.join(__dirname, "..", "..", "..", "..", "update");
-            let updateTemp: string = path.join(global.temp, "update");
-            await extractArchive(targetPath, updateTemp);
-            while (
-                fs.readdirSync(updateTemp).length == 1
-            ) {
-                updateTemp = path.join(updateTemp, fs.readdirSync(updateTemp)[0]);
+            global.win.webContents.send("updateOperation", {
+                uid: "downloadUpdate",
+                title: "Update Downloaded",
+                body: "Downloaded the latest version of CMC Mod Manager.",
+                state: OpState.finished
+            });
+            if (app.isPackaged) {
+                const updateDir: string = path.join(global.appDir, "update");
+                let updateTemp: string = path.join(global.temp, "update");
+                await extractArchive(targetPath, updateTemp);
+                while (
+                    fs.readdirSync(updateTemp).length == 1
+                ) {
+                    updateTemp = path.join(updateTemp, fs.readdirSync(updateTemp)[0]);
+                }
+                fs.moveSync(updateTemp, updateDir, { overwrite: true });
             }
-            fs.moveSync(updateTemp, updateDir, { overwrite: true });
 
-            global.updateOnExit = true;
-            app.quit();
+            global.win.webContents.send("addOperation", {
+                uid: "installUpdate",
+                title: "Install Update",
+                body: "Installing the latest version of CMC Mod Manager. This process will " +
+                    "restart the program.",
+                state: OpState.queued,
+                icon: "install_desktop",
+                animation: Math.floor(Math.random() * 3),
+                // This operation depends on all so that other operations are finished first
+                dependencies: [
+                    OpDep.fighters,
+                    OpDep.fighterLock,
+                    OpDep.alts,
+                    OpDep.css,
+                    OpDep.gameSettings,
+                    OpDep.stages,
+                    OpDep.stageLock,
+                    OpDep.sss,
+                    OpDep.download,
+                    OpDep.update
+                ],
+                call: {
+                    name: "installUpdate",
+                    args: []
+                }
+            });
             return;
         });
 }
 
-export function runUpdater(): void {
+export function installUpdate(): void {
     if (!app.isPackaged) throw new Error("Cannot update in dev mode.");
-    const buildInfo: any = JSON.parse(fs.readFileSync(
-        path.join(__dirname, "..", "..", "build.json"),
-        "utf-8"
-    ));
-    //FIXME: I should write a better way of finding the parent directory... this
-    //could lead to issues
-    const updateDir: string = path.join(__dirname, "..", "..", "..", "..", "update");
-    const updaterDir: string = path.join(__dirname, "..", "..", "..", "..", "updater");
+    const updateDir: string = path.join(global.appDir, "update");
+    const updaterDir: string = path.join(global.appDir, "updater");
     if (!fs.existsSync(path.join(updateDir))) throw new Error("Update files not found.");
     if (
         fs.existsSync(path.join(updateDir, "updater")) &&
@@ -236,6 +275,19 @@ export function runUpdater(): void {
         fs.removeSync(updaterDir);
         fs.copySync(path.join(updateDir, "updater"), updaterDir, { overwrite: true });
     }
+    global.updateOnExit = true;
+    app.quit();
+    //The program should exit, there is no point in updating the operation
+    return;
+}
+
+export function runUpdater(): void {
+    if (!app.isPackaged) throw new Error("Cannot update in dev mode.");
+    const buildInfo: any = JSON.parse(fs.readFileSync(
+        path.join(__dirname, "..", "..", "build.json"),
+        "utf-8"
+    ));
+    const updaterDir: string = path.join(global.appDir, "updater");
     
     if (buildInfo.platform == "win32") {
         spawn(path.join(updaterDir, "update.bat"), {
@@ -272,7 +324,7 @@ export async function handleURI(uri: string): Promise<void> {
         state: OpState.queued,
         icon: "download",
         animation: Math.floor(Math.random() * 3),
-        dependencies: ["download"],
+        dependencies: [OpDep.download],
         call: {
             name: "downloadMod",
             args: [url, modId]
@@ -281,6 +333,7 @@ export async function handleURI(uri: string): Promise<void> {
     return;
 }
 
+//TODO: split this function up
 export async function downloadMod(url: string, modId: string): Promise<void> {
     return new Promise((resolve: () => void) => {
         console.log(url);
@@ -355,7 +408,7 @@ export async function downloadMod(url: string, modId: string): Promise<void> {
                                 state: OpState.queued,
                                 icon: "contact_page",
                                 animation: Math.floor(Math.random() * 3),
-                                dependencies: ["fighters"],
+                                dependencies: [OpDep.fighters],
                                 call: {
                                     name: "installDownloadedCharacter",
                                     args: [output]
@@ -372,7 +425,7 @@ export async function downloadMod(url: string, modId: string): Promise<void> {
                                 state: OpState.queued,
                                 icon: "note_add",
                                 animation: Math.floor(Math.random() * 3),
-                                dependencies: ["stages"],
+                                dependencies: [OpDep.stages],
                                 call: {
                                     name: "installDownloadedStage",
                                     args: [output]
@@ -382,14 +435,19 @@ export async function downloadMod(url: string, modId: string): Promise<void> {
                     }
                 });
 
-                updateDownloadProgress(url, modInfo, downloadStream, downloadSize);
+                updateDownloadProgress(
+                    url,
+                    "Downloading mod: '" + modInfo[0] + "' from GameBanana.",
+                    downloadStream,
+                    downloadSize
+                );
             });
     });
 }
 
 export function updateDownloadProgress(
-    url: string,
-    modInfo: string[],
+    uid: string,
+    body: string,
     downloadStream: fs.WriteStream,
     downloadSize: number
 ): void {
@@ -397,11 +455,11 @@ export function updateDownloadProgress(
         if (downloadStream.closed || downloadStream.errored) return;
         if (downloadStream.bytesWritten < downloadSize) {
             global.win.webContents.send("updateOperation", {
-                uid: url,
-                body: "Downloading mod: '" + modInfo[0] + "' from GameBanana. (" +
-                    toMb(downloadStream.bytesWritten) + " / " + toMb(downloadSize) + " mb)",
+                uid: uid,
+                body: body + " (" + toMb(downloadStream.bytesWritten) + " / " +
+                    toMb(downloadSize) + " mb)",
             });
-            updateDownloadProgress(url, modInfo, downloadStream, downloadSize);
+            updateDownloadProgress(uid, body, downloadStream, downloadSize);
         }
     }, 1000);
 }

@@ -14,6 +14,7 @@ declare const global: {
     gameDir: string,
     log: string,
     appData: AppData,
+    appDir: string,
     temp: string,
     confirmedClose: boolean,
     updateOnExit: boolean
@@ -23,6 +24,10 @@ global.win = null;
 global.gameDir = "";
 global.log = "";
 global.appData = null;
+// if (path.parse(app.getPath("exe")).name == "electron") {
+global.appDir = app.isPackaged ?
+    path.parse(app.getPath("exe")).dir :
+    path.join(path.parse(app.getPath("exe")).dir, "..", "..", "..");
 global.temp = path.join(app.getPath("temp"), "cmc-mod-manager");
 global.confirmedClose = false;
 global.updateOnExit = false;
@@ -46,8 +51,10 @@ if (!app.requestSingleInstanceLock()) {
     }
 }
 
+console.log(global.appDir);
+
 function createWindow(): void {
-    const updateDir: string = path.join(__dirname, "..", "..", "..", "..", "update");
+    const updateDir: string = path.join(global.appDir, "update");
     if (fs.existsSync(updateDir)) {
         console.log(updateDir);
         fs.removeSync(updateDir);

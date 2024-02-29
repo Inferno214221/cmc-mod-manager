@@ -4,7 +4,7 @@ import IconButton from "../global/icon-button/icon-button";
 import ToggleIconButton from "../global/icon-button/toggle-icon-button";
 import CycleIconButton from "../global/icon-button/cycle-icon-button";
 import {
-    DndData, DndDataType, OpState, Operation, SortTypeOptions, SssData, SssPage, Stage,
+    DndData, DndDataType, OpDep, OpState, Operation, SortTypeOptions, SssData, SssPage, Stage,
     StageList,
     sortTypes
 } from "../../interfaces";
@@ -123,7 +123,7 @@ export function TabStageSelectionScreen({
                 state: OpState.queued,
                 icon: "location_pin",
                 animation: Math.floor(Math.random() * 3),
-                dependencies: ["sss"],
+                dependencies: [OpDep.sss],
                 call: async () => {
                     await api.writeSssPages(sssPages);
                     setOperations((prev: Operation[]) => {
@@ -434,7 +434,7 @@ function SssPages({
                                     state: OpState.queued,
                                     icon: "add",
                                     animation: Math.floor(Math.random() * 3),
-                                    dependencies: ["sss"],
+                                    dependencies: [OpDep.sss],
                                     call: async () => {
                                         await api.addSssPage(newPageName);
                                         setOperations((prev: Operation[]) => {
@@ -499,7 +499,7 @@ function SssPageDisplay({
                             state: OpState.queued,
                             icon: "delete",
                             animation: Math.floor(Math.random() * 3),
-                            dependencies: ["sss"],
+                            dependencies: [OpDep.sss],
                             call: async () => {
                                 await api.removeSssPage(page);
                                 setOperations((prev: Operation[]) => {

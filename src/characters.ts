@@ -13,6 +13,7 @@ declare const global: {
     gameDir: string,
     log: string,
     appData: AppData,
+    appDir: string,
     temp: string,
     confirmedClose: boolean,
     updateOnExit: boolean

@@ -4,7 +4,7 @@ import IconButton from "../global/icon-button/icon-button";
 import ToggleIconButton from "../global/icon-button/toggle-icon-button";
 import CycleIconButton from "../global/icon-button/cycle-icon-button";
 import {
-    AppData, OpState, Operation, SortTypeOptions, Stage, sortTypes
+    AppData, OpDep, OpState, Operation, SortTypeOptions, Stage, sortTypes
 } from "../../interfaces";
 import missing from "../../assets/missing.png";
 
@@ -231,7 +231,7 @@ export function TabStages({
                                     state: OpState.queued,
                                     icon: "create_new_folder",
                                     animation: Math.floor(Math.random() * 3),
-                                    dependencies: ["stages"],
+                                    dependencies: [OpDep.stages],
                                     call: async () => {
                                         const stage: Stage = await api.installStageDir(
                                             filterInstallation,
@@ -270,7 +270,7 @@ export function TabStages({
                                     state: OpState.queued,
                                     icon: "note_add",
                                     animation: Math.floor(Math.random() * 3),
-                                    dependencies: ["stages"],
+                                    dependencies: [OpDep.stages],
                                     call: async () => {
                                         const stage: Stage = await api.installStageArchive(
                                             filterInstallation,
@@ -373,7 +373,7 @@ function StageDisplay({
                 state: OpState.queued,
                 icon: randomSelection ? "help" : "help_outline",
                 animation: Math.floor(Math.random() * 3),
-                dependencies: ["stage_lock"],
+                dependencies: [OpDep.stageLock],
                 call: async () => {
                     api.writeStageRandom(stage.name, randomSelection);
                     stage.randomSelection = randomSelection;
@@ -422,7 +422,7 @@ function StageDisplay({
                                         state: OpState.queued,
                                         icon: "delete",
                                         animation: Math.floor(Math.random() * 3),
-                                        dependencies: ["stages", "stage_lock", "sss"],
+                                        dependencies: [OpDep.stages, OpDep.stageLock, OpDep.sss],
                                         call: async () => {
                                             await api.removeStage(stage.name);
                                             setOperations((prev: Operation[]) => {
@@ -454,7 +454,7 @@ function StageDisplay({
                                         state: OpState.queued,
                                         icon: "drive_file_move",
                                         animation: Math.floor(Math.random() * 3),
-                                        dependencies: ["stages"],
+                                        dependencies: [OpDep.stages],
                                         call: async () => {
                                             await api.extractStage(stage.name);
                                             setOperations((prev: Operation[]) => {
@@ -515,7 +515,7 @@ function SeriesDisplay({
                                 state: OpState.queued,
                                 icon: "delete_sweep",
                                 animation: Math.floor(Math.random() * 3),
-                                dependencies: ["stages", "stage_lock", "sss"],
+                                dependencies: [OpDep.stages, OpDep.stageLock, OpDep.sss],
                                 call: async () => {
                                     await api.removeSeriesStages(series);
                                     setOperations((prev: Operation[]) => {

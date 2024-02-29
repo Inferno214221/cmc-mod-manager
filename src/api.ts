@@ -158,6 +158,8 @@ export default {
         dir?: string
     ]): Promise<Stage | null> => ipcRenderer.invoke("installStageDir", args)),
 
+    installUpdate: ((): Promise<void> => ipcRenderer.invoke("installUpdate")),
+
     isValidGameDir: ((...args: [
         dir?: string
     ]): Promise<boolean> => ipcRenderer.invoke("isValidGameDir", args)),

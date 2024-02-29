@@ -4,7 +4,7 @@ import IconButton from "../global/icon-button/icon-button";
 import ToggleIconButton from "../global/icon-button/toggle-icon-button";
 import CycleIconButton from "../global/icon-button/cycle-icon-button";
 import {
-    Alt, AppData, Character, OpState, Operation, SortTypeOptions, sortTypes
+    Alt, AppData, Character, OpDep, OpState, Operation, SortTypeOptions, sortTypes
 } from "../../interfaces";
 import missing from "../../assets/missing.png";
 
@@ -239,7 +239,7 @@ export function TabCharacters({
                                     state: OpState.queued,
                                     icon: "folder_shared",
                                     animation: Math.floor(Math.random() * 3),
-                                    dependencies: ["fighters"],
+                                    dependencies: [OpDep.fighters],
                                     call: async () => {
                                         const character: Character = await api.installCharacterDir(
                                             filterInstallation,
@@ -279,7 +279,7 @@ export function TabCharacters({
                                     state: OpState.queued,
                                     icon: "contact_page",
                                     animation: Math.floor(Math.random() * 3),
-                                    dependencies: ["fighters"],
+                                    dependencies: [OpDep.fighters],
                                     call: async () => {
                                         const character: Character =
                                             await api.installCharacterArchive(
@@ -388,7 +388,7 @@ function CharacterDisplay({
                 state: OpState.queued,
                 icon: randomSelection ? "help" : "help_outline",
                 animation: Math.floor(Math.random() * 3),
-                dependencies: ["fighter_lock"],
+                dependencies: [OpDep.fighterLock],
                 call: async () => {
                     api.writeCharacterRandom(character.name, randomSelection);
                     character.randomSelection = randomSelection;
@@ -437,7 +437,9 @@ function CharacterDisplay({
                                         state: OpState.queued,
                                         icon: "delete",
                                         animation: Math.floor(Math.random() * 3),
-                                        dependencies: ["fighters", "alts", "fighter_lock", "css"],
+                                        dependencies: [
+                                            OpDep.fighters, OpDep.alts, OpDep.fighterLock, OpDep.css
+                                        ],
                                         call: async () => {
                                             await api.removeCharacter(character.name);
                                             setOperations((prev: Operation[]) => {
@@ -469,7 +471,7 @@ function CharacterDisplay({
                                         state: OpState.queued,
                                         icon: "drive_file_move",
                                         animation: Math.floor(Math.random() * 3),
-                                        dependencies: ["fighters"],
+                                        dependencies: [OpDep.fighters],
                                         call: async () => {
                                             await api.extractCharacter(character.name);
                                             setOperations((prev: Operation[]) => {
@@ -567,7 +569,7 @@ function CharacterAltDisplay({
                                 state: OpState.queued,
                                 icon: "group_remove",
                                 animation: Math.floor(Math.random() * 3),
-                                dependencies: ["fighters", "alts"],
+                                dependencies: [OpDep.fighters, OpDep.alts],
                                 call: async () => {
                                     await api.removeAlt(alt);
                                     setOperations((prev: Operation[]) => {
@@ -643,7 +645,7 @@ function AddAltButton({
                         state: OpState.queued,
                         icon: "person_add",
                         animation: Math.floor(Math.random() * 3),
-                        dependencies: ["fighters", "alts", "fighter_lock", "css"],
+                        dependencies: [OpDep.fighters, OpDep.alts, OpDep.fighterLock, OpDep.css],
                         call: async () => {
                             await api.addAlt(altTarget, character);
                             setAltTarget(null);
@@ -693,7 +695,9 @@ function SeriesDisplay({
                                 state: OpState.queued,
                                 icon: "delete_sweep",
                                 animation: Math.floor(Math.random() * 3),
-                                dependencies: ["fighters", "alts", "fighter_lock", "css"],
+                                dependencies: [
+                                    OpDep.fighters, OpDep.alts, OpDep.fighterLock, OpDep.css
+                                ],
                                 call: async () => {
                                     await api.removeSeriesCharacters(series);
                                     setOperations((prev: Operation[]) => {

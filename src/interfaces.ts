@@ -307,7 +307,7 @@ export interface Operation {
     state: OpState,
     icon: string,
     animation: number,
-    dependencies: string[],
+    dependencies: OpDep[],
     call: (() => Promise<void>) | MainCall
 }
 
@@ -325,6 +325,19 @@ export enum OpState {
     finished = "Finished",
     canceled = "Canceled",
     error = "Error"
+}
+
+export enum OpDep {
+    fighters,
+    fighterLock,
+    alts,
+    css,
+    gameSettings,
+    stages,
+    stageLock,
+    sss,
+    download,
+    update
 }
 
 export interface MainCall {

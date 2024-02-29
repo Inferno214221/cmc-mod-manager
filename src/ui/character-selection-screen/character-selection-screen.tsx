@@ -4,7 +4,7 @@ import IconButton from "../global/icon-button/icon-button";
 import ToggleIconButton from "../global/icon-button/toggle-icon-button";
 import CycleIconButton from "../global/icon-button/cycle-icon-button";
 import {
-    Character, CharacterList, CssData, CssPage, DndData, DndDataType, OpState,
+    Character, CharacterList, CssData, CssPage, DndData, DndDataType, OpDep, OpState,
     Operation, SortTypeOptions, sortTypes
 } from "../../interfaces";
 import missing from "../../assets/missing.png";
@@ -100,7 +100,7 @@ export function TabCharacterSelectionScreen({
                 state: OpState.queued,
                 icon: "pan_tool_alt",
                 animation: Math.floor(Math.random() * 3),
-                dependencies: ["css"],
+                dependencies: [OpDep.css],
                 call: async () => {
                     await api.writeCssData(activePage, data);
                     getCssData();
@@ -433,7 +433,7 @@ function CssPages({
                                     state: OpState.queued,
                                     icon: "add",
                                     animation: Math.floor(Math.random() * 3),
-                                    dependencies: ["css", "game_settings"],
+                                    dependencies: [OpDep.css, OpDep.gameSettings],
                                     call: async () => {
                                         await api.addCssPage(newPageName);
                                         setOperations((prev: Operation[]) => {
@@ -494,7 +494,7 @@ function CssPageDisplay({
                             state: OpState.queued,
                             icon: "delete",
                             animation: Math.floor(Math.random() * 3),
-                            dependencies: ["css", "game_settings"],
+                            dependencies: [OpDep.css, OpDep.gameSettings],
                             call: async () => {
                                 await api.removeCssPage(page);
                                 setOperations((prev: Operation[]) => {
