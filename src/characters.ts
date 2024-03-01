@@ -690,15 +690,22 @@ export async function installCharacter(
     return character;
 }
 
-export async function installDownloadedCharacter(targetDir: string): Promise<void> {
+export async function installDownloadedCharacter(targetDir: string, uid: string): Promise<void> {
     const character: Character = await installCharacter(
         targetDir,
         true,
         global.appData.config.updateCharacters,
         global.gameDir
     );
+    if (character == null) {
+        global.win.webContents.send("updateOperation", {
+            uid: uid + "_install",
+            state: OpState.canceled
+        });
+        return;
+    }
     global.win.webContents.send("updateOperation", {
-        uid: targetDir,
+        uid: uid + "_install",
         title: "Character Installation",
         body: "Installed character: '" + character.name + "' from GameBanana.",
         image: "img://" + character.mug,

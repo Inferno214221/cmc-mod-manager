@@ -138,7 +138,7 @@ export async function switchTabs(tab: Tab): Promise<void> {
 export function App({ tab }: { tab: Tab }): JSX.Element {
     const [showPanel, setShowPanel]:
     [boolean, Dispatch<SetStateAction<boolean>>]
-    = useState(false);
+    = useState(null);
 
     const [operations, setOperations]:
     [Operation[], Dispatch<SetStateAction<Operation[]>>]
@@ -248,7 +248,7 @@ export function OperationPanel({
     setShowPanel: Dispatch<SetStateAction<boolean>>
 }): JSX.Element {
     useEffect(() => {
-        if (operations.length > 0) {
+        if (showPanel == null && operations.length > 0) {
             setShowPanel(true);
         }
     }, [operations])
@@ -350,11 +350,11 @@ export async function callQueuedOperations(
     setOperations: Dispatch<SetStateAction<Operation[]>>
 ): Promise<void> {
     // console.log("callQueuedOperations");
-    const filesInUse: OpDep[] = [];
+    const depsInUse: OpDep[] = [];
     operations.forEach((operation: Operation) => {
         if (operation.state == OpState.started) {
             operation.dependencies.forEach((dep: OpDep) => {
-                filesInUse.push(dep);
+                depsInUse.push(dep);
             });
         }
     });
@@ -362,11 +362,11 @@ export async function callQueuedOperations(
         if (operation.state == OpState.queued) {
             if (
                 !operation.dependencies.map(
-                    (dep: OpDep) => filesInUse.includes(dep)
+                    (dep: OpDep) => depsInUse.includes(dep)
                 ).includes(true)
             ) {
                 operation.dependencies.forEach((dep: OpDep) => {
-                    filesInUse.push(dep);
+                    depsInUse.push(dep);
                 });
                 return true;
             }
@@ -397,7 +397,7 @@ export async function callQueuedOperations(
             const newOperations: Operation[] = [...prev];
             newOperations[operationId].state = OpState.error;
             newOperations[operationId].body =
-                error.message.replace(/(Error: Error)[\w:' ]*(?=Error)/, "");
+                error.message.replace(/(Error)[\w' ]*: (?=Error)/, "");
             return newOperations;
         });
     }

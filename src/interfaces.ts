@@ -335,9 +335,7 @@ export enum OpDep {
     gameSettings,
     stages,
     stageLock,
-    sss,
-    download,
-    update
+    sss
 }
 
 export interface MainCall {

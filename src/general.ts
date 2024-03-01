@@ -157,18 +157,19 @@ export async function checkForUpdates(): Promise<void> {
         if (error != null) return;
         const latestVersion: string = semver.clean(JSON.parse(body).tag_name);
         console.log("Latest Version: " + latestVersion);
+        const uid: string = new Date().getTime() + "_downloadUpdate";
         if (semver.lt(currentVersion, latestVersion)) {
             global.win.webContents.send("addOperation", {
-                uid: "downloadUpdate",
+                uid: uid,
                 title: "Download Update",
                 body: "Downloading the latest version of CMC Mod Manager.",
                 state: OpState.queued,
                 icon: "download",
                 animation: Math.floor(Math.random() * 3),
-                dependencies: [OpDep.update],
+                dependencies: [],
                 call: {
                     name: "downloadUpdate",
-                    args: [JSON.parse(body).tag_name]
+                    args: [JSON.parse(body).tag_name, uid]
                 }
             });
             return;
@@ -176,16 +177,15 @@ export async function checkForUpdates(): Promise<void> {
     });
 }
 
-export async function downloadUpdate(tagName: string): Promise<void> {
+export async function downloadUpdate(tagName: string, uid: string): Promise<void> {
     if (!(await confirm({
         title: "CMC Mod Manager | Program Update",
         body: "CMC Mod Manager requires an update. This update will now be installed " +
-            "automatically, please do not close the program. After the update is " +
-            "installed the program will need to be launched again manually.",
+            "automatically.",
         okLabel: "Continue"
     }))) {
         global.win.webContents.send("updateOperation", {
-            uid: "downloadUpdate",
+            uid: uid,
             state: OpState.canceled
         });
         return;
@@ -207,7 +207,7 @@ export async function downloadUpdate(tagName: string): Promise<void> {
         }).on("response", (res: request.Response) => {
             const downloadSize: number = parseInt(res.headers["content-length"]);
             updateDownloadProgress(
-                "downloadUpdate",
+                uid,
                 "Downloading the latest version of CMC Mod Manager.",
                 targetStream,
                 downloadSize
@@ -215,7 +215,7 @@ export async function downloadUpdate(tagName: string): Promise<void> {
         }).pipe(targetStream).on("close", async () => {
             if (targetStream.errored) return;
             global.win.webContents.send("updateOperation", {
-                uid: "downloadUpdate",
+                uid: uid,
                 title: "Update Downloaded",
                 body: "Downloaded the latest version of CMC Mod Manager.",
                 state: OpState.finished
@@ -232,37 +232,25 @@ export async function downloadUpdate(tagName: string): Promise<void> {
                 fs.moveSync(updateTemp, updateDir, { overwrite: true });
             }
 
+            const installUid: string = new Date().getTime() + "_installUpdate";
             global.win.webContents.send("addOperation", {
-                uid: "installUpdate",
+                uid: installUid,
                 title: "Install Update",
-                body: "Installing the latest version of CMC Mod Manager. This process will " +
-                    "restart the program.",
+                body: "Installing the latest version of CMC Mod Manager.",
                 state: OpState.queued,
                 icon: "install_desktop",
                 animation: Math.floor(Math.random() * 3),
-                // This operation depends on all so that other operations are finished first
-                dependencies: [
-                    OpDep.fighters,
-                    OpDep.fighterLock,
-                    OpDep.alts,
-                    OpDep.css,
-                    OpDep.gameSettings,
-                    OpDep.stages,
-                    OpDep.stageLock,
-                    OpDep.sss,
-                    OpDep.download,
-                    OpDep.update
-                ],
+                dependencies: [],
                 call: {
                     name: "installUpdate",
-                    args: []
+                    args: [installUid]
                 }
             });
             return;
         });
 }
 
-export function installUpdate(): void {
+export function installUpdate(uid: string): void {
     if (!app.isPackaged) throw new Error("Cannot update in dev mode.");
     const updateDir: string = path.join(global.appDir, "update");
     const updaterDir: string = path.join(global.appDir, "updater");
@@ -276,8 +264,11 @@ export function installUpdate(): void {
         fs.copySync(path.join(updateDir, "updater"), updaterDir, { overwrite: true });
     }
     global.updateOnExit = true;
-    app.quit();
-    //The program should exit, there is no point in updating the operation
+    global.win.webContents.send("updateOperation", {
+        uid: uid,
+        body: "Please close CMC Mod Manager to finish the update.",
+        state: OpState.finished
+    });
     return;
 }
 
@@ -314,32 +305,32 @@ export async function handleURI(uri: string): Promise<void> {
     const splitUri: string[] = uri.replace("cmcmm:", "").split(",");
     const url: string = splitUri[0];
     const modId: string = splitUri[2];
+    const uid: string = modId + "_" + new Date().getTime();
     global.win.webContents.send("addOperation", {
-        uid: url,
+        uid: uid + "_download",
         title: "Mod Download",
         body: "Downloading a mod from GameBanana.",
         image: "https://gamebanana.com/mods/embeddables/" + modId + "?type=medium_square",
         state: OpState.queued,
         icon: "download",
         animation: Math.floor(Math.random() * 3),
-        dependencies: [OpDep.download],
+        dependencies: [],
         call: {
             name: "downloadMod",
-            args: [url, modId]
+            args: [url, modId, uid]
         }
     });
     return;
 }
 
 //TODO: split this function up
-export async function downloadMod(url: string, modId: string): Promise<void> {
+export async function downloadMod(url: string, modId: string, uid: string): Promise<void> {
     return new Promise((resolve: () => void) => {
         console.log(url);
-        const temp: string = global.temp;
-        fs.ensureDirSync(temp);
+        fs.ensureDirSync(global.temp);
         
         const infoPromise: Promise<string[]> = getDownloadInfo(modId);
-        let file: string = "download_" + modId + ".";
+        let file: string = uid + "_download.";
         request.get(url)
             .on("error", (error: Error) => { log(error) })
             .on("response", async (res: request.Response) => {
@@ -356,7 +347,7 @@ export async function downloadMod(url: string, modId: string): Promise<void> {
                             "Invalid archive type: " + res.headers["content-type"].split("/")[1]
                         );
                 }
-                const filePath: string = path.join(temp, file);
+                const filePath: string = path.join(global.temp, file);
                 const modInfo: string[] = await Promise.resolve(infoPromise);
                 let modType: ModType;
                 switch (modInfo[1].toLowerCase()) {
@@ -372,7 +363,7 @@ export async function downloadMod(url: string, modId: string): Promise<void> {
 
                 const downloadSize: number = parseInt(res.headers["content-length"]);
                 global.win.webContents.send("updateOperation", {
-                    uid: url,
+                    uid: uid + "_download",
                     title: modType + " Download",
                     body: "Downloading mod: '" + modInfo[0] + "' from GameBanana. (0 / " +
                         toMb(downloadSize) + " mb)",
@@ -386,10 +377,10 @@ export async function downloadMod(url: string, modId: string): Promise<void> {
                     throw error;
                 }).pipe(downloadStream).on("close", async () => {
                     if (downloadStream.errored) return;
-                    const output: string = await extractArchive(filePath, temp);
+                    const output: string = await extractArchive(filePath, global.temp);
                     fs.removeSync(filePath);                    
                     global.win.webContents.send("updateOperation", {
-                        uid: url,
+                        uid: uid + "_download",
                         body: "Downloaded mod: '" + modInfo[0] + "' from GameBanana.",
                         state: OpState.finished,
                     });
@@ -398,7 +389,7 @@ export async function downloadMod(url: string, modId: string): Promise<void> {
                     switch (modType) {
                         case ModType.character:
                             global.win.webContents.send("addOperation", {
-                                uid: output,
+                                uid: uid + "_install",
                                 title: "Character Installation",
                                 body: "Installing character from GameBanana.",
                                 image: "https://gamebanana.com/mods/embeddables/" + modId +
@@ -409,13 +400,13 @@ export async function downloadMod(url: string, modId: string): Promise<void> {
                                 dependencies: [OpDep.fighters],
                                 call: {
                                     name: "installDownloadedCharacter",
-                                    args: [output]
+                                    args: [output, uid]
                                 }
                             });
                             break;
                         case ModType.stage:
                             global.win.webContents.send("addOperation", {
-                                uid: output,
+                                uid: uid + "_install",
                                 title: "Stage Installation",
                                 body: "Installing stage from GameBanana.",
                                 image: "https://gamebanana.com/mods/embeddables/" + modId +
@@ -426,7 +417,7 @@ export async function downloadMod(url: string, modId: string): Promise<void> {
                                 dependencies: [OpDep.stages],
                                 call: {
                                     name: "installDownloadedStage",
-                                    args: [output]
+                                    args: [output, uid]
                                 }
                             });
                             break;
@@ -434,7 +425,7 @@ export async function downloadMod(url: string, modId: string): Promise<void> {
                 });
 
                 updateDownloadProgress(
-                    url,
+                    uid + "_download",
                     "Downloading mod: '" + modInfo[0] + "' from GameBanana.",
                     downloadStream,
                     downloadSize

@@ -1,7 +1,5 @@
 #!/bin/bash
 
-sleep 1
-
 cd ..
 
 find . -mindepth 1 -maxdepth 1 ! -path "./updater" ! -path "./update" -exec rm -r {} + &&

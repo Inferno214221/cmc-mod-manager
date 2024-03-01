@@ -117,12 +117,12 @@ function createWindow(): void {
         if (operations.filter((operation: Operation) =>
             operation.state == OpState.started || operation.state == OpState.queued
         ).length > 0) {
-            if ((await general.confirm({
+            if (!(await general.confirm({
                 title: "CMC Mod Manager | Unfinished Operations",
                 body: "Are you sure you want to close CMC Mod Manager? Some operations are " +
                     "unfinished and will be cancelled if you close (or reload) the program.",
-                okLabel: "Cancel",
-                cancelLabel: "Close Anyway"
+                okLabel: "Close Anyway",
+                cancelLabel: "Cancel"
             }))) {
                 return;
             }

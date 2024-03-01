@@ -378,15 +378,22 @@ export async function installStage(
     return stage;
 }
 
-export async function installDownloadedStage(targetDir: string): Promise<void> {
+export async function installDownloadedStage(targetDir: string, uid: string): Promise<void> {
     const stage: Stage = await installStage(
         targetDir,
         true,
         global.appData.config.updateStages,
         global.gameDir
     );
+    if (stage == null) {
+        global.win.webContents.send("updateOperation", {
+            uid: uid + "_install",
+            state: OpState.canceled
+        });
+        return;
+    }
     global.win.webContents.send("updateOperation", {
-        uid: targetDir,
+        uid: uid + "_install",
         title: "Stage Installation",
         body: "Installed stage: '" + stage.name + "' from GameBanana.",
         image: "img://" + stage.icon,

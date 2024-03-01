@@ -1,7 +1,7 @@
 @echo off
 setlocal
 
-timeout /t 1 /nobreak >nul
+timeout /t 1 /nobreak >nul 2>&1
 
 cd ..
 
@@ -13,6 +13,6 @@ for /f "delims=" %%i in ('dir /b /ad ".\*" ^| findstr /v /c:"updater" /c:"update
     rd /s /q ".\%%i"
 )
 
-xcopy /s /e ".\update\*" ".\"
+xcopy /s /e ".\update\*" ".\" /Y
 
 start "" ".\cmc-mod-manager.exe"
