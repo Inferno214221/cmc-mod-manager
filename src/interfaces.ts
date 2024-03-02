@@ -300,7 +300,7 @@ export interface SssPage {
 export type SssData = string[][];
 
 export interface Operation {
-    uid?: string,
+    id?: string,
     title: string,
     body: string,
     image?: string,
@@ -312,7 +312,7 @@ export interface Operation {
 }
 
 export interface OperationUpdate {
-    uid: string,
+    id: string,
     title?: string,
     body?: string,
     image?: string,

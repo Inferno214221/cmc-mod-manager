@@ -286,6 +286,7 @@ export async function installStage(
         }
     } else {
         if (!(await general.confirm({
+            id: "confirmStageInput",
             title: "CMC Mod Manager | Stage Installation",
             body: "Because of CMC+'s current modding format, you will be required to enter some " +
                 "information about the stage you are installing. This information can usually be " +
@@ -296,6 +297,7 @@ export async function installStage(
         }
 
         if (await general.confirm({
+            id: "openStageDir",
             title: "CMC Mod Manager | Stage Installation",
             body: "Would you like to open the mod's directory to find any txt files manually?",
             okLabel: "Yes",
@@ -307,6 +309,7 @@ export async function installStage(
         let menuName: string;
         while (menuName == undefined || menuName == "") {
             menuName = await general.prompt({
+                id: "inputStageMenuName",
                 title: "CMC Mod Manager | Stage Installation",
                 body: "Please enter the stage's 'menu name'. (The name that will be displayed " +
                     "on the stage selection screen.)",
@@ -317,6 +320,7 @@ export async function installStage(
         let source: string;
         while (source == undefined || source == "") {
             source = await general.prompt({
+                id: "inputStageSource",
                 title: "CMC Mod Manager | Stage Installation",
                 body: "Please enter the stage's 'source'. (The name of the source content that " +
                     "the stage is originally from, such as the title of the game.)",
@@ -327,6 +331,7 @@ export async function installStage(
         let series: string;
         while (series == undefined || series == "") {
             series = await general.prompt({
+                id: "inputStageSeries",
                 title: "CMC Mod Manager | Stage Installation",
                 body: "Please enter the stage's 'series'. (This name will be used to select the " +
                     "icon to use on the stage selection screen. This value is usually short and " +
@@ -378,7 +383,7 @@ export async function installStage(
     return stage;
 }
 
-export async function installDownloadedStage(targetDir: string, uid: string): Promise<void> {
+export async function installDownloadedStage(targetDir: string, id: string): Promise<void> {
     const stage: Stage = await installStage(
         targetDir,
         true,
@@ -387,13 +392,13 @@ export async function installDownloadedStage(targetDir: string, uid: string): Pr
     );
     if (stage == null) {
         global.win.webContents.send("updateOperation", {
-            uid: uid + "_install",
+            id: id + "_install",
             state: OpState.canceled
         });
         return;
     }
     global.win.webContents.send("updateOperation", {
-        uid: uid + "_install",
+        id: id + "_install",
         title: "Stage Installation",
         body: "Installed stage: '" + stage.name + "' from GameBanana.",
         image: "img://" + stage.icon,

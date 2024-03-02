@@ -81,6 +81,7 @@ export function TabHome({
                     <div className={"center"}>
                         <button onClick={() => {
                             api.alert({
+                                id: "licenseNotice",
                                 title: "CMC Mod Manager | License Notice",
                                 body: LICENSE
                             });

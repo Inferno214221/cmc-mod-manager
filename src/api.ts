@@ -35,12 +35,12 @@ export default {
     downloadMod: ((...args: [
         url: string,
         modId: string,
-        uid: string
+        id: string
     ]): Promise<void> => ipcRenderer.invoke("downloadMod", args)),
 
     downloadUpdate: ((...args: [
         tagName: string,
-        uid: string
+        id: string
     ]): Promise<void> => ipcRenderer.invoke("downloadUpdate", args)),
 
     ensureAllAltsAreCharacters: ((...args: [
@@ -161,7 +161,7 @@ export default {
     ]): Promise<Stage | null> => ipcRenderer.invoke("installStageDir", args)),
 
     installUpdate: ((...args: [
-        uid: string
+        id: string
     ]): Promise<void> => ipcRenderer.invoke("installUpdate", args)),
 
     isValidGameDir: ((...args: [

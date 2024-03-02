@@ -158,7 +158,7 @@ export function App({ tab }: { tab: Tab }): JSX.Element {
         setOperations((prev: Operation[]) => {
             const newOperations: Operation[] = [...prev];
             const filtered: Operation[] = newOperations.filter(
-                (operation: Operation) => operation.uid == update.uid
+                (operation: Operation) => operation.id == update.id
             );
             if (filtered.length < 1) return;
             const operation: Operation = filtered[0];

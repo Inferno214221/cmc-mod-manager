@@ -584,6 +584,7 @@ export async function installCharacter(
         characterDat.series == undefined
     ) {
         if (!(await general.confirm({
+            id: "confirmCharacterInput",
             title: "CMC Mod Manager | Character Installation",
             body: "The character that is being installed's dat file uses the vanilla format and " +
                 "you will be required to enter some information for the installation. This " +
@@ -594,6 +595,7 @@ export async function installCharacter(
         }
 
         if (await general.confirm({
+            id: "openCharacterDir",
             title: "CMC Mod Manager | Character Installation",
             body: "Would you like to open the mod's directory to find any txt files manually?",
             okLabel: "Yes",
@@ -612,6 +614,7 @@ export async function installCharacter(
 
         while (characterDat.menuName == undefined || characterDat.menuName == "") {
             characterDat.menuName = await general.prompt({
+                id: "inputCharacterMenuName",
                 title: "CMC Mod Manager | Character Installation",
                 body: "Please enter the character's 'menu name'. (This is the name displayed " +
                     "on the when the character is selected on the character selection screen.)",
@@ -625,6 +628,7 @@ export async function installCharacter(
 
         while (characterDat.battleName == undefined || characterDat.battleName == "") {
             characterDat.battleName = await general.prompt({
+                id: "inputCharacterBattleName",
                 title: "CMC Mod Manager | Character Installation",
                 body: "Please enter the character's 'battle name'. (This is the name displayed " +
                     "as a part of the HUD during a match.)",
@@ -634,6 +638,7 @@ export async function installCharacter(
 
         while (characterDat.series == undefined || characterDat.series == "") {
             characterDat.series = await general.prompt({
+                id: "inputCharacterSeries",
                 title: "CMC Mod Manager | Character Installation",
                 body: "Please enter the character's 'series'. (This name will be used to select " +
                 "the icon to use on the character selection screen. This value is usually short " +
@@ -690,7 +695,7 @@ export async function installCharacter(
     return character;
 }
 
-export async function installDownloadedCharacter(targetDir: string, uid: string): Promise<void> {
+export async function installDownloadedCharacter(targetDir: string, id: string): Promise<void> {
     const character: Character = await installCharacter(
         targetDir,
         true,
@@ -699,13 +704,13 @@ export async function installDownloadedCharacter(targetDir: string, uid: string)
     );
     if (character == null) {
         global.win.webContents.send("updateOperation", {
-            uid: uid + "_install",
+            id: id + "_install",
             state: OpState.canceled
         });
         return;
     }
     global.win.webContents.send("updateOperation", {
-        uid: uid + "_install",
+        id: id + "_install",
         title: "Character Installation",
         body: "Installed character: '" + character.name + "' from GameBanana.",
         image: "img://" + character.mug,

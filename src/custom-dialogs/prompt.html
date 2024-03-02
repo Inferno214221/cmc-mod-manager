@@ -8,10 +8,10 @@
     <body onkeyup="
         switch (event.key) {
             case 'Enter':
-                dialog.ok(document.getElementById('input').value);
+                ok(document.getElementById('input').value);
                 break;
             case 'Escape':
-                dialog.cancel();
+                cancel();
                 break;
         }
     ">
@@ -22,12 +22,14 @@
         <input type="text" id="input" placeholder=""/>
         <br/>
         <div class="right">
-            <button id="cancel" onclick="dialog.cancel();">Cancel</button>
-            <button id="ok" onclick="dialog.ok(document.getElementById('input').value);">OK</button>
+            <button id="cancel" onclick="cancel();">Cancel</button>
+            <button id="ok" onclick="ok(document.getElementById('input').value);">OK</button>
         </div>
         <script>
+            var id;
             dialog.onStart((options) => {
                 console.log(options);
+                id = options.id;
                 document.getElementById("body").innerHTML = options.body;
                 if (options.title != undefined) {
                     document.title = options.title;
@@ -46,9 +48,17 @@
                 if (options.cancelLabel != undefined) {
                     document.getElementById("cancel").innerHTML = options.cancelLabel;
                 }
-                dialog.resize(document.documentElement.getBoundingClientRect().height);
+                dialog.resize(id, document.documentElement.getBoundingClientRect().height);
                 document.getElementById('input').focus();
             });
+            function ok(input) {
+                if (id == undefined) return;
+                dialog.ok(id, input);
+            }
+            function cancel() {
+                if (id == undefined) return;
+                dialog.cancel(id);
+            }
         </script>
     </body>
 </html>

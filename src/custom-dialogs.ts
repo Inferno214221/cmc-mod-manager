@@ -17,6 +17,7 @@ const WINDOW_OPTIONS: BrowserWindowConstructorOptions = {
 const PRELOAD_SCRIPT: string = path.join(__dirname, "custom-dialogs/custom-dialogs-preload.js");
 
 export type AlertOptions = {
+    id: string,
     body: string,
     title?: string,
     okLabel?: string
@@ -36,6 +37,7 @@ export function alertSync(
     options: AlertOptions,
     callback?: (() => void)
 ): void {
+    options.id = new Date().getTime() + "_" + options.id;
     const windowOptions: BrowserWindowConstructorOptions = {
         width: 360,
         height: 0,
@@ -61,19 +63,22 @@ export function alertSync(
         if (callback != undefined) callback();
     });
 
-    ipcMain.removeHandler("dialogResize");
-    ipcMain.handleOnce("dialogResize", (event: IpcMainInvokeEvent, height: number) => {
-        customDialogWin.setContentSize(360, height);
-    });
+    ipcMain.removeHandler(options.id + "_dialogResize");
+    ipcMain.handleOnce(options.id + "_dialogResize",
+        (_event: IpcMainInvokeEvent, height: number) => {
+            customDialogWin.setContentSize(360, height);
+        }
+    );
 
-    ipcMain.removeHandler("dialogOk");
-    ipcMain.handleOnce("dialogOk", () => {
+    ipcMain.removeHandler(options.id + "_dialogOk");
+    ipcMain.handleOnce(options.id + "_dialogOk", () => {
         customDialogWin.destroy();
         if (callback != undefined) callback();
     });
 }
 
 export type ConfirmOptions = {
+    id: string,
     body: string,
     title?: string,
     okLabel?: string,
@@ -94,6 +99,7 @@ export function confirmSync(
     options: ConfirmOptions,
     callback?: ((result: boolean) => void)
 ): void {
+    options.id = new Date().getTime() + "_" + options.id;
     const windowOptions: BrowserWindowConstructorOptions = {
         width: 360,
         height: 0,
@@ -119,25 +125,28 @@ export function confirmSync(
         if (callback != undefined) callback(undefined);
     });
 
-    ipcMain.removeHandler("dialogResize");
-    ipcMain.handleOnce("dialogResize", (event: IpcMainInvokeEvent, height: number) => {
-        customDialogWin.setContentSize(360, height);
-    });
+    ipcMain.removeHandler(options.id + "_dialogResize");
+    ipcMain.handleOnce(options.id + "_dialogResize",
+        (_event: IpcMainInvokeEvent, height: number) => {
+            customDialogWin.setContentSize(360, height);
+        }
+    );
 
-    ipcMain.removeHandler("dialogOk");
-    ipcMain.handleOnce("dialogOk", () => {
+    ipcMain.removeHandler(options.id + "_dialogOk");
+    ipcMain.handleOnce(options.id + "_dialogOk", () => {
         customDialogWin.destroy();
         if (callback != undefined) callback(true);
     });
 
-    ipcMain.removeHandler("dialogCancel");
-    ipcMain.handleOnce("dialogCancel", () => {
+    ipcMain.removeHandler(options.id + "_dialogCancel");
+    ipcMain.handleOnce(options.id + "_dialogCancel", () => {
         customDialogWin.destroy();
         if (callback != undefined) callback(false);
     });
 }
 
 export type PromptOptions = {
+    id: string,
     body: string,
     title?: string,
     placeholder?: string,
@@ -160,6 +169,7 @@ export function promptSync(
     options: PromptOptions,
     callback?: ((result: string) => void)
 ): void {
+    options.id = new Date().getTime() + "_" + options.id;
     const windowOptions: BrowserWindowConstructorOptions = {
         width: 360,
         height: 0,
@@ -185,19 +195,23 @@ export function promptSync(
         if (callback != undefined) callback(undefined);
     });
 
-    ipcMain.removeHandler("dialogResize");
-    ipcMain.handleOnce("dialogResize", (event: IpcMainInvokeEvent, height: number) => {
-        customDialogWin.setContentSize(360, height);
-    });
+    ipcMain.removeHandler(options.id + "_dialogResize");
+    ipcMain.handleOnce(options.id + "_dialogResize",
+        (_event: IpcMainInvokeEvent, height: number) => {
+            customDialogWin.setContentSize(360, height);
+        }
+    );
 
-    ipcMain.removeHandler("dialogOk");
-    ipcMain.handleOnce("dialogOk", (event: IpcMainInvokeEvent, value: string) => {
-        customDialogWin.destroy();
-        if (callback != undefined) callback(value);
-    });
+    ipcMain.removeHandler(options.id + "_dialogOk");
+    ipcMain.handleOnce(options.id + "_dialogOk",
+        (_event: IpcMainInvokeEvent, value: string) => {
+            customDialogWin.destroy();
+            if (callback != undefined) callback(value);
+        }
+    );
 
-    ipcMain.removeHandler("dialogCancel");
-    ipcMain.handleOnce("dialogCancel", () => {
+    ipcMain.removeHandler(options.id + "_dialogCancel");
+    ipcMain.handleOnce(options.id + "_dialogCancel", () => {
         customDialogWin.destroy();
         if (callback != undefined) callback(undefined);
     });
