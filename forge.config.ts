@@ -70,11 +70,35 @@ const config: ForgeConfig = {
                 config: rendererConfig,
                 entryPoints: [
                     {
-                        html: "./src/ui/global/global.html",
-                        js: "./src/renderer.ts",
+                        html: "./src/renderer/app/app.html",
+                        js: "./src/renderer/renderer.ts",
                         name: "main_window",
                         preload: {
-                            js: "./src/preload.ts",
+                            js: "./src/renderer/preload.ts",
+                        },
+                    },
+                    {
+                        html: "./src/custom-dialogs/alert/alert.html",
+                        js: "./src/custom-dialogs/alert/alert.ts",
+                        name: "dialog_alert",
+                        preload: {
+                            js: "./src/custom-dialogs/preload.ts",
+                        },
+                    },
+                    {
+                        html: "./src/custom-dialogs/confirm/confirm.html",
+                        js: "./src/custom-dialogs/confirm/confirm.ts",
+                        name: "dialog_confirm",
+                        preload: {
+                            js: "./src/custom-dialogs/preload.ts",
+                        },
+                    },
+                    {
+                        html: "./src/custom-dialogs/prompt/prompt.html",
+                        js: "./src/custom-dialogs/prompt/prompt.ts",
+                        name: "dialog_prompt",
+                        preload: {
+                            js: "./src/custom-dialogs/preload.ts",
                         },
                     },
                 ],
@@ -97,7 +121,7 @@ const config: ForgeConfig = {
                 { encoding: "utf-8" }
             );
             fs.copySync(
-                path.join(__dirname, "updater"),
+                path.join(__dirname, "src", "updater"),
                 path.join(packageResult.outputPaths[0], "updater"),
                 { overwrite: true }
             );

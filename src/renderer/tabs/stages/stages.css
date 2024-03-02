@@ -1,0 +1,73 @@
+@import "../../app/app.css";
+
+#stage-div {
+    flex-grow: 1;
+    min-height: 0px;
+    /* padding: 5px;
+    margin-top: 5px; */
+    margin: 5px;
+    overflow: auto;
+}
+
+#button-div,
+#sort-div {
+    height: min-content;
+    background-color: var(--inf-grey4);
+    z-index: 1;
+    padding: 5px;
+    flex-shrink: 0;
+}
+
+.inline-sort-options {
+    display: inline-block;
+}
+
+#sort-type-select {
+    margin-left: 5px;
+    margin-top: -1px;
+}
+
+#stage-search {
+    width: 150px;
+}
+
+.stage-display-wrapper {
+    display: inline-flex;
+    height: 62px;
+    width: 100%;
+}
+
+.stage-display-mug,
+.stage-display-mug img {
+    width: 62px;
+    object-fit: cover;
+    height: 100%;
+    display: inline;
+}
+
+.stage-display-name {
+    height: calc(100% - 20px);
+    flex-grow: 1;
+    padding: 10px;
+    display: inline-flex;
+    align-items: center;
+}
+
+.stage-display-actions {
+    width: fit-content;
+    height: calc(100% - 10px);
+    padding: 5px;
+    display: inline-flex;
+    align-items: center;
+}
+
+.series-display-name {
+    display: inline-block;
+    width: calc(100% - 40px);
+}
+
+.series-display-wrapper .icon-button-wrapper {
+    display: inline-block;
+    width: 30px;
+    margin: 0px 10px 0px 0px;
+}

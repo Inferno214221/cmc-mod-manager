@@ -1,5 +1,9 @@
-/* TODO: Currently unused */
-
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>CMC Mod Manager</title>
+        <style>
 body {
     /* My Palette */
     /* Titlebar */
@@ -91,3 +95,27 @@ input[type=text] {
 .right {
     float: right;
 }
+        </style>
+    </head>
+    <body onkeyup="
+        switch (event.key) {
+            case 'Enter':
+                ok(document.getElementById('input').value);
+                break;
+            case 'Escape':
+                cancel();
+                break;
+        }
+    ">
+        <!-- <h1 id="title">Title</h1> -->
+        <div class="center">
+            <span id="body">Body</span>
+        </div>
+        <input type="text" id="input" placeholder=""/>
+        <br/>
+        <div class="right">
+            <button id="cancel" onclick="cancel();">Cancel</button>
+            <button id="ok" onclick="ok(document.getElementById('input').value);">OK</button>
+        </div>
+    </body>
+</html>
