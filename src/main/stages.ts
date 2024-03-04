@@ -1,8 +1,7 @@
 import { OpenDialogReturnValue, dialog } from "electron";
 import fs from "fs-extra";
 import path from "path";
-import { StageList } from "../global/global";
-import { OpState } from "../global/global";
+import { OpState, StageList } from "../global/global";
 
 import * as general from "./general";
 import * as customDialogs from "./custom-dialogs";
@@ -239,7 +238,6 @@ export async function installStage(
         }
     }
     if (!fs.readdirSync(correctedDir).includes("stage")) {
-        //TODO: inform user
         general.log("Install Stage - Exit: No Stage Directory");
         throw new Error("No 'stage' subdirectory found.");
     }
@@ -253,7 +251,6 @@ export async function installStage(
 
     const stageList: StageList = readStageList(dir);
     if (!updateStages && stageList.getStageByName(stageName) != undefined) {
-        //TODO: inform user
         general.log("Install Stage - Exit: Stage Already Installed");
         throw new Error("Stage already installed, updates disabled.");
     }
@@ -281,7 +278,8 @@ export async function installStage(
             title: "CMC Mod Manager | Stage Installation",
             body: "Because of CMC+'s current modding format, you will be required to enter some " +
                 "information about the stage you are installing. This information can usually be " +
-                "found in a txt file in the mod's top level directory.",
+                "found in a txt file in the mod's top level directory. (If such a txt file " +
+                "exists and contains four lines, the first one likely is unessecary.)",
             okLabel: "Continue"
         }))) {
             return null;
@@ -297,8 +295,8 @@ export async function installStage(
             general.openDir(correctedDir);
         }
 
-        let menuName: string;
-        while (menuName == undefined || menuName == "") {
+        let menuName: string = "";
+        while (menuName == "") {
             menuName = await customDialogs.prompt({
                 id: "inputStageMenuName",
                 title: "CMC Mod Manager | Stage Installation",
@@ -306,10 +304,11 @@ export async function installStage(
                     "on the stage selection screen.)",
                 placeholder: "Stage's Menu Name"
             });
+            if (menuName == undefined) return null;
         }
 
-        let source: string;
-        while (source == undefined || source == "") {
+        let source: string = "";
+        while (source == "") {
             source = await customDialogs.prompt({
                 id: "inputStageSource",
                 title: "CMC Mod Manager | Stage Installation",
@@ -317,10 +316,11 @@ export async function installStage(
                     "the stage is originally from, such as the title of the game.)",
                 placeholder: "Stage's Source"
             });
+            if (source == undefined) return null;
         }
 
-        let series: string;
-        while (series == undefined || series == "") {
+        let series: string = "";
+        while (series == "") {
             series = await customDialogs.prompt({
                 id: "inputStageSeries",
                 title: "CMC Mod Manager | Stage Installation",
@@ -329,6 +329,7 @@ export async function installStage(
                     "in all lowercase letters.)",
                 placeholder: "Stage's Series"
             });
+            if (series == undefined) return null;
         }
 
         stage = {

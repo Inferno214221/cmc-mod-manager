@@ -4,8 +4,9 @@ import IconButton from "../../icon-buttons/icon-button";
 import ToggleIconButton from "../../icon-buttons/toggle-icon-button";
 import CycleIconButton from "../../icon-buttons/cycle-icon-button";
 import missing from "../../../assets/missing.png";
-import { CharacterList } from "../../../global/global";
-import { DndDataType, OpDep, OpState, SortTypeOptions } from "../../../global/global";
+import {
+    CharacterList, DndDataType, OpDep, OpState, SortTypeOptions
+} from "../../../global/global";
 
 const sortTypes: SortTypeOptions[] = [
     SortTypeOptions.number,

@@ -2,8 +2,7 @@ import { OpenDialogReturnValue, dialog } from "electron";
 import fs from "fs-extra";
 import path from "path";
 import ini from "ini";
-import { CharacterList } from "../global/global";
-import { OpState } from "../global/global";
+import { CharacterList, OpState } from "../global/global";
 
 import * as general from "./general";
 import * as customDialogs from "./custom-dialogs";
@@ -528,7 +527,6 @@ export async function installCharacter(
         }
     }
     if (!fs.readdirSync(correctedDir).includes("fighter")) {
-        //TODO: inform user
         general.log("Install Character - Exit: No Fighter Directory");
         throw new Error("No 'fighter' subdirectory found.");
     }
@@ -542,7 +540,6 @@ export async function installCharacter(
 
     const characters: CharacterList = readCharacterList(dir);
     if (!updateCharacters && characters.getCharacterByName(characterName) != undefined) {
-        //TODO: inform user
         general.log("Install Character - Exit: Character Already Installed");
         throw new Error("Character already installed, updates disabled.");
     }
@@ -559,7 +556,6 @@ export async function installCharacter(
             characterName
         );
     } else {
-        //TODO: inform user
         general.log("Install Character - Exit: No Dat File");
         throw new Error("No dat file found.");
     }
@@ -607,6 +603,7 @@ export async function installCharacter(
                     "on the when the character is selected on the character selection screen.)",
                 placeholder: "Character's Menu Name"
             });
+            if (characterDat.menuName == undefined) return null;
         }
 
         if (characterDat.displayName == undefined || characterDat.displayName == "") {
@@ -621,6 +618,7 @@ export async function installCharacter(
                     "as a part of the HUD during a match.)",
                 placeholder: "Character's Battle Name"
             });
+            if (characterDat.battleName == undefined) return null;
         }
 
         while (characterDat.series == undefined || characterDat.series == "") {
@@ -632,6 +630,7 @@ export async function installCharacter(
                 "and in all lowercase letters.)",
                 placeholder: "Character's Series"
             });
+            if (characterDat.series == undefined) return null;
         }
     }
     general.log(characterDat);
@@ -851,6 +850,7 @@ export function readCssPages(dir: string = global.gameDir): CssPage[] {
             path: path.join(global.gameDir, "data", "css.txt")
         });
         general.log("Read CSS Pages - Return: CSS Customs Disabled", pages);
+        return pages;
     }
     for (
         let number: number = 1;
@@ -877,9 +877,8 @@ export async function writeCssPages(pages: CssPage[], dir: string = global.gameD
         "ascii"
     ).split(/\r?\n/);
     if (ini.parse(gameSettings.join("\r\n"))["global.css_customs"] == 0) {
-        //TODO: throw error
         general.log("Write CSS Pages - Exit: CSS Customs Disabled");
-        return;
+        throw new Error("Custom CSS pages disabled in game_settings.");
     }
     gameSettings = gameSettings.map((line: string) => {
         if (line.startsWith("global.css_custom_number")) {
@@ -928,7 +927,7 @@ export async function addCssPage(pageName: string, dir: string = global.gameDir)
     );
     const pages: CssPage[] = readCssPages(dir);
     pages.push({ name: pageName, path: pagePath });
-    writeCssPages(pages, dir);
+    await writeCssPages(pages, dir);
     if (fs.existsSync(pagePath)) {
         throw new Error("File already exists with the same names as the new CSS page.");
     }

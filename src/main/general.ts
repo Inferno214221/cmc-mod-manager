@@ -222,9 +222,9 @@ export async function downloadUpdate(tagName: string, id: string): Promise<void>
                 fs.moveSync(updateTemp, updateDir, { overwrite: true });
             }
 
-            const installid: string = new Date().getTime() + "_installUpdate";
+            const installId: string = new Date().getTime() + "_installUpdate";
             global.win.webContents.send("addOperation", {
-                id: installid,
+                id: installId,
                 title: "Install Update",
                 body: "Installing the latest version of CMC Mod Manager.",
                 state: OpState.queued,
@@ -233,7 +233,7 @@ export async function downloadUpdate(tagName: string, id: string): Promise<void>
                 dependencies: [],
                 call: {
                     name: "installUpdate",
-                    args: [installid]
+                    args: [installId]
                 }
             });
             return;
