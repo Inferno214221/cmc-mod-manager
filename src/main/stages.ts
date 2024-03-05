@@ -141,7 +141,7 @@ export function getStageFiles(
 ): string[] {
     general.log("Get Stage Files - Start:", dir, stage, ignoreSeries, similarNames);
     const stageFiles: string[] = general.getAllFiles(dir)
-        .map((file: string) => path.posix.relative(dir, file));
+        .map((file: string) => path.relative(dir, file).split(path.sep).join(path.posix.sep));
     let stageFilesString: string = stageFiles.join("\n");
     const validFiles: string[] = [];
     getStageRegExps(stage, ignoreSeries).forEach((exp: RegExp) => {
@@ -225,7 +225,7 @@ export async function installStage(
     const modFiles: string[] = general.getAllFiles(correctedDir)
         .map((file: string) => file.replace(correctedDir, ""));
     for (let file of modFiles) {
-        file = path.posix.join(file);
+        file = path.join(file).split(path.sep).join(path.posix.sep);
         const fileDir: string = path.posix.parse(file).dir + "/";
         if (fileDir.includes("/stage/") && !file.includes("/music/")) {
             let topDir: string = file.split("/").shift();

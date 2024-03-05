@@ -511,21 +511,31 @@ export async function installCharacter(
         characterDir, filterInstallation, updateCharacters, dir);
     const toResolve: Promise<void>[] = [];
     let correctedDir: string = characterDir;
+    console.log(correctedDir);
     const modFiles: string[] = general.getAllFiles(correctedDir)
         .map((file: string) => file.replace(correctedDir, ""));
+    console.log(modFiles);
     for (let file of modFiles) {
-        file = path.posix.join(file);
+        file = path.join(file).split(path.sep).join(path.posix.sep);
+        console.log(file);
         const fileDir: string = path.posix.parse(file).dir + "/";
+        console.log(fileDir);
+        console.log(fileDir.includes("/fighter/") && !file.includes("/announcer/"));
         if (fileDir.includes("/fighter/") && !file.includes("/announcer/")) {
             let topDir: string = file.split("/").shift();
+            console.log(topDir);
             while (topDir != "fighter") {
                 correctedDir = path.join(correctedDir, topDir);
+                console.log(correctedDir);
                 file = file.replace(topDir + "/", "");
+                console.log(file);
                 topDir = file.split("/").shift();
+                console.log(topDir);
             }
             break;
         }
     }
+    console.log(correctedDir, fs.readdirSync(correctedDir));
     if (!fs.readdirSync(correctedDir).includes("fighter")) {
         general.log("Install Character - Exit: No Fighter Directory");
         throw new Error("No 'fighter' subdirectory found.");
@@ -812,7 +822,7 @@ export function getCharacterFiles(
     general.log("Get Character Files - Start:",
         dir, characterDat, includeExtraFiles, ignoreSeries, similarNames);
     const characterFiles: string[] = general.getAllFiles(dir)
-        .map((file: string) => path.posix.relative(dir, file));
+        .map((file: string) => path.relative(dir, file).split(path.sep).join(path.posix.sep));
     let characterFilesString: string = characterFiles.join("\n");
     const validFiles: string[] = [];
     getCharacterRegExps(characterDat, includeExtraFiles, ignoreSeries).forEach((exp: RegExp) => {

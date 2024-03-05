@@ -122,6 +122,8 @@ function createWindow(): void {
         global.confirmedClose = true;
         app.quit();
     });
+
+    app.setAsDefaultProtocolClient("cmcmm");
 }
 
 if (require("electron-squirrel-startup")) {
