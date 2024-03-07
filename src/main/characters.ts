@@ -712,7 +712,7 @@ export async function installDownloadedCharacter(targetDir: string, id: string):
         image: "img://" + character.mug,
         state: OpState.finished
     });
-    global.win.webContents.send("onInstallCharacter");
+    global.win.webContents.send("installCharacter");
     return;
 }
 

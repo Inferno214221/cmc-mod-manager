@@ -6,8 +6,8 @@ export function TabSettings({
 }: {
     setOperations: Dispatch<SetStateAction<Operation[]>>
 }): JSX.Element {
-    api.onInstallCharacter((): void => null);
-    api.onInstallStage((): void => null);
+    api.on("installCharacter", (): void => null);
+    api.on("installStage", (): void => null);
     
     return (
         <section>

@@ -43,8 +43,8 @@ export function TabCharacterSelectionScreen({
     [CssData, Dispatch<SetStateAction<CssData>>]
     = useState(null);
 
-    api.onInstallCharacter(getInfo);
-    api.onInstallStage((): void => null);
+    api.on("installCharacter", getInfo);
+    api.on("installStage", (): void => null);
 
     async function getInfo(): Promise<void> {
         const characters: Character[] = await api.readCharacters();

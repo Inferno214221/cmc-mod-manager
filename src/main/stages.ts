@@ -396,7 +396,7 @@ export async function installDownloadedStage(targetDir: string, id: string): Pro
         image: "img://" + stage.icon,
         state: OpState.finished
     });
-    global.win.webContents.send("onInstallStage");
+    global.win.webContents.send("installStage");
     return;
 }
 

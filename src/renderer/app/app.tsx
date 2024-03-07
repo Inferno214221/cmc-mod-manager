@@ -132,17 +132,17 @@ export function App({ tab }: { tab: Tab }): JSX.Element {
     [Operation[], Dispatch<SetStateAction<Operation[]>>]
     = useState([]);
 
-    api.addOperation((operation: Operation) => {
+    api.on("addOperation", (operation: Operation) => {
         setOperations((prev: Operation[]) => {
             const newOperations: Operation[] = [...prev];
             newOperations.push(operation);
             return newOperations;
         });
     });
-    api.getOperations(() => {
-        return api.getOperationsReturn(JSON.stringify(operations));
+    api.on("getOperations", () => {
+        return api.getOperations(JSON.stringify(operations));
     });
-    api.updateOperation((update: OperationUpdate) => {
+    api.on("updateOperation", (update: OperationUpdate) => {
         setOperations((prev: Operation[]) => {
             const newOperations: Operation[] = [...prev];
             const filtered: Operation[] = newOperations.filter(
@@ -377,7 +377,11 @@ export async function callQueuedOperations(
         } else {
             /* // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore: expression of type 'string' can't be used to index type */
-            await api[operation.call.name](...operation.call.args);
+            if (api[operation.call.name] != undefined) {
+                await api[operation.call.name](...operation.call.args);
+            } else {
+                //TODO: throw error
+            }
         }
         console.log("Finished: " + operation.title);
     } catch (error: any) {

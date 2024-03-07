@@ -6,7 +6,7 @@ import path from "path";
 import extract from "extract-zip";
 import { ArcFile, ArcFiles, Extractor, createExtractorFromFile } from "node-unrar-js/esm";
 // import sevenZip from "node-7z-archive";
-import { execFile, execSync, spawn } from "child_process";
+import { execSync, spawn } from "child_process";
 import request from "request";
 import http from "http";
 import util from "util";
@@ -293,9 +293,18 @@ export async function handleURI(uri: string): Promise<void> {
         return;
     }
     const splitUri: string[] = uri.replace("cmcmm:", "").split(",");
+    if (splitUri[1].toLowerCase() != "mod") return;
     const url: string = splitUri[0];
     const modId: string = splitUri[2];
     const id: string = modId + "_" + new Date().getTime();
+
+    global.win.webContents.send("showNotification", "1-Click Download Initialised", {
+        body: "Downloading mod with id: '" + modId + "' from GameBanana."
+    }, {
+        name: "focusWindow",
+        args: []
+    });
+
     global.win.webContents.send("addOperation", {
         id: id + "_download",
         title: "Mod Download",
@@ -311,6 +320,19 @@ export async function handleURI(uri: string): Promise<void> {
         }
     });
     return;
+}
+
+export function focusWindow(): void {
+    if (global.win) {
+        if (global.win.isMinimized()) {
+            global.win.restore();
+        }
+        global.win.setAlwaysOnTop(true);
+        global.win.show();
+        global.win.focus();
+        app.focus();
+        global.win.setAlwaysOnTop(false);
+    }
 }
 
 //TODO: split this function up
@@ -468,8 +490,8 @@ export async function getDownloadInfo(modId: string): Promise<string[]> {
 
 export async function getOperations(): Promise<Operation[]> {
     return new Promise((resolve: (value: Operation[]) => void) => {
-        ipcMain.removeHandler("getOperationsReturn");
-        ipcMain.handleOnce("getOperationsReturn",
+        ipcMain.removeHandler("getOperations");
+        ipcMain.handleOnce("getOperations",
             (_event: IpcMainInvokeEvent, args: [string]) => {
                 resolve(JSON.parse(args[0]));
             }
@@ -537,10 +559,11 @@ export async function openDir(dir: string): Promise<void> {
 }
 
 export async function runGame(dir: string = global.gameDir): Promise<void> {
-    execFile(path.join(dir, getGameVersion(global.gameDir) + ".exe"), {
+    spawn(path.join(dir, getGameVersion(global.gameDir) + ".exe"), {
         cwd: dir,
-        windowsHide: true
-    });
+        windowsHide: true,
+        detached: true
+    }).unref();
     return;
 }
 

@@ -63,6 +63,8 @@ export default {
         dir?: string
     ]): Promise<void> => ipcRenderer.invoke("extractStage", args)),
 
+    focusWindow: ((): Promise<void> => ipcRenderer.invoke("focusWindow")),
+
     getCharacterFiles: ((...args: [
         characterDat: CharacterDat,
         includeExtraFiles: boolean,
@@ -90,6 +92,10 @@ export default {
         dir?: string,
         list?: string[]
     ]): Promise<string | null> => ipcRenderer.invoke("getGameVersion", args)),
+
+    getOperations: ((... args: [
+        operations: string
+    ]): Promise<void> => ipcRenderer.invoke("getOperations", args)),
 
     getStageFiles: ((...args: [
         stage: Stage,
@@ -319,50 +325,14 @@ export default {
         dir?: string
     ]): Promise<void> => ipcRenderer.invoke("writeStageRandom", args)),
 
-    // The Following Functions Are For Communication From Main To Renderer & Back
-
-    addOperation: (
-        callback: ((operation: Operation) => void)
+    on: ((
+        channel: string,
+        call: ((...args: any) => void)
     ) => {
-        ipcRenderer.removeAllListeners("addOperation");
-        ipcRenderer.on("addOperation", (
+        ipcRenderer.removeAllListeners(channel);
+        ipcRenderer.on(channel, (
             _event: IpcRendererEvent,
-            operation: Operation
-        ) => callback(operation));
-    },
-
-    getOperations: (
-        callback: (() => void)
-    ) => {
-        ipcRenderer.removeAllListeners("getOperations");
-        ipcRenderer.on("getOperations", callback);
-    },
-
-    getOperationsReturn: ((... args: [
-        operations: string
-    ]): Promise<void> => ipcRenderer.invoke("getOperationsReturn", args)),
-
-    onInstallCharacter: (
-        callback: (() => void)
-    ) => {
-        ipcRenderer.removeAllListeners("onInstallCharacter");
-        ipcRenderer.on("onInstallCharacter", () => callback());
-    },
-
-    onInstallStage: (
-        callback: (() => void)
-    ) => {
-        ipcRenderer.removeAllListeners("onInstallStage");
-        ipcRenderer.on("onInstallStage", () => callback());
-    },
-
-    updateOperation: (
-        callback: ((operation: OperationUpdate) => void)
-    ) => {
-        ipcRenderer.removeAllListeners("updateOperation");
-        ipcRenderer.on("updateOperation", (
-            _event: IpcRendererEvent,
-            operation: OperationUpdate
-        ) => callback(operation));
-    }
+            ...args: any
+        ) => call(...args));
+    }),
 }

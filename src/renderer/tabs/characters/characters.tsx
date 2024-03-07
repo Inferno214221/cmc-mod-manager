@@ -53,8 +53,8 @@ export function TabCharacters({
     [Character, Dispatch<SetStateAction<Character>>]
     = useState(null);
 
-    api.onInstallCharacter(readCharacters);
-    api.onInstallStage((): void => null);
+    api.on("installCharacter", readCharacters);
+    api.on("installStage", (): void => null);
 
     useEffect(() => {
         readCharacters();
