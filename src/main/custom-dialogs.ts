@@ -2,7 +2,7 @@ import {
     BrowserWindow, BrowserWindowConstructorOptions, IpcMainInvokeEvent, ipcMain
 } from "electron";
 
-const DEV_TOOLS_ENABLED: boolean = true;
+const DEV_TOOLS_ENABLED: boolean = false;
 
 const WINDOW_OPTIONS: BrowserWindowConstructorOptions = {
     resizable: DEV_TOOLS_ENABLED,

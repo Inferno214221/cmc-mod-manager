@@ -31,7 +31,15 @@ const LICENSE: string = (
 );
 
 export async function AllowTabSwitchHome(): Promise<boolean> {
-    return await api.isValidGameDir();
+    if (await api.isValidGameDir()) {
+        return true;
+    }
+    api.alert({
+        id: "allowTabSwitch",
+        title: "CMC Mod Manager | No Directory Selected",
+        body: "Please select your CMC+ directory before continuing."
+    });
+    return false;
 }
 
 export function TabHome({

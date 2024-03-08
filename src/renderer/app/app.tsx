@@ -114,10 +114,7 @@ export async function switchTabs(tab: Tab): Promise<void> {
         activeTab != null &&
         activeTab.allowTabSwitch != null &&
         !await activeTab.allowTabSwitch()
-    ) {
-        console.log("Do some stuff and then return");
-        return;
-    }
+    ) return;
     activeTab = tab;
     root.render(<App tab={tab}/>);
     document.title = "CMC Mod Manager | " + tab.displayName;
