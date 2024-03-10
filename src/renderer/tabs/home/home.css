@@ -1,4 +1,4 @@
-@import "../../app/app.css";
+/* @import "../../app/app.css"; */
 
 #about-div,
 #game-select-div,
@@ -114,6 +114,7 @@
 
 .tab-button-icon {
     color: var(--inf-white3);
+    font-size: 80px;
 }
 
 .tab-button-wrapper:hover .tab-button-icon {

@@ -1,10 +1,13 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import "./stages.css";
 import IconButton from "../../icon-buttons/icon-button";
 import ToggleIconButton from "../../icon-buttons/toggle-icon-button";
 import CycleIconButton from "../../icon-buttons/cycle-icon-button";
 import missing from "../../../assets/missing.png";
 import { OpDep, OpState, SortTypeOptions } from "../../../global/global";
+import appStyles from "../../app/app.css";
+import stagesStyles from "./stages.css";
+const styles: typeof import("../../app/app.css") & typeof import("./stages.css") =
+    Object.assign({}, appStyles, stagesStyles);
 
 const sortTypes: SortTypeOptions[] = [
     SortTypeOptions.number,
@@ -128,23 +131,23 @@ export function TabStages({
 
     return (
         <section>
-            <div id={"sort-div"}>
-                <div className={"center"}>
-                    <div className={"tooltip-wrapper inline-sort-options"}>
+            <div id={styles.sortDiv}>
+                <div className={styles.center}>
+                    <div className={styles.tooltipRrapper + " " + styles.inlineSortOptions}>
                         <input
                             type={"text"}
                             placeholder={"Search"}
-                            id={"stage-search"}
+                            id={styles.stageSearch}
                             onInput={(event: any) => {
                                 setSearchValue(event.target.value);
                                 console.log(searchValue, sortType, reverseSort);
                             }}
                         />
-                        <div className={"tooltip"}>
+                        <div className={styles.tooltip}>
                             <span>Search For Stages</span>
                         </div>
                     </div>
-                    <div className={"inline-sort-options"}>
+                    <div className={styles.inlineSortOptions}>
                         <CycleIconButton
                             index={sortType}
                             icons={[
@@ -172,8 +175,8 @@ export function TabStages({
                     </div>
                 </div>
             </div>
-            <div id={"stage-div"}>
-                <div className={"center"}>
+            <div id={styles.stageDiv}>
+                <div className={styles.center}>
                     <table>
                         <tbody>
                             {sortType == sortTypes.indexOf(SortTypeOptions.series) ?
@@ -222,8 +225,8 @@ export function TabStages({
                 </div>
             </div>
             <hr/>
-            <div id={"button-div"}>
-                <div className={"center"}>
+            <div id={styles.buttonDiv}>
+                <div className={styles.center}>
                     <IconButton
                         icon={"create_new_folder"}
                         iconSize={"50px"}
@@ -310,7 +313,7 @@ export function TabStages({
                             api.openDir(await api.getExtractedDir());
                         }}
                     />
-                    <hr className={"vr"}/>
+                    <hr className={styles.vr}/>
                     <IconButton
                         icon={"delete_sweep"}
                         iconSize={"50px"}
@@ -329,7 +332,7 @@ export function TabStages({
                         tooltip={"Unbin All Characters"}
                         onClick={() => {console.log("a")}}
                     /> */}
-                    <hr className={"vr"}/>
+                    <hr className={styles.vr}/>
                     <ToggleIconButton
                         checked={filterInstallation}
                         trueIcon={"filter_alt"}
@@ -398,10 +401,10 @@ function StageDisplay({
     }, [randomSelection]);
 
     return (
-        <tr className={"stage-display-row"}>
+        <tr className={styles.stageDisplayRow}>
             <td>
-                <div className={"stage-display-wrapper"}>
-                    <div className={"stage-display-mug"}>
+                <div className={styles.stageDisplayRrapper}>
+                    <div className={styles.stageDisplayMug}>
                         <img
                             src={"img://" + stage.icon}
                             draggable={false}
@@ -410,10 +413,10 @@ function StageDisplay({
                             }}
                         />
                     </div>
-                    <div className={"stage-display-name"}>
+                    <div className={styles.stageDisplayName}>
                         <span>{stage.menuName}</span>
                     </div>
-                    <div className={"stage-display-actions"}>
+                    <div className={styles.stageDisplayActions}>
                         <IconButton
                             icon={"delete"}
                             iconSize={"30px"}
@@ -504,8 +507,8 @@ function SeriesDisplay({
 }): JSX.Element {
     return (
         <tr>
-            <th className={"series-display-wrapper"}>
-                <div className={"series-display-name"}>
+            <th className={styles.seriesDisplayRrapper}>
+                <div className={styles.seriesDisplayName}>
                     <span>{series.toUpperCase()}</span>
                 </div>
                 <IconButton

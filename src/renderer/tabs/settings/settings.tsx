@@ -1,33 +1,31 @@
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import "./settings.css";
+import appStyles from "../../app/app.css";
+import settingsStyles from "./settings.css";
+const styles: typeof import("../../app/app.css") & typeof import("./settings.css") =
+    Object.assign({}, appStyles, settingsStyles);
 
-export function TabSettings({
-    setOperations
-}: {
-    setOperations: Dispatch<SetStateAction<Operation[]>>
-}): JSX.Element {
+export function TabSettings(): JSX.Element {
     api.on("installCharacter", (): void => null);
     api.on("installStage", (): void => null);
     
     return (
         <section>
-            <div id={"settings-div"}>
-                <div className={"center"}>
-                    <div className={"settings-group"}>
+            <div id={styles.settingsDiv}>
+                <div className={styles.center}>
+                    <div className={styles.settingsGroup}>
                         <h2>Character Managment</h2>
                         <p>E</p>
                         <h3>Include Alts As Characters (Toggle Button)</h3>
                         <p>E</p>
                     </div>
                     <hr/>
-                    <div className={"settings-group"}>
+                    <div className={styles.settingsGroup}>
                         <h2>GameBanana 1-Click Installation</h2>
                         <p>E</p>
                         <h3>Enable 1-Click Installation (Toggle Button)</h3>
                         <p>E</p>
                     </div>
                     <hr/>
-                    <div className={"settings-group"}>
+                    <div className={styles.settingsGroup}>
                         <h2>Debug Logs</h2>
                         <p>E</p>
                         <h3>Enable Debug Logs (Toggle Button)</h3>
@@ -36,7 +34,7 @@ export function TabSettings({
                         <p>E</p>
                     </div>
                     <hr/>
-                    <div className={"settings-group"}>
+                    <div className={styles.settingsGroup}>
                         <h2>Unbinner</h2>
                         <p>
                             The 'CMC Unbinner' is a tool developed by SusImposter73 which can be

@@ -1,6 +1,5 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Root, createRoot } from "react-dom/client";
-import "./app.css";
 import { AllowTabSwitchHome, TabHome } from "../tabs/home/home";
 import { TabCharacters } from "../tabs/characters/characters";
 import { TabCharacterSelectionScreen } from "../tabs/character-ss/character-ss";
@@ -10,6 +9,7 @@ import { TabSettings } from "../tabs/settings/settings";
 import ToggleIconButton from "../icon-buttons/toggle-icon-button";
 import missing from "../../assets/missing.png";
 import { OpDep, OpState } from "../../global/global";
+import styles from "./app.css";
 
 let root: Root;
 let activeTab: Tab = null;
@@ -29,8 +29,7 @@ export const HOME: Tab = {
     name: "home",
     displayName: "Home",
     icon: "home",
-    element: (setOperations: Dispatch<SetStateAction<Operation[]>>) =>
-        <TabHome setOperations={setOperations}/>,
+    element: () => <TabHome/>,
     allowTabSwitch: AllowTabSwitchHome
 };
 export const CHARACTERS: Tab = {
@@ -76,8 +75,7 @@ export const SETTINGS: Tab = {
     name: "settings",
     displayName: "Settings",
     icon: "settings",
-    element: (setOperations: Dispatch<SetStateAction<Operation[]>>) =>
-        <TabSettings setOperations={setOperations}/>,
+    element: () => <TabSettings/>,
     allowTabSwitch: null
 };
 
@@ -183,7 +181,7 @@ export function Nav(): JSX.Element {
             <NavTab info={STAGE_SELECTION_SCREEN}/>
             <hr/>
             <NavTab info={SETTINGS}/>
-            <div className={"flex-fill"}/>
+            <div className={styles.flexFill}/>
             <NavButton info={CHANGE_DIR}/>
             <NavButton info={OPEN_DIR}/>
             <NavButton info={RUN_GAME}/>
@@ -193,11 +191,13 @@ export function Nav(): JSX.Element {
 
 export function NavTab({ info }: { info: Tab }): JSX.Element {
     return (
-        <div className={(activeTab == info ? "active-tab " : "") + "tooltip-wrapper"}>
-            <button className={"nav-click"} onClick={() => {switchTabs(info);}}>
-                <span className={"mat-icon nav-icon"}>{info.icon}</span>
+        <div className={
+            (activeTab == info ? styles.activeTab + " " : "") + styles.tooltipWrapper
+        }>
+            <button className={styles.navClick} onClick={() => {switchTabs(info);}}>
+                <span className={styles.matIcon + " " + styles.navIcon}>{info.icon}</span>
             </button>
-            <div className={"tooltip"}>
+            <div className={styles.tooltip}>
                 <span>{info.displayName}</span>
             </div>
         </div>
@@ -206,11 +206,11 @@ export function NavTab({ info }: { info: Tab }): JSX.Element {
 
 export function NavButton({ info }: { info: NavButtonInfo }): JSX.Element {
     return (
-        <div className={"tooltip-wrapper"}>
-            <button className={"nav-click"} onClick={() => {info.function()}}>
-                <span className={"mat-icon nav-icon"}>{info.icon}</span>
+        <div className={styles.tooltipWrapper}>
+            <button className={styles.navClick} onClick={() => {info.function()}}>
+                <span className={styles.matIcon + " " + styles.navIcon}>{info.icon}</span>
             </button>
-            <div className={"tooltip"}>
+            <div className={styles.tooltip}>
                 <span>{info.displayName}</span>
             </div>
         </div>
@@ -239,8 +239,8 @@ export function OperationPanel({
     }, [operations])
 
     return (
-        <div className={"operation-panel"}>
-            <div className={"operation-panel-toggle"}>
+        <div className={styles.operationPanel}>
+            <div className={styles.operationPanelToggle}>
                 <ToggleIconButton
                     checked={showPanel}
                     trueIcon={"keyboard_arrow_right"}
@@ -252,9 +252,9 @@ export function OperationPanel({
                 />
             </div>
             {showPanel ?
-                <div className={"operation-display-box"}>
-                    <div className={"center"}>
-                        <h2 className={"operation-panel-title"}>Operations</h2>
+                <div className={styles.operationDisplayBox}>
+                    <div className={styles.center}>
+                        <h2 className={styles.operationPanelTitle}>Operations</h2>
                     </div>
                     {operations.toReversed().map((display: Operation, index: number) =>
                         <OperationDisplay
@@ -270,9 +270,9 @@ export function OperationPanel({
 
 export function OperationDisplay({ display }: { display: Operation }): JSX.Element {
     let icon: string = display.icon;
-    let classes: string = "mat-icon";
+    let classes: string = styles.matIcon;
     if (display.state == OpState.started) {
-        classes += " " + ANIMATIONS[display.animation];
+        classes += " " + styles[ANIMATIONS[display.animation]];
     } else {
         switch (display.state) {
             case (OpState.queued):
@@ -291,9 +291,9 @@ export function OperationDisplay({ display }: { display: Operation }): JSX.Eleme
     }
 
     return (
-        <div className={"operation-display"}>
+        <div className={styles.operationDisplay}>
             <h3>{display.title}</h3>
-            <div className={"operation-display-info"}>
+            <div className={styles.operationDisplayInfo}>
                 {display.image == null ? null :
                     <img
                         src={display.image}
@@ -306,7 +306,7 @@ export function OperationDisplay({ display }: { display: Operation }): JSX.Eleme
                 <div>
                     <span>{display.body}</span>
                 </div>
-                <div className={"operation-display-state"}>
+                <div className={styles.operationDisplayState}>
                     <span className={classes}>
                         {icon}
                     </span>

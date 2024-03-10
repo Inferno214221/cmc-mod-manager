@@ -1,5 +1,4 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import "./home.css";
 import cmcmm from "../../../assets/icon.png";
 import pfp from "../../../assets/pfp.png";
 import gh from "../../../assets/github.png";
@@ -15,6 +14,10 @@ import {
     Tab,
     switchTabs
 } from "../../app/app";
+import appStyles from "../../app/app.css";
+import homeStyles from "./home.css";
+const styles: typeof import("../../app/app.css") & typeof import("./home.css") =
+    Object.assign({}, appStyles, homeStyles);
 
 const LICENSE: string = (
     "Copyright © 2023 Inferno214221\n\n" +
@@ -42,30 +45,26 @@ export async function AllowTabSwitchHome(): Promise<boolean> {
     return false;
 }
 
-export function TabHome({
-    setOperations
-}: {
-    setOperations: Dispatch<SetStateAction<Operation[]>>
-}): JSX.Element {
+export function TabHome(): JSX.Element {
     api.on("installCharacter", (): void => null);
     api.on("installStage", (): void => null);
     
     return (
         <section>
-            <div id={"about-div"} className={"vertical-outer-div"}>
-                <div className={"vertical-inner-div"}>
-                    <div className={"center margin-vertical"}>
-                        <img src={cmcmm} id={"cmcmm-icon"} draggable={false}/>
+            <div id={styles.aboutDiv} className={styles.verticalOuterDiv}>
+                <div className={styles.verticalInnerDiv}>
+                    <div className={styles.center + " " + styles.marginVertical}>
+                        <img src={cmcmm} id={styles.cmcmmIcon} draggable={false}/>
                         <h1>CMC Mod Manager</h1>
                     </div>
-                    <div className={"center"} id={"by-div"}>
+                    <div className={styles.center} id={styles.byDiv}>
                         <h2>By</h2>
                     </div>
-                    <div className={"center margin-vertical"}>
-                        <img src={pfp} id={"pfp"} draggable={false}/>
+                    <div className={styles.center + " " + styles.marginVertical}>
+                        <img src={pfp} id={styles.pfp} draggable={false}/>
                         <h2>Inferno214221</h2>
                     </div>
-                    <div className={"center margin-vertical"}>
+                    <div className={styles.center + " " + styles.marginVertical}>
                         <ExternalLinkImage
                             icon={cmcmm}
                             tooltip={"Home Page"}
@@ -85,7 +84,7 @@ export function TabHome({
                             id={"gb"}
                         />
                     </div>
-                    <div className={"center"}>
+                    <div className={styles.center}>
                         <button onClick={() => {
                             api.alert({
                                 id: "licenseNotice",
@@ -97,16 +96,16 @@ export function TabHome({
                 </div>
             </div>
             <hr/>
-            <div id={"game-select-div"} className={"vertical-outer-div"}>
-                <div className={"vertical-inner-div"}>
+            <div id={styles.gameSelectDiv} className={styles.verticalOuterDiv}>
+                <div className={styles.verticalInnerDiv}>
                     <GameDirectoryActions/>
                 </div>
             </div>
             <hr/>
-            <div id={"tabs-div"} className={"vertical-outer-div"}>
-                <div className={"vertical-inner-div"}>
-                    {/* <div id={"tabs-scrollable"}> */}
-                    <div className={"center"}>
+            <div id={styles.tabsDiv} className={styles.verticalOuterDiv}>
+                <div className={styles.verticalInnerDiv}>
+                    {/* <div id={styles.tabs-scrollable"}> */}
+                    <div className={styles.center}>
                         <TabButton
                             tab={CHARACTERS}
                             desc={"Install, extract or delete characters from CMC+."}
@@ -151,13 +150,18 @@ function ExternalLinkImage({
     id: string
 }): JSX.Element {
     return (
-        <div className={"external-wrapper tooltip-wrapper"}>
-            <button  className={"external-button"} onClick={() => {
+        <div className={styles.externalWrapper + " " + styles.tooltipWrapper}>
+            <button  className={styles.externalButton} onClick={() => {
                 api.openExternal(location)
             }}>
-                <img src={icon} id={id} className={"external-img"} draggable={false}/>
+                <img
+                    src={icon}
+                    id={styles[id]}
+                    className={styles.externalImg}
+                    draggable={false}
+                />
             </button>
-            <div className={"tooltip"}>
+            <div className={styles.tooltip}>
                 <span>{tooltip}</span>
             </div>
         </div>
@@ -180,17 +184,17 @@ function GameDirectoryActions(): JSX.Element {
     
     return (
         <>
-            <div className={"center"}>
+            <div className={styles.center}>
                 <span>Current CMC+ Directory: </span>
                 <input
                     type={"text"}
                     readOnly={true}
-                    id={"dir-output"}
+                    id={styles.dirOutput}
                     value={cmcDir}
                     size={Math.ceil(cmcDir.length * 0.75)}
                 />
             </div>
-            <div className={"center margin-vertical"}>
+            <div className={styles.center + " " + styles.marginVertical}>
                 <IconButton
                     icon={"policy"}
                     iconSize={"50px"}
@@ -229,15 +233,15 @@ function TabButton({
     desc: string
 }): JSX.Element {
     return (
-        <div className={"tab-button-wrapper"}>
-            <button className={"tab-button"} onClick={() => {switchTabs(tab)}}>
-                <span className={"mat-icon tab-button-icon"} style={{ fontSize: "80px" }}>
+        <div className={styles.tabButtonWrapper}>
+            <button className={styles.tabButton} onClick={() => {switchTabs(tab)}}>
+                <span className={styles.matIcon + " " + styles.tabButtonIcon}>
                     {tab.icon}
                 </span>
-                <p className={"tab-button-title"}>
+                <p className={styles.tabButtonTitle}>
                     {tab.displayName}
                 </p>
-                <p className={"tab-button-desc"}>
+                <p className={styles.tabButtonDesc}>
                     {desc}
                 </p>
             </button>

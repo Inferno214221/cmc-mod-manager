@@ -5,7 +5,18 @@ import { plugins } from "./webpack.plugins";
 
 rules.push({
     test: /\.css$/,
-    use: [{ loader: "style-loader" }, { loader: "css-loader" }],
+    loader: "style-loader"
+});
+
+rules.push({
+    test: /\.css$/,
+    loader: "css-loader",
+    options: {
+        modules: {
+            localIdentName: "[name]_[local]_[hash:base64:5]",
+            exportLocalsConvention: "camelCase"
+        },
+    }
 });
 
 rules.push({

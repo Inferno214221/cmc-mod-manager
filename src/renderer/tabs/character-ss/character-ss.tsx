@@ -1,5 +1,4 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import "./character-ss.css";
 import IconButton from "../../icon-buttons/icon-button";
 import ToggleIconButton from "../../icon-buttons/toggle-icon-button";
 import CycleIconButton from "../../icon-buttons/cycle-icon-button";
@@ -7,6 +6,10 @@ import missing from "../../../assets/missing.png";
 import {
     CharacterList, DndDataType, OpDep, OpState, SortTypeOptions
 } from "../../../global/global";
+import appStyles from "../../app/app.css";
+import characterSsStyles from "./character-ss.css";
+const styles: typeof import("../../app/app.css") & typeof import("./character-ss.css") =
+    Object.assign({}, appStyles, characterSsStyles);
 
 const sortTypes: SortTypeOptions[] = [
     SortTypeOptions.number,
@@ -147,8 +150,8 @@ export function TabCharacterSelectionScreen({
 
     return (
         <section>
-            <div id={"pages-div"}>
-                <div className={"center"}>
+            <div id={styles.pagesDiv}>
+                <div className={styles.center}>
                     <CssPages
                         cssPages={cssPages}
                         activePage={activePage}
@@ -159,10 +162,10 @@ export function TabCharacterSelectionScreen({
                 </div>
             </div>
             <hr/>
-            <div id={"css-div"}>
-                <div id={"css-wrapper"}>
-                    <div className={"center"}>
-                        <table id={"css-table"}>
+            <div id={styles.cssDiv}>
+                <div id={styles.cssWrapper}>
+                    <div className={styles.center}>
+                        <table id={styles.cssTable}>
                             <tbody>
                                 <CssTableContents
                                     cssData={cssData}
@@ -238,23 +241,23 @@ function ExcludedCharacters({
 
     return (
         <>
-            <div id={"sort-excluded-div"}>
-                <div className={"center"}>
-                    <div className={"tooltip-wrapper inline-sort-options"}>
+            <div id={styles.sortExcludedDiv}>
+                <div className={styles.center}>
+                    <div className={styles.tooltipWrapper + " " + styles.inlineSortOptions}>
                         <input
                             type={"text"}
                             placeholder={"Search"}
-                            id={"excluded-search"}
+                            id={styles.excludedSearch}
                             onInput={(event: any) => {
                                 setSearchValue(event.target.value);
                                 console.log(searchValue, sortType, reverseSort);
                             }}
                         />
-                        <div className={"tooltip"}>
+                        <div className={styles.tooltip}>
                             <span>Search For Characters</span>
                         </div>
                     </div>
-                    <div className={"inline-sort-options"}>
+                    <div className={styles.inlineSortOptions}>
                         <CycleIconButton
                             index={sortType}
                             icons={[
@@ -291,9 +294,9 @@ function ExcludedCharacters({
                     </div>
                 </div>
             </div>
-            <div id={"excluded-div"}>
-                <div className={"center"}>
-                    <div id={"excluded-wrapper"}>
+            <div id={styles.excludedDiv}>
+                <div className={styles.center}>
+                    <div id={styles.excludedWrapper}>
                         {sortType == sortTypes.indexOf(SortTypeOptions.series) ?
                             sortedCharacters.map((
                                 character: Character,
@@ -313,7 +316,7 @@ function ExcludedCharacters({
                                 ) {
                                     return (
                                         <>
-                                            <div className={"series-name"}>
+                                            <div className={styles.seriesName}>
                                                 <span>
                                                     <b>{character.series.toUpperCase()}</b>
                                                 </span>
@@ -353,9 +356,9 @@ function CharacterDisplay({
         number: ("0000" + character.number).slice(-4)
     }
     return (
-        <div className={"excluded-display-wrapper tooltip-wrapper"}>
+        <div className={styles.excludedDisplayWrapper + " " + styles.tooltipWrapper}>
             <div
-                className={"excluded-display-mug"}
+                className={styles.excludedDisplayMug}
                 draggable={true}
                 onDragStart={(event: any) => {
                     event.dataTransfer.setData("data", JSON.stringify(dndData));
@@ -377,11 +380,11 @@ function CharacterDisplay({
                         event.target.src = missing;
                     }}
                 />
-                <div className={"excluded-display-name"}>
+                <div className={styles.excludedDisplayName}>
                     <span>{character.menuName}</span>
                 </div>
             </div>
-            <div className={"tooltip excluded-tooltip"}>
+            <div className={styles.tooltip + " " + styles.excludedTooltip}>
                 <span>{character.menuName}</span>
             </div>
         </div>
@@ -406,7 +409,7 @@ function CssPages({
     = useState("");
 
     return (
-        <div id={"pages-wrapper"}>
+        <div id={styles.pagesWrapper}>
             {cssPages.map((page: CssPage) =>
                 <CssPageDisplay
                     page={page}
@@ -417,7 +420,7 @@ function CssPages({
                     key={page.name}
                 />
             )}
-            <div className={"css-page add-css-page"}>
+            <div className={styles.cssPage + " " + styles.addCssPage}>
                 <input
                     type={"text"}
                     placeholder={"Page Name"}
@@ -478,13 +481,15 @@ function CssPageDisplay({
     setOperations: Dispatch<SetStateAction<Operation[]>>
 }): JSX.Element {
     return (
-        <div className={"css-page" + (activePage.path == page.path ? " css-page-active" : "")}>
+        <div className={
+            styles.cssPage + (activePage.path == page.path ? " " + styles.cssPageActive : "")
+        }>
             <button
                 type={"button"}
                 onClick={() => {
                     setActivePage(page);
                 }}
-                className={"css-page-button"}
+                className={styles.cssPageButton}
             >
                 {page.name}
             </button>
@@ -548,7 +553,7 @@ function CssTableContents({
                         key={index}
                     />
                 )}
-                <th className="css-column-header" id={"css-add-column"}>
+                <th className="cssColumnHeader" id={styles.cssAddColumn}>
                     <IconButton
                         icon={"add"}
                         iconSize={"11pt"}
@@ -585,7 +590,7 @@ function CssTableContents({
                 </tr>
             )}
             <tr>
-                <th className="css-row-header" id={"css-add-row"}>
+                <th className="cssRowHeader" id={styles.cssAddRow}>
                     <IconButton
                         icon={"add"}
                         iconSize={"11pt"}
@@ -626,7 +631,7 @@ function CssCharacterDisplay({
     if (character == undefined) {
         return (
             <td
-                className={"css-character-display"}
+                className={styles.cssCharacterDisplay}
                 onDragOver={(event: any) => {
                     event.preventDefault();
                 }}
@@ -641,8 +646,8 @@ function CssCharacterDisplay({
         );
     }
     return (
-        <td className={"css-character-display"}>
-            <div className={"tooltip-wrapper"}>
+        <td className={styles.cssCharacterDisplay}>
+            <div className={styles.tooltipWrapper}>
                 <div
                     draggable={true}
                     onDragStart={(event: any) => {
@@ -677,7 +682,7 @@ function CssCharacterDisplay({
                     <span>{character.menuName}</span>
                 </div>
                 <div
-                    className={"tooltip css-tooltip"}
+                    className={styles.tooltip + " " + styles.cssTooltip}
                     hidden={true}
                     onDragEnter={(event: any) => {
                         // console.log(event);
@@ -705,7 +710,7 @@ function CssColumnHeader({
     = useState(false);
     return (
         <th
-            className={"css-column-header"}
+            className={styles.cssColumnHeader}
             onMouseOver={() => {
                 setHovered(true);
             }}
@@ -748,7 +753,7 @@ function CssRowHeader({
     = useState(false);
     return (
         <th
-            className={"css-row-header"}
+            className={styles.cssRowHeader}
             onMouseOver={() => {
                 setHovered(true);
             }}

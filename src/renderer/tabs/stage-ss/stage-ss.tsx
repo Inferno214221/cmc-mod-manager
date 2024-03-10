@@ -1,10 +1,13 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import "./stage-ss.css";
 import IconButton from "../../icon-buttons/icon-button";
 import ToggleIconButton from "../../icon-buttons/toggle-icon-button";
 import CycleIconButton from "../../icon-buttons/cycle-icon-button";
 import missing from "../../../assets/missing.png";
 import { DndDataType, OpDep, OpState, SortTypeOptions, StageList } from "../../../global/global";
+import appStyles from "../../app/app.css";
+import stageSsStyles from "./stage-ss.css";
+const styles: typeof import("../../app/app.css") & typeof import("./stage-ss.css") =
+    Object.assign({}, appStyles, stageSsStyles);
 
 const sortTypes: SortTypeOptions[] = [
     SortTypeOptions.number,
@@ -146,8 +149,8 @@ export function TabStageSelectionScreen({
 
     return (
         <section>
-            <div id={"pages-div"}>
-                <div className={"center"}>
+            <div id={styles.pagesDiv}>
+                <div className={styles.center}>
                     <SssPages
                         sssPages={sssPages}
                         activePage={activePage}
@@ -158,10 +161,10 @@ export function TabStageSelectionScreen({
                 </div>
             </div>
             <hr/>
-            <div id={"sss-div"}>
-                <div id={"sss-wrapper"}>
-                    <div className={"center"}>
-                        <table id={"sss-table"}>
+            <div id={styles.sssDiv}>
+                <div id={styles.sssWrapper}>
+                    <div className={styles.center}>
+                        <table id={styles.sssTable}>
                             <tbody>
                                 <SssTableContents
                                     sssData={sssData}
@@ -235,23 +238,23 @@ function ExcludedStages({
 
     return (
         <>
-            <div id={"sort-excluded-div"}>
-                <div className={"center"}>
-                    <div className={"tooltip-wrapper inline-sort-options"}>
+            <div id={styles.sortExcludedDiv}>
+                <div className={styles.center}>
+                    <div className={styles.tooltipWrapper + " " + styles.inlineSortOptions}>
                         <input
                             type={"text"}
                             placeholder={"Search"}
-                            id={"excluded-search"}
+                            id={styles.excludedSearch}
                             onInput={(event: any) => {
                                 setSearchValue(event.target.value);
                                 console.log(searchValue, sortType, reverseSort);
                             }}
                         />
-                        <div className={"tooltip"}>
+                        <div className={styles.tooltip}>
                             <span>Search For Stages</span>
                         </div>
                     </div>
-                    <div className={"inline-sort-options"}>
+                    <div className={styles.inlineSortOptions}>
                         <CycleIconButton
                             index={sortType}
                             icons={[
@@ -288,9 +291,9 @@ function ExcludedStages({
                     </div>
                 </div>
             </div>
-            <div id={"excluded-div"}>
-                <div className={"center"}>
-                    <div id={"excluded-wrapper"}>
+            <div id={styles.excludedDiv}>
+                <div className={styles.center}>
+                    <div id={styles.excludedWrapper}>
                         {sortType == sortTypes.indexOf(SortTypeOptions.series) ?
                             sortedStages.map((
                                 stage: Stage,
@@ -310,7 +313,7 @@ function ExcludedStages({
                                 ) {
                                     return (
                                         <>
-                                            <div className={"series-name"}>
+                                            <div className={styles.seriesName}>
                                                 <span>
                                                     <b>{stage.series.toUpperCase()}</b>
                                                 </span>
@@ -350,9 +353,9 @@ function StageDisplay({
         number: ("0000" + stage.number).slice(-4)
     }
     return (
-        <div className={"excluded-display-wrapper tooltip-wrapper"}>
+        <div className={styles.excludedDisplayWrapper + " " + styles.tooltipWrapper}>
             <div
-                className={"excluded-display-mug"}
+                className={styles.excludedDisplayMug}
                 draggable={true}
                 onDragStart={(event: any) => {
                     event.dataTransfer.setData("data", JSON.stringify(dndData));
@@ -374,11 +377,11 @@ function StageDisplay({
                         event.target.src = missing;
                     }}
                 />
-                <div className={"excluded-display-name"}>
+                <div className={styles.excludedDisplayName}>
                     <span>{stage.menuName}</span>
                 </div>
             </div>
-            <div className={"tooltip excluded-tooltip"}>
+            <div className={styles.tooltip + " " + styles.excludedTooltip}>
                 <span>{stage.menuName}</span>
             </div>
         </div>
@@ -403,7 +406,7 @@ function SssPages({
     = useState("");
 
     return (
-        <div id={"pages-wrapper"}>
+        <div id={styles.pagesWrapper}>
             {sssPages.map((page: SssPage) =>
                 <SssPageDisplay
                     page={page}
@@ -415,7 +418,7 @@ function SssPages({
                     key={page.name}
                 />
             )}
-            <div className={"sss-page add-sss-page"}>
+            <div className={styles.sssPage + " " + styles.addSssPage}>
                 <input
                     type={"text"}
                     placeholder={"Page Name"}
@@ -479,14 +482,14 @@ function SssPageDisplay({
 }): JSX.Element {
     console.log(sssPages[activePage].pageNumber == page.pageNumber);
     return (
-        <div className={"sss-page" +
-            (sssPages[activePage].pageNumber == page.pageNumber ? " sss-page-active" : "")}>
+        <div className={styles.sssPage + (sssPages[activePage].pageNumber == page.pageNumber ?
+            " " + styles.sssPageActive : "")}>
             <button
                 type={"button"}
                 onClick={() => {
                     setActivePage(page.pageNumber);
                 }}
-                className={"sss-page-button"}
+                className={styles.sssPageButton}
             >
                 {page.name}
             </button>
@@ -582,7 +585,7 @@ function SssStageDisplay({
     if (stage == undefined) {
         return (
             <td
-                className={"sss-stage-display"}
+                className={styles.sssStageDisplay}
                 onDragOver={(event: any) => {
                     event.preventDefault();
                 }}
@@ -597,8 +600,8 @@ function SssStageDisplay({
         );
     }
     return (
-        <td className={"sss-stage-display"}>
-            <div className={"tooltip-wrapper"}>
+        <td className={styles.sssStageDisplay}>
+            <div className={styles.tooltipWrapper}>
                 <div
                     draggable={true}
                     onDragStart={(event: any) => {
@@ -639,7 +642,7 @@ function SssStageDisplay({
                     <span>{stage.menuName}</span>
                 </div>
                 <div
-                    className={"tooltip sss-tooltip"}
+                    className={styles.tooltip + " " + styles.sssTooltip}
                     hidden={true}
                     onDragEnter={(event: any) => {
                         // console.log(event);

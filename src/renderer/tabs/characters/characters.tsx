@@ -1,10 +1,13 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import "./characters.css";
 import IconButton from "../../icon-buttons/icon-button";
 import ToggleIconButton from "../../icon-buttons/toggle-icon-button";
 import CycleIconButton from "../../icon-buttons/cycle-icon-button";
 import missing from "../../../assets/missing.png";
 import { OpDep, OpState, SortTypeOptions } from "../../../global/global";
+import appStyles from "../../app/app.css";
+import charactersStyles from "./characters.css";
+const styles: typeof import("../../app/app.css") & typeof import("./characters.css") =
+    Object.assign({}, appStyles, charactersStyles);
 
 const sortTypes: SortTypeOptions[] = [
     SortTypeOptions.number,
@@ -132,23 +135,23 @@ export function TabCharacters({
 
     return (
         <section>
-            <div id={"sort-div"}>
-                <div className={"center"}>
-                    <div className={"tooltip-wrapper inline-sort-options"}>
+            <div id={styles.sortDiv}>
+                <div className={styles.center}>
+                    <div className={styles.tooltipWrapper + " " + styles.inlineSortOptions}>
                         <input
                             type={"text"}
                             placeholder={"Search"}
-                            id={"character-search"}
+                            id={styles.characterSearch}
                             onInput={(event: any) => {
                                 setSearchValue(event.target.value);
                                 console.log(searchValue, sortType, reverseSort);
                             }}
                         />
-                        <div className={"tooltip"}>
+                        <div className={styles.tooltip}>
                             <span>Search For Characters</span>
                         </div>
                     </div>
-                    <div className={"inline-sort-options"}>
+                    <div className={styles.inlineSortOptions}>
                         <CycleIconButton
                             index={sortType}
                             icons={[
@@ -176,8 +179,8 @@ export function TabCharacters({
                     </div>
                 </div>
             </div>
-            <div id={"character-div"}>
-                <div className={"center"}>
+            <div id={styles.characterDiv}>
+                <div className={styles.center}>
                     <table>
                         <tbody>
                             {sortType == sortTypes.indexOf(SortTypeOptions.series) ?
@@ -230,8 +233,8 @@ export function TabCharacters({
                 </div>
             </div>
             <hr/>
-            <div id={"button-div"}>
-                <div className={"center"}>
+            <div id={styles.buttonDiv}>
+                <div className={styles.center}>
                     <IconButton
                         icon={"folder_shared"}
                         iconSize={"50px"}
@@ -321,7 +324,7 @@ export function TabCharacters({
                             api.openDir(await api.getExtractedDir());
                         }}
                     />
-                    <hr className={"vr"}/>
+                    <hr className={styles.vr}/>
                     <IconButton
                         icon={"delete_sweep"}
                         iconSize={"50px"}
@@ -340,7 +343,7 @@ export function TabCharacters({
                         tooltip={"Unbin All Characters"}
                         onClick={() => {console.log("a")}}
                     /> */}
-                    <hr className={"vr"}/>
+                    <hr className={styles.vr}/>
                     <ToggleIconButton
                         checked={filterInstallation}
                         trueIcon={"filter_alt"}
@@ -413,10 +416,10 @@ function CharacterDisplay({
     }, [randomSelection]);
 
     return (
-        <tr className={"character-display-row"}>
+        <tr className={styles.characterDisplayRow}>
             <td>
-                <div className={"character-display-wrapper"}>
-                    <div className={"character-display-mug"}>
+                <div className={styles.characterDisplayWrapper}>
+                    <div className={styles.characterDisplayMug}>
                         <img
                             src={"img://" + character.mug}
                             draggable={false}
@@ -425,10 +428,10 @@ function CharacterDisplay({
                             }}
                         />
                     </div>
-                    <div className={"character-display-name"}>
+                    <div className={styles.characterDisplayName}>
                         <span>{character.menuName}</span>
                     </div>
-                    <div className={"character-display-actions"}>
+                    <div className={styles.characterDisplayActions}>
                         <IconButton
                             icon={"delete"}
                             iconSize={"30px"}
@@ -519,7 +522,7 @@ function CharacterDisplay({
                 </div>
             </td>
             <td>
-                <div className={"character-display-alts"}>
+                <div className={styles.characterDisplayAlts}>
                     {character.alts.filter((alt: Alt) => alt.base != alt.alt)
                         .map((alt: Alt, index: number) =>
                             <CharacterAltDisplay
@@ -546,8 +549,8 @@ function CharacterAltDisplay({
     setOperations: Dispatch<SetStateAction<Operation[]>>
 }): JSX.Element {
     return (
-        <div className={"alt-display-wrapper"}>
-            <div className={"alt-display-mug"}>
+        <div className={styles.altDisplayWrapper}>
+            <div className={styles.altDisplayMug}>
                 <img
                     src={"img://" + alt.mug}
                     draggable={false}
@@ -556,10 +559,10 @@ function CharacterAltDisplay({
                     }}
                 />
             </div>
-            <div className={"alt-display-name"}>
+            <div className={styles.altDisplayName}>
                 <span>{alt.menuName}</span>
             </div>
-            <div className={"alt-display-actions"}>
+            <div className={styles.altDisplayActions}>
                 <IconButton
                     icon={"group_remove"}
                     iconSize={"30px"}
@@ -684,8 +687,8 @@ function SeriesDisplay({
 }): JSX.Element {
     return (
         <tr>
-            <th className={"series-display-wrapper"}>
-                <div className={"series-display-name"}>
+            <th className={styles.seriesDisplayWrapper}>
+                <div className={styles.seriesDisplayName}>
                     <span>{series.toUpperCase()}</span>
                 </div>
                 <IconButton

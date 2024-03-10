@@ -1,5 +1,8 @@
 import { Dispatch, SetStateAction } from "react";
-import "./icon-buttons.css";
+import appStyles from "../app/app.css";
+import iconButtonStyles from "./icon-buttons.css";
+const styles: typeof import("../app/app.css") & typeof import("./icon-buttons.css") =
+    Object.assign({}, appStyles, iconButtonStyles);
 
 export default function ToggleIconButton({
     // defaultState,
@@ -22,15 +25,17 @@ export default function ToggleIconButton({
 }): JSX.Element {
     if (checked == null) return null;
     return (
-        <div className={"icon-button-wrapper"}>
-            <button  className={"icon-button"} onClick={() => {
+        <div className={styles.iconButtonWrapper}>
+            <button  className={styles.iconButton} onClick={() => {
                 setter((prev: boolean) => !prev);
             }}>
-                <span className={"mat-icon button-icon"} style={{ fontSize: iconSize }}>
+                <span className={styles.matIcon + " " + styles.buttonIcon}
+                    style={{ fontSize: iconSize }}
+                >
                     {checked ? trueIcon : falseIcon}
                 </span>
             </button>
-            <div className={"icon-button-tooltip"}>
+            <div className={styles.iconButtonTooltip}>
                 <span>{checked ? trueTooltip : falseTooltip}</span>
             </div>
         </div>
