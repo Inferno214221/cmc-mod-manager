@@ -10,6 +10,7 @@ const unrar = require("node-unrar-js");
 const prompt = require("native-prompt");
 const ini = require("ini");
 var win;
+var updateOnExit = false;
 
 const SUPPORTED_VERSIONS = [
     "CMC_v8",
@@ -111,6 +112,34 @@ const createWindow = () => {
     
     win.loadFile("./index.html");
     checkUpdates();
+    win.on("close", () => {
+        if (updateOnExit) runUpdater();
+    });
+}
+
+function runUpdater() {
+    if (!app.isPackaged) throw new Error("Cannot update in dev mode.");
+    const buildInfo = readJSON(path.join(__dirname, "program", "data.json"));;
+    
+    const updaterDir = path.join(__dirname, "..", "..", "updater");
+    
+    console.log(buildInfo);
+    if (buildInfo.platform.startsWith("win32")) {
+        childProcess.spawn(path.join(updaterDir, "update.bat"), {
+            cwd: updaterDir,
+            detached: true,
+            stdio: ["ignore", "ignore", "ignore"]
+        }).unref();
+    } else if (buildInfo.platform.startsWith("linux")) {
+        childProcess.execSync("chmod +x \"" + path.join(updaterDir, "update.sh")
+            .replaceAll("\"", "\\\"").replaceAll("'", "\\'") + "\"");
+        childProcess.spawn(path.join(updaterDir, "update.sh"), {
+            cwd: updaterDir,
+            detached: true,
+            stdio: ["ignore", "ignore", "ignore"]
+        }).unref();
+    }
+    return;
 }
 
 if (!app.requestSingleInstanceLock()) {
@@ -171,10 +200,11 @@ launched again manually.",
                 });
                 console.log("Update required.");
                 downloadUpdate(result.tag_name);
-                // downloadUpdate("auto"); //FOR TESTS
             } else {
                 console.log("No update required.");
             }
+            // console.log("Updating as a test.");
+            // downloadUpdate("auto"); //FOR TESTS
         });
     }).on("error", function(error) {
         console.log(error);
@@ -186,16 +216,16 @@ function downloadUpdate(tag) {
     console.log("Downloading update.");
     let request = require("request");
     let platform = readJSON(path.join(__dirname, "program", "data.json")).platform;
-    let filePath = path.join(__dirname, "update.zip");
+    let filePath = path.join(__dirname, "..", "..", "update.zip");
     request("https://github.com/Inferno214221/cmc-mod-manager/releases/download/"
     + tag + "/cmc-mod-manager-" + platform + ".zip")
     .pipe(fs.createWriteStream(filePath))
     .on("close", function () {
         console.log("Downloaded sucessfully.");
-        fs.ensureDirSync(path.join(__dirname, "update"));
-        fs.emptyDirSync(path.join(__dirname, "update"));
+        fs.ensureDirSync(path.join(__dirname, "..", "..", "update"));
+        fs.emptyDirSync(path.join(__dirname, "..", "..", "update"));
         extract(filePath, {
-            dir: path.join(__dirname, "update"),
+            dir: path.join(__dirname, "..", "..", "update"),
         }).then(() => {
             console.log("Extracted.");
             installUpdate(platform);
@@ -203,17 +233,40 @@ function downloadUpdate(tag) {
     });
 }
 
-function installUpdate(platform) {
-    console.log("Installing update, please don't close the program.");
-    if (platform == "linux-x64") {
-        fs.copySync(path.join(__dirname, "update", "cmc-mod-manager-linux-x64", "resources", "app"), path.join(__dirname), {overwrite: true});
-        //), path.join(__dirname, "..", "..")
-    } else {
-        fs.copySync(path.join(__dirname, "update", "resources", "app"), path.join(__dirname), {overwrite: true});
+async function installUpdate(platform) {
+    if (!app.isPackaged) throw new Error("Cannot update in dev mode.");
+    const updateDir = path.join(__dirname, "..", "..", "update");
+    const updaterDir = path.join(__dirname, "..", "..", "updater");
+    let updateTemp = path.join(updateDir);
+    while (
+        fs.readdirSync(updateTemp).length == 1
+    ) {
+        updateTemp = path.join(updateTemp, fs.readdirSync(updateTemp)[0]);
     }
-    fs.removeSync(path.join(__dirname, "update.zip"));
-    fs.removeSync(path.join(__dirname, "update"));
-    console.log("Update installed.");
+    fs.moveSync(updateTemp, path.join(__dirname, "..", "..", "temp"), { overwrite: true });
+    fs.moveSync(path.join(__dirname, "..", "..", "temp"), updateDir, { overwrite: true });
+
+    if (!fs.existsSync(path.join(updateDir))) throw new Error("Update files not found.");
+    if (
+        fs.existsSync(path.join(updateDir, "updater")) &&
+        fs.existsSync(path.join(updateDir, "updater", "update.sh")) &&
+        fs.existsSync(path.join(updateDir, "updater", "update.bat"))
+    ) {
+        fs.removeSync(updaterDir);
+        fs.copySync(path.join(updateDir, "updater"), updaterDir, { overwrite: true });
+    } else {
+        console.log("Installing update, please don't close the program.");
+        if (platform == "linux-x64") {
+            fs.copySync(path.join(__dirname, "..", "..", "update", "cmc-mod-manager-linux-x64", "resources", "app"), path.join(__dirname), {overwrite: true});
+            //), path.join(__dirname, "..", "..")
+        } else {
+            fs.copySync(path.join(__dirname, "..", "..", "update", "resources", "app"), path.join(__dirname), {overwrite: true});
+        }
+        fs.removeSync(path.join(__dirname, "..", "..", "update.zip"));
+        fs.removeSync(path.join(__dirname, "..", "..", "update"));
+        console.log("Update installed.");
+    }
+    updateOnExit = true;
     app.quit();
 }
 
