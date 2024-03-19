@@ -306,6 +306,10 @@ hr.vr {
     margin: 5px 0px 0px 5px;
 }
 
+.inline-sort-options {
+    display: inline-block;
+}
+
 .operation-panel {
     position: relative;
     z-index: 10;
@@ -347,23 +351,23 @@ hr.vr {
     height: 100%;
 }
 
-.operation-panel-toggle .icon-button-wrapper {
+.operation-panel-toggle :global(.icon-buttons_icon-button-wrapper) {
     pointer-events: all;
     background-color: var(--inf-grey2);
     margin: 0px;
     border-radius: 3px 0px 0px 3px;
 }
 
-.operation-panel-toggle .icon-button-tooltip {
+.operation-panel-toggle :global(.icon-buttons_icon-button-tooltip) {
     right: 30px;
 }
 
-.operation-panel-toggle .icon-button-wrapper .icon-button:hover {
+.operation-panel-toggle :global(.icon-buttons_icon-button-wrapper) :global(.icon-buttons_icon-button:hover) {
     background-color: var(--inf-grey2);
 }
 
-.operation-panel-toggle .icon-button-wrapper,
-.operation-panel-toggle .icon-button-wrapper .icon-button {
+.operation-panel-toggle :global(.icon-buttons_icon-button-wrapper),
+.operation-panel-toggle :global(.icon-buttons_icon-button-wrapper) :global(.icon-buttons_icon-button) {
     height: 30px;
 }
 

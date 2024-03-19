@@ -84,22 +84,22 @@
     min-width: fit-content;
 }
 
-.css-page:hover:not(:has(.icon-button-wrapper:hover)),
-.css-page:hover:not(:has(.icon-button-wrapper:hover)) .css-page-button {
+.css-page:hover:not(:has(:global(.icon-buttons_icon-button-wrapper:hover))),
+.css-page:hover:not(:has(:global(.icon-buttons_icon-button-wrapper:hover))) .css-page-button {
     background-color: var(--inf-grey3);
 }
 
-.css-page .icon-button-wrapper {
+.css-page :global(.icon-buttons_icon-button-wrapper) {
     margin-left: -5px;
     margin-right: 0px;
 }
 
-.css-page .button-icon {
+.css-page :global(.icon-buttons_button-icon) {
     padding: 5px;
 }
 
-.css-page .icon-button-wrapper:hover,
-.css-page .icon-button-wrapper:hover .button-icon {
+.css-page :global(.icon-buttons_icon-button-wrapper:hover),
+.css-page :global(.icon-buttons_icon-button-wrapper:hover) :global(.icon-buttons_button-icon) {
     background-color: var(--inf-grey3);
 }
 
@@ -160,7 +160,7 @@
     text-wrap: nowrap;
 }
 
-.css-column-header .icon-button-wrapper {
+.css-column-header :global(.icon-buttons_icon-button-wrapper) {
     margin: -2.5px 0px;
 }
 
@@ -173,7 +173,7 @@
     padding: 0px;
 } */
 
-.css-row-header .icon-button-wrapper {
+.css-row-header :global(.icon-buttons_icon-button-wrapper) {
     margin: 0px -5px;
 }
 
@@ -195,7 +195,7 @@
     margin: 2px 0px 0px 2px;
 }
 
-.add-css-page .icon-button-wrapper {
+.add-css-page :global(.icon-buttons_icon-button-wrapper) {
     margin-left: 0px;
 }
 
@@ -213,6 +213,6 @@
     width: 150px;
 }
 
-.add-css-page .icon-button-tooltip {
+.add-css-page :global(.icon-buttons_icon-button-tooltip) {
     right: 28px;
 }

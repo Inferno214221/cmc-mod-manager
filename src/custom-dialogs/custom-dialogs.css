@@ -1,4 +1,4 @@
-@import url("../../assets/fonts/fonts.css");
+@import url("../assets/fonts/fonts.css");
 
 body {
     /* My Palette */
@@ -44,7 +44,7 @@ button {
     border-color: black;
     color: inherit;
     font-family: inherit;
-    margin: 5px 0px 10px 0px;
+    margin: 5px 0px 10px 5px;
     box-shadow: 0px 1px #00000088;
 }
 

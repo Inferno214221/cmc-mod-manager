@@ -13,7 +13,7 @@ rules.push({
     loader: "css-loader",
     options: {
         modules: {
-            localIdentName: "[name]_[local]_[hash:base64:5]",
+            localIdentName: "[name]_[local]",
             exportLocalsConvention: "camelCase"
         },
     }

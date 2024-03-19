@@ -18,10 +18,6 @@
     flex-shrink: 0;
 }
 
-.inline-sort-options {
-    display: inline-block;
-}
-
 #sort-type-select {
     margin-left: 5px;
     margin-top: -1px;
@@ -66,7 +62,7 @@
     width: calc(100% - 40px);
 }
 
-.series-display-wrapper .icon-button-wrapper {
+.series-display-wrapper :global(.icon-buttons_icon-button-wrapper) {
     display: inline-block;
     width: 30px;
     margin: 0px 10px 0px 0px;

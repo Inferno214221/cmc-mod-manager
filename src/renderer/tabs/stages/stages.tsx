@@ -133,7 +133,7 @@ export function TabStages({
         <section>
             <div id={styles.sortDiv}>
                 <div className={styles.center}>
-                    <div className={styles.tooltipRrapper + " " + styles.inlineSortOptions}>
+                    <div className={styles.tooltipWrapper + " " + styles.inlineSortOptions}>
                         <input
                             type={"text"}
                             placeholder={"Search"}
@@ -403,7 +403,7 @@ function StageDisplay({
     return (
         <tr className={styles.stageDisplayRow}>
             <td>
-                <div className={styles.stageDisplayRrapper}>
+                <div className={styles.stageDisplayWrapper}>
                     <div className={styles.stageDisplayMug}>
                         <img
                             src={"img://" + stage.icon}
@@ -507,7 +507,7 @@ function SeriesDisplay({
 }): JSX.Element {
     return (
         <tr>
-            <th className={styles.seriesDisplayRrapper}>
+            <th className={styles.seriesDisplayWrapper}>
                 <div className={styles.seriesDisplayName}>
                     <span>{series.toUpperCase()}</span>
                 </div>

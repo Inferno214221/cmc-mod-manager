@@ -84,22 +84,22 @@
     min-width: fit-content;
 }
 
-.sss-page:hover:not(:has(.icon-button-wrapper:hover)),
-.sss-page:hover:not(:has(.icon-button-wrapper:hover)) .sss-page-button {
+.sss-page:hover:not(:has(:global(.icon-buttons_icon-button-wrapper:hover))),
+.sss-page:hover:not(:has(:global(.icon-buttons_icon-button-wrapper:hover))) .sss-page-button {
     background-color: var(--inf-grey3);
 }
 
-.sss-page .icon-button-wrapper {
+.sss-page :global(.icon-buttons_icon-button-wrapper) {
     margin-left: -5px;
     margin-right: 0px;
 }
 
-.sss-page .button-icon {
+.sss-page :global(.icon-buttons_button-icon) {
     padding: 5px;
 }
 
-.sss-page .icon-button-wrapper:hover,
-.sss-page .icon-button-wrapper:hover .button-icon {
+.sss-page :global(.icon-buttons_icon-button-wrapper:hover),
+.sss-page :global(.icon-buttons_icon-button-wrapper:hover) :global(.icon-buttons_button-icon) {
     background-color: var(--inf-grey3);
 }
 
@@ -160,7 +160,7 @@
     text-wrap: nowrap;
 }
 
-.sss-column-header .icon-button-wrapper {
+.sss-column-header :global(.icon-buttons_icon-button-wrapper) {
     margin: -2.5px 0px;
 }
 
@@ -173,7 +173,7 @@
     padding: 0px;
 } */
 
-.sss-row-header .icon-button-wrapper {
+.sss-row-header :global(.icon-buttons_icon-button-wrapper) {
     margin: 0px -5px;
 }
 
@@ -195,7 +195,7 @@
     margin: 2px 0px 0px 2px;
 }
 
-.add-sss-page .icon-button-wrapper {
+.add-sss-page :global(.icon-buttons_icon-button-wrapper) {
     margin-left: 0px;
 }
 
@@ -213,6 +213,6 @@
     width: 150px;
 }
 
-.add-sss-page .icon-button-tooltip {
+.add-sss-page :global(.icon-buttons_icon-button-tooltip) {
     right: 28px;
 }
