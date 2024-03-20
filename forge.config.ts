@@ -70,7 +70,7 @@ const config: ForgeConfig = {
                 config: rendererConfig,
                 entryPoints: [
                     {
-                        html: "./src/renderer/app/app.html",
+                        html: "./src/renderer/renderer.html",
                         js: "./src/renderer/renderer.ts",
                         name: "main_window",
                         preload: {
@@ -78,24 +78,24 @@ const config: ForgeConfig = {
                         },
                     },
                     {
-                        html: "./src/custom-dialogs/alert/alert.html",
-                        js: "./src/custom-dialogs/alert/alert.ts",
+                        html: "./src/custom-dialogs/custom-dialogs.html",
+                        js: "./src/custom-dialogs/alert.tsx",
                         name: "dialog_alert",
                         preload: {
                             js: "./src/custom-dialogs/preload.ts",
                         },
                     },
                     {
-                        html: "./src/custom-dialogs/confirm/confirm.html",
-                        js: "./src/custom-dialogs/confirm/confirm.ts",
+                        html: "./src/custom-dialogs/custom-dialogs.html",
+                        js: "./src/custom-dialogs/confirm.tsx",
                         name: "dialog_confirm",
                         preload: {
                             js: "./src/custom-dialogs/preload.ts",
                         },
                     },
                     {
-                        html: "./src/custom-dialogs/prompt/prompt.html",
-                        js: "./src/custom-dialogs/prompt/prompt.ts",
+                        html: "./src/custom-dialogs/custom-dialogs.html",
+                        js: "./src/custom-dialogs/prompt.tsx",
                         name: "dialog_prompt",
                         preload: {
                             js: "./src/custom-dialogs/preload.ts",

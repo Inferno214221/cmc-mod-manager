@@ -17,4 +17,4 @@ api.on("showNotification", (
             //TODO: throw error
         }
     }
-})
+});
