@@ -14,6 +14,10 @@ function Body(): JSX.Element {
     [AlertOptions, Dispatch<SetStateAction<AlertOptions>>]
     = useState(null);
 
+    const [height, setHeight]:
+    [number, Dispatch<SetStateAction<number>>]
+    = useState(0);
+
     dialog.onStart((options: AlertOptions) => {
         setOptions(options);
     });
@@ -28,11 +32,15 @@ function Body(): JSX.Element {
 
     useEffect(() => {
         window.requestAnimationFrame(() => {
+            if (document.documentElement.getBoundingClientRect().height == height) return;
             console.log(options, document.documentElement.getBoundingClientRect().height);
-            if (options != undefined && options.id != undefined)
+            if (options != undefined && options.id != undefined) {
                 dialog.resize(options.id, document.documentElement.getBoundingClientRect().height);
+                setHeight(document.documentElement.getBoundingClientRect().height);
+            }
         });
     });
+
 
     return (
         <div onKeyUp={(event: any) => {

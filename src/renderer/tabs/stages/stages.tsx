@@ -317,19 +317,19 @@ export function TabStages({
                     <IconButton
                         icon={"delete_sweep"}
                         iconSize={"50px"}
-                        tooltip={"Remove All Characters"}
+                        tooltip={"Remove All Stages"}
                         onClick={() => {console.log("a")}}
                     />
                     <IconButton
                         icon={"drive_file_move"}
                         iconSize={"50px"}
-                        tooltip={"Extract All Characters"}
+                        tooltip={"Extract All Stages"}
                         onClick={() => {console.log("a")}}
                     />
                     {/* <IconButton
                         icon={"folder_zip"}
                         iconSize={"50px"}
-                        tooltip={"Unbin All Characters"}
+                        tooltip={"Unbin All Stages"}
                         onClick={() => {console.log("a")}}
                     /> */}
                     <hr className={styles.vr}/>

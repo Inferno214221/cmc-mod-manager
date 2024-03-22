@@ -14,6 +14,10 @@ function Body(): JSX.Element {
     [ConfirmOptions, Dispatch<SetStateAction<ConfirmOptions>>]
     = useState(null);
 
+    const [height, setHeight]:
+    [number, Dispatch<SetStateAction<number>>]
+    = useState(0);
+
     dialog.onStart((options: ConfirmOptions) => {
         setOptions(options);
     });
@@ -28,9 +32,12 @@ function Body(): JSX.Element {
 
     useEffect(() => {
         window.requestAnimationFrame(() => {
+            if (document.documentElement.getBoundingClientRect().height == height) return;
             console.log(options, document.documentElement.getBoundingClientRect().height);
-            if (options != undefined && options.id != undefined)
+            if (options != undefined && options.id != undefined) {
                 dialog.resize(options.id, document.documentElement.getBoundingClientRect().height);
+                setHeight(document.documentElement.getBoundingClientRect().height);
+            }
         });
     });
 
@@ -39,8 +46,10 @@ function Body(): JSX.Element {
             switch (event.key) {
                 case " ":
                 case "Enter":
-                case "Escape":
                     ok(options.id);
+                    break;
+                case "Escape":
+                    cancel(options.id);
                     break;
             }
         }}>

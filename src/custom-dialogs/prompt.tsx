@@ -14,6 +14,10 @@ function Body(): JSX.Element {
     [PromptOptions, Dispatch<SetStateAction<PromptOptions>>]
     = useState(null);
 
+    const [height, setHeight]:
+    [number, Dispatch<SetStateAction<number>>]
+    = useState(0);
+
     const [inputValue, setInputValue]:
     [string, Dispatch<SetStateAction<string>>]
     = useState("");
@@ -32,19 +36,23 @@ function Body(): JSX.Element {
 
     useEffect(() => {
         window.requestAnimationFrame(() => {
+            if (document.documentElement.getBoundingClientRect().height == height) return;
             console.log(options, document.documentElement.getBoundingClientRect().height);
-            if (options != undefined && options.id != undefined)
+            if (options != undefined && options.id != undefined) {
                 dialog.resize(options.id, document.documentElement.getBoundingClientRect().height);
+                setHeight(document.documentElement.getBoundingClientRect().height);
+            }
         });
     });
 
     return (
         <div onKeyUp={(event: any) => {
             switch (event.key) {
-                case " ":
                 case "Enter":
-                case "Escape":
                     ok(options.id, inputValue);
+                    break;
+                case "Escape":
+                    cancel(options.id);
                     break;
             }
         }}>
@@ -58,6 +66,7 @@ function Body(): JSX.Element {
                 </span>
             </div>
             <input
+                autoFocus
                 type={"text"}
                 placeholder={
                     (options == undefined || options.placeholder == undefined) ?
@@ -66,7 +75,7 @@ function Body(): JSX.Element {
                 }
                 onInput={
                     (options == undefined || options.invalidCharacters == undefined) ?
-                        (() => null) :
+                        ((event: any) => setInputValue(event.target.value)) :
                         ((event: any) => {
                             event.target.value =
                                 event.target.value.replace(options.invalidCharacters, "");
