@@ -26,6 +26,10 @@ import * as characters from "./characters";
 import * as stages from "./stages";
 import * as customDialogs from "./custom-dialogs";
 
+general.loadAppData();
+
+global.gameDir = global.appData.dir;
+
 if (!app.requestSingleInstanceLock()) {
     console.log("No App Single Instance Lock");
     app.exit();

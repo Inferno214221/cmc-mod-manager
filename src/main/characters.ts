@@ -645,6 +645,23 @@ export async function installCharacter(
     }
     general.log(characterDat);
 
+    if (updateCharacters) {
+        if (
+            (
+                fs.existsSync(path.join(correctedDir, "fighter", characterName + ".bin")) ||
+                fs.existsSync(path.join(correctedDir, "fighter", characterName))
+            ) &&
+            (
+                fs.existsSync(path.join(dir, "fighter", characterName + ".bin")) ||
+                fs.existsSync(path.join(dir, "fighter", characterName))
+            )
+        ) {
+            console.log("Removing bin & folder for replacement.");
+            fs.removeSync(path.join(dir, "fighter", characterName + ".bin"));
+            fs.removeSync(path.join(dir, "fighter", characterName));
+        }
+    }
+
     if (filterInstallation) {
         getCharacterFiles(characterDat, false, false, correctedDir).forEach((file: string) => {
             const filePath: string = path.join(correctedDir, file);

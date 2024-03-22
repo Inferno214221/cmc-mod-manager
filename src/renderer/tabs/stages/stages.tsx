@@ -255,7 +255,8 @@ export function TabStages({
                                                 newOperations[operationId].state = OpState.finished;
                                                 newOperations[operationId].body = "Installed " +
                                                     "stage: '" + stage.name + "' from a directory.";
-                                                newOperations[operationId].image = stage.icon;
+                                                newOperations[operationId].image = "img://" +
+                                                    stage.icon;
                                             }
                                             return newOperations;
                                         });
@@ -294,7 +295,8 @@ export function TabStages({
                                                 newOperations[operationId].state = OpState.finished;
                                                 newOperations[operationId].body = "Installed " +
                                                     "stage: '" + stage.name + "' from an archive.";
-                                                newOperations[operationId].image = stage.icon;
+                                                newOperations[operationId].image = "img://" +
+                                                    stage.icon;
                                             }
                                             return newOperations;
                                         });
@@ -546,7 +548,7 @@ function SeriesDisplay({
                             ).then((path: string) => {
                                 setOperations((prev: Operation[]) => {
                                     const newOperations: Operation[] = [...prev];
-                                    newOperations[operationId].image = path;
+                                    newOperations[operationId].image = "img://" + path;
                                     return newOperations;
                                 });
                             });

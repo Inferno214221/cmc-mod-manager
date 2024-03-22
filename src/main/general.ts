@@ -35,21 +35,22 @@ const DEFAULT_CONFIG: AppConfig = {
 };
 
 const DATA_FILE: string = path.join(app.getPath("userData"), "data.json");
-if (!fs.existsSync(DATA_FILE)) {
-    writeAppData({
-        dir: "",
-        config: DEFAULT_CONFIG
-    });
-} else {
-    global.appData = readJSON(DATA_FILE);
-    if (global.appData.config == undefined) {
-        global.appData.config = DEFAULT_CONFIG;
-    }
-    writeAppData(global.appData);
-}
-global.appData = readJSON(DATA_FILE);
 
-global.gameDir = global.appData.dir;
+export function loadAppData(): void {
+    if (!fs.existsSync(DATA_FILE)) {
+        writeAppData({
+            dir: "",
+            config: DEFAULT_CONFIG
+        });
+    } else {
+        global.appData = readJSON(DATA_FILE);
+        if (global.appData.config == undefined) {
+            global.appData.config = DEFAULT_CONFIG;
+        }
+        writeAppData(global.appData);
+    }
+    global.appData = readJSON(DATA_FILE);
+}
 
 export function log(...objs: any[]): void {
     if (!global.appData.config.enableLogs) return;

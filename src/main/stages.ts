@@ -343,6 +343,23 @@ export async function installStage(
         }
     }
 
+    if (updateStages) {
+        if (
+            (
+                fs.existsSync(path.join(correctedDir, "stage", stageName + ".bin")) ||
+                fs.existsSync(path.join(correctedDir, "stage", stageName))
+            ) &&
+            (
+                fs.existsSync(path.join(dir, "stage", stageName + ".bin")) ||
+                fs.existsSync(path.join(dir, "stage", stageName))
+            )
+        ) {
+            console.log("Removing bin & folder for replacement.");
+            fs.removeSync(path.join(dir, "stage", stageName + ".bin"));
+            fs.removeSync(path.join(dir, "stage", stageName));
+        }
+    }
+
     if (filterInstallation) {
         getStageFiles(stage, false, correctedDir).forEach((file: string) => {
             const filePath: string = path.join(correctedDir, file);

@@ -264,7 +264,8 @@ export function TabCharacters({
                                                 newOperations[operationId].body = "Installed " +
                                                     "character: '" + character.name +
                                                     "' from a directory.";
-                                                newOperations[operationId].image = character.mug;
+                                                newOperations[operationId].image = "img://" +
+                                                    character.mug;
                                             }
                                             return newOperations;
                                         });
@@ -305,7 +306,8 @@ export function TabCharacters({
                                                 newOperations[operationId].body = "Installed " +
                                                     "character: '" + character.name +
                                                     "' from an archive.";
-                                                newOperations[operationId].image = character.mug;
+                                                newOperations[operationId].image = "img://" +
+                                                    character.mug;
                                             }
                                             return newOperations;
                                         });
@@ -728,7 +730,7 @@ function SeriesDisplay({
                             ).then((path: string) => {
                                 setOperations((prev: Operation[]) => {
                                     const newOperations: Operation[] = [...prev];
-                                    newOperations[operationId].image = path;
+                                    newOperations[operationId].image = "img://" + path;
                                     return newOperations;
                                 });
                             });
