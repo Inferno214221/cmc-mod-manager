@@ -21,6 +21,10 @@ export default {
         options: AlertOptions
     ]): Promise<void> => ipcRenderer.invoke("alert", args)),
 
+    cancelOperation: ((...args: [
+        id: string
+    ]): Promise<void> => ipcRenderer.invoke("cancelOperation", args)),
+
     checkForUpdates: ((): Promise<void> => ipcRenderer.invoke("checkForUpdates")),
 
     confirm: ((...args: [

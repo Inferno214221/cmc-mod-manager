@@ -10,6 +10,7 @@ import ToggleIconButton from "../icon-buttons/toggle-icon-button";
 import missing from "../../assets/missing.png";
 import { OpDep, OpState } from "../../global/global";
 import styles from "./app.css";
+import IconButton from "../icon-buttons/icon-button";
 
 let root: Root;
 let activeTab: Tab = null;
@@ -271,28 +272,50 @@ export function OperationPanel({
 export function OperationDisplay({ display }: { display: Operation }): JSX.Element {
     let icon: string = display.icon;
     let classes: string = styles.matIcon;
-    if (display.state == OpState.started) {
-        classes += " " + styles[ANIMATIONS[display.animation]];
-    } else {
-        switch (display.state) {
-            case (OpState.queued):
-                icon = "pending";
-                break;
-            case (OpState.finished):
-                icon = "done";
-                break;
-            case (OpState.canceled):
-                icon = "close";
-                break;
-            case (OpState.error):
-                icon = "error_outline";
-                break;
-        }
+    let closeButton: JSX.Element = null;
+    switch (display.state) {
+        case (OpState.started):
+            classes += " " + styles[ANIMATIONS[display.animation]];
+            if (display.cancelable) {
+                closeButton = (
+                    <IconButton
+                        icon={"close"}
+                        iconSize={"16px"}
+                        tooltip={"Cancel Operation"}
+                        onClick={() => api.cancelOperation(display.id)}
+                    />
+                );
+            }
+            break
+        case (OpState.queued):
+            icon = "pending";
+            closeButton = (
+                <IconButton
+                    icon={"close"}
+                    iconSize={"16px"}
+                    tooltip={"Cancel Operation"}
+                    onClick={() => display.state = OpState.canceled}
+                    // Pass by reference moment
+                />
+            );
+            break;
+        case (OpState.finished):
+            icon = "done";
+            break;
+        case (OpState.canceled):
+            icon = "block";
+            break;
+        case (OpState.error):
+            icon = "error_outline";
+            break;
     }
 
     return (
         <div className={styles.operationDisplay}>
-            <h3>{display.title}</h3>
+            <div className={styles.operationDisplayTitle}>
+                <h3>{display.title}</h3>
+                {closeButton}
+            </div>
             <div className={styles.operationDisplayInfo}>
                 {display.image == null ? null :
                     <img

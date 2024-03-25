@@ -377,6 +377,24 @@ hr.vr {
     height: 30px;
 }
 
+.operation-display-title {
+    display: flex;
+    flex-wrap: nowrap;
+    width: 100%;
+}
+
+.operation-display-title h3 {
+    flex: 1;
+}
+
+.operation-display-title :global(.icon-buttons_icon-button-wrapper) {
+    margin: 0px;  
+}
+
+.operation-display-title :global(.icon-buttons_icon-button-tooltip) {
+    right: 18px;
+}
+
 .operation-display-info {
     display: flex;
     flex-direction: row;

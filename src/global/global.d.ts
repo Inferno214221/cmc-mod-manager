@@ -12,6 +12,7 @@ declare const global: {
     temp: string,
     confirmedClose: boolean,
     updateOnExit: boolean
+    cancelFunctions: { [id: string]: () => void }
 };
 
 interface Character {
@@ -130,7 +131,8 @@ interface Operation {
     icon: string,
     animation: number,
     dependencies: OpDep[],
-    call: (() => Promise<void>) | MainCall
+    call: (() => Promise<void>) | MainCall,
+    cancelable?: boolean
 }
 
 interface OperationUpdate {
@@ -138,7 +140,8 @@ interface OperationUpdate {
     title?: string,
     body?: string,
     image?: string,
-    state?: OpState
+    state?: OpState,
+    cancelable?: boolean
 }
 
 interface MainCall {

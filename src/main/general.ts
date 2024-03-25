@@ -383,13 +383,32 @@ export async function downloadMod(url: string, modId: string, id: string): Promi
                 });
 
                 const downloadStream: fs.WriteStream = fs.createWriteStream(filePath);
-                request.get(
+                let canceled: boolean = false;
+                const req: any = request.get(
                     res.request.uri.href
-                ).on("error", (error: Error) => {
+                ).on("error", (error: Error & { code: string }) => {
                     downloadStream.close();
+                    if (canceled) return;
                     throw error;
-                }).pipe(downloadStream).on("close", async () => {
-                    if (downloadStream.errored) return;
+                });
+
+                global.cancelFunctions[id + "_download"] = (() => {
+                    req.abort();
+                    canceled = true;
+                    global.win.webContents.send("updateOperation", {
+                        id: id + "_download",
+                        state: OpState.canceled,
+                    });
+                    delete global.cancelFunctions[id + "_download"];
+                });
+                global.win.webContents.send("updateOperation", {
+                    id: id + "_download",
+                    cancelable: true,
+                });
+
+                req.pipe(downloadStream).on("close", async () => {
+                    delete global.cancelFunctions[id + "_download"];
+                    if (downloadStream.errored || canceled) return;
                     const output: string = await extractArchive(filePath, global.temp);
                     fs.removeSync(filePath);                    
                     global.win.webContents.send("updateOperation", {
@@ -501,6 +520,11 @@ export async function getOperations(): Promise<Operation[]> {
     });
 }
 
+export function cancelOperation(id: string): void {
+    if (id == undefined || global.cancelFunctions[id] == undefined) return;
+    return global.cancelFunctions[id]();
+}
+
 export function getGameDir(): string {
     return global.gameDir;
 }
@@ -534,7 +558,7 @@ export async function selectGameDir(): Promise<string | null> {
         properties: ["openDirectory"]
     });
     if (dir.canceled == true) {
-        log("Select Game Dir - Exit: Selection Cancelled");
+        log("Select Game Dir - Exit: Selection Canceled");
         return null;
     }
     if (!await isValidGameDir(dir.filePaths[0])) {

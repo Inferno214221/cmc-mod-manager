@@ -468,7 +468,7 @@ export async function installCharacterDir(
         properties: ["openDirectory"]
     });
     if (selected.canceled == true) {
-        general.log("Install Character Dir - Exit: Selection Cancelled");
+        general.log("Install Character Dir - Exit: Selection Canceled");
         return null;
     }
     const retVal: Character =
@@ -487,7 +487,7 @@ export async function installCharacterArchive(
         properties: ["openFile"]
     });
     if (selected.canceled == true) {
-        general.log("Install Character Archive - Exit: Selection Cancelled");
+        general.log("Install Character Archive - Exit: Selection Canceled");
         return null;
     }
     const output: string = await general.extractArchive(

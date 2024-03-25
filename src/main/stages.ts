@@ -179,7 +179,7 @@ export async function installStageDir(
         properties: ["openDirectory"]
     });
     if (selected.canceled == true) {
-        general.log("Install Stage Dir - Exit: Selection Cancelled");
+        general.log("Install Stage Dir - Exit: Selection Canceled");
         return null;
     }
     const retVal: Stage | null =
@@ -198,7 +198,7 @@ export async function installStageArchive(
         properties: ["openFile"]
     });
     if (selected.canceled == true) {
-        general.log("Install Stage Archive - Exit: Selection Cancelled");
+        general.log("Install Stage Archive - Exit: Selection Canceled");
         return null;
     }
     const output: string = await general.extractArchive(

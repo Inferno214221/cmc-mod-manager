@@ -20,6 +20,7 @@ global.appDir = app.isPackaged ?
 global.temp = path.join(app.getPath("temp"), "cmc-mod-manager");
 global.confirmedClose = false;
 global.updateOnExit = false;
+global.cancelFunctions = {};
 
 import * as general from "./general";
 import * as characters from "./characters";
@@ -110,7 +111,7 @@ function createWindow(): void {
                 id: "closeUnfinishedOperations",
                 title: "CMC Mod Manager | Unfinished Operations",
                 body: "Are you sure you want to close CMC Mod Manager? Some operations are " +
-                    "unfinished and will be cancelled if you close (or reload) the program.",
+                    "unfinished and will be canceled if you close (or reload) the program.",
                 okLabel: "Close Anyway",
                 cancelLabel: "Cancel"
             }))) {
