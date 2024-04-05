@@ -9,6 +9,7 @@ const extract = require("extract-zip");
 const unrar = require("node-unrar-js");
 const prompt = require("native-prompt");
 const ini = require("ini");
+const semver = require("semver");
 var win;
 var updateOnExit = false;
 
@@ -171,35 +172,38 @@ function checkUpdates() {
         res.on("data", (data) => {
             result += data;
         });
-        res.on("end", () => {
+        res.on("end", async () => {
             result = JSON.parse(result);
-            let latest = result.tag_name.replace("v", "").split(".");
-            let current = app.getVersion().split(".");
-            // if (result.tag_name != "v" + app.getVersion()) {
+            let latest = result.tag_name;
+            let current = app.getVersion();
             console.log(latest, current);
             if (
-                result != undefined && (
-                    (
-                        parseInt(latest[0]) > parseInt(current[0])
-                    ) ||
-                    (
-                        parseInt(latest[0]) == parseInt(current[0]) &&
-                        parseInt(latest[1]) > parseInt(current[1])
-                    ) ||
-                    (
-                        parseInt(latest[0]) == parseInt(current[0]) &&
-                        parseInt(latest[1]) == parseInt(current[1]) &&
-                        parseInt(latest[2]) > parseInt(current[2])
-                    )
-                )
+                result != undefined && semver.gt(latest, current)
             ) {
+                if (semver.prerelease(latest)) {
+                    if (!semver.prerelease(current)) {
+                        if (!(await dialog.showMessageBox({
+                            message: "A beta update is available: This new version does not yet \
+contain functionality for character or stage porting, nor the ability to complete bulk operations \
+on characters or stages. However, this new version has a much more polished UI, should reduce \
+the frequency of errors that occur within the program and incorperates one-click installation \
+better. If you would like to try the beta rather than installing it over this version, a copy can \
+be installed from GitHub or GameBanana.",
+                            checkboxLabel: "Update this installation to the beta version?",
+                            checkboxChecked: false
+                        })).checkboxChecked) return;
+                        console.log("here");
+                        downloadUpdate(latest);
+                        return;
+                    }
+                }
                 dialog.showMessageBox({
                     message: "Update required: This update will be installed automatically, \
 please do not close the program. When finished, the program will close and need to be \
 launched again manually.",
                 });
                 console.log("Update required.");
-                downloadUpdate(result.tag_name);
+                downloadUpdate(latest);
             } else {
                 console.log("No update required.");
             }

@@ -28,6 +28,7 @@
     "ini": "^4.1.1",
     "native-prompt": "^2.1.4",
     "request": "^2.88.2",
+    "semver": "^7.6.0",
     "strftime": "^0.10.2",
     "unrar-promise": "^3.1.0"
   }
