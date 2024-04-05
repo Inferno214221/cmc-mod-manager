@@ -81,8 +81,6 @@ interface DndData {
 interface AppConfig {
     enableLogs: boolean,
     altsAsCharacters: boolean,
-    useUnbinner: boolean,
-    moveBins: boolean,
     filterCharacterInstallation: boolean,
     updateCharacters: boolean,
     filterStageInstallation: boolean,

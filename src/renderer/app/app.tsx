@@ -180,8 +180,8 @@ export function Nav(): JSX.Element {
             <hr/>
             <NavTab info={STAGES}/>
             <NavTab info={STAGE_SELECTION_SCREEN}/>
-            <hr/>
-            <NavTab info={SETTINGS}/>
+            {/* <hr/>
+            <NavTab info={SETTINGS}/> */}
             <div className={styles.flexFill}/>
             <NavButton info={CHANGE_DIR}/>
             <NavButton info={OPEN_DIR}/>

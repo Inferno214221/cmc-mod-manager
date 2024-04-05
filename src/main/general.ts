@@ -26,8 +26,6 @@ const SUPPORTED_VERSIONS: string[] = [
 const DEFAULT_CONFIG: AppConfig = {
     enableLogs: false,
     altsAsCharacters: true,
-    useUnbinner: false,
-    moveBins: false,
     filterCharacterInstallation: true,
     updateCharacters: false,
     filterStageInstallation: true,
@@ -46,6 +44,12 @@ export function loadAppData(): void {
         global.appData = readJSON(DATA_FILE);
         if (global.appData.config == undefined) {
             global.appData.config = DEFAULT_CONFIG;
+        } else {
+            Object.keys(DEFAULT_CONFIG).forEach((key: keyof AppConfig) => {
+                if (global.appData.config[key] == undefined) {
+                    global.appData.config[key] = DEFAULT_CONFIG[key];
+                }
+            });
         }
         writeAppData(global.appData);
     }
@@ -137,7 +141,6 @@ export async function extractArchive(archive: string, destination: string): Prom
 
 export async function checkForUpdates(): Promise<void> {
     const currentVersion: string = semver.clean(app.getVersion());
-    // const currentVersion: string = semver.clean("v2.3.0");
     request.get("https://api.github.com/repos/Inferno214221/cmc-mod-manager/releases/latest", {
         headers: {
             "Accept": "application/vnd.github.v3+json",
@@ -149,6 +152,11 @@ export async function checkForUpdates(): Promise<void> {
         console.log("Latest Version: " + latestVersion);
         const id: string = new Date().getTime() + "_downloadUpdate";
         if (semver.lt(currentVersion, latestVersion)) {
+            if (semver.prerelease(latestVersion)) {
+                if (!semver.prerelease(currentVersion)) {
+                    return;
+                }
+            }
             global.win.webContents.send("addOperation", {
                 id: id,
                 title: "Download Update",

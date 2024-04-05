@@ -210,7 +210,8 @@ label {
 }
 
 h1,
-h2 {
+h2,
+h3 {
     display: inline-block;
     vertical-align: middle;
 }

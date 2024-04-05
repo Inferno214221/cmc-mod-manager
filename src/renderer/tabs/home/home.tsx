@@ -8,7 +8,7 @@ import {
     CHARACTERS,
     CHARACTER_SELECTION_SCREEN,
     // PORT_CHARACTERS,
-    SETTINGS,
+    // SETTINGS,
     STAGES,
     STAGE_SELECTION_SCREEN,
     Tab,
@@ -56,6 +56,7 @@ export function TabHome(): JSX.Element {
                     <div className={styles.center + " " + styles.marginVertical}>
                         <img src={cmcmm} id={styles.cmcmmIcon} draggable={false}/>
                         <h1>CMC Mod Manager</h1>
+                        <h3>(v3.0.0-beta)</h3>
                     </div>
                     <div className={styles.center} id={styles.byDiv}>
                         <h2>By</h2>
@@ -126,10 +127,10 @@ export function TabHome(): JSX.Element {
                             tab={STAGE_SELECTION_SCREEN}
                             desc={"Modify CMC+'s stage selection screen."}
                         />
-                        <TabButton
+                        {/* <TabButton
                             tab={SETTINGS}
                             desc={"Configure the program and enable optional features."}
-                        />
+                        /> */}
                     </div>
                     {/* </div> */}
                 </div>

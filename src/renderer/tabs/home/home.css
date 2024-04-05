@@ -61,6 +61,10 @@
     margin: 0px 0px 0px 5px;
 }
 
+#about-div h3 {
+    margin: 0px 15px 0px 5px;
+}
+
 .margin-vertical {
     margin-top: 10px;
     margin-bottom: 10px;
