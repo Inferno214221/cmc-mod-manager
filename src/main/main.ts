@@ -13,7 +13,6 @@ global.win = null;
 global.gameDir = "";
 global.log = "";
 global.appData = null;
-// if (path.parse(app.getPath("exe")).name == "electron") {
 global.appDir = app.isPackaged ?
     path.parse(app.getPath("exe")).dir :
     path.join(path.parse(app.getPath("exe")).dir, "..", "..", "..");
