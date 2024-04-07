@@ -141,14 +141,22 @@ export async function extractArchive(archive: string, destination: string): Prom
 
 export async function checkForUpdates(): Promise<void> {
     const currentVersion: string = semver.clean(app.getVersion());
-    request.get("https://api.github.com/repos/Inferno214221/cmc-mod-manager/releases/latest", {
+    request.get("https://api.github.com/repos/Inferno214221/cmc-mod-manager/releases", {
         headers: {
             "Accept": "application/vnd.github.v3+json",
             "User-Agent": "CMC-Mod-Manager",
         }
     }, async (error: any, res: http.IncomingMessage, body: string) => {
         if (error != null) return;
-        const latestVersion: string = semver.clean(JSON.parse(body).tag_name);
+        const releases: any[] = JSON.parse(body).toSorted((a: any, b: any) => {
+            if (!semver.valid(a.tag_name)) {
+                return 1;
+            } else if (!semver.valid(b.tag_name)) {
+                return -1;
+            }
+            return (semver.gte(a.tag_name, b.tag_name) ? -1 : 1);
+        });
+        const latestVersion: string = semver.clean(releases[0].tag_name);
         console.log("Latest Version: " + latestVersion);
         const id: string = new Date().getTime() + "_downloadUpdate";
         if (semver.lt(currentVersion, latestVersion)) {
@@ -167,7 +175,7 @@ export async function checkForUpdates(): Promise<void> {
                 dependencies: [],
                 call: {
                     name: "downloadUpdate",
-                    args: [JSON.parse(body).tag_name, id]
+                    args: [releases[0].tag_name, id]
                 }
             });
             return;
