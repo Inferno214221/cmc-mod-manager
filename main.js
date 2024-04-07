@@ -161,7 +161,7 @@ if (!app.requestSingleInstanceLock()) {
 }
 
 function checkUpdates() {
-    https.get("https://api.github.com/repos/Inferno214221/cmc-mod-manager/releases/latest", {
+    https.get("https://api.github.com/repos/Inferno214221/cmc-mod-manager/releases", {
         headers: {
             "Accept": "application/vnd.github.v3+json",
             "User-Agent": "CMC-Mod-Manager",
@@ -174,11 +174,19 @@ function checkUpdates() {
         });
         res.on("end", async () => {
             result = JSON.parse(result);
-            let latest = result.tag_name;
+            let releases = result.toSorted((a, b) => {
+                if (!semver.valid(a.tag_name)) {
+                    return 1;
+                } else if (!semver.valid(b.tag_name)) {
+                    return -1;
+                }
+                return (semver.gte(a.tag_name, b.tag_name) ? -1 : 1);
+            });
+            let latest = releases[0].tag_name;
             let current = app.getVersion();
             console.log(latest, current);
             if (
-                result != undefined && semver.gt(latest, current)
+                releases[0] != undefined && semver.gt(latest, current)
             ) {
                 if (semver.prerelease(latest)) {
                     if (!semver.prerelease(current)) {
