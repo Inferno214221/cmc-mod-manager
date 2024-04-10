@@ -80,6 +80,7 @@ export function readCharacterList(dir: string = global.gameDir): CharacterList {
                 mug: path.join(dir, "gfx", "mugs", character + ".png")
             });
         }
+        //TODO: else error
     });
     const lockedTxt: string[] = fs.readFileSync(
         path.join(dir, "data", "fighter_lock.txt"),
@@ -87,7 +88,7 @@ export function readCharacterList(dir: string = global.gameDir): CharacterList {
     ).split(/\r?\n/);
     lockedTxt.shift();
     lockedTxt.forEach((locked: string) => {
-        if (locked == "") return;
+        if (characterList.getCharacterByName(locked) == undefined) return;
         characterList.updateCharacterByName(locked, { randomSelection: false });
     });
     // general.log("Read Character List - Return:", characters);

@@ -53,7 +53,7 @@ function readStageList(dir: string = global.gameDir): StageList {
     ).split(/\r?\n/);
     lockedTxt.shift();
     lockedTxt.forEach((locked: string) => {
-        if (locked == "") return;
+        if (stageList.getStageByName(locked) == undefined) return;
         stageList.updateStageByName(locked, { randomSelection: false });
     });
     general.log("Read Stage List - Return:", stageList);
