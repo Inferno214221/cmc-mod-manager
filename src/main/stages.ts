@@ -279,7 +279,7 @@ export async function installStage(
             body: "Because of CMC+'s current modding format, you will be required to enter some " +
                 "information about the stage you are installing. This information can usually be " +
                 "found in a txt file in the mod's top level directory. (If such a txt file " +
-                "exists and contains four lines, the first one likely is unessecary.)",
+                "exists and contains four lines, the first one likely is unnecessary.)",
             okLabel: "Continue"
         }))) {
             return null;

@@ -212,7 +212,7 @@ export async function downloadUpdate(tagName: string, id: string): Promise<void>
         .on("error", (error: Error) => {
             console.log(error);
             targetStream.close();
-            throw new Error("A stream error occured: \"" + error.message + "\"");
+            throw new Error("A stream error occurred: \"" + error.message + "\"");
         }).on("response", (res: request.Response) => {
             const downloadSize: number = parseInt(res.headers["content-length"]);
             updateDownloadProgress(
