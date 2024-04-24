@@ -188,9 +188,11 @@ export async function downloadUpdate(tagName: string, id: string): Promise<void>
         id: "confirmUpdate",
         title: "CMC Mod Manager | Program Update",
         body: "CMC Mod Manager requires an update. This update will now be installed " +
-            "automatically.",
+            "automatically. This update will remove all files within CMC Mod Manager's " +
+            "directory, if this is problematic, please cancel this update and remove any " +
+            "affected files.",
         okLabel: "Continue"
-    }))) {
+    })) || await dirContainedWithinSelf()) {
         global.win.webContents.send("updateOperation", {
             id: id,
             state: OpState.canceled
@@ -564,8 +566,24 @@ export function getGameVersion(
     return null;
 }
 
+export async function dirContainedWithinSelf(dir: string = global.gameDir): Promise<boolean> {
+    const relativePath: string = path.relative(global.appDir, path.resolve(dir));
+    if (!relativePath || (!relativePath.startsWith("..") && !path.isAbsolute(relativePath))) {
+        customDialogs.alert({
+            id: "modManagerContainedDirWarning",
+            body: "The selected game directory is contained within CMC Mod Manager's own " +
+                "directory. CMC Mod Manager deletes all files within this directory when " +
+                "updating, so it cannot be used to store your game files, please move them to " +
+                "a different location.",
+            title: "Invalid Game Location Warning",
+        });
+        return true;
+    }
+    return false;
+}
+
 export async function isValidGameDir(dir: string = global.gameDir): Promise<boolean> {
-    return (dir != null && getGameVersion(dir) != null);
+    return (dir == null || getGameVersion(dir) != null || !await dirContainedWithinSelf(dir));
 }
 
 export async function selectGameDir(): Promise<string | null> {
