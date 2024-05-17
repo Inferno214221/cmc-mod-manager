@@ -5,7 +5,7 @@ import {
 const DEV_TOOLS_ENABLED: boolean = false;
 
 const WINDOW_OPTIONS: BrowserWindowConstructorOptions = {
-    resizable: DEV_TOOLS_ENABLED,
+    resizable: true,
     modal: true,
     autoHideMenuBar: true,
     minimizable: false,

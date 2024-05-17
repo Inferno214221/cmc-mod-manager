@@ -395,8 +395,6 @@ export async function callQueuedOperations(
         if (typeof operation.call == "function") {
             await operation.call();
         } else {
-            /* // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore: expression of type 'string' can't be used to index type */
             if (api[operation.call.name] != undefined) {
                 await api[operation.call.name](...operation.call.args);
             } else {
