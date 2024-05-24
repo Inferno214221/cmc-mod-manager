@@ -59,7 +59,6 @@ export function readCharacters(dir: string = global.gameDir): Character[] {
 }
 
 export function readCharacterList(dir: string = global.gameDir): CharacterList {
-    // general.log("Read Character List - Start:", dir);
     const alts: Alt[] = readAlts(dir);
     const characterList: CharacterList = new CharacterList();
     const charactersTxt: string[] = fs.readFileSync(
@@ -80,7 +79,7 @@ export function readCharacterList(dir: string = global.gameDir): CharacterList {
                 mug: path.join(dir, "gfx", "mugs", character + ".png")
             });
         }
-        //TODO: else error
+        // TODO: else error quietly
     });
     const lockedTxt: string[] = fs.readFileSync(
         path.join(dir, "data", "fighter_lock.txt"),
@@ -91,7 +90,6 @@ export function readCharacterList(dir: string = global.gameDir): CharacterList {
         if (characterList.getCharacterByName(locked) == undefined) return;
         characterList.updateCharacterByName(locked, { randomSelection: false });
     });
-    // general.log("Read Character List - Return:", characters);
     return characterList;
 }
 
@@ -99,7 +97,6 @@ export async function writeCharacters(
     characters: Character[],
     dir: string = global.gameDir
 ): Promise<void> {
-    general.log("Write Characters - Start:", characters, dir);
     characters.sort((a: Character, b: Character) =>
         (a.number > b.number ? 1 : -1)
     );
@@ -112,7 +109,6 @@ export async function writeCharacters(
         output,
         { encoding: "ascii" }
     );
-    general.log("Write Characters - Return");
     return;
 }
 
@@ -121,7 +117,6 @@ export async function writeCharacterRandom(
     randomSelection: boolean,
     dir: string = global.gameDir
 ): Promise<void> {
-    general.log("Write Character Random - Start:", character, randomSelection, dir);
     let lockedTxt: string[] = fs.readFileSync(
         path.join(dir, "data", "fighter_lock.txt"),
         "ascii"
@@ -139,12 +134,10 @@ export async function writeCharacterRandom(
         output,
         { encoding: "ascii" }
     );
-    general.log("Write Character Random - Return");
     return;
 }
 
 export function readAlts(dir: string = global.gameDir): Alt[] {
-    general.log("Read Alts - Start:", dir);
     const altsTxt: string[] = fs.readFileSync(
         path.join(dir, "data", "alts.txt"),
         "ascii"
@@ -161,13 +154,11 @@ export function readAlts(dir: string = global.gameDir): Alt[] {
             mug: path.join(dir, "gfx", "mugs", altsTxt[(alt * 5) + 2] + ".png")
         });
     }
-    general.log("Read Alts - Return:", alts);
     return alts;
 }
 
 export async function writeAlts(alts: Alt[], dir: string = global.gameDir): Promise<void> {
-    general.log("Write Alts - Start:", alts, dir);
-    //TODO: verify alt numbers
+    // TODO: verify alt numbers
     const output: string = [
         alts.length,
         alts.map((alt: Alt) =>
@@ -185,7 +176,6 @@ export async function writeAlts(alts: Alt[], dir: string = global.gameDir): Prom
         output,
         { encoding: "ascii" }
     );
-    general.log("Write Alts - Return");
     return;
 }
 
@@ -194,7 +184,6 @@ export async function addAlt(
     newAlt: Character,
     dir: string = global.gameDir
 ): Promise<void> {
-    general.log("Add Alt - Start:", base, newAlt, dir);
     const toResolve: Promise<void>[] = [];
     const alts: Alt[] = readAlts(dir);
     let altNumber: number = 1;
@@ -212,7 +201,6 @@ export async function addAlt(
     });
     await writeAlts(alts, dir);
     if (global.appData.config.altsAsCharacters) {
-        general.log("Add Alt - Return: Alt Remains A Character");
         return;
     }
     const characterList: CharacterList = readCharacterList(dir);
@@ -221,7 +209,6 @@ export async function addAlt(
     toResolve.push(removeCharacterCss(newAlt, dir));
     toResolve.push(writeCharacterRandom(newAlt.name, true, dir));
     await Promise.allSettled(toResolve);
-    general.log("Add Alt - Return: Alt Is No Longer A Character");
     return;
 }
 
@@ -230,7 +217,6 @@ export async function removeAlt(
     ensureAccessible: boolean = true,
     dir: string = global.gameDir
 ): Promise<void> {
-    general.log("Remove Alt - Start:", alt, ensureAccessible, dir);
     const alts: Alt[] = readAlts(dir).filter((i: Alt) => !(
         i.base == alt.base &&
         i.alt == alt.alt &&
@@ -245,15 +231,12 @@ export async function removeAlt(
     if (ensureAccessible) {
         await ensureAltIsCharacter(alt, dir);
     }
-    general.log("Remove Alt - Return");
     return;
 }
 
 export async function ensureAltIsCharacter(alt: Alt, dir: string = global.gameDir): Promise<void> {
-    general.log("Ensure Alt Is Character - Start:", alt, dir);
     const characterList: CharacterList = readCharacterList(dir);
     if (characterList.getCharacterByName(alt.alt) != undefined) {
-        general.log("Ensure Alt Is Character - Exit: Character Already Exists");
         return;
     }
 
@@ -270,7 +253,6 @@ export async function ensureAltIsCharacter(alt: Alt, dir: string = global.gameDi
     });
 
     await writeCharacters(characterList.getAllCharacters(), dir);
-    general.log("Ensure Alt Is Character - Return");
     return;
 }
 
@@ -278,18 +260,15 @@ export async function ensureAltIsntCharacter(
     alt: Alt,
     dir: string = global.gameDir
 ): Promise<void> {
-    general.log("Ensure Alt Isn't Character - Start:", alt, dir);
     const toResolve: Promise<void>[] = [];
     const characterList: CharacterList = readCharacterList(dir);
     if (characterList.getCharacterByName(alt.alt) == undefined) {
-        general.log("Ensure Alt Isn't Character - Exit: No Character Found");
         return;
     }
     characterList.removeCharacterByName(alt.alt);
     toResolve.push(writeCharacters(characterList.getAllCharacters(), dir));
     toResolve.push(writeCharacterRandom(alt.alt, true, dir));
     await Promise.allSettled(toResolve);
-    general.log("Ensure Alt Isn't Character - Return");
     return;
 }
 
@@ -297,7 +276,6 @@ export async function ensureAllAltsAreCharacters(
     areCharacters: boolean,
     dir: string = global.gameDir
 ): Promise<void> {
-    general.log("Ensure All Alts Are? Characters - Start:", dir);
     const alts: Alt[] = readAlts(dir);
     for (const alt of alts) {
         console.log(alt);
@@ -307,7 +285,6 @@ export async function ensureAllAltsAreCharacters(
             await ensureAltIsntCharacter(alt, dir);
         }
     }
-    general.log("Ensure All Alts Are? Characters - Return");
     return;
 }
 
@@ -315,7 +292,6 @@ export async function removeAllAlts(
     character: Character,
     dir: string = global.gameDir
 ): Promise<void> {
-    general.log("Remove All Alts - Start:", character, dir);
     // remove each of character's alts
     while (character.alts.length > 0) {
         await removeAlt(character.alts[0], true, dir);
@@ -333,7 +309,6 @@ export async function removeAllAlts(
     )) {
         await removeAlt(alt, false, dir);
     }
-    general.log("Remove All Alts - Return");
     return;
 }
 
@@ -345,7 +320,6 @@ export function readCharacterDatPath(
     datPath: string,
     character: string = path.parse(datPath).name
 ): CharacterDat | null {
-    // general.log("Read Character Dat Path - Start:", datPath, character);
     if (!fs.existsSync(datPath)) return null;
     const characterDatTxt: string[] = fs.readFileSync(
         datPath,
@@ -421,12 +395,10 @@ export function readCharacterDatPath(
         randomDatas: randomDatas,
         palettes: palettes
     };
-    // general.log("Read Character Dat Path - Return:", characterDat);
     return characterDat;
 }
 
 export async function writeCharacterDat(dat: CharacterDat, destination: string): Promise<void> {
-    general.log("Write Character Dat - Start:", dat, destination);
     let output: string = [
         dat.displayName,
         dat.menuName,
@@ -455,7 +427,6 @@ export async function writeCharacterDat(dat: CharacterDat, destination: string):
     });
     fs.ensureFileSync(path.join(destination, dat.name + ".dat"));
     fs.writeFileSync(path.join(destination, dat.name + ".dat"), output, { encoding: "ascii" });
-    general.log("Write Character Dat - Return");
     return;
 }
 
@@ -464,17 +435,14 @@ export async function installCharacterDir(
     updateCharacters: boolean,
     dir: string = global.gameDir
 ): Promise<Character> {
-    general.log("Install Character Dir - Start:", filterInstallation, updateCharacters, dir);
     const selected: OpenDialogReturnValue = await dialog.showOpenDialog(global.win, {
         properties: ["openDirectory"]
     });
     if (selected.canceled == true) {
-        general.log("Install Character Dir - Exit: Selection Canceled");
         return null;
     }
     const retVal: Character =
         await installCharacter(selected.filePaths[0], filterInstallation, updateCharacters, dir);
-    general.log("Install Character Dir - Return:", retVal);
     return retVal;
 }
 
@@ -483,22 +451,18 @@ export async function installCharacterArchive(
     updateCharacters: boolean,
     dir: string = global.gameDir
 ): Promise<Character> {
-    general.log("Install Character Archive - Start:", filterInstallation, updateCharacters, dir);
     const selected: OpenDialogReturnValue = await dialog.showOpenDialog(global.win, {
         properties: ["openFile"]
     });
     if (selected.canceled == true) {
-        general.log("Install Character Archive - Exit: Selection Canceled");
         return null;
     }
     const output: string = await general.extractArchive(
         selected.filePaths[0],
         global.temp
     );
-    general.log(output, filterInstallation);
     const retVal: Character =
         await installCharacter(output, filterInstallation, updateCharacters, dir);
-    general.log("Install Character Archive - Return:", retVal);
     return retVal;
 }
 
@@ -508,8 +472,6 @@ export async function installCharacter(
     updateCharacters: boolean = false,
     dir: string = global.gameDir
 ): Promise<Character> {
-    general.log("Install Character - Start:",
-        characterDir, filterInstallation, updateCharacters, dir);
     const toResolve: Promise<void>[] = [];
     let correctedDir: string = characterDir;
     console.log(correctedDir);
@@ -538,20 +500,14 @@ export async function installCharacter(
     }
     console.log(correctedDir, fs.readdirSync(correctedDir));
     if (!fs.readdirSync(correctedDir).includes("fighter")) {
-        general.log("Install Character - Exit: No Fighter Directory");
         throw new Error("No 'fighter' subdirectory found.");
     }
-    general.log(correctedDir);
-
     const characterName: string = fs.readdirSync(path.join(correctedDir, "fighter"))
         .filter((file: string) =>
             file.endsWith(".bin") || !file.includes(".")
         )[0].split(".")[0];
-    general.log(characterName);
-
     const characters: CharacterList = readCharacterList(dir);
     if (!updateCharacters && characters.getCharacterByName(characterName) != undefined) {
-        general.log("Install Character - Exit: Character Already Installed");
         throw new Error("Character already installed, updates disabled.");
     }
 
@@ -567,7 +523,6 @@ export async function installCharacter(
             characterName
         );
     } else {
-        general.log("Install Character - Exit: No Dat File");
         throw new Error("No dat file found.");
     }
 
@@ -644,8 +599,6 @@ export async function installCharacter(
             if (characterDat.series == undefined) return null;
         }
     }
-    general.log(characterDat);
-
     if (updateCharacters) {
         if (
             (
@@ -669,7 +622,6 @@ export async function installCharacter(
             const targetPath: string = path.join(dir, file);
             fs.ensureDirSync(path.parse(targetPath).dir);
             if (!updateCharacters && fs.existsSync(targetPath)) return;
-            general.log("Copying: " + filePath);
             toResolve.push(
                 fs.copy(
                     filePath,
@@ -679,7 +631,6 @@ export async function installCharacter(
             );
         });
     } else {
-        general.log("Copying: All Files");
         toResolve.push(fs.copy(correctedDir, dir, { overwrite: true }));
     }
 
@@ -699,13 +650,11 @@ export async function installCharacter(
     };
 
     if (characters.getCharacterByName(characterName) != undefined) {
-        general.log("Install Character - Return: Character Already In List:", character);
         return character;
     }
     characters.addCharacter(character);
     toResolve.push(writeCharacters(characters.getAllCharacters(), dir));
     await Promise.allSettled(toResolve);
-    general.log("Install Character - Return:", character);
     return character;
 }
 
@@ -738,7 +687,6 @@ export async function extractCharacter(
     extract: string,
     dir: string = global.gameDir
 ): Promise<void> {
-    general.log("Extract Character - Start:", extract, dir);
     const toResolve: Promise<void>[] = [];
     const characters: Character[] = readCharacters(dir);
     const similarNames: string[] = [];
@@ -755,7 +703,6 @@ export async function extractCharacter(
         const filePath: string = path.join(dir, file);
         const targetPath: string = path.join(extractDir, file);
         fs.ensureDirSync(path.parse(targetPath).dir);
-        general.log("Extracting: " + filePath);
         toResolve.push(
             fs.copy(
                 filePath,
@@ -771,12 +718,10 @@ export async function extractCharacter(
         path.join(extractDir, "data", "dats")
     ));
     await Promise.allSettled(toResolve);
-    general.log("Extract Character - Return");
     return;
 }
 
 export async function removeCharacter(remove: string, dir: string = global.gameDir): Promise<void> {
-    general.log("Remove Character - Start:", remove, dir);
     const toResolve: Promise<void>[] = [];
     const character: Character = readCharacterList(dir).getCharacterByName(remove);
     await removeAllAlts(character, dir);
@@ -793,7 +738,6 @@ export async function removeCharacter(remove: string, dir: string = global.gameD
     console.log(new Date().getTime());
     getCharacterFiles(characterDat, true, true, dir, similarNames).forEach((file: string) => {
         const filePath: string = path.join(dir, file);
-        general.log("Removing: " + filePath);
         toResolve.push(
             fs.remove(filePath)
         );
@@ -805,7 +749,6 @@ export async function removeCharacter(remove: string, dir: string = global.gameD
     toResolve.push(removeCharacterCss(character, dir));
     toResolve.push(writeCharacterRandom(character.name, true, dir));
     await Promise.allSettled(toResolve);
-    general.log("Remove Character - Return");
     return;    
 }
 
@@ -814,7 +757,6 @@ export function getCharacterRegExps(
     includeExtraFiles: boolean,
     ignoreSeries: boolean = false
 ): RegExp[] {
-    general.log("Get Character RegExps - Start:", characterDat, includeExtraFiles, ignoreSeries);
     const files: RegExp[] = [];
     (includeExtraFiles ? EXTRA_CHARACTER_FILES : CHARACTER_FILES).forEach((file: string) => {
         let wipString: string = file.replaceAll("<fighter>", characterDat.name);
@@ -826,7 +768,6 @@ export function getCharacterRegExps(
         wipString = wipString.replaceAll("<any>", "[^\\/\\\\]+");
         files.push(new RegExp(wipString, "gmi"));
     });
-    general.log("Get Character RegExps - Return:", files);
     return files;
 }
 
@@ -837,8 +778,6 @@ export function getCharacterFiles(
     dir: string = global.gameDir,
     similarNames: string[] = []
 ): string[] {
-    general.log("Get Character Files - Start:",
-        dir, characterDat, includeExtraFiles, ignoreSeries, similarNames);
     const characterFiles: string[] = general.getAllFiles(dir)
         .map((file: string) => path.relative(dir, file).split(path.sep).join(path.posix.sep));
     let characterFilesString: string = characterFiles.join("\n");
@@ -861,12 +800,10 @@ export function getCharacterFiles(
                 }
             });
     });
-    general.log("Get Character Files - Return:", validFiles);
     return validFiles;
 }
 
 export function readCssPages(dir: string = global.gameDir): CssPage[] {
-    general.log("Read CSS Pages - Start:", dir);
     const pages: CssPage[] = [];
     const gameSettings: any = ini.parse(fs.readFileSync(
         path.join(dir, "data", "GAME_SETTINGS.txt"),
@@ -877,7 +814,6 @@ export function readCssPages(dir: string = global.gameDir): CssPage[] {
             name: "Default",
             path: path.join(global.gameDir, "data", "css.txt")
         });
-        general.log("Read CSS Pages - Return: CSS Customs Disabled", pages);
         return pages;
     }
     for (
@@ -894,18 +830,15 @@ export function readCssPages(dir: string = global.gameDir): CssPage[] {
             )
         });
     }
-    general.log("Read CSS Pages - Return:", pages);
     return pages;
 }
 
 export async function writeCssPages(pages: CssPage[], dir: string = global.gameDir): Promise<void> {
-    general.log("Write CSS Pages - Start:", pages, dir);
     let gameSettings: string[] = fs.readFileSync(
         path.join(dir, "data", "GAME_SETTINGS.txt"),
         "ascii"
     ).split(/\r?\n/);
     if (ini.parse(gameSettings.join("\r\n"))["global.css_customs"] == 0) {
-        general.log("Write CSS Pages - Exit: CSS Customs Disabled");
         throw new Error("Custom CSS pages disabled in game_settings.");
     }
     gameSettings = gameSettings.map((line: string) => {
@@ -933,21 +866,17 @@ export async function writeCssPages(pages: CssPage[], dir: string = global.gameD
         gameSettings.join("\r\n"),
         { encoding: "ascii" }
     );
-    general.log("Write CSS Pages - Return");
     return;
 }
 
 export async function removeCssPage(page: CssPage, dir: string = global.gameDir): Promise<void> {
-    general.log("Remove CSS Page - Start:", page, dir);
     const pages: CssPage[] = readCssPages(dir).filter((i: CssPage) => i.path != page.path);
     fs.remove(page.path);
     await writeCssPages(pages, dir);
-    general.log("Remove CSS Page - Return");
     return;
 }
 
 export async function addCssPage(pageName: string, dir: string = global.gameDir): Promise<void> {
-    general.log("Add CSS Page - Start:", pageName, dir);
     pageName = pageName.replace(/'|"/g, "");
     const pagePath: string = path.join(
         dir, "data", "css",
@@ -965,28 +894,23 @@ export async function addCssPage(pageName: string, dir: string = global.gameDir)
         BLANK_CSS_PAGE_DATA,
         { encoding: "ascii" }
     );
-    general.log("Add CSS Page - Return");
     return;
 }
 
 export function readCssData(page: CssPage): CssData {
-    general.log("Read CSS Data - Start:", page);
     const cssFile: string[] = fs.readFileSync(page.path, "ascii").split(/\r?\n/);
     const css: CssData = cssFile.map((line: string) => line.split(" "));
     css[css.length - 1].pop();
-    general.log("Read CSS Data - Return:", css);
     return css;
 }
 
 export async function writeCssData(page: CssPage, data: CssData): Promise<void> {
-    general.log("Write CSS Data - Start:", page, data);
     const output: string = data.map((row: string[]) => row.join(" ")).join("\r\n") + " ";
     fs.writeFileSync(
         page.path,
         output,
         { encoding: "ascii" }
     );
-    general.log("Write CSS Data - Return");
     return;
 }
 
@@ -994,7 +918,6 @@ export async function removeCharacterCss(
     character: Character,
     dir: string = global.gameDir
 ): Promise<void> {
-    general.log("Remove Character CSS - Start:", character, dir);
     const toResolve: Promise<void>[] = [];
     const cssPages: CssPage[] = readCssPages(dir);
     cssPages.forEach((page: CssPage) => {
@@ -1012,7 +935,6 @@ export async function removeCharacterCss(
         })));
     });
     await Promise.allSettled(toResolve);
-    general.log("Remove Character CSS - Return");
     return;
 }
 
@@ -1020,7 +942,6 @@ export async function removeSeriesCharacters(
     series: string,
     dir: string = global.gameDir
 ): Promise<void> {
-    general.log("Remove Series Characters - Start:", series, dir);
     const charactersToRemove: Character[] = readCharacters(dir)
         .filter((character: Character) => character.series == series);
     const altsToRemove: Alt[] = [];
@@ -1039,6 +960,5 @@ export async function removeSeriesCharacters(
         await removeCharacter(alt.alt, dir);
     }
     console.log(new Date().getTime());
-    general.log("Remove Series Characters - Return");
     return;
 }

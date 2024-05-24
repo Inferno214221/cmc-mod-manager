@@ -14,7 +14,7 @@ api.on("showNotification", (
         if (api[onclick.name] != undefined) {
             api[onclick.name](...onclick.args);
         } else {
-            //TODO: throw error
+            // TODO: throw error
         }
     }
 });

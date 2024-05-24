@@ -6,7 +6,6 @@ declare module "*.css";
 declare const global: {
     win: BrowserWindow,
     gameDir: string,
-    log: string,
     appData: AppData,
     appDir: string,
     temp: string,

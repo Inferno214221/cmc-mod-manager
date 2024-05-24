@@ -29,7 +29,6 @@ export function readStages(dir: string = global.gameDir): Stage[] {
 }
 
 function readStageList(dir: string = global.gameDir): StageList {
-    general.log("Read Stage List - Start:", dir);
     const stageList: StageList = new StageList();
     const stagesTxt: string[] = fs.readFileSync(
         path.join(dir, "data", "stages.txt"),
@@ -56,7 +55,6 @@ function readStageList(dir: string = global.gameDir): StageList {
         if (stageList.getStageByName(locked) == undefined) return;
         stageList.updateStageByName(locked, { randomSelection: false });
     });
-    general.log("Read Stage List - Return:", stageList);
     return stageList;
 }
 
@@ -64,7 +62,6 @@ export async function writeStages(
     stages: Stage[],
     dir: string = global.gameDir
 ): Promise<void> {
-    general.log("Write Stage - Start:", stages, dir);
     stages.sort((a: Stage, b: Stage) =>
         (a.number > b.number ? 1 : -1)
     );
@@ -84,7 +81,6 @@ export async function writeStages(
         output,
         { encoding: "ascii" }
     );
-    general.log("Write Stages - Return");
     return;
 }
 
@@ -93,7 +89,6 @@ export async function writeStageRandom(
     randomSelection: boolean,
     dir: string = global.gameDir
 ): Promise<void> {
-    general.log("Write Stage Random - Start:", stage, randomSelection, dir);
     let lockedTxt: string[] = fs.readFileSync(
         path.join(dir, "data", "stage_lock.txt"),
         "ascii"
@@ -111,7 +106,6 @@ export async function writeStageRandom(
         output,
         { encoding: "ascii" }
     );
-    general.log("Write Stage Random - Return");
     return;
 }
 
@@ -119,7 +113,6 @@ export function getStageRegExps(
     stage: Stage,
     ignoreSeries: boolean = false
 ): RegExp[] {
-    general.log("Get Stage RegExps - Start:", stage, ignoreSeries);
     const files: RegExp[] = [];
     STAGE_FILES.forEach((file: string) => {
         let wipString: string = file.replaceAll("<stage>", stage.name);
@@ -129,7 +122,6 @@ export function getStageRegExps(
         wipString = wipString.replaceAll("<any>", "[^\\/\\\\]+");
         files.push(new RegExp(wipString, "gmi"));
     });
-    general.log("Get Stage RegExps - Return:", files);
     return files;
 }
 
@@ -139,7 +131,6 @@ export function getStageFiles(
     dir: string = global.gameDir,
     similarNames: string[] = []
 ): string[] {
-    general.log("Get Stage Files - Start:", dir, stage, ignoreSeries, similarNames);
     const stageFiles: string[] = general.getAllFiles(dir)
         .map((file: string) => path.relative(dir, file).split(path.sep).join(path.posix.sep));
     let stageFilesString: string = stageFiles.join("\n");
@@ -165,7 +156,6 @@ export function getStageFiles(
                 });
         });
     }
-    general.log("Get Stage Files - Return:", validFiles);
     return validFiles;
 }
 
@@ -174,17 +164,14 @@ export async function installStageDir(
     updateStages: boolean,
     dir: string = global.gameDir
 ): Promise<Stage | null> {
-    general.log("Install Stage Dir - Start:", filterInstallation, updateStages, dir);
     const selected: OpenDialogReturnValue = await dialog.showOpenDialog(global.win, {
         properties: ["openDirectory"]
     });
     if (selected.canceled == true) {
-        general.log("Install Stage Dir - Exit: Selection Canceled");
         return null;
     }
     const retVal: Stage | null =
         await installStage(selected.filePaths[0], filterInstallation, updateStages, dir);
-    general.log("Install Stage Dir - Return:", retVal);
     return retVal;
 }
 
@@ -193,22 +180,18 @@ export async function installStageArchive(
     updateStages: boolean,
     dir: string = global.gameDir
 ): Promise<Stage | null> {
-    general.log("Install Stage Archive - Start:", filterInstallation, updateStages, dir);
     const selected: OpenDialogReturnValue = await dialog.showOpenDialog(global.win, {
         properties: ["openFile"]
     });
     if (selected.canceled == true) {
-        general.log("Install Stage Archive - Exit: Selection Canceled");
         return null;
     }
     const output: string = await general.extractArchive(
         selected.filePaths[0],
         global.temp
     );
-    general.log(output, filterInstallation);
     const retVal: Stage | null =
         await installStage(output, filterInstallation, updateStages, dir);
-    general.log("Install Stage Archive - Return:", retVal);
     return retVal;
 }
 
@@ -218,8 +201,6 @@ export async function installStage(
     updateStages: boolean = false,
     dir: string = global.gameDir
 ): Promise<Stage | null> {
-    general.log("Install Stage - Start:",
-        stageDir, filterInstallation, updateStages, dir);
     const toResolve: Promise<void>[] = [];
     let correctedDir: string = stageDir;
     const modFiles: string[] = general.getAllFiles(correctedDir)
@@ -238,20 +219,14 @@ export async function installStage(
         }
     }
     if (!fs.readdirSync(correctedDir).includes("stage")) {
-        general.log("Install Stage - Exit: No Stage Directory");
         throw new Error("No 'stage' subdirectory found.");
     }
-    general.log(correctedDir);
-
     const stageName: string = fs.readdirSync(path.join(correctedDir, "stage"))
         .filter((file: string) =>
             file.endsWith(".bin") || !file.includes(".")
         )[0].split(".")[0];
-    general.log(stageName);
-
     const stageList: StageList = readStageList(dir);
     if (!updateStages && stageList.getStageByName(stageName) != undefined) {
-        general.log("Install Stage - Exit: Stage Already Installed");
         throw new Error("Stage already installed, updates disabled.");
     }
 
@@ -366,7 +341,6 @@ export async function installStage(
             const targetPath: string = path.join(dir, file);
             fs.ensureDirSync(path.parse(targetPath).dir);
             if (!updateStages && fs.existsSync(targetPath)) return;
-            general.log("Copying: " + filePath);
             toResolve.push(
                 fs.copy(
                     filePath,
@@ -376,19 +350,16 @@ export async function installStage(
             );
         });
     } else {
-        general.log("Copying: All Files");
         toResolve.push(fs.copy(correctedDir, dir, { overwrite: true }));
     }
 
     if (stageList.getStageByName(stageName) != undefined) {
-        general.log("Install Stage - Return: Stage Already In List:", stage);
         return stageList.getStageByName(stageName);
     }
     stageList.addStage(stage);
     toResolve.push(writeStages(stageList.getAllStages(), dir));
     await Promise.allSettled(toResolve);
     fs.removeSync(path.join(dir, "info.json"));
-    general.log("Install Stage - Return:", stage);
     return stage;
 }
 
@@ -418,7 +389,6 @@ export async function installDownloadedStage(targetDir: string, id: string): Pro
 }
 
 export async function extractStage(extract: string, dir: string = global.gameDir): Promise<void> {
-    general.log("Extract Stage - Start:", extract, dir);
     const toResolve: Promise<void>[] = [];
     const stageList: StageList = readStageList(dir);
     const similarNames: string[] = [];
@@ -435,7 +405,6 @@ export async function extractStage(extract: string, dir: string = global.gameDir
         const filePath: string = path.join(dir, file);
         const targetPath: string = path.join(extractDir, file);
         fs.ensureDirSync(path.parse(targetPath).dir);
-        general.log("Extracting: " + filePath);
         toResolve.push(
             fs.copy(
                 filePath,
@@ -453,12 +422,10 @@ export async function extractStage(extract: string, dir: string = global.gameDir
         ], null, 2)
     ));
     await Promise.allSettled(toResolve);
-    general.log("Extract Stage - Return");
     return;
 }
 
 export async function removeStage(remove: string, dir: string = global.gameDir): Promise<void> {
-    general.log("Remove Stage - Start:", remove, dir);
     const toResolve: Promise<void>[] = [];
     const stageList: StageList = readStageList(dir);
     const stage: Stage = stageList.getStageByName(remove);
@@ -473,7 +440,6 @@ export async function removeStage(remove: string, dir: string = global.gameDir):
     console.log(new Date().getTime());
     getStageFiles(stage, true, dir, similarNames).forEach((file: string) => {
         const filePath: string = path.join(dir, file);
-        general.log("Removing: " + filePath);
         toResolve.push(
             fs.remove(filePath)
         );
@@ -485,12 +451,10 @@ export async function removeStage(remove: string, dir: string = global.gameDir):
     toResolve.push(removeStageSss(stage, dir));
     toResolve.push(writeStageRandom(stage.name, true, dir));
     await Promise.allSettled(toResolve);
-    general.log("Remove Stage - Return");
     return;
 }
 
 export function readSssPages(dir: string = global.gameDir): SssPage[] {
-    general.log("Read SSS Pages - Start:", dir);
     const pages: SssPage[] = [];
     // Currently SSS Pages are a fixed size - 10x6. Although it is possible that his may change in
     // the future, if any changes would be made to the stage format, it would likely become more
@@ -511,12 +475,10 @@ export function readSssPages(dir: string = global.gameDir): SssPage[] {
             data: data
         });
     }
-    general.log("Read SSS Pages - Return:", pages);
     return pages;
 }
 
 export async function writeSssPages(pages: SssPage[], dir: string = global.gameDir): Promise<void> {
-    general.log("Write SSS Pages - Start:", pages, dir);
     pages.sort((a: SssPage, b: SssPage) =>
         (a.pageNumber > b.pageNumber ? 1 : -1)
     );
@@ -534,7 +496,6 @@ export async function writeSssPages(pages: SssPage[], dir: string = global.gameD
         output,
         { encoding: "ascii" }
     );
-    general.log("Write SSS Pages - Return");
     return;
 }
 
@@ -542,7 +503,6 @@ export async function removeStageSss(
     stage: Stage,
     dir: string = global.gameDir
 ): Promise<void> {
-    general.log("Remove Stage SSS - Start:", stage, dir);
     const sssPages: SssPage[] = readSssPages(dir);
     for (const page of sssPages) {
         page.data = page.data.map((row: string[]) =>
@@ -558,7 +518,6 @@ export async function removeStageSss(
         );
     }
     await writeSssPages(sssPages, dir);
-    general.log("Remove Stage SSS - Return");
     return;
 }
 
@@ -566,7 +525,6 @@ export async function removeSeriesStages(
     series: string,
     dir: string = global.gameDir
 ): Promise<void> {
-    general.log("Remove Series Stages - Start:", series, dir);
     const stagesToRemove: Stage[] = readStages(dir)
         .filter((stage: Stage) => stage.series == series);
     console.log(new Date().getTime());
@@ -575,26 +533,21 @@ export async function removeSeriesStages(
         await removeStage(stage.name, dir);
     }
     console.log(new Date().getTime());
-    general.log("Remove Series Stages - Return");
     return;
 }
 
 export async function addSssPage(pageName: string, dir: string = global.gameDir): Promise<void> {
-    general.log("Add SSS Page - Start:", pageName, dir);
     pageName = pageName.replace(/'|"/g, "");
     const pages: SssPage[] = readSssPages(dir);
     pages.push({ name: pageName, pageNumber: pages.length, data: BLANK_SSS_PAGE_DATA });
     writeSssPages(pages);
-    general.log("Add SSS Page - Return");
     return;
 }
 
 export async function removeSssPage(page: SssPage, dir: string = global.gameDir): Promise<void> {
-    general.log("Remove SSS Page - Start:", page, dir);
     const pages: SssPage[] = readSssPages(dir).filter((i: SssPage) =>
         !(i.name == page.name && i.pageNumber == page.pageNumber)
     );
     await writeSssPages(pages, dir);
-    general.log("Remove SSS Page - Return");
     return;
 }

@@ -4,12 +4,10 @@ import {
 import fs from "fs-extra";
 import path from "path";
 import extract from "extract-zip";
-import { ArcFile, ArcFiles, Extractor, createExtractorFromFile } from "node-unrar-js/esm";
-// import sevenZip from "node-7z-archive";
+import { Extractor, createExtractorFromFile } from "node-unrar-js/esm";
 import { execSync, spawn } from "child_process";
 import request from "request";
 import http from "http";
-import util from "util";
 import semver from "semver";
 import { ModType, OpDep, OpState } from "../global/global";
 
@@ -56,15 +54,6 @@ export function loadAppData(): void {
     global.appData = readJSON(DATA_FILE);
 }
 
-export function log(...objs: any[]): void {
-    if (!global.appData.config.enableLogs) return;
-    // console.log(...objs);
-    objs.forEach((obj: any) => {
-        global.log += util.inspect(obj) + "\n";
-    });
-    global.log += "\n--------------------\n\n";
-}
-
 export function readJSON(file: string): any {
     return JSON.parse(fs.readFileSync(file, "utf-8"));
 }
@@ -105,7 +94,6 @@ export function getAllFiles(dirPath: string, arrayOfFiles?: string[]): string[] 
 }
 
 export async function extractArchive(archive: string, destination: string): Promise<string> {
-    log("Extract Archive - Start:", archive, destination);
     const output: string = path.join(destination, path.parse(archive).name);
     fs.ensureDirSync(destination);
     fs.removeSync(output);
@@ -123,19 +111,13 @@ export async function extractArchive(archive: string, destination: string): Prom
                 filepath: archive,
                 targetPath: output
             });
-            const extracted: ArcFiles = extractor.extract();
-            log(extracted);
-            const files: ArcFile[] = [...extracted.files];
-            log(files);
+            extractor.extract();
+            // const extracted: ArcFiles = extractor.extract();
+            // const _files: ArcFile[] = [...extracted.files];
             break;
-        // case ".7z":
-            //FIXME: doesn't work
-            // await sevenZip.extractArchive(archive, output, {}, true);
-            // break;
         default:
             throw new Error("Unsupported archive type: " + path.parse(archive).ext.toLowerCase());
     }
-    log("Extract Archive - Return:", output);
     return output;
 }
 
@@ -192,7 +174,8 @@ export async function downloadUpdate(tagName: string, id: string): Promise<void>
             "directory, if this is problematic, please cancel this update and remove any " +
             "affected files.",
         okLabel: "Continue"
-    })) || await dirContainedWithinSelf()) {
+    })) || isSelfContainedDir()) {
+        if (isSelfContainedDir()) alertSelfContainedDir();
         global.win.webContents.send("updateOperation", {
             id: id,
             state: OpState.canceled
@@ -354,7 +337,7 @@ export function focusWindow(): void {
     }
 }
 
-//TODO: split this function up
+// TODO: split this function up
 export async function downloadMod(url: string, modId: string, id: string): Promise<void> {
     return new Promise((resolve: () => void) => {
         console.log(url);
@@ -363,8 +346,9 @@ export async function downloadMod(url: string, modId: string, id: string): Promi
         const infoPromise: Promise<string[]> = getDownloadInfo(modId);
         let file: string = id + "_download.";
         request.get(url)
-            .on("error", (error: Error) => { log(error) })
-            .on("response", async (res: request.Response) => {
+            .on("error", (error: Error) => {
+                throw error;
+            }).on("response", async (res: request.Response) => {
                 switch (res.headers["content-type"].split("/")[1]) {
                     case "zip":
                         file += "zip";
@@ -434,7 +418,6 @@ export async function downloadMod(url: string, modId: string, id: string): Promi
                         body: "Downloaded mod: '" + modInfo[0] + "' from GameBanana.",
                         state: OpState.finished,
                     });
-                    log(output);
                     resolve();
                     switch (modType) {
                         case ModType.character:
@@ -508,10 +491,6 @@ export function toMb(bytes: number): number {
 }
 
 export async function getDownloadInfo(modId: string): Promise<string[]> {
-    if (modId == undefined) {
-        //TODO:
-        return;
-    }
     return new Promise((resolve: (value: string[]) => void) => {
         request.get(
             {
@@ -566,38 +545,47 @@ export function getGameVersion(
     return null;
 }
 
-export async function dirContainedWithinSelf(dir: string = global.gameDir): Promise<boolean> {
+export function isSelfContainedDir(dir: string = global.gameDir): boolean {
     const relativePath: string = path.relative(global.appDir, path.resolve(dir));
-    if (!relativePath || (!relativePath.startsWith("..") && !path.isAbsolute(relativePath))) {
-        customDialogs.alert({
-            id: "modManagerContainedDirWarning",
-            body: "The selected game directory is contained within CMC Mod Manager's own " +
-                "directory. CMC Mod Manager deletes all files within this directory when " +
-                "updating, so it cannot be used to store your game files, please move them to " +
-                "a different location.",
-            title: "Invalid Game Location Warning",
-        });
-        return true;
-    }
-    return false;
+    return (!relativePath || (!relativePath.startsWith("..") && !path.isAbsolute(relativePath)));
+}
+
+async function alertSelfContainedDir(): Promise<void> {
+    customDialogs.alert({
+        id: "modManagerContainedDirWarning",
+        body: "The selected game directory is contained within CMC Mod Manager's own " +
+            "directory. CMC Mod Manager deletes all files within this directory when " +
+            "updating, so it cannot be used to store your game files, please move them to " +
+            "a different location.",
+        title: "Invalid Game Location Warning",
+    });
+    return;
 }
 
 export async function isValidGameDir(dir: string = global.gameDir): Promise<boolean> {
-    return (dir == null || getGameVersion(dir) != null || !await dirContainedWithinSelf(dir));
+    return ((dir == null || getGameVersion(dir) != null) && !isSelfContainedDir(dir));
 }
 
 export async function selectGameDir(): Promise<string | null> {
-    log("Select Game Dir - Start");
     const dir: OpenDialogReturnValue = await dialog.showOpenDialog(global.win, {
         properties: ["openDirectory"]
     });
     if (dir.canceled == true) {
-        log("Select Game Dir - Exit: Selection Canceled");
         return null;
     }
     if (!await isValidGameDir(dir.filePaths[0])) {
-        //TODO: inform the user
-        log("Select Game Dir - Exit: Invalid Game Dir");
+        if (isSelfContainedDir(dir.filePaths[0])) {
+            alertSelfContainedDir();
+        } else {
+            customDialogs.alert({
+                id: "invalidGameDir",
+                body: "The selected directory is invalid as it does not contain one of the " +
+                "following identifying executables: " +
+                SUPPORTED_VERSIONS.map((val: string) => val + ".exe").join(", ") +
+                ".",
+                title: "Invalid Directory Selected",
+            });
+        }
         return null;
     }
 
@@ -608,7 +596,6 @@ export async function selectGameDir(): Promise<string | null> {
     global.appData = readJSON(DATA_FILE);
     global.appData.dir = global.gameDir;
     writeAppData(global.appData);
-    log("Select Game Dir - Return:", global.gameDir);
     return global.gameDir;
 }
 

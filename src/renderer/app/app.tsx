@@ -398,7 +398,7 @@ export async function callQueuedOperations(
             if (api[operation.call.name] != undefined) {
                 await api[operation.call.name](...operation.call.args);
             } else {
-                //TODO: throw error
+                // TODO: throw error
             }
         }
         console.log("Finished: " + operation.title);

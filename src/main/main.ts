@@ -11,7 +11,6 @@ declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 
 global.win = null;
 global.gameDir = "";
-global.log = "";
 global.appData = null;
 global.appDir = app.isPackaged ?
     path.parse(app.getPath("exe")).dir :
@@ -143,13 +142,7 @@ app.on("activate", () => {
 });
 
 app.on("before-quit", async () => {
-    const toResolve: Promise<void>[] = [];
-    toResolve.push(fs.remove(global.temp));
-    if (global.log == "") return;
-    const LOG_FILE: string = path.join(app.getPath("userData"), "log.txt");
-    fs.ensureFileSync(LOG_FILE);
-    toResolve.push(fs.appendFile(LOG_FILE, global.log));
-    await Promise.allSettled(toResolve);
+    await fs.remove(global.temp);
 });
 
 function createHandlers(module: any): void {
