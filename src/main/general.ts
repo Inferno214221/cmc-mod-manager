@@ -146,7 +146,7 @@ export async function checkForUpdates(): Promise<void> {
             "Accept": "application/vnd.github.v3+json",
             "User-Agent": "CMC-Mod-Manager",
         }
-    }, async (error: any, res: http.IncomingMessage, body: string) => {
+    }, async (error: any, _res: http.IncomingMessage, body: string) => {
         if (error != null) return;
         const releases: any[] = JSON.parse(body).toSorted((a: any, b: any) => {
             if (!semver.valid(a.tag_name)) {
@@ -518,7 +518,7 @@ export async function getDownloadInfo(modId: string): Promise<string[]> {
                 url: "https://api.gamebanana.com/Core/Item/Data?itemtype=Mod&itemid=" +
                     modId + "&fields=name,RootCategory().name"
             },
-            async (error: any, res: http.IncomingMessage, body: string) => {
+            async (error: any, _res: http.IncomingMessage, body: string) => {
                 if (error != null) return;
                 resolve(JSON.parse(body));
             }

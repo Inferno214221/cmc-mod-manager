@@ -541,7 +541,7 @@ function SssTableContents({
         <>
             <tr>
                 <th></th>
-                {sssData[0].map((cell: string, index: number) =>
+                {sssData[0].map((_cell: string, index: number) =>
                     <th key={index}>{index}</th>
                 )}
             </tr>

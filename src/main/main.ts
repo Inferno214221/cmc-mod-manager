@@ -67,13 +67,13 @@ function createWindow(): void {
     createHandlers(customDialogs);
     ipcMain.handle(
         "pathJoin", (
-            event: IpcMainInvokeEvent,
+            _event: IpcMainInvokeEvent,
             args: Parameters<typeof path.join>
         ) => path.join(...args)
     );
     ipcMain.handle(
         "openExternal", (
-            event: IpcMainInvokeEvent,
+            _event: IpcMainInvokeEvent,
             args: Parameters<typeof shell.openExternal>
         ) => shell.openExternal(...args)
     );

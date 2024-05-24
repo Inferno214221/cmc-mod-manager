@@ -545,7 +545,7 @@ function CssTableContents({
         <>
             <tr>
                 <th></th>
-                {cssData[0].map((cell: string, index: number) =>
+                {cssData[0].map((_cell: string, index: number) =>
                     <CssColumnHeader
                         column={index}
                         setCssData={setCssData}
