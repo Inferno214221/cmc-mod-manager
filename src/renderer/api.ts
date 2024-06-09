@@ -31,6 +31,9 @@ export default {
         options: ConfirmOptions
     ]): Promise<boolean> => ipcRenderer.invoke("confirm", args)),
 
+    confirmDestructiveAction: ((): Promise<boolean> =>
+        ipcRenderer.invoke("confirmDestructiveAction")),
+
     downloadMod: ((...args: [
         url: string,
         modId: string,

@@ -498,6 +498,7 @@ function SssPageDisplay({
                 iconSize={"18px"}
                 tooltip={"Delete Page"}
                 onClick={async () => {
+                    if (!await api.confirmDestructiveAction()) return;
                     let operationId: number;
                     setOperations((prev: Operation[]) => {
                         const newOperations: Operation[] = [...prev];

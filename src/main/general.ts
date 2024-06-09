@@ -616,3 +616,13 @@ export async function runGame(dir: string = global.gameDir): Promise<void> {
 export function escapeRegex(str: string): string {
     return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
+
+export async function confirmDestructiveAction(): Promise<boolean> {
+    return await customDialogs.confirm({
+        id: "confirmDestructiveAction",
+        body: "This action is destructive and cannot be undone. Are you sure that you want to " +
+            "continue?",
+        title: "Destructive Action Confirmation",
+        okLabel: "Continue",
+    });
+}
