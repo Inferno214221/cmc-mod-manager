@@ -53,7 +53,7 @@ jobs:
       - name: Electron Forge Build
         run: yarn run make-win
       - name: Move Output Zip
-        run: move .\out\make\zip\win32\x64\cmc-mod-manager-win32-x64-3.0.0-beta.1.zip .\cmc-mod-manager-win32-x64.zip
+        run: move .\out\make\zip\win32\x64\cmc-mod-manager-win32-x64-3.0.0-beta.2.zip .\cmc-mod-manager-win32-x64.zip
 
       - name: Update Release
         uses: ncipollo/release-action@v1
@@ -67,7 +67,7 @@ jobs:
       - name: Electron Forge Build 32 Bit
         run: yarn run make-win32
       - name: Move Output Zip
-        run: move .\out\make\zip\win32\ia32\cmc-mod-manager-win32-ia32-3.0.0-beta.1.zip .\cmc-mod-manager-win32-ia32.zip
+        run: move .\out\make\zip\win32\ia32\cmc-mod-manager-win32-ia32-3.0.0-beta.2.zip .\cmc-mod-manager-win32-ia32.zip
 
       - name: Update Release
         uses: ncipollo/release-action@v1
@@ -108,21 +108,12 @@ jobs:
       - name: Electron Forge Build
         run: yarn run make-linux
       - name: Move Output Zip
-        run: mv ./out/make/zip/linux/x64/cmc-mod-manager-linux-x64-3.0.0-beta.1.zip ./cmc-mod-manager-linux-x64.zip
-      # - name: Electron Forge Build
-      #   run: yarn run make-linux-all
-      # - name: Move Output Zip
-      #   run: mv ./out/make/zip/linux/x64/cmc-mod-manager-linux-x64-3.0.0-beta.1.zip ./cmc-mod-manager-linux-x64.zip
-      # - name: Move Output Deb
-      #   run: mv ./out/make/deb/x64/cmc-mod-manager_3.0.0-beta.1_amd64.deb ./cmc-mod-manager-linux.deb
-      # - name: Move Output Rpm
-      #   run: mv ./out/make/rpm/x64/cmc-mod-manager-3.0.0-beta.1-1.x86_64.rpm ./cmc-mod-manager-linux.rpm
+        run: mv ./out/make/zip/linux/x64/cmc-mod-manager-linux-x64-3.0.0-beta.2.zip ./cmc-mod-manager-linux-x64.zip
       
       - name: Update Release
         uses: ncipollo/release-action@v1
         with:
           artifacts: "./cmc-mod-manager-linux-x64.zip"
-          # artifacts: "./cmc-mod-manager-linux-x64.zip,./cmc-mod-manager-linux.deb,./cmc-mod-manager-linux.rpm"
           tag: auto
           allowUpdates: true
           prerelease: true

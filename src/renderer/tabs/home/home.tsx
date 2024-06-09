@@ -56,7 +56,7 @@ export function TabHome(): JSX.Element {
                     <div className={styles.center + " " + styles.marginVertical}>
                         <img src={cmcmm} id={styles.cmcmmIcon} draggable={false}/>
                         <h1>CMC Mod Manager</h1>
-                        <h3>(v3.0.0-beta.1)</h3>
+                        <h3>(v3.0.0-beta.2)</h3>
                     </div>
                     <div className={styles.center} id={styles.byDiv}>
                         <h2>By</h2>
