@@ -4,7 +4,7 @@ import {
 import fs from "fs-extra";
 import path from "path";
 import extract from "extract-zip";
-import { Extractor, createExtractorFromFile } from "node-unrar-js/esm";
+import { ArcFile, ArcFiles, Extractor, createExtractorFromFile } from "node-unrar-js/esm";
 import { execSync, spawn } from "child_process";
 import request from "request";
 import http from "http";
@@ -111,9 +111,11 @@ export async function extractArchive(archive: string, destination: string): Prom
                 filepath: archive,
                 targetPath: output
             });
-            extractor.extract();
-            // const extracted: ArcFiles = extractor.extract();
-            // const _files: ArcFile[] = [...extracted.files];
+            // None of the following code can be removed
+            const extracted: ArcFiles = extractor.extract();
+            const files: ArcFile[] = [...extracted.files];
+            console.log(files);
+            // This log statement included because of how the generator works
             break;
         default:
             throw new Error("Unsupported archive type: " + path.parse(archive).ext.toLowerCase());
@@ -271,7 +273,7 @@ export function runUpdater(): void {
         "utf-8"
     ));
     const updaterDir: string = path.join(global.appDir, "updater");
-    
+
     if (buildInfo.platform == "win32") {
         spawn(path.join(updaterDir, "update.bat"), {
             cwd: updaterDir,
@@ -342,7 +344,7 @@ export async function downloadMod(url: string, modId: string, id: string): Promi
     return new Promise((resolve: () => void) => {
         console.log(url);
         fs.ensureDirSync(global.temp);
-        
+
         const infoPromise: Promise<string[]> = getDownloadInfo(modId);
         let file: string = id + "_download.";
         request.get(url)
@@ -412,7 +414,7 @@ export async function downloadMod(url: string, modId: string, id: string): Promi
                     delete global.cancelFunctions[id + "_download"];
                     if (downloadStream.errored || canceled) return;
                     const output: string = await extractArchive(filePath, global.temp);
-                    fs.removeSync(filePath);                    
+                    fs.removeSync(filePath);
                     global.win.webContents.send("updateOperation", {
                         id: id + "_download",
                         body: "Downloaded mod: '" + modInfo[0] + "' from GameBanana.",

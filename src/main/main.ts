@@ -46,7 +46,7 @@ function createWindow(): void {
         console.log(updateDir);
         fs.removeSync(updateDir);
     }
-    
+
     global.win = new BrowserWindow({
         width: 1120,
         height: 630,
