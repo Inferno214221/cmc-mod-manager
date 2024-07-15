@@ -1,12 +1,6 @@
-import { IpcRendererEvent, ipcRenderer } from "electron";
+import { ipcRenderer } from "electron";
 
 export default {
-    onStart: (
-        callback: ( options: AnyOptions ) => void
-    ) => ipcRenderer.on("dialogOnStart", (
-        _event: IpcRendererEvent,
-        options: AnyOptions
-    ) => callback(options)),
     ok: (
         id: string,
         value: any

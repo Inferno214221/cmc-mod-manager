@@ -33,21 +33,18 @@ export function alertSync(
     options.id = new Date().getTime() + "_" + options.id;
     const windowOptions: BrowserWindowConstructorOptions = {
         width: 360,
-        height: 0,
+        height: 100,
         parent: global.win,
         webPreferences: {
             devTools: DEV_TOOLS_ENABLED,
-            preload: DIALOG_ALERT_PRELOAD_WEBPACK_ENTRY
+            preload: DIALOG_ALERT_PRELOAD_WEBPACK_ENTRY,
+            additionalArguments: [JSON.stringify(options)]
         }
     };
     const customDialogWin: BrowserWindow = new BrowserWindow(
         Object.assign({}, WINDOW_OPTIONS, windowOptions)
     );
     customDialogWin.loadURL(DIALOG_ALERT_WEBPACK_ENTRY);
-
-    customDialogWin.on("ready-to-show", () => {
-        customDialogWin.webContents.send("dialogOnStart", options);
-    });
 
     customDialogWin.on("close", () => {
         if (callback != undefined) callback();
@@ -85,21 +82,18 @@ export function confirmSync(
     options.id = new Date().getTime() + "_" + options.id;
     const windowOptions: BrowserWindowConstructorOptions = {
         width: 360,
-        height: 0,
+        height: 100,
         parent: global.win,
         webPreferences: {
             devTools: DEV_TOOLS_ENABLED,
-            preload: DIALOG_CONFIRM_PRELOAD_WEBPACK_ENTRY
+            preload: DIALOG_CONFIRM_PRELOAD_WEBPACK_ENTRY,
+            additionalArguments: [JSON.stringify(options)]
         }
     };
     const customDialogWin: BrowserWindow = new BrowserWindow(
         Object.assign({}, WINDOW_OPTIONS, windowOptions)
     );
     customDialogWin.loadURL(DIALOG_CONFIRM_WEBPACK_ENTRY);
-
-    customDialogWin.on("ready-to-show", () => {
-        customDialogWin.webContents.send("dialogOnStart", options);
-    });
 
     customDialogWin.on("close", () => {
         if (callback != undefined) callback(undefined);
@@ -143,21 +137,18 @@ export function promptSync(
     options.id = new Date().getTime() + "_" + options.id;
     const windowOptions: BrowserWindowConstructorOptions = {
         width: 360,
-        height: 0,
+        height: 100,
         parent: global.win,
         webPreferences: {
             devTools: DEV_TOOLS_ENABLED,
-            preload: DIALOG_PROMPT_PRELOAD_WEBPACK_ENTRY
+            preload: DIALOG_PROMPT_PRELOAD_WEBPACK_ENTRY,
+            additionalArguments: [JSON.stringify(options)]
         }
     };
     const customDialogWin: BrowserWindow = new BrowserWindow(
         Object.assign({}, WINDOW_OPTIONS, windowOptions)
     );
     customDialogWin.loadURL(DIALOG_PROMPT_WEBPACK_ENTRY);
-
-    customDialogWin.on("ready-to-show", () => {
-        customDialogWin.webContents.send("dialogOnStart", options);
-    });
 
     customDialogWin.on("close", () => {
         if (callback != undefined) callback(undefined);
