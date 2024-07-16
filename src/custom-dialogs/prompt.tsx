@@ -23,14 +23,14 @@ function Body(): JSX.Element {
     = useState("");
 
     useEffect(() => {
-        window.requestAnimationFrame(() => {
+        // Request second frame
+        window.requestAnimationFrame(() => window.requestAnimationFrame(() => {
             if (document.documentElement.getBoundingClientRect().height == height) return;
-            console.log(options, document.documentElement.getBoundingClientRect().height);
             if (options.id != undefined) {
                 dialog.resize(options.id, document.documentElement.getBoundingClientRect().height);
                 setHeight(document.documentElement.getBoundingClientRect().height);
             }
-        });
+        }));
     });
 
     return (

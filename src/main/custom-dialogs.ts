@@ -53,6 +53,7 @@ export function alertSync(
     ipcMain.removeHandler(options.id + "_dialogResize");
     ipcMain.handle(options.id + "_dialogResize",
         (_event: IpcMainInvokeEvent, height: number) => {
+            console.log(options.id, height);
             customDialogWin.setContentSize(360, height);
         }
     );
@@ -102,6 +103,7 @@ export function confirmSync(
     ipcMain.removeHandler(options.id + "_dialogResize");
     ipcMain.handle(options.id + "_dialogResize",
         (_event: IpcMainInvokeEvent, height: number) => {
+            console.log(options.id, height);
             customDialogWin.setContentSize(360, height);
         }
     );
@@ -157,6 +159,7 @@ export function promptSync(
     ipcMain.removeHandler(options.id + "_dialogResize");
     ipcMain.handle(options.id + "_dialogResize",
         (_event: IpcMainInvokeEvent, height: number) => {
+            console.log(options.id, height);
             customDialogWin.setContentSize(360, height);
         }
     );
