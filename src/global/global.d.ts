@@ -146,35 +146,22 @@ interface MainCall {
     args: []
 }
 
-interface AlertOptions {
+interface Options {
     id: string,
     body: string,
     title?: string,
+}
+
+interface AlertOptions extends Options {
     okLabel?: string
 }
 
-interface ConfirmOptions {
-    id: string,
-    body: string,
-    title?: string,
+interface ConfirmOptions extends Options {
     okLabel?: string,
     cancelLabel?: string
 }
 
-interface PromptOptions {
-    id: string,
-    body: string,
-    title?: string,
-    placeholder?: string,
-    invalidCharacters?: RegExp,
-    okLabel?: string,
-    cancelLabel?: string
-}
-
-interface AnyOptions {
-    id: string,
-    body: string,
-    title?: string,
+interface PromptOptions extends Options {
     placeholder?: string,
     invalidCharacters?: RegExp,
     okLabel?: string,

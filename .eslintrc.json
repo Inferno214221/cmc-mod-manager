@@ -46,6 +46,11 @@
             "propertyDeclaration": true,
             "variableDeclaration": true
         }],
+        "@typescript-eslint/no-unused-vars": ["warn", {
+            "vars": "local",
+            "args": "all",
+            "argsIgnorePattern": "^_"
+        }],
         "no-case-declarations": "off",
         "import/no-named-as-default-member": "off",
         "sort-imports": ["warn", {

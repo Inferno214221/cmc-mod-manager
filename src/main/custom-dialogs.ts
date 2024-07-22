@@ -1,180 +1,145 @@
-import {
-    BrowserWindow, BrowserWindowConstructorOptions, IpcMainInvokeEvent, ipcMain
-} from "electron";
+import { BrowserWindow, IpcMainInvokeEvent, ipcMain } from "electron";
 
 const DEV_TOOLS_ENABLED: boolean = false;
 
-const WINDOW_OPTIONS: BrowserWindowConstructorOptions = {
-    resizable: DEV_TOOLS_ENABLED,
-    modal: true,
-    autoHideMenuBar: true,
-    minimizable: false,
-    maximizable: false,
-    alwaysOnTop: true,
-    fullscreenable: false,
-    darkTheme: true
+abstract class Dialog<OptionsType extends Options, ReturnType> {
+    options: OptionsType;
+    window: BrowserWindow;
+    callback: ((result?: ReturnType) => void);
+
+    abstract readonly PRELOAD_ENTRY: string;
+    abstract readonly REACT_ENTRY: string;
+
+    constructor(options: OptionsType) {
+        this.options = options;
+    }
+
+    async show(): Promise<ReturnType> {
+        return new Promise((resolve: (result?: ReturnType) => void) => {
+            this.showSync(resolve);
+        });
+    }
+
+    showSync(callback: ((result?: ReturnType) => void)): void {
+        this.options.id = new Date().getTime() + "_" + this.options.id;
+        this.callback = callback;
+
+        this.window = new BrowserWindow({
+            resizable: DEV_TOOLS_ENABLED,
+            modal: true,
+            autoHideMenuBar: true,
+            minimizable: false,
+            maximizable: false,
+            alwaysOnTop: true,
+            fullscreenable: false,
+            darkTheme: true,
+            width: 360,
+            height: 100,
+            parent: global.win,
+            webPreferences: {
+                devTools: DEV_TOOLS_ENABLED,
+                preload: this.PRELOAD_ENTRY,
+                additionalArguments: [JSON.stringify(this.options)]
+            }
+        });
+        this.window.loadURL(this.REACT_ENTRY);
+
+        this.window.on("close", () => {
+            this.clearHandlers();
+            if (callback != undefined) callback(undefined);
+        });
+
+        ipcMain.handle(this.options.id + "_dialogResize",
+            (_event: IpcMainInvokeEvent, height: number) => this.resize(height)
+        );
+        ipcMain.handle(this.options.id + "_dialogOk",
+            (_event: IpcMainInvokeEvent, value: ReturnType) => this.ok(value)
+        );
+        ipcMain.handle(this.options.id + "_dialogCancel",
+            () => this.cancel()
+        );
+    }
+
+    resize(height: number): void {
+        this.window.setContentSize(360, height);
+    }
+
+    ok(_value: ReturnType): void {
+        this.clearHandlers();
+        this.window.destroy();
+    }
+    
+    cancel(): void {
+        this.clearHandlers();
+        this.window.destroy();
+    }
+
+    clearHandlers(): void {
+        ipcMain.removeHandler(this.options.id + "_dialogResize");
+        ipcMain.removeHandler(this.options.id + "_dialogOk");
+        ipcMain.removeHandler(this.options.id + "_dialogCancel");
+    }
 }
 
-declare const DIALOG_ALERT_WEBPACK_ENTRY: string;
 declare const DIALOG_ALERT_PRELOAD_WEBPACK_ENTRY: string;
+declare const DIALOG_ALERT_WEBPACK_ENTRY: string;
 
-export async function alert(
-    options: AlertOptions
-): Promise<void> {
-    return new Promise((resolve: () => void) => {
-        alertSync(options, resolve);
-    });
+export class AlertDialog extends Dialog<AlertOptions, null> {
+    readonly PRELOAD_ENTRY: string = DIALOG_ALERT_PRELOAD_WEBPACK_ENTRY;
+    readonly REACT_ENTRY: string = DIALOG_ALERT_WEBPACK_ENTRY;
+
+    ok(value: null): void {
+        super.ok(value);
+        this.callback();
+    }
+    cancel(): void {
+        super.cancel();
+        this.callback();
+    }
 }
 
-export function alertSync(
-    options: AlertOptions,
-    callback?: (() => void)
-): void {
-    options.id = new Date().getTime() + "_" + options.id;
-    const windowOptions: BrowserWindowConstructorOptions = {
-        width: 360,
-        height: 100,
-        parent: global.win,
-        webPreferences: {
-            devTools: DEV_TOOLS_ENABLED,
-            preload: DIALOG_ALERT_PRELOAD_WEBPACK_ENTRY,
-            additionalArguments: [JSON.stringify(options)]
-        }
-    };
-    const customDialogWin: BrowserWindow = new BrowserWindow(
-        Object.assign({}, WINDOW_OPTIONS, windowOptions)
-    );
-    customDialogWin.loadURL(DIALOG_ALERT_WEBPACK_ENTRY);
-
-    customDialogWin.on("close", () => {
-        if (callback != undefined) callback();
-    });
-
-    ipcMain.removeHandler(options.id + "_dialogResize");
-    ipcMain.handle(options.id + "_dialogResize",
-        (_event: IpcMainInvokeEvent, height: number) => {
-            console.log(options.id, height);
-            customDialogWin.setContentSize(360, height);
-        }
-    );
-
-    ipcMain.removeHandler(options.id + "_dialogOk");
-    ipcMain.handle(options.id + "_dialogOk", () => {
-        customDialogWin.destroy();
-        if (callback != undefined) callback();
-    });
+export async function alert(options: AlertOptions): Promise<void> {
+    return new AlertDialog(options).show();
 }
 
-declare const DIALOG_CONFIRM_WEBPACK_ENTRY: string;
 declare const DIALOG_CONFIRM_PRELOAD_WEBPACK_ENTRY: string;
+declare const DIALOG_CONFIRM_WEBPACK_ENTRY: string;
 
-export async function confirm(
-    options: ConfirmOptions
-): Promise<boolean> {
-    return new Promise((resolve: (result: boolean) => void) => {
-        confirmSync(options, resolve);
-    });
+export class ConfirmDialog extends Dialog<ConfirmOptions, boolean> {
+    readonly PRELOAD_ENTRY: string = DIALOG_CONFIRM_PRELOAD_WEBPACK_ENTRY;
+    readonly REACT_ENTRY: string = DIALOG_CONFIRM_WEBPACK_ENTRY;
+
+    ok(value: boolean): void {
+        super.ok(value);
+        this.callback(true);
+    }
+    cancel(): void {
+        super.cancel();
+        this.callback(false);
+    }
 }
 
-export function confirmSync(
-    options: ConfirmOptions,
-    callback?: ((result: boolean) => void)
-): void {
-    options.id = new Date().getTime() + "_" + options.id;
-    const windowOptions: BrowserWindowConstructorOptions = {
-        width: 360,
-        height: 100,
-        parent: global.win,
-        webPreferences: {
-            devTools: DEV_TOOLS_ENABLED,
-            preload: DIALOG_CONFIRM_PRELOAD_WEBPACK_ENTRY,
-            additionalArguments: [JSON.stringify(options)]
-        }
-    };
-    const customDialogWin: BrowserWindow = new BrowserWindow(
-        Object.assign({}, WINDOW_OPTIONS, windowOptions)
-    );
-    customDialogWin.loadURL(DIALOG_CONFIRM_WEBPACK_ENTRY);
-
-    customDialogWin.on("close", () => {
-        if (callback != undefined) callback(undefined);
-    });
-
-    ipcMain.removeHandler(options.id + "_dialogResize");
-    ipcMain.handle(options.id + "_dialogResize",
-        (_event: IpcMainInvokeEvent, height: number) => {
-            console.log(options.id, height);
-            customDialogWin.setContentSize(360, height);
-        }
-    );
-
-    ipcMain.removeHandler(options.id + "_dialogOk");
-    ipcMain.handle(options.id + "_dialogOk", () => {
-        customDialogWin.destroy();
-        if (callback != undefined) callback(true);
-    });
-
-    ipcMain.removeHandler(options.id + "_dialogCancel");
-    ipcMain.handle(options.id + "_dialogCancel", () => {
-        customDialogWin.destroy();
-        if (callback != undefined) callback(false);
-    });
+export async function confirm(options: ConfirmOptions): Promise<boolean> {
+    return new ConfirmDialog(options).show();
 }
 
-declare const DIALOG_PROMPT_WEBPACK_ENTRY: string;
 declare const DIALOG_PROMPT_PRELOAD_WEBPACK_ENTRY: string;
+declare const DIALOG_PROMPT_WEBPACK_ENTRY: string;
 
-export async function prompt(
-    options: PromptOptions,
-): Promise<string> {
-    return new Promise((resolve: (result: string) => void) => {
-        promptSync(options, resolve);
-    });
+export class PromptDialog extends Dialog<PromptOptions, string> {
+    readonly PRELOAD_ENTRY: string = DIALOG_PROMPT_PRELOAD_WEBPACK_ENTRY;
+    readonly REACT_ENTRY: string = DIALOG_PROMPT_WEBPACK_ENTRY;
+
+    ok(value: string): void {
+        super.ok(value);
+        this.callback(value);
+    }
+    cancel(): void {
+        super.cancel();
+        this.callback(undefined);
+    }
 }
 
-export function promptSync(
-    options: PromptOptions,
-    callback?: ((result: string) => void)
-): void {
-    options.id = new Date().getTime() + "_" + options.id;
-    const windowOptions: BrowserWindowConstructorOptions = {
-        width: 360,
-        height: 100,
-        parent: global.win,
-        webPreferences: {
-            devTools: DEV_TOOLS_ENABLED,
-            preload: DIALOG_PROMPT_PRELOAD_WEBPACK_ENTRY,
-            additionalArguments: [JSON.stringify(options)]
-        }
-    };
-    const customDialogWin: BrowserWindow = new BrowserWindow(
-        Object.assign({}, WINDOW_OPTIONS, windowOptions)
-    );
-    customDialogWin.loadURL(DIALOG_PROMPT_WEBPACK_ENTRY);
-
-    customDialogWin.on("close", () => {
-        if (callback != undefined) callback(undefined);
-    });
-
-    ipcMain.removeHandler(options.id + "_dialogResize");
-    ipcMain.handle(options.id + "_dialogResize",
-        (_event: IpcMainInvokeEvent, height: number) => {
-            console.log(options.id, height);
-            customDialogWin.setContentSize(360, height);
-        }
-    );
-
-    ipcMain.removeHandler(options.id + "_dialogOk");
-    ipcMain.handle(options.id + "_dialogOk",
-        (_event: IpcMainInvokeEvent, value: string) => {
-            customDialogWin.destroy();
-            if (callback != undefined) callback(value);
-        }
-    );
-
-    ipcMain.removeHandler(options.id + "_dialogCancel");
-    ipcMain.handle(options.id + "_dialogCancel", () => {
-        customDialogWin.destroy();
-        if (callback != undefined) callback(undefined);
-    });
+export async function prompt(options: PromptOptions): Promise<string> {
+    return new PromptDialog(options).show();
 }
