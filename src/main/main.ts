@@ -162,7 +162,7 @@ function createHandlers(module: any): void {
         ipcMain.handle(
             func,
             (
-                event: IpcMainInvokeEvent,
+                _event: IpcMainInvokeEvent,
                 args: Parameters<typeof module[keyof typeof module]>
             ): Promise<ReturnType<typeof module[keyof typeof module]>> => {
                 // @ts-ignore: A spread argument must either have a tuple type or be passed to a
