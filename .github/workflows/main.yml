@@ -44,10 +44,6 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       
-      - name: Initialise Submodules
-        run: git submodule init
-      - name: Update Submodules
-        run: git submodule update
       - name: Install Yarn Dependencies
         run: yarn
       - name: Electron Forge Build
@@ -99,10 +95,6 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       
-      - name: Initialise Submodules
-        run: git submodule init
-      - name: Update Submodules
-        run: git submodule update
       - name: Install Yarn Dependencies
         run: yarn
       - name: Electron Forge Build
