@@ -146,3 +146,7 @@
 .tab-button-wrapper:hover .tab-button-desc {
     color: var(--inf-white2);
 }
+
+#dir-output {
+    field-sizing: content;
+}

@@ -192,7 +192,6 @@ function GameDirectoryActions(): JSX.Element {
                     readOnly={true}
                     id={styles.dirOutput}
                     value={cmcDir}
-                    size={Math.ceil(cmcDir.length * 0.75)}
                 />
             </div>
             <div className={styles.center + " " + styles.marginVertical}>
