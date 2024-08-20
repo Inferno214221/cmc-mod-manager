@@ -28,6 +28,10 @@ export function TabCharacters({
     [boolean, Dispatch<SetStateAction<boolean>>]
     = useState(null);
 
+    const [altsAsCharacters, setAltsAsCharacters]:
+    [boolean, Dispatch<SetStateAction<boolean>>]
+    = useState(null);
+
     const [characters, setCharacters]:
     [Character[], Dispatch<SetStateAction<Character[]>>]
     = useState([]);
@@ -72,6 +76,7 @@ export function TabCharacters({
         const data: AppData = await api.readAppData();
         setFilterInstallation(data.config.filterCharacterInstallation);
         setUpdateCharacters(data.config.updateCharacters);
+        setAltsAsCharacters(data.config.altsAsCharacters);
     }
 
     useEffect(() => {
@@ -104,31 +109,24 @@ export function TabCharacters({
     }
 
     useEffect(() => {
-        writeFilterInstallation();
+        writeSetting("filterCharacterInstallation", filterInstallation);
     }, [filterInstallation]);
 
-    async function writeFilterInstallation(): Promise<void> {
-        const appData: AppData = await api.readAppData();
-        if (
-            filterInstallation != null &&
-            appData.config.filterCharacterInstallation != filterInstallation
-        ) {
-            appData.config.filterCharacterInstallation = filterInstallation;
-            await api.writeAppData(appData);
-        }
-    }
-
     useEffect(() => {
-        writeUpdateCharacters();
+        writeSetting("updateCharacters", updateCharacters);
     }, [updateCharacters]);
 
-    async function writeUpdateCharacters(): Promise<void> {
+    useEffect(() => {
+        writeSetting("altsAsCharacters", altsAsCharacters);
+    }, [altsAsCharacters]);
+
+    async function writeSetting(
+        name: "filterCharacterInstallation" | "updateCharacters" | "altsAsCharacters",
+        value: boolean
+    ): Promise<void> {
         const appData: AppData = await api.readAppData();
-        if (
-            updateCharacters != null &&
-            appData.config.updateCharacters != updateCharacters
-        ) {
-            appData.config.updateCharacters = updateCharacters;
+        if (value != null && appData.config[name] != value) {
+            appData.config[name] = value;
             await api.writeAppData(appData);
         }
     }
@@ -357,6 +355,17 @@ export function TabCharacters({
                         falseTooltip={"Existing Characters: Abort"}
                         iconSize={"50px"}
                         setter={setUpdateCharacters}
+                    />
+                    <ToggleIconButton
+                        checked={altsAsCharacters}
+                        // trueIcon={"group"}
+                        trueIcon={"diversity_3"}
+                        trueTooltip={"Alts: Included As Characters"}
+                        // falseIcon={"group_off"}
+                        falseIcon={"reduce_capacity"}
+                        falseTooltip={"Alts: Excluded From Characters"}
+                        iconSize={"50px"}
+                        setter={setAltsAsCharacters}
                     />
                 </div>
             </div>
