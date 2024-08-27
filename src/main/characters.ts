@@ -199,14 +199,13 @@ export async function addAlt(
         mug: newAlt.mug
     });
     await writeAlts(alts, dir);
-    if (global.appData.config.altsAsCharacters) {
-        return;
+    if (!global.appData.config.altsAsCharacters && !isCharacterOnCSS(newAlt, dir)) {
+        const characterList: CharacterList = readCharacterList(dir);
+        characterList.removeByName(newAlt.name);
+        toResolve.push(writeCharacters(characterList.toArray(), dir));
+        toResolve.push(removeCharacterCss(newAlt, dir));
+        toResolve.push(writeCharacterRandom(newAlt.name, true, dir));
     }
-    const characterList: CharacterList = readCharacterList(dir);
-    characterList.removeByName(newAlt.name);
-    toResolve.push(writeCharacters(characterList.toArray(), dir));
-    toResolve.push(removeCharacterCss(newAlt, dir));
-    toResolve.push(writeCharacterRandom(newAlt.name, true, dir));
     await Promise.allSettled(toResolve);
     return;
 }
@@ -231,6 +230,19 @@ export async function removeAlt(
         await ensureAltIsCharacter(alt, dir);
     }
     return;
+}
+
+export function isCharacterOnCSS(character: Character, dir: string = global.gameDir): boolean {
+    const cssPages: CssPage[] = readCssPages(dir);
+    for (const page of cssPages) {
+        const cssData: CssData = readCssData(page);
+        for (const row of cssData) {
+            if (row.includes(("0000" + character.number).slice(-4))) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 export async function ensureAltIsCharacter(alt: Alt, dir: string = global.gameDir): Promise<void> {
@@ -261,11 +273,13 @@ export async function ensureAltIsntCharacter(
 ): Promise<void> {
     const toResolve: Promise<void>[] = [];
     const characterList: CharacterList = readCharacterList(dir);
-    if (characterList.getByName(alt.alt) == undefined) {
+    const character: Character = characterList.getByName(alt.alt);
+    if (character == undefined || isCharacterOnCSS(character, dir)) {
         return;
     }
     characterList.removeByName(alt.alt);
     toResolve.push(writeCharacters(characterList.toArray(), dir));
+    toResolve.push(removeCharacterCss(character, dir)); // Updates numbers
     toResolve.push(writeCharacterRandom(alt.alt, true, dir));
     await Promise.allSettled(toResolve);
     return;

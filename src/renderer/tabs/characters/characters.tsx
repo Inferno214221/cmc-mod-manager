@@ -117,7 +117,7 @@ export function TabCharacters({
     }, [updateCharacters]);
 
     useEffect(() => {
-        writeSetting("altsAsCharacters", altsAsCharacters);
+        writeAltsAsCharacters(altsAsCharacters);
     }, [altsAsCharacters]);
 
     async function writeSetting(
@@ -128,6 +128,17 @@ export function TabCharacters({
         if (value != null && appData.config[name] != value) {
             appData.config[name] = value;
             await api.writeAppData(appData);
+        }
+    }
+
+    async function writeAltsAsCharacters(value: boolean): Promise<void> {
+        const appData: AppData = await api.readAppData();
+        if (value != null && appData.config["altsAsCharacters"] != value) {
+            appData.config["altsAsCharacters"] = value;
+            await api.writeAppData(appData);
+            console.log("Calling");
+            await api.ensureAllAltsAreCharacters(altsAsCharacters);
+            readCharacters();
         }
     }
 
