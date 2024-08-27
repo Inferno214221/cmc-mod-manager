@@ -388,7 +388,7 @@ export async function installDownloadedStage(targetDir: string, id: string): Pro
     return;
 }
 
-export async function extractStage(extract: string, dir: string = global.gameDir): Promise<void> {
+export async function extractStage(extract: string, dir: string = global.gameDir): Promise<string> {
     const toResolve: Promise<void>[] = [];
     const stageList: StageList = readStageList(dir);
     const similarNames: string[] = [];
@@ -422,7 +422,7 @@ export async function extractStage(extract: string, dir: string = global.gameDir
         ], null, 2)
     ));
     await Promise.allSettled(toResolve);
-    return;
+    return extractDir;
 }
 
 export async function removeStage(remove: string, dir: string = global.gameDir): Promise<void> {

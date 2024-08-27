@@ -63,12 +63,12 @@ export default {
     extractCharacter: ((...args: [
         extract: string,
         dir?: string
-    ]): Promise<void> => ipcRenderer.invoke("extractCharacter", args)),
+    ]): Promise<string> => ipcRenderer.invoke("extractCharacter", args)),
 
     extractStage: ((...args: [
         extract: string,
         dir?: string
-    ]): Promise<void> => ipcRenderer.invoke("extractStage", args)),
+    ]): Promise<string> => ipcRenderer.invoke("extractStage", args)),
 
     focusWindow: ((): Promise<void> => ipcRenderer.invoke("focusWindow")),
 

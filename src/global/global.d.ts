@@ -139,7 +139,12 @@ interface Operation {
     animation: number,
     dependencies: OpDep[],
     call: (() => Promise<void>) | MainCall,
-    cancelable?: boolean
+    cancelable?: boolean,
+    postCompletition?: {
+        icon: string,
+        tooltip: string,
+        call: (() => Promise<void>) | MainCall
+    }
 }
 
 interface OperationUpdate {
@@ -148,12 +153,17 @@ interface OperationUpdate {
     body?: string,
     image?: string,
     state?: OpState,
-    cancelable?: boolean
+    cancelable?: boolean,
+    postCompletition?: {
+        icon: string,
+        tooltip: string,
+        call: (() => Promise<void>) | MainCall
+    }
 }
 
 interface MainCall {
     name: string,
-    args: []
+    args: any[]
 }
 
 interface Options {

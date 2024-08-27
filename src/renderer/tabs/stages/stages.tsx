@@ -462,12 +462,21 @@ function StageDisplay({
                                         animation: Math.floor(Math.random() * 3),
                                         dependencies: [OpDep.stages],
                                         call: async () => {
-                                            await api.extractStage(stage.name);
+                                            const extractDir: string =
+                                                await api.extractStage(stage.name);
                                             setOperations((prev: Operation[]) => {
                                                 const newOperations: Operation[] = [...prev];
                                                 newOperations[operationId].state = OpState.finished;
                                                 newOperations[operationId].body = "Extracted " +
                                                     "stage: '" + stage.name + "'.";
+                                                newOperations[operationId].postCompletition = {
+                                                    icon: "source",
+                                                    tooltip: "Open Extracted Files",
+                                                    call: {
+                                                        name: "openDir",
+                                                        args: [extractDir]
+                                                    }
+                                                };
                                                 return newOperations;
                                             });
                                         }

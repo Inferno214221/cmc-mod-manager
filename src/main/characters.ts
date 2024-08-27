@@ -685,7 +685,7 @@ export async function installDownloadedCharacter(targetDir: string, id: string):
 export async function extractCharacter(
     extract: string,
     dir: string = global.gameDir
-): Promise<void> {
+): Promise<string> {
     const toResolve: Promise<void>[] = [];
     const characters: Character[] = readCharacters(dir);
     const similarNames: string[] = [];
@@ -717,7 +717,7 @@ export async function extractCharacter(
         path.join(extractDir, "data", "dats")
     ));
     await Promise.allSettled(toResolve);
-    return;
+    return extractDir;
 }
 
 export async function removeCharacter(remove: string, dir: string = global.gameDir): Promise<void> {

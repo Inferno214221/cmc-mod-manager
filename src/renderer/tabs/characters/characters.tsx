@@ -488,12 +488,21 @@ function CharacterDisplay({
                                         animation: Math.floor(Math.random() * 3),
                                         dependencies: [OpDep.fighters],
                                         call: async () => {
-                                            await api.extractCharacter(character.name);
+                                            const extractDir: string =
+                                                await api.extractCharacter(character.name);
                                             setOperations((prev: Operation[]) => {
                                                 const newOperations: Operation[] = [...prev];
                                                 newOperations[operationId].state = OpState.finished;
                                                 newOperations[operationId].body = "Extracted " +
                                                     "character: '" + character.name + "'.";
+                                                newOperations[operationId].postCompletition = {
+                                                    icon: "source",
+                                                    tooltip: "Open Extracted Files",
+                                                    call: {
+                                                        name: "openDir",
+                                                        args: [extractDir]
+                                                    }
+                                                };
                                                 return newOperations;
                                             });
                                         }

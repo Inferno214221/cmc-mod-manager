@@ -301,6 +301,21 @@ export function OperationDisplay({ display }: { display: Operation }): JSX.Eleme
             break;
         case (OpState.finished):
             icon = "done";
+            if (display.postCompletition) {
+                closeButton = (
+                    <IconButton
+                        icon={display.postCompletition.icon}
+                        iconSize={"16px"}
+                        tooltip={display.postCompletition.tooltip}
+                        onClick={() => runOperation(display.postCompletition.call)}
+                    />
+                );
+            }
+            // could modify call and then run again??? - this would involve call
+            // overriding its parent's reference to itself, although it does already update itself
+            // for install operations, could que a delete to undo
+            // delete operations could be modified copies of extract, which target a tmp dir and que
+            // a install operation on undo
             break;
         case (OpState.canceled):
             icon = "block";
@@ -357,7 +372,6 @@ export async function callQueuedOperations(
     operations: Operation[],
     setOperations: Dispatch<SetStateAction<Operation[]>>
 ): Promise<void> {
-    // console.log("callQueuedOperations");
     const depsInUse: OpDep[] = [];
     operations.forEach((operation: Operation) => {
         if (operation.state == OpState.started) {
@@ -381,7 +395,6 @@ export async function callQueuedOperations(
         }
         return false;
     });
-    // console.log(toStart);
     if (toStart.length < 1) return;
     const operation: Operation = toStart[0];
     const operationId: number = operations.indexOf(operation);
@@ -392,15 +405,7 @@ export async function callQueuedOperations(
             newOperations[operationId].state = OpState.started;
             return newOperations;
         });
-        if (typeof operation.call == "function") {
-            await operation.call();
-        } else {
-            if (api[operation.call.name] != undefined) {
-                await api[operation.call.name](...operation.call.args);
-            } else {
-                // TODO: throw error
-            }
-        }
+        await runOperation(operation.call);
         console.log("Finished: " + operation.title);
     } catch (error: any) {
         setOperations((prev: Operation[]) => {
@@ -410,5 +415,17 @@ export async function callQueuedOperations(
                 error.message.replace(/(Error)[\w' ]*: (?=Error)/, "");
             return newOperations;
         });
+    }
+}
+
+async function runOperation(call: (() => Promise<void>) | MainCall): Promise<void> {
+    if (typeof call == "function") {
+        await call();
+    } else {
+        if (api[call.name] != undefined) {
+            await api[call.name](...call.args);
+        } else {
+            throw new Error("Function not found: " + call.name + ".");
+        }
     }
 }
