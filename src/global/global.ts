@@ -3,7 +3,7 @@ export enum DndDataType {
     excluded = "excluded"
 }
 
-export enum ModType {
+export enum ModTypes {
     character = "Character",
     stage = "Stage"
 }
@@ -33,163 +33,86 @@ export enum SortTypeOptions {
     menuName = "menuName"
 }
 
-export class CharacterList {
-    private characters: Character[];
-    private charactersByName: { [name: string]: number };
-    private charactersByNum: { [number: number]: number };
-    
-    // RIP overloads cause of JS
-    constructor(characters?: Character[]) {
-        this.characters = characters || [];
-        this.indexAllCharacters();
+export abstract class ModList<ModType extends Mod, ModUpdateType extends ModUpdate> {
+    private mods: ModType[];
+    private modsByName: { [name: string]: number };
+    private modsByNum: { [number: number]: number };
+
+    constructor(mods?: ModType[]) {
+        this.mods = mods || [];
+        this.indexAll();
     }
 
-    private indexAllCharacters(): void {
-        this.charactersByName = {};
-        this.charactersByNum = {};
-        this.characters.forEach((character: Character, index: number) => {
-            this.charactersByName[character.name] = index;
-            this.charactersByNum[character.number] = index;
+    private indexAll(): void {
+        this.modsByName = {};
+        this.modsByNum = {};
+        this.mods.forEach((mod: ModType, index: number) => {
+            this.modsByName[mod.name] = index;
+            this.modsByNum[mod.number] = index;
         });
     }
 
-    getAllCharacters(): Character[] {
-        return this.characters;
+    toArray(): ModType[] {
+        return this.mods;
     }
 
     getNextNumber(): number {
-        return this.characters.length + 1;
+        return this.mods.length + 1;
     }
 
-    addCharacter(character: Character): void {
-        const index: number = this.characters.push(character) - 1;
-        this.charactersByName[character.name] = index;
-        this.charactersByNum[character.number] = index;
+    add(mod: ModType): void {
+        const index: number = this.mods.push(mod) - 1;
+        this.modsByName[mod.name] = index;
+        this.modsByNum[mod.number] = index;
     }
 
-    getCharacterByName(name: string): Character {
-        return this.characters[this.charactersByName[name]];
+    getByName(name: string): ModType {
+        return this.mods[this.modsByName[name]];
     }
 
-    setCharacterByName(name: string, character: Character): void {
-        this.characters[this.charactersByName[name]] = character;
+    setByName(name: string, mod: ModType): void {
+        this.mods[this.modsByName[name]] = mod;
     }
 
-    updateCharacterByName(name: string, update: CharacterUpdate): void {
-        Object.assign(this.characters[this.charactersByName[name]], update);
+    updateByName(name: string, update: ModUpdateType): void {
+        Object.assign(this.mods[this.modsByName[name]], update);
     }
 
-    removeCharacterByName(name: string): void {
-        const remove: Character = this.getCharacterByName(name);
-        this.characters.splice(this.charactersByName[name], 1);
-        for (const character of this.characters) {
-            if (character.number > remove.number) {
-                character.number--;
+    removeByName(name: string): void {
+        const remove: ModType = this.getByName(name);
+        this.mods.splice(this.modsByName[name], 1);
+        for (const mod of this.mods) {
+            if (mod.number > remove.number) {
+                mod.number--;
             }
         }
-        this.indexAllCharacters();
+        this.indexAll();
     }
 
-    getCharacterByNum(number: number): Character {
-        return this.characters[this.charactersByNum[number]];
+    getByNum(number: number): ModType {
+        return this.mods[this.modsByNum[number]];
     }
 
-    setCharacterByNum(number: number, character: Character): void {
-        this.characters[this.charactersByNum[number]] = character;
+    setByNum(number: number, mod: ModType): void {
+        this.mods[this.modsByNum[number]] = mod;
     }
 
-    updateCharacterByNum(number: number, update: CharacterUpdate): void {
-        Object.assign(this.characters[this.charactersByNum[number]], update);
+    updateByNum(number: number, update: ModUpdateType): void {
+        Object.assign(this.mods[this.modsByNum[number]], update);
     }
 
-    removeCharacterByNum(number: number): void {
-        const remove: Character = this.getCharacterByNum(number);
-        this.characters.splice(this.charactersByNum[number], 1);
-        for (const character of this.characters) {
-            if (character.number > remove.number) {
-                character.number--;
+    removeByNum(number: number): void {
+        const remove: ModType = this.getByNum(number);
+        this.mods.splice(this.modsByNum[number], 1);
+        for (const mod of this.mods) {
+            if (mod.number > remove.number) {
+                mod.number--;
             }
         }
-        this.indexAllCharacters();
+        this.indexAll();
     }
 }
 
-export class StageList {
-    private stages: Stage[];
-    private stagesByName: { [name: string]: number };
-    private stagesByNum: { [number: number]: number };
-    
-    constructor(stages?: Stage[]) {
-        this.stages = stages || [];
-        this.indexAllStages();
-    }
+export class CharacterList extends ModList<Character, CharacterUpdate> {}
 
-    private indexAllStages(): void {
-        this.stagesByName = {};
-        this.stagesByNum = {};
-        this.stages.forEach((stage: Stage, index: number) => {
-            this.stagesByName[stage.name] = index;
-            this.stagesByNum[stage.number] = index;
-        });
-    }
-
-    getAllStages(): Stage[] {
-        return this.stages;
-    }
-
-    getNextNumber(): number {
-        return this.stages.length + 1;
-    }
-
-    addStage(stage: Stage): void {
-        const index: number = this.stages.push(stage) - 1;
-        this.stagesByName[stage.name] = index;
-        this.stagesByNum[stage.number] = index;
-    }
-
-    getStageByName(name: string): Stage {
-        return this.stages[this.stagesByName[name]];
-    }
-
-    setStageByName(name: string, stage: Stage): void {
-        this.stages[this.stagesByName[name]] = stage;
-    }
-
-    updateStageByName(name: string, update: StageUpdate): void {
-        Object.assign(this.stages[this.stagesByName[name]], update);
-    }
-
-    removeStageByName(name: string): void {
-        const remove: Stage = this.getStageByName(name);
-        this.stages.splice(this.stagesByName[name], 1);
-        for (const stage of this.stages) {
-            if (stage.number > remove.number) {
-                stage.number--;
-            }
-        }
-        this.indexAllStages();
-    }
-
-    getStageByNum(number: number): Stage {
-        return this.stages[this.stagesByNum[number]];
-    }
-
-    setStageByNum(number: number, stage: Stage): void {
-        this.stages[this.stagesByNum[number]] = stage;
-    }
-
-    updateStageByNum(number: number, update: StageUpdate): void {
-        Object.assign(this.stages[this.stagesByNum[number]], update);
-    }
-
-    removeStageByNum(number: number): void {
-        const remove: Stage = this.getStageByNum(number);
-        this.stages.splice(this.stagesByNum[number], 1);
-        for (const stage of this.stages) {
-            if (stage.number > remove.number) {
-                stage.number--;
-            }
-        }
-        this.indexAllStages();
-    }
-}
+export class StageList extends ModList<Stage, StageUpdate> {}

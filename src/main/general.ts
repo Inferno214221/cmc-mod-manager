@@ -9,7 +9,7 @@ import { execSync, spawn } from "child_process";
 import request from "request";
 import http from "http";
 import semver from "semver";
-import { ModType, OpDep, OpState } from "../global/global";
+import { ModTypes, OpDep, OpState } from "../global/global";
 
 require.resolve("./unrar.wasm");
 const WASM_BINARY: Buffer = fs.readFileSync(path.join(__dirname, "unrar.wasm"));
@@ -366,13 +366,13 @@ export async function downloadMod(url: string, modId: string, id: string): Promi
                 }
                 const filePath: string = path.join(global.temp, file);
                 const modInfo: string[] = await Promise.resolve(infoPromise);
-                let modType: ModType;
+                let modType: ModTypes;
                 switch (modInfo[1].toLowerCase()) {
                     case "characters":
-                        modType = ModType.character;
+                        modType = ModTypes.character;
                         break;
                     case "stages":
-                        modType = ModType.stage;
+                        modType = ModTypes.stage;
                         break;
                     default:
                         throw new Error("Unknown mod type.");
@@ -422,7 +422,7 @@ export async function downloadMod(url: string, modId: string, id: string): Promi
                     });
                     resolve();
                     switch (modType) {
-                        case ModType.character:
+                        case ModTypes.character:
                             global.win.webContents.send("addOperation", {
                                 id: id + "_install",
                                 title: "Character Installation",
@@ -439,7 +439,7 @@ export async function downloadMod(url: string, modId: string, id: string): Promi
                                 }
                             });
                             break;
-                        case ModType.stage:
+                        case ModTypes.stage:
                             global.win.webContents.send("addOperation", {
                                 id: id + "_install",
                                 title: "Stage Installation",

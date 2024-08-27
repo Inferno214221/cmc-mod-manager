@@ -14,7 +14,17 @@ declare const global: {
     cancelFunctions: { [id: string]: () => void }
 };
 
-interface Character {
+interface Mod {
+    name: string,
+    number: number,
+}
+
+interface ModUpdate {
+    name?: string,
+    number?: number,
+}
+
+interface Character extends Mod {
     name: string,
     menuName: string,
     series: string,
@@ -33,7 +43,7 @@ interface Alt {
     mug: string
 }
 
-interface CharacterUpdate {
+interface CharacterUpdate extends ModUpdate {
     name?: string,
     menuName?: string,
     series?: string,
@@ -91,7 +101,7 @@ interface AppData {
     config: AppConfig
 }
 
-interface Stage {
+interface Stage extends Mod {
     name: string,
     menuName: string,
     source: string,
@@ -101,7 +111,7 @@ interface Stage {
     icon: string
 }
 
-interface StageUpdate {
+interface StageUpdate extends ModUpdate {
     name?: string,
     menuName?: string,
     source?: string,

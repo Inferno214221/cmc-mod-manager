@@ -25,7 +25,7 @@ const BLANK_SSS_PAGE_DATA: SssData = [
 ];
 
 export function readStages(dir: string = global.gameDir): Stage[] {
-    return readStageList(dir).getAllStages();
+    return readStageList(dir).toArray();
 }
 
 function readStageList(dir: string = global.gameDir): StageList {
@@ -36,7 +36,7 @@ function readStageList(dir: string = global.gameDir): StageList {
     ).split(/\r?\n/);
     stagesTxt.shift(); // Drop the number
     for (let stage: number = 0; stage < Math.floor(stagesTxt.length / 4); stage++) {
-        stageList.addStage({
+        stageList.add({
             name: stagesTxt[(stage * 4) + 0],
             menuName: stagesTxt[(stage * 4) + 1],
             source: stagesTxt[(stage * 4) + 2],
@@ -52,8 +52,8 @@ function readStageList(dir: string = global.gameDir): StageList {
     ).split(/\r?\n/);
     lockedTxt.shift();
     lockedTxt.forEach((locked: string) => {
-        if (stageList.getStageByName(locked) == undefined) return;
-        stageList.updateStageByName(locked, { randomSelection: false });
+        if (stageList.getByName(locked) == undefined) return;
+        stageList.updateByName(locked, { randomSelection: false });
     });
     return stageList;
 }
@@ -148,7 +148,7 @@ export function getStageFiles(
         const stageList: StageList = readStageList(dir);
         similarNames.forEach((name: string) => {
             const validFilesString: string = validFiles.join("\n");
-            getStageRegExps(stageList.getStageByName(name), ignoreSeries)
+            getStageRegExps(stageList.getByName(name), ignoreSeries)
                 .forEach((exp: RegExp) => {
                     for (const match of validFilesString.matchAll(exp)) {
                         validFiles.splice(validFiles.indexOf(match[0]), 1);
@@ -226,7 +226,7 @@ export async function installStage(
             file.endsWith(".bin") || !file.includes(".")
         )[0].split(".")[0];
     const stageList: StageList = readStageList(dir);
-    if (!updateStages && stageList.getStageByName(stageName) != undefined) {
+    if (!updateStages && stageList.getByName(stageName) != undefined) {
         throw new Error("Stage already installed, updates disabled.");
     }
 
@@ -353,11 +353,11 @@ export async function installStage(
         toResolve.push(fs.copy(correctedDir, dir, { overwrite: true }));
     }
 
-    if (stageList.getStageByName(stageName) != undefined) {
-        return stageList.getStageByName(stageName);
+    if (stageList.getByName(stageName) != undefined) {
+        return stageList.getByName(stageName);
     }
-    stageList.addStage(stage);
-    toResolve.push(writeStages(stageList.getAllStages(), dir));
+    stageList.add(stage);
+    toResolve.push(writeStages(stageList.toArray(), dir));
     await Promise.allSettled(toResolve);
     fs.removeSync(path.join(dir, "info.json"));
     return stage;
@@ -392,9 +392,9 @@ export async function extractStage(extract: string, dir: string = global.gameDir
     const toResolve: Promise<void>[] = [];
     const stageList: StageList = readStageList(dir);
     const similarNames: string[] = [];
-    const stage: Stage = stageList.getStageByName(extract);
+    const stage: Stage = stageList.getByName(extract);
     const extractDir: string = path.join(dir, "0extracted", extract);
-    stageList.getAllStages().forEach((stage: Stage) => {
+    stageList.toArray().forEach((stage: Stage) => {
         if (stage.name.includes(extract) && stage.name != extract) {
             similarNames.push(stage.name);
         }
@@ -428,10 +428,10 @@ export async function extractStage(extract: string, dir: string = global.gameDir
 export async function removeStage(remove: string, dir: string = global.gameDir): Promise<void> {
     const toResolve: Promise<void>[] = [];
     const stageList: StageList = readStageList(dir);
-    const stage: Stage = stageList.getStageByName(remove);
+    const stage: Stage = stageList.getByName(remove);
 
     const similarNames: string[] = [];
-    stageList.getAllStages().forEach((stage: Stage) => {
+    stageList.toArray().forEach((stage: Stage) => {
         if (stage.name.startsWith(remove) && stage.name != remove) {
             similarNames.push(stage.name);
         }
@@ -446,8 +446,8 @@ export async function removeStage(remove: string, dir: string = global.gameDir):
     });
     console.log(new Date().getTime());
     
-    stageList.removeStageByName(remove);
-    toResolve.push(writeStages(stageList.getAllStages(), dir));
+    stageList.removeByName(remove);
+    toResolve.push(writeStages(stageList.toArray(), dir));
     toResolve.push(removeStageSss(stage, dir));
     toResolve.push(writeStageRandom(stage.name, true, dir));
     await Promise.allSettled(toResolve);

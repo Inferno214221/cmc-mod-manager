@@ -628,7 +628,7 @@ function CssCharacterDisplay({
         x: x,
         y: y
     };
-    const character: Character = characterList.getCharacterByNum(parseInt(cell));
+    const character: Character = characterList.getByNum(parseInt(cell));
     if (character == undefined) {
         return (
             <td
