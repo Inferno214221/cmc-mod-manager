@@ -1,6 +1,6 @@
 import { BrowserWindow, IpcMainInvokeEvent, ipcMain } from "electron";
 
-const DEV_TOOLS_ENABLED: boolean = false;
+const DEV_TOOLS_ENABLED: boolean = true;
 
 abstract class Dialog<OptionsType extends Options, ReturnType> {
     options: OptionsType;
@@ -25,7 +25,7 @@ abstract class Dialog<OptionsType extends Options, ReturnType> {
         this.callback = callback;
 
         this.window = new BrowserWindow({
-            resizable: DEV_TOOLS_ENABLED,
+            resizable: true,
             modal: true,
             autoHideMenuBar: true,
             minimizable: false,

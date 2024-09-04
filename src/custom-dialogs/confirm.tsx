@@ -13,20 +13,34 @@ if (options.title != undefined) {
 }
 root.render(<Body/>);
 
+async function requestNextFrame(height: number, depth: number = 0): Promise<number> {
+    return new Promise((resolve: (result: number) => void) => {
+        window.requestAnimationFrame(async () => {
+            if (document.documentElement.getBoundingClientRect().height == height) {
+                console.log(depth);
+                if (depth == 60) {
+                    resolve(height);
+                } else {
+                    resolve(await requestNextFrame(height, depth + 1));
+                }
+            } else {
+                dialog.resize(
+                    options.id,
+                    document.documentElement.getBoundingClientRect().height
+                );
+                resolve(document.documentElement.getBoundingClientRect().height);
+            }
+        });
+    });
+}
+
 function Body(): JSX.Element {
     const [height, setHeight]:
     [number, Dispatch<SetStateAction<number>>]
     = useState(0);
 
     useEffect(() => {
-        // Request second frame
-        window.requestAnimationFrame(() => window.requestAnimationFrame(() => {
-            if (document.documentElement.getBoundingClientRect().height == height) return;
-            if (options.id != undefined) {
-                dialog.resize(options.id, document.documentElement.getBoundingClientRect().height);
-                setHeight(document.documentElement.getBoundingClientRect().height);
-            }
-        }));
+        (async () => setHeight(await requestNextFrame(height)))();
     });
 
     return (
