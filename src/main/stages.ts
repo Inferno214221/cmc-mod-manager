@@ -551,3 +551,29 @@ export async function removeSssPage(page: SssPage, dir: string = global.gameDir)
     await writeSssPages(pages, dir);
     return;
 }
+
+export async function reorderSssPage(
+    from: number,
+    to: number,
+    dir: string = global.gameDir
+): Promise<void> {
+    if (to == from) return;
+    const pages: SssPage[] = readSssPages(dir);
+    pages.sort((a: SssPage, b: SssPage) =>
+        (a.pageNumber > b.pageNumber ? 1 : -1)
+    );
+    // I don't believe that the pages could ever be unordered, however I previously sorted them in
+    // the write function so I'll do it here too.
+    const target: SssPage = pages[from];
+    pages.splice(from, 1);
+    if (to > from) to--;
+    pages.splice(to, 0, target);
+    await writeSssPages(
+        pages.map((page: SssPage, index: number) => {
+            page.pageNumber = index;
+            return page;
+        }),
+        dir
+    );
+    return;
+}

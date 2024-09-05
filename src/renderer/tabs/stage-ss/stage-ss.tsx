@@ -405,6 +405,34 @@ function SssPages({
     [string, Dispatch<SetStateAction<string>>]
     = useState("");
 
+    function reorderSssPage(from: number, to: number): void {
+        let operationId: number;
+        setOperations((prev: Operation[]) => {
+            const newOperations: Operation[] = [...prev];
+            operationId = newOperations.push({
+                title: "Reorder SSS Pages",
+                body: "Moving SSS page: '" + sssPages[from].name + "' to index: " +
+                    (to > from ? to - 1 : to) + ".",
+                state: OpState.queued,
+                icon: "swap_horiz",
+                animation: Math.floor(Math.random() * 3),
+                dependencies: [OpDep.sss],
+                call: async () => {
+                    await api.reorderSssPage(from, to);
+                    setOperations((prev: Operation[]) => {
+                        const newOperations: Operation[] = [...prev];
+                        newOperations[operationId].state = OpState.finished;
+                        newOperations[operationId].body = "Moved SSS page: '" +
+                            sssPages[from].name + "' to index: " + (to > from ? to - 1 : to) + ".";
+                        return newOperations;
+                    });
+                    getPages();
+                }
+            }) - 1;
+            return newOperations;
+        });
+    }
+
     return (
         <div id={styles.pagesWrapper}>
             {sssPages.map((page: SssPage) =>
@@ -415,6 +443,7 @@ function SssPages({
                     setActivePage={setActivePage}
                     getPages={getPages}
                     setOperations={setOperations}
+                    reorderSssPage={reorderSssPage}
                     key={page.name}
                 />
             )}
@@ -425,6 +454,15 @@ function SssPages({
                     onInput={(event: any) => {
                         event.target.value = event.target.value.replace(/'|"/g, "");
                         setNewPageName(event.target.value);
+                    }}
+                    onDragOver={(event: any) => {
+                        event.preventDefault();
+                    }}
+                    onDrop={(event: any) => {
+                        reorderSssPage(
+                            parseInt(event.dataTransfer.getData("data")),
+                            sssPages.length
+                        );
                     }}
                 />
                 <IconButton
@@ -471,16 +509,17 @@ function SssPageDisplay({
     activePage,
     setActivePage,
     getPages,
-    setOperations
+    setOperations,
+    reorderSssPage
 }: {
     page: SssPage,
     sssPages: SssPage[],
     activePage: number,
     setActivePage: Dispatch<SetStateAction<number>>,
     getPages: () => Promise<void>,
-    setOperations: Dispatch<SetStateAction<Operation[]>>
+    setOperations: Dispatch<SetStateAction<Operation[]>>,
+    reorderSssPage: (from: number, to: number) => void
 }): JSX.Element {
-    console.log(sssPages[activePage].pageNumber == page.pageNumber);
     return (
         <div className={styles.sssPage + (sssPages[activePage].pageNumber == page.pageNumber ?
             " " + styles.sssPageActive : "")}>
@@ -490,6 +529,21 @@ function SssPageDisplay({
                     setActivePage(page.pageNumber);
                 }}
                 className={styles.sssPageButton}
+                draggable={true}
+                onDragStart={(event: any) => {
+                    event.dataTransfer.setData("data", page.pageNumber);
+                }}
+                onDragOver={(event: any) => {
+                    event.preventDefault();
+                }}
+                onDrop={(event: any) => {
+                    const from: number = parseInt(event.dataTransfer.getData("data"));
+                    if (from == page.pageNumber) return;
+                    reorderSssPage(
+                        from,
+                        page.pageNumber
+                    );
+                }}
             >
                 {page.name}
             </button>

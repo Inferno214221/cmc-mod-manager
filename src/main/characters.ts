@@ -899,7 +899,7 @@ export async function addCssPage(pageName: string, dir: string = global.gameDir)
     pages.push({ name: pageName, path: pagePath });
     await writeCssPages(pages, dir);
     if (fs.existsSync(pagePath)) {
-        throw new Error("File already exists with the same names as the new CSS page.");
+        throw new Error("File already exists with the same name as the new CSS page.");
     }
     fs.ensureFileSync(pagePath);
     fs.writeFileSync(
@@ -907,6 +907,21 @@ export async function addCssPage(pageName: string, dir: string = global.gameDir)
         BLANK_CSS_PAGE_DATA,
         { encoding: "ascii" }
     );
+    return;
+}
+
+export async function reorderCssPage(
+    from: number,
+    to: number,
+    dir: string = global.gameDir
+): Promise<void> {
+    if (to == from) return;
+    const pages: CssPage[] = readCssPages(dir);
+    const target: CssPage = pages[from];
+    pages.splice(from, 1);
+    if (to > from) to--;
+    pages.splice(to, 0, target);
+    await writeCssPages(pages, dir);
     return;
 }
 

@@ -408,15 +408,45 @@ function CssPages({
     [string, Dispatch<SetStateAction<string>>]
     = useState("");
 
+    function reorderCssPage(from: number, to: number): void {
+        let operationId: number;
+        setOperations((prev: Operation[]) => {
+            const newOperations: Operation[] = [...prev];
+            operationId = newOperations.push({
+                title: "Reorder CSS Pages",
+                body: "Moving CSS page: '" + cssPages[from].name + "' to index: " +
+                    (to > from ? to - 1 : to) + ".",
+                state: OpState.queued,
+                icon: "swap_horiz",
+                animation: Math.floor(Math.random() * 3),
+                dependencies: [OpDep.gameSettings],
+                call: async () => {
+                    await api.reorderCssPage(from, to);
+                    setOperations((prev: Operation[]) => {
+                        const newOperations: Operation[] = [...prev];
+                        newOperations[operationId].state = OpState.finished;
+                        newOperations[operationId].body = "Moved CSS page: '" +
+                            cssPages[from].name + "' to index: " + (to > from ? to - 1 : to) + ".";
+                        return newOperations;
+                    });
+                    getPages();
+                }
+            }) - 1;
+            return newOperations;
+        });
+    }
+
     return (
         <div id={styles.pagesWrapper}>
-            {cssPages.map((page: CssPage) =>
+            {cssPages.map((page: CssPage, index: number) =>
                 <CssPageDisplay
                     page={page}
                     activePage={activePage}
+                    pageIndex={index}
                     setActivePage={setActivePage}
                     getPages={getPages}
                     setOperations={setOperations}
+                    reorderCssPage={reorderCssPage}
                     key={page.name}
                 />
             )}
@@ -427,6 +457,15 @@ function CssPages({
                     onInput={(event: any) => {
                         event.target.value = event.target.value.replace(/'|"/g, "");
                         setNewPageName(event.target.value);
+                    }}
+                    onDragOver={(event: any) => {
+                        event.preventDefault();
+                    }}
+                    onDrop={(event: any) => {
+                        reorderCssPage(
+                            parseInt(event.dataTransfer.getData("data")),
+                            cssPages.length
+                        );
                     }}
                 />
                 <IconButton
@@ -470,26 +509,47 @@ function CssPages({
 function CssPageDisplay({
     page,
     activePage,
+    pageIndex,
     setActivePage,
     getPages,
-    setOperations
+    setOperations,
+    reorderCssPage
 }: {
     page: CssPage,
     activePage: CssPage,
+    pageIndex: number,
     setActivePage: (state: CssPage) => void,
     getPages: () => Promise<void>,
-    setOperations: Dispatch<SetStateAction<Operation[]>>
+    setOperations: Dispatch<SetStateAction<Operation[]>>,
+    reorderCssPage: (from: number, to: number) => void
 }): JSX.Element {
     return (
-        <div className={
-            styles.cssPage + (activePage.path == page.path ? " " + styles.cssPageActive : "")
-        }>
+        <div
+            className={
+                styles.cssPage + (activePage.path == page.path ? " " + styles.cssPageActive : "")
+            }
+        >
             <button
                 type={"button"}
                 onClick={() => {
                     setActivePage(page);
                 }}
                 className={styles.cssPageButton}
+                draggable={true}
+                onDragStart={(event: any) => {
+                    event.dataTransfer.setData("data", pageIndex);
+                }}
+                onDragOver={(event: any) => {
+                    event.preventDefault();
+                }}
+                onDrop={(event: any) => {
+                    const from: number = parseInt(event.dataTransfer.getData("data"));
+                    if (from == pageIndex) return;
+                    reorderCssPage(
+                        from,
+                        pageIndex
+                    );
+                }}
             >
                 {page.name}
             </button>

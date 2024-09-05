@@ -280,6 +280,18 @@ export default {
         dir?: string
     ]): Promise<void> => ipcRenderer.invoke("removeStageSss", args)),
 
+    reorderCssPage: ((...args: [
+        from: number,
+        to: number,
+        dir?: string
+    ]): Promise<void> => ipcRenderer.invoke("reorderCssPage", args)),
+
+    reorderSssPage: ((...args: [
+        from: number,
+        to: number,
+        dir?: string
+    ]): Promise<void> => ipcRenderer.invoke("reorderSssPage", args)),
+
     runGame: ((...args: [
         dir?: string
     ]): Promise<void> => ipcRenderer.invoke("runGame", args)),
