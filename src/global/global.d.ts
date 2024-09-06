@@ -89,7 +89,13 @@ interface DndData {
 
 interface FoundCharacter {
     name: string
-    dat: CharacterDat
+    dat: CharacterDat,
+    mug: string
+}
+
+interface MinimalCharacter {
+    name: string,
+    displayName: string
 }
 
 interface AppConfig {
@@ -191,4 +197,8 @@ interface PromptOptions extends Options {
     invalidCharacters?: RegExp,
     okLabel?: string,
     cancelLabel?: string
+}
+
+interface CharacterInstallOptions extends Options {
+    targetDir: string
 }

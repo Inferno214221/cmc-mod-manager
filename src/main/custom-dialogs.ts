@@ -143,3 +143,26 @@ export class PromptDialog extends Dialog<PromptOptions, string> {
 export async function prompt(options: PromptOptions): Promise<string> {
     return new PromptDialog(options).show();
 }
+
+declare const DIALOG_CHARACTER_INSTALL_PRELOAD_WEBPACK_ENTRY: string;
+declare const DIALOG_CHARACTER_INSTALL_WEBPACK_ENTRY: string;
+
+export class CharacterInstallDialog extends Dialog<CharacterInstallOptions, null> {
+    readonly PRELOAD_ENTRY: string = DIALOG_CHARACTER_INSTALL_PRELOAD_WEBPACK_ENTRY;
+    readonly REACT_ENTRY: string = DIALOG_CHARACTER_INSTALL_WEBPACK_ENTRY;
+
+    ok(value: null): void {
+        super.ok(value);
+        this.callback();
+    }
+    cancel(): void {
+        super.cancel();
+        this.callback();
+    }
+
+    // TODO: wait until rendered to show
+}
+
+export async function characterInstallation(options: CharacterInstallOptions): Promise<void> {
+    return new CharacterInstallDialog(options).show();
+}

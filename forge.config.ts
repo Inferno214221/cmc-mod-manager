@@ -101,12 +101,20 @@ const config: ForgeConfig = {
                             js: "./src/custom-dialogs/preload.ts",
                         },
                     },
+                    {
+                        html: "./src/custom-dialogs/custom-dialogs.html",
+                        js: "./src/custom-dialogs/installation-dialogs/character-install.tsx",
+                        name: "dialog_character_install",
+                        preload: {
+                            js: "./src/custom-dialogs/installation-dialogs/preload.ts",
+                        },
+                    }
                 ],
             },
         }),
     ],
     hooks: {
-        postPackage: async (config: any, packageResult: any) => {
+        postPackage: async (_config: any, packageResult: any) => {
             fs.copySync(
                 path.join(__dirname, "LICENSE"),
                 path.join(packageResult.outputPaths[0], "LICENSE"),

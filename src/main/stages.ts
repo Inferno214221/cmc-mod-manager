@@ -202,7 +202,6 @@ export function installStages(
             );
         } else {
             // add operation to prompt user and discard filter and update prefs
-            // TODO: add user as a dependency - for prompts
             throw new Error("Not implemented");
         }
     } catch (error: any) {
@@ -242,7 +241,7 @@ export function correctStageDir(targetDir: string): string {
 }
 
 export function findStages(targetDir: string): string[] {
-    return [...new Set(
+    return Array.from(new Set(
         fs.readdirSync(
             path.join(targetDir, "stage")
         ).filter(
@@ -250,7 +249,7 @@ export function findStages(targetDir: string): string[] {
         ).map(
             (stage: string) => stage.replace(/\.[^/\\]+$/, "")
         )
-    )];
+    ));
 }
 
 export function queStageInstallation(
@@ -267,7 +266,7 @@ export function queStageInstallation(
         title: "Stage Installation",
         body: "Installing a stage from " + location + ".",
         state: OpState.queued,
-        icon: "folder_shared", // or archive?
+        icon: "folder_shared",
         animation: Math.floor(Math.random() * 3),
         dependencies: [OpDep.stages],
         call: {

@@ -484,8 +484,14 @@ export function installCharacters(
                 dir
             );
         } else {
-            // add operation to prompt user and discard filter and update prefs
-            throw new Error("Not implemented");
+            // TODO: make operation
+            console.log(foundCharacters);
+            customDialogs.characterInstallation({
+                id: "TODO",
+                body: "Characters found in '" + correctedTarget + "':",
+                title: "Select Characters To Install",
+                targetDir: correctedTarget
+            });
         }
     } catch (error: any) {
         global.win.webContents.send("addOperation", {
@@ -524,7 +530,7 @@ export function correctCharacterDir(targetDir: string): string {
 }
 
 export function findCharacters(targetDir: string): FoundCharacter[] {
-    const characterNames: string[] = [...new Set(
+    const characterNames: string[] = Array.from(new Set(
         fs.readdirSync(
             path.join(targetDir, "fighter")
         ).filter(
@@ -532,7 +538,7 @@ export function findCharacters(targetDir: string): FoundCharacter[] {
         ).map(
             (character: string) => character.replace(/\.[^/\\]+$/, "")
         )
-    )];
+    ));
     return characterNames.map((characterName: string) => {
         if (fs.existsSync(path.join(targetDir, "data", "dats", characterName + ".dat"))) {
             return {
@@ -540,7 +546,8 @@ export function findCharacters(targetDir: string): FoundCharacter[] {
                 dat: readCharacterDatPath(
                     path.join(targetDir, "data", "dats", characterName + ".dat"),
                     characterName
-                )
+                ),
+                mug: path.join(targetDir, "gfx", "mugs", characterName + ".png")
             };
         } else if (fs.existsSync(path.join(targetDir, "data", characterName + ".dat"))) {
             return {
@@ -548,7 +555,8 @@ export function findCharacters(targetDir: string): FoundCharacter[] {
                 dat: readCharacterDatPath(
                     path.join(targetDir, "data", characterName + ".dat"),
                     characterName
-                )
+                ),
+                mug: path.join(targetDir, "gfx", "mugs", characterName + ".png")
             };
         } else {
             // TODO: inform the user about characters without dats?
@@ -571,7 +579,7 @@ export function queCharacterInstallation(
         title: "Character Installation",
         body: "Installing a character from " + location + ".",
         state: OpState.queued,
-        icon: "folder_shared", // or archive?
+        icon: "folder_shared",
         animation: Math.floor(Math.random() * 3),
         dependencies: [OpDep.fighters],
         call: {
