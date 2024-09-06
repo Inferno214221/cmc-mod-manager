@@ -87,6 +87,11 @@ interface DndData {
     y?: number
 }
 
+interface FoundCharacter {
+    name: string
+    dat: CharacterDat
+}
+
 interface AppConfig {
     enableLogs: boolean,
     altsAsCharacters: boolean,

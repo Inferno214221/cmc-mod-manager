@@ -14,6 +14,7 @@ import { ModTypes, OpDep, OpState } from "../global/global";
 require.resolve("./unrar.wasm");
 const WASM_BINARY: Buffer = fs.readFileSync(path.join(__dirname, "unrar.wasm"));
 
+import * as characters from "./characters";
 import * as customDialogs from "./custom-dialogs";
 
 const SUPPORTED_VERSIONS: string[] = [
@@ -423,21 +424,22 @@ export async function downloadMod(url: string, modId: string, id: string): Promi
                     resolve();
                     switch (modType) {
                         case ModTypes.character:
-                            global.win.webContents.send("addOperation", {
-                                id: id + "_install",
-                                title: "Character Installation",
-                                body: "Installing character from GameBanana.",
-                                image: "https://gamebanana.com/mods/embeddables/" + modId +
-                                    "?type=medium_square",
-                                state: OpState.queued,
-                                icon: "contact_page",
-                                animation: Math.floor(Math.random() * 3),
-                                dependencies: [OpDep.fighters],
-                                call: {
-                                    name: "installDownloadedCharacter",
-                                    args: [output, id]
-                                }
-                            });
+                            characters.installDownloadedCharacters(output);
+                            // global.win.webContents.send("addOperation", {
+                            //     id: id + "_install",
+                            //     title: "Character Installation",
+                            //     body: "Installing character from GameBanana.",
+                            //     image: "https://gamebanana.com/mods/embeddables/" + modId +
+                            //         "?type=medium_square",
+                            //     state: OpState.queued,
+                            //     icon: "contact_page",
+                            //     animation: Math.floor(Math.random() * 3),
+                            //     dependencies: [OpDep.fighters],
+                            //     call: {
+                            //         name: "installDownloadedCharacters",
+                            //         args: [output, id]
+                            //     }
+                            // });
                             break;
                         case ModTypes.stage:
                             global.win.webContents.send("addOperation", {

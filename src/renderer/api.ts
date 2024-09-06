@@ -34,6 +34,10 @@ export default {
     confirmDestructiveAction: ((): Promise<boolean> =>
         ipcRenderer.invoke("confirmDestructiveAction")),
 
+    correctCharacterDir: ((...args: [
+        targetDir: string
+    ]): Promise<string> => ipcRenderer.invoke("correctCharacterDir", args)),
+
     downloadMod: ((...args: [
         url: string,
         modId: string,
@@ -70,6 +74,10 @@ export default {
         dir?: string
     ]): Promise<string> => ipcRenderer.invoke("extractStage", args)),
 
+    findCharacters: ((...args: [
+        targetDir: string
+    ]): Promise<FoundCharacter[]> => ipcRenderer.invoke("findCharacters", args)),
+
     focusWindow: ((): Promise<void> => ipcRenderer.invoke("focusWindow")),
 
     getCharacterFiles: ((...args: [
@@ -100,6 +108,11 @@ export default {
         list?: string[]
     ]): Promise<string | null> => ipcRenderer.invoke("getGameVersion", args)),
 
+    getMissingDatInfo: ((...args: [
+        dat: CharacterDat,
+        targetDir: string//
+    ]): Promise<CharacterDat> => ipcRenderer.invoke("getMissingDatInfo", args)),
+
     getOperations: ((... args: [
         operations: string
     ]): Promise<void> => ipcRenderer.invoke("getOperations", args)),
@@ -123,27 +136,33 @@ export default {
     handleProcessArgs: ((): Promise<void> => ipcRenderer.invoke("handleProcessArgs")),
 
     installCharacter: ((...args: [
-        characterDir: string,
-        filterInstallation?: boolean,
-        updateCharacters?: boolean,
-        dir?: string
-    ]): Promise<Character> => ipcRenderer.invoke("installCharacter", args)),
-
-    installCharacterArchive: ((...args: [
+        targetDir: string,
+        foundCharacter: FoundCharacter,
         filterInstallation: boolean,
         updateCharacters: boolean,
         dir?: string
-    ]): Promise<Character> => ipcRenderer.invoke("installCharacterArchive", args)),
+    ]): Promise<void> => ipcRenderer.invoke("installCharacter", args)),
 
-    installCharacterDir: ((...args: [
+    installCharacters: ((...args: [
+        targetDir: string,
         filterInstallation: boolean,
         updateCharacters: boolean,
+        location: string,
         dir?: string
-    ]): Promise<Character> => ipcRenderer.invoke("installCharacterDir", args)),
+    ]): Promise<void> => ipcRenderer.invoke("installCharacters", args)),
 
-    installDownloadedCharacter: ((...args: [
+    installCharacterOp: ((...args: [
+        targetDir: string,
+        foundCharacter: FoundCharacter,
+        filterInstallation: boolean,
+        updateCharacters: boolean,
+        id: string,
+        dir?: string
+    ]): Promise<void> => ipcRenderer.invoke("installCharacterOp", args)),
+
+    installDownloadedCharacters: ((...args: [
         targetDir: string
-    ]): Promise<void> => ipcRenderer.invoke("installDownloadedCharacter", args)),
+    ]): Promise<void> => ipcRenderer.invoke("installDownloadedCharacters", args)),
 
     installDownloadedStage: ((...args: [
         targetDir: string
@@ -192,6 +211,15 @@ export default {
     prompt: ((...args: [
         options: PromptOptions
     ]): Promise<string> => ipcRenderer.invoke("prompt", args)),
+
+    queCharacterInstallation: ((...args: [
+        target: string,
+        foundCharacter: FoundCharacter,
+        filterInstallation: boolean,
+        updateCharacters: boolean,
+        location: string,
+        dir?: string
+    ]): Promise<void> => ipcRenderer.invoke("queCharacterInstallation", args)),
 
     readAlts: ((...args: [
         dir?: string
@@ -295,6 +323,19 @@ export default {
     runGame: ((...args: [
         dir?: string
     ]): Promise<void> => ipcRenderer.invoke("runGame", args)),
+
+    selectAndInstallCharacters: ((...args: [
+        filterInstallation?: boolean,
+        updateCharacters?: boolean,
+        fromArchive?: boolean,
+        dir?: string
+    ]): Promise<void> => ipcRenderer.invoke("selectAndInstallCharacters", args)),
+
+    selectCharacterPathsArch: ((): Promise<string[]> =>
+        ipcRenderer.invoke("selectCharacterPathsArch")),
+
+    selectCharacterPathsDir: ((): Promise<string[]> =>
+        ipcRenderer.invoke("selectCharacterPathsDir")),
 
     selectGameDir: ((): Promise<string | null> => ipcRenderer.invoke("selectGameDir")),
 

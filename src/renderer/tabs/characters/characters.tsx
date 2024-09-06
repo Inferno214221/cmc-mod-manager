@@ -249,40 +249,11 @@ export function TabCharacters({
                         iconSize={"50px"}
                         tooltip={"Install Character From Directory"}
                         onClick={async () => {
-                            let operationId: number;
-                            setOperations((prev: Operation[]) => {
-                                const newOperations: Operation[] = [...prev];
-                                operationId = newOperations.push({
-                                    title: "Character Installation",
-                                    body: "Installing a character from a directory.",
-                                    state: OpState.queued,
-                                    icon: "folder_shared",
-                                    animation: Math.floor(Math.random() * 3),
-                                    dependencies: [OpDep.fighters],
-                                    call: async () => {
-                                        const character: Character = await api.installCharacterDir(
-                                            filterInstallation,
-                                            updateCharacters
-                                        );
-                                        setOperations((prev: Operation[]) => {
-                                            const newOperations: Operation[] = [...prev];
-                                            if (character == null) {
-                                                newOperations[operationId].state = OpState.canceled;
-                                            } else {
-                                                newOperations[operationId].state = OpState.finished;
-                                                newOperations[operationId].body = "Installed " +
-                                                    "character: '" + character.name +
-                                                    "' from a directory.";
-                                                newOperations[operationId].image = "img://" +
-                                                    character.mug;
-                                            }
-                                            return newOperations;
-                                        });
-                                        readCharacters();
-                                    }
-                                }) - 1;
-                                return newOperations;
-                            });
+                            api.selectAndInstallCharacters(
+                                filterInstallation,
+                                updateCharacters,
+                                false,
+                            );
                         }}
                     />
                     <IconButton
@@ -290,41 +261,11 @@ export function TabCharacters({
                         iconSize={"50px"}
                         tooltip={"Install Character From Archive"}
                         onClick={async () => {
-                            let operationId: number;
-                            setOperations((prev: Operation[]) => {
-                                const newOperations: Operation[] = [...prev];
-                                operationId = newOperations.push({
-                                    title: "Character Installation",
-                                    body: "Installing a character from an archive.",
-                                    state: OpState.queued,
-                                    icon: "contact_page",
-                                    animation: Math.floor(Math.random() * 3),
-                                    dependencies: [OpDep.fighters],
-                                    call: async () => {
-                                        const character: Character =
-                                            await api.installCharacterArchive(
-                                                filterInstallation,
-                                                updateCharacters
-                                            );
-                                        setOperations((prev: Operation[]) => {
-                                            const newOperations: Operation[] = [...prev];
-                                            if (character == null) {
-                                                newOperations[operationId].state = OpState.canceled;
-                                            } else {
-                                                newOperations[operationId].state = OpState.finished;
-                                                newOperations[operationId].body = "Installed " +
-                                                    "character: '" + character.name +
-                                                    "' from an archive.";
-                                                newOperations[operationId].image = "img://" +
-                                                    character.mug;
-                                            }
-                                            return newOperations;
-                                        });
-                                        readCharacters();
-                                    }
-                                }) - 1;
-                                return newOperations;
-                            });
+                            api.selectAndInstallCharacters(
+                                filterInstallation,
+                                updateCharacters,
+                                true,
+                            );
                         }}
                     />
                     <IconButton

@@ -2,7 +2,7 @@ import { OpenDialogReturnValue, dialog } from "electron";
 import fs from "fs-extra";
 import path from "path";
 import ini from "ini";
-import { CharacterList, OpState } from "../global/global";
+import { CharacterList, OpDep, OpState } from "../global/global";
 
 import * as general from "./general";
 import * as customDialogs from "./custom-dialogs";
@@ -443,107 +443,259 @@ export async function writeCharacterDat(dat: CharacterDat, destination: string):
     return;
 }
 
-export async function installCharacterDir(
+export async function selectAndInstallCharacters(
     filterInstallation: boolean,
     updateCharacters: boolean,
+    fromArchive: boolean = false,
     dir: string = global.gameDir
-): Promise<Character> {
-    const selected: OpenDialogReturnValue = await dialog.showOpenDialog(global.win, {
-        properties: ["openDirectory"]
-    });
-    if (selected.canceled == true) {
-        return null;
-    }
-    const retVal: Character =
-        await installCharacter(selected.filePaths[0], filterInstallation, updateCharacters, dir);
-    return retVal;
-}
-
-export async function installCharacterArchive(
-    filterInstallation: boolean,
-    updateCharacters: boolean,
-    dir: string = global.gameDir
-): Promise<Character> {
-    const selected: OpenDialogReturnValue = await dialog.showOpenDialog(global.win, {
-        properties: ["openFile"]
-    });
-    if (selected.canceled == true) {
-        return null;
-    }
-    const output: string = await general.extractArchive(
-        selected.filePaths[0],
-        global.temp
+): Promise<void> {
+    const targetDirs: string[] = (
+        fromArchive ? await selectCharacterPathsArch() : await selectCharacterPathsDir()
     );
-    const retVal: Character =
-        await installCharacter(output, filterInstallation, updateCharacters, dir);
-    return retVal;
+    if (targetDirs.length == 0) return;
+    targetDirs.forEach((target: string) => {
+        installCharacters(target, filterInstallation, updateCharacters, "filesystem", dir);
+    });
+    return;
 }
 
-export async function installCharacter(
-    characterDir: string,
-    filterInstallation: boolean = true,
-    updateCharacters: boolean = false,
+export async function installDownloadedCharacters(targetDir: string): Promise<void> {
+    installCharacters(targetDir, true, global.appData.config.updateCharacters, "GameBanana");
+}
+
+export function installCharacters(
+    targetDir: string,
+    filterInstallation: boolean,
+    updateCharacters: boolean,
+    location: string,
     dir: string = global.gameDir
-): Promise<Character> {
-    const toResolve: Promise<void>[] = [];
-    let correctedDir: string = characterDir;
-    console.log(correctedDir);
+): Promise<void> {
+    // TODO: catch error for no fighter dir
+    const correctedTarget: string = correctCharacterDir(targetDir);
+    // TODO: mention something about characters which fail?
+    const foundCharacters: FoundCharacter[] = findCharacters(correctedTarget);
+    if (foundCharacters.length == 0) return; // TODO: none found
+    if (foundCharacters.length == 1) {
+        queCharacterInstallation(
+            correctedTarget, foundCharacters[0], filterInstallation, updateCharacters, location, dir
+        );
+    } else {
+        // add operation to prompt user and discard filter and update prefs
+        // TODO: add user as a dependency - for prompts
+        throw new Error("Not implemented");
+    }
+    return;
+}
+
+export async function selectCharacterPathsArch(): Promise<string[]> {
+    const selected: OpenDialogReturnValue = await dialog.showOpenDialog(global.win, {
+        filters: [
+            { name: "Archives", extensions: ["zip", "rar"] },
+            { name: "All Files", extensions: ["*"] }
+        ],
+        properties: ["openFile", "multiSelections"]
+    });
+    if (selected.filePaths == undefined) return [];
+    const promises: Promise<string>[] = selected.filePaths.map(
+        (archive: string) => general.extractArchive(
+            archive,
+            global.temp
+        )
+    );
+    const resolved: string[] = await Promise.all(promises);
+    // This is probably the same as awaiting in the map, but I'm not sure about unrar
+    return resolved;
+}
+
+export async function selectCharacterPathsDir(): Promise<string[]> {
+    const selected: OpenDialogReturnValue = await dialog.showOpenDialog(global.win, {
+        properties: ["openDirectory", "multiSelections"]
+    });
+    return selected.filePaths || [];
+}
+
+export function correctCharacterDir(targetDir: string): string {
+    let correctedDir: string = targetDir;
     const modFiles: string[] = general.getAllFiles(correctedDir)
         .map((file: string) => file.replace(correctedDir, ""));
-    console.log(modFiles);
     for (let file of modFiles) {
         file = path.join(file).split(path.sep).join(path.posix.sep);
-        console.log(file);
         const fileDir: string = path.posix.parse(file).dir + "/";
-        console.log(fileDir);
-        console.log(fileDir.includes("/fighter/") && !file.includes("/announcer/"));
         if (fileDir.includes("/fighter/") && !file.includes("/announcer/")) {
             let topDir: string = file.split("/").shift();
-            console.log(topDir);
             while (topDir != "fighter") {
                 correctedDir = path.join(correctedDir, topDir);
-                console.log(correctedDir);
                 file = file.replace(topDir + "/", "");
-                console.log(file);
                 topDir = file.split("/").shift();
-                console.log(topDir);
             }
             break;
         }
     }
-    console.log(correctedDir, fs.readdirSync(correctedDir));
     if (!fs.readdirSync(correctedDir).includes("fighter")) {
         throw new Error("No 'fighter' subdirectory found.");
     }
-    const characterName: string = fs.readdirSync(path.join(correctedDir, "fighter"))
+    return correctedDir;
+}
+
+export function findCharacters(targetDir: string): FoundCharacter[] {
+    const characterNames: string[] = fs.readdirSync(path.join(targetDir, "fighter"))
         .filter((file: string) =>
             file.endsWith(".bin") || !file.includes(".")
-        )[0].split(".")[0];
+        )[0].split(".");
+    return characterNames.map((characterName: string) => {
+        if (fs.existsSync(path.join(targetDir, "data", "dats", characterName + ".dat"))) {
+            return {
+                name: characterName,
+                dat: readCharacterDatPath(
+                    path.join(targetDir, "data", "dats", characterName + ".dat"),
+                    characterName
+                )
+            };
+        } else if (fs.existsSync(path.join(targetDir, "data", characterName + ".dat"))) {
+            return {
+                name: characterName,
+                dat: readCharacterDatPath(
+                    path.join(targetDir, "data", characterName + ".dat"),
+                    characterName
+                )
+            };
+        } else {
+            // TODO: inform the user about characters without dats?
+            return null;
+        }
+    }).filter((found: FoundCharacter) => found != null);
+}
+
+export function queCharacterInstallation(
+    targetDir: string,
+    foundCharacter: FoundCharacter,
+    filterInstallation: boolean,
+    updateCharacters: boolean,
+    location: string,
+    dir: string = global.gameDir
+): void {
+    const id: string = foundCharacter.name + "_" + new Date().getTime();
+    global.win.webContents.send("addOperation", {
+        id: id,
+        title: "Character Installation",
+        body: "Installing a character from " + location + ".",
+        state: OpState.queued,
+        icon: "folder_shared", // or archive?
+        animation: Math.floor(Math.random() * 3),
+        dependencies: [OpDep.fighters],
+        call: {
+            name: "installCharacterOp",
+            args: [
+                targetDir, foundCharacter, filterInstallation, updateCharacters, id, location, dir
+            ]
+        }
+    });
+}
+
+export async function installCharacterOp(
+    targetDir: string,
+    foundCharacter: FoundCharacter,
+    filterInstallation: boolean,
+    updateCharacters: boolean,
+    id: string,
+    location: string,
+    dir: string = global.gameDir
+): Promise<void> {
+    const character: Character = await installCharacter(
+        targetDir, foundCharacter, filterInstallation, updateCharacters, dir
+    );
+    global.win.webContents.send("updateOperation", {
+        id: id,
+        body: "Installed character: '" + character.name + "' from " + location + ".",
+        image: "img://" + character.mug,
+        state: OpState.finished,
+    });
+    global.win.webContents.send("installCharacter");
+}
+
+export async function installCharacter(
+    targetDir: string,
+    foundCharacter: FoundCharacter,
+    filterInstallation: boolean,
+    updateCharacters: boolean,
+    dir: string = global.gameDir
+): Promise<Character> {
     const characters: CharacterList = readCharacterList(dir);
-    if (!updateCharacters && characters.getByName(characterName) != undefined) {
+    if (!updateCharacters && characters.getByName(foundCharacter.name) != undefined) {
         throw new Error("Character already installed, updates disabled.");
     }
+    
+    foundCharacter.dat = await getMissingDatInfo(foundCharacter.dat, targetDir);
 
-    let characterDat: CharacterDat;
-    if (fs.existsSync(path.join(correctedDir, "data", "dats", characterName + ".dat"))) {
-        characterDat = readCharacterDatPath(
-            path.join(correctedDir, "data", "dats", characterName + ".dat"),
-            characterName
-        );
-    } else if (fs.existsSync(path.join(correctedDir, "data", characterName + ".dat"))) {
-        characterDat = readCharacterDatPath(
-            path.join(correctedDir, "data", characterName + ".dat"),
-            characterName
-        );
-    } else {
-        throw new Error("No dat file found.");
+    if (updateCharacters) {
+        if (
+            (
+                fs.existsSync(path.join(targetDir, "fighter", foundCharacter.name + ".bin")) ||
+                fs.existsSync(path.join(targetDir, "fighter", foundCharacter.name))
+            ) &&
+            (
+                fs.existsSync(path.join(dir, "fighter", foundCharacter.name + ".bin")) ||
+                fs.existsSync(path.join(dir, "fighter", foundCharacter.name))
+            )
+        ) {
+            console.log("Removing bin & folder for replacement.");
+            fs.removeSync(path.join(dir, "fighter", foundCharacter.name + ".bin"));
+            fs.removeSync(path.join(dir, "fighter", foundCharacter.name));
+        }
     }
 
+    const toResolve: Promise<void>[] = [];
+    if (filterInstallation) {
+        getCharacterFiles(foundCharacter.dat, false, false, targetDir).forEach((file: string) => {
+            const filePath: string = path.join(targetDir, file);
+            const targetPath: string = path.join(dir, file);
+            fs.ensureDirSync(path.parse(targetPath).dir);
+            if (!updateCharacters && fs.existsSync(targetPath)) return;
+            toResolve.push(
+                fs.copy(
+                    filePath,
+                    targetPath,
+                    { overwrite: !file.startsWith("gfx/seriesicon/") }
+                )
+            );
+        });
+    } else {
+        toResolve.push(fs.copy(targetDir, dir, { overwrite: true }));
+    }
+
+    toResolve.push(writeCharacterDat(
+        foundCharacter.dat,
+        path.join(dir, "data", "dats")
+    ));
+
+    const character: Character = {
+        name: foundCharacter.name,
+        menuName: foundCharacter.dat.menuName,
+        series: foundCharacter.dat.series,
+        randomSelection: true,
+        number: characters.getNextNumber(),
+        alts: [],
+        mug: path.join(dir, "gfx", "mugs", foundCharacter.name + ".png")
+    };
+
+    if (characters.getByName(foundCharacter.name) != undefined) {
+        return character;
+    }
+    characters.add(character);
+    toResolve.push(writeCharacters(characters.toArray(), dir));
+    await Promise.allSettled(toResolve);
+    return character;
+}
+
+export async function getMissingDatInfo(
+    dat: CharacterDat,
+    targetDir: string
+): Promise<CharacterDat> {
     if (
-        characterDat.displayName == undefined ||
-        characterDat.menuName == undefined ||
-        characterDat.battleName == undefined ||
-        characterDat.series == undefined
+        dat.displayName == undefined ||
+        dat.menuName == undefined ||
+        dat.battleName == undefined ||
+        dat.series == undefined
     ) {
         if (!(await customDialogs.confirm({
             id: "confirmCharacterInput",
@@ -563,45 +715,37 @@ export async function installCharacter(
             okLabel: "Yes",
             cancelLabel: "No"
         })) {
-            general.openDir(correctedDir);
+            general.openDir(targetDir);
         }
 
-        // while (characterDat.displayName == undefined || characterDat.displayName == "") {
-        //     characterDat.displayName = await general.prompt({
-        //         title: "CMC Mod Manager | Character Installation",
-        //         body: "Please enter the character's 'display name'.",
-        //         placeholder: "Character's Display Name"
-        //     });
-        // }
-
-        while (characterDat.menuName == undefined || characterDat.menuName == "") {
-            characterDat.menuName = await customDialogs.prompt({
+        while (dat.menuName == undefined || dat.menuName == "") {
+            dat.menuName = await customDialogs.prompt({
                 id: "inputCharacterMenuName",
                 title: "CMC Mod Manager | Character Installation",
                 body: "Please enter the character's 'menu name'. (This is the name displayed " +
                     "on the when the character is selected on the character selection screen.)",
                 placeholder: "Character's Menu Name"
             });
-            if (characterDat.menuName == undefined) return null;
+            if (dat.menuName == undefined) return null;
         }
 
-        if (characterDat.displayName == undefined || characterDat.displayName == "") {
-            characterDat.displayName = characterDat.menuName;
+        if (dat.displayName == undefined || dat.displayName == "") {
+            dat.displayName = dat.menuName;
         }
 
-        while (characterDat.battleName == undefined || characterDat.battleName == "") {
-            characterDat.battleName = await customDialogs.prompt({
+        while (dat.battleName == undefined || dat.battleName == "") {
+            dat.battleName = await customDialogs.prompt({
                 id: "inputCharacterBattleName",
                 title: "CMC Mod Manager | Character Installation",
                 body: "Please enter the character's 'battle name'. (This is the name displayed " +
                     "as a part of the HUD during a match.)",
                 placeholder: "Character's Battle Name"
             });
-            if (characterDat.battleName == undefined) return null;
+            if (dat.battleName == undefined) return null;
         }
 
-        while (characterDat.series == undefined || characterDat.series == "") {
-            characterDat.series = await customDialogs.prompt({
+        while (dat.series == undefined || dat.series == "") {
+            dat.series = await customDialogs.prompt({
                 id: "inputCharacterSeries",
                 title: "CMC Mod Manager | Character Installation",
                 body: "Please enter the character's 'series'. (This name will be used to select " +
@@ -609,91 +753,10 @@ export async function installCharacter(
                 "and in all lowercase letters.)",
                 placeholder: "Character's Series"
             });
-            if (characterDat.series == undefined) return null;
+            if (dat.series == undefined) return null;
         }
     }
-    if (updateCharacters) {
-        if (
-            (
-                fs.existsSync(path.join(correctedDir, "fighter", characterName + ".bin")) ||
-                fs.existsSync(path.join(correctedDir, "fighter", characterName))
-            ) &&
-            (
-                fs.existsSync(path.join(dir, "fighter", characterName + ".bin")) ||
-                fs.existsSync(path.join(dir, "fighter", characterName))
-            )
-        ) {
-            console.log("Removing bin & folder for replacement.");
-            fs.removeSync(path.join(dir, "fighter", characterName + ".bin"));
-            fs.removeSync(path.join(dir, "fighter", characterName));
-        }
-    }
-
-    if (filterInstallation) {
-        getCharacterFiles(characterDat, false, false, correctedDir).forEach((file: string) => {
-            const filePath: string = path.join(correctedDir, file);
-            const targetPath: string = path.join(dir, file);
-            fs.ensureDirSync(path.parse(targetPath).dir);
-            if (!updateCharacters && fs.existsSync(targetPath)) return;
-            toResolve.push(
-                fs.copy(
-                    filePath,
-                    targetPath,
-                    { overwrite: !file.startsWith("gfx/seriesicon/") }
-                )
-            );
-        });
-    } else {
-        toResolve.push(fs.copy(correctedDir, dir, { overwrite: true }));
-    }
-
-    toResolve.push(writeCharacterDat(
-        characterDat,
-        path.join(dir, "data", "dats")
-    ));
-
-    const character: Character = {
-        name: characterName,
-        menuName: characterDat.menuName,
-        series: characterDat.series,
-        randomSelection: true,
-        number: characters.getNextNumber(),
-        alts: [],
-        mug: path.join(dir, "gfx", "mugs", characterName + ".png")
-    };
-
-    if (characters.getByName(characterName) != undefined) {
-        return character;
-    }
-    characters.add(character);
-    toResolve.push(writeCharacters(characters.toArray(), dir));
-    await Promise.allSettled(toResolve);
-    return character;
-}
-
-export async function installDownloadedCharacter(targetDir: string, id: string): Promise<void> {
-    const character: Character = await installCharacter(
-        targetDir,
-        true,
-        global.appData.config.updateCharacters,
-        global.gameDir
-    );
-    if (character == null) {
-        global.win.webContents.send("updateOperation", {
-            id: id + "_install",
-            state: OpState.canceled
-        });
-        return;
-    }
-    global.win.webContents.send("updateOperation", {
-        id: id + "_install",
-        title: "Character Installation",
-        body: "Installed character: '" + character.name + "' from GameBanana.",
-        image: "img://" + character.mug,
-        state: OpState.finished
-    });
-    global.win.webContents.send("installCharacter");
-    return;
+    return dat;
 }
 
 export async function extractCharacter(
