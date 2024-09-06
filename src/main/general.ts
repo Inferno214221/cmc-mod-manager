@@ -9,12 +9,13 @@ import { execSync, spawn } from "child_process";
 import request from "request";
 import http from "http";
 import semver from "semver";
-import { ModTypes, OpDep, OpState } from "../global/global";
+import { ModTypes, OpState } from "../global/global";
 
 require.resolve("./unrar.wasm");
 const WASM_BINARY: Buffer = fs.readFileSync(path.join(__dirname, "unrar.wasm"));
 
 import * as characters from "./characters";
+import * as stages from "./stages";
 import * as customDialogs from "./custom-dialogs";
 
 const SUPPORTED_VERSIONS: string[] = [
@@ -122,6 +123,33 @@ export async function extractArchive(archive: string, destination: string): Prom
             throw new Error("Unsupported archive type: " + path.parse(archive).ext.toLowerCase());
     }
     return output;
+}
+
+export async function selectPathsArch(): Promise<string[]> {
+    const selected: OpenDialogReturnValue = await dialog.showOpenDialog(global.win, {
+        filters: [
+            { name: "Archives", extensions: ["zip", "rar"] },
+            { name: "All Files", extensions: ["*"] }
+        ],
+        properties: ["openFile", "multiSelections"]
+    });
+    if (selected.filePaths == undefined) return [];
+    const promises: Promise<string>[] = selected.filePaths.map(
+        (archive: string) => extractArchive(
+            archive,
+            global.temp
+        )
+    );
+    const resolved: string[] = await Promise.all(promises);
+    // This is probably the same as awaiting in the map, but I'm not sure about unrar
+    return resolved;
+}
+
+export async function selectPathsDir(): Promise<string[]> {
+    const selected: OpenDialogReturnValue = await dialog.showOpenDialog(global.win, {
+        properties: ["openDirectory", "multiSelections"]
+    });
+    return selected.filePaths || [];
 }
 
 export async function checkForUpdates(): Promise<void> {
@@ -425,38 +453,9 @@ export async function downloadMod(url: string, modId: string, id: string): Promi
                     switch (modType) {
                         case ModTypes.character:
                             characters.installDownloadedCharacters(output);
-                            // global.win.webContents.send("addOperation", {
-                            //     id: id + "_install",
-                            //     title: "Character Installation",
-                            //     body: "Installing character from GameBanana.",
-                            //     image: "https://gamebanana.com/mods/embeddables/" + modId +
-                            //         "?type=medium_square",
-                            //     state: OpState.queued,
-                            //     icon: "contact_page",
-                            //     animation: Math.floor(Math.random() * 3),
-                            //     dependencies: [OpDep.fighters],
-                            //     call: {
-                            //         name: "installDownloadedCharacters",
-                            //         args: [output, id]
-                            //     }
-                            // });
                             break;
                         case ModTypes.stage:
-                            global.win.webContents.send("addOperation", {
-                                id: id + "_install",
-                                title: "Stage Installation",
-                                body: "Installing stage from GameBanana.",
-                                image: "https://gamebanana.com/mods/embeddables/" + modId +
-                                    "?type=medium_square",
-                                state: OpState.queued,
-                                icon: "note_add",
-                                animation: Math.floor(Math.random() * 3),
-                                dependencies: [OpDep.stages],
-                                call: {
-                                    name: "installDownloadedStage",
-                                    args: [output, id]
-                                }
-                            });
+                            stages.installDownloadedStages(output);
                             break;
                     }
                 });

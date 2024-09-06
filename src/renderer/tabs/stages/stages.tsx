@@ -232,39 +232,11 @@ export function TabStages({
                         iconSize={"50px"}
                         tooltip={"Install Stage From Directory"}
                         onClick={async () => {
-                            let operationId: number;
-                            setOperations((prev: Operation[]) => {
-                                const newOperations: Operation[] = [...prev];
-                                operationId = newOperations.push({
-                                    title: "Stage Installation",
-                                    body: "Installing a stage from a directory.",
-                                    state: OpState.queued,
-                                    icon: "create_new_folder",
-                                    animation: Math.floor(Math.random() * 3),
-                                    dependencies: [OpDep.stages],
-                                    call: async () => {
-                                        const stage: Stage = await api.installStageDir(
-                                            filterInstallation,
-                                            updateStages
-                                        );
-                                        setOperations((prev: Operation[]) => {
-                                            const newOperations: Operation[] = [...prev];
-                                            if (stage == null) {
-                                                newOperations[operationId].state = OpState.canceled;
-                                            } else {
-                                                newOperations[operationId].state = OpState.finished;
-                                                newOperations[operationId].body = "Installed " +
-                                                    "stage: '" + stage.name + "' from a directory.";
-                                                newOperations[operationId].image = "img://" +
-                                                    stage.icon;
-                                            }
-                                            return newOperations;
-                                        });
-                                        readStages();
-                                    }
-                                }) - 1;
-                                return newOperations;
-                            });
+                            api.selectAndInstallStages(
+                                filterInstallation,
+                                updateStages,
+                                false,
+                            );
                         }}
                     />
                     <IconButton
@@ -272,39 +244,11 @@ export function TabStages({
                         iconSize={"50px"}
                         tooltip={"Install Stage From Archive"}
                         onClick={async () => {
-                            let operationId: number;
-                            setOperations((prev: Operation[]) => {
-                                const newOperations: Operation[] = [...prev];
-                                operationId = newOperations.push({
-                                    title: "Stage Installation",
-                                    body: "Installing a stage from an archive.",
-                                    state: OpState.queued,
-                                    icon: "note_add",
-                                    animation: Math.floor(Math.random() * 3),
-                                    dependencies: [OpDep.stages],
-                                    call: async () => {
-                                        const stage: Stage = await api.installStageArchive(
-                                            filterInstallation,
-                                            updateStages
-                                        );
-                                        setOperations((prev: Operation[]) => {
-                                            const newOperations: Operation[] = [...prev];
-                                            if (stage == null) {
-                                                newOperations[operationId].state = OpState.canceled;
-                                            } else {
-                                                newOperations[operationId].state = OpState.finished;
-                                                newOperations[operationId].body = "Installed " +
-                                                    "stage: '" + stage.name + "' from an archive.";
-                                                newOperations[operationId].image = "img://" +
-                                                    stage.icon;
-                                            }
-                                            return newOperations;
-                                        });
-                                        readStages();
-                                    }
-                                }) - 1;
-                                return newOperations;
-                            });
+                            api.selectAndInstallStages(
+                                filterInstallation,
+                                updateStages,
+                                true,
+                            );
                         }}
                     />
                     <IconButton

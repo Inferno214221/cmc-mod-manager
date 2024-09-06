@@ -1,7 +1,6 @@
-import { OpenDialogReturnValue, dialog } from "electron";
 import fs from "fs-extra";
 import path from "path";
-import { OpState, StageList } from "../global/global";
+import { OpDep, OpState, StageList } from "../global/global";
 
 import * as general from "./general";
 import * as customDialogs from "./custom-dialogs";
@@ -159,50 +158,68 @@ export function getStageFiles(
     return validFiles;
 }
 
-export async function installStageDir(
+export async function selectAndInstallStages(
     filterInstallation: boolean,
     updateStages: boolean,
+    fromArchive: boolean = false,
     dir: string = global.gameDir
-): Promise<Stage | null> {
-    const selected: OpenDialogReturnValue = await dialog.showOpenDialog(global.win, {
-        properties: ["openDirectory"]
-    });
-    if (selected.canceled == true) {
-        return null;
-    }
-    const retVal: Stage | null =
-        await installStage(selected.filePaths[0], filterInstallation, updateStages, dir);
-    return retVal;
-}
-
-export async function installStageArchive(
-    filterInstallation: boolean,
-    updateStages: boolean,
-    dir: string = global.gameDir
-): Promise<Stage | null> {
-    const selected: OpenDialogReturnValue = await dialog.showOpenDialog(global.win, {
-        properties: ["openFile"]
-    });
-    if (selected.canceled == true) {
-        return null;
-    }
-    const output: string = await general.extractArchive(
-        selected.filePaths[0],
-        global.temp
+): Promise<void> {
+    const targetDirs: string[] = (
+        fromArchive ? await general.selectPathsArch() : await general.selectPathsDir()
     );
-    const retVal: Stage | null =
-        await installStage(output, filterInstallation, updateStages, dir);
-    return retVal;
+    if (targetDirs.length == 0) return;
+    targetDirs.forEach((target: string) => {
+        installStages(target, filterInstallation, updateStages, "filesystem", dir);
+    });
+    return;
 }
 
-export async function installStage(
-    stageDir: string,
-    filterInstallation: boolean = true,
-    updateStages: boolean = false,
+export async function installDownloadedStages(targetDir: string): Promise<void> {
+    installStages(targetDir, true, global.appData.config.updateStages, "GameBanana");
+}
+
+export function installStages(
+    targetDir: string,
+    filterInstallation: boolean,
+    updateStages: boolean,
+    location: string,
     dir: string = global.gameDir
-): Promise<Stage | null> {
-    const toResolve: Promise<void>[] = [];
-    let correctedDir: string = stageDir;
+): Promise<void> {
+    try {
+        const correctedTarget: string = correctStageDir(targetDir);
+        const foundStages: string[] = findStages(correctedTarget);
+        console.log(foundStages);
+        if (foundStages.length == 0)
+            throw new Error("No valid stages found in directory: '" + targetDir + "'.");
+        if (foundStages.length == 1) {
+            queStageInstallation(
+                correctedTarget,
+                foundStages[0],
+                filterInstallation,
+                updateStages,
+                location,
+                dir
+            );
+        } else {
+            // add operation to prompt user and discard filter and update prefs
+            // TODO: add user as a dependency - for prompts
+            throw new Error("Not implemented");
+        }
+    } catch (error: any) {
+        global.win.webContents.send("addOperation", {
+            title: "Stage Installation",
+            body: (error as Error).message,
+            state: OpState.error,
+            icon: "folder_shared",
+            animation: Math.floor(Math.random() * 3),
+            dependencies: [],
+        });
+    }
+    return;
+}
+
+export function correctStageDir(targetDir: string): string {
+    let correctedDir: string = targetDir;
     const modFiles: string[] = general.getAllFiles(correctedDir)
         .map((file: string) => file.replace(correctedDir, ""));
     for (let file of modFiles) {
@@ -219,125 +236,122 @@ export async function installStage(
         }
     }
     if (!fs.readdirSync(correctedDir).includes("stage")) {
-        throw new Error("No 'stage' subdirectory found.");
+        throw new Error("No 'stage' subdirectory found in directory: '" + targetDir + "'.");
     }
-    const stageName: string = fs.readdirSync(path.join(correctedDir, "stage"))
-        .filter((file: string) =>
-            file.endsWith(".bin") || !file.includes(".")
-        )[0].split(".")[0];
+    return correctedDir;
+}
+
+export function findStages(targetDir: string): string[] {
+    return [...new Set(
+        fs.readdirSync(
+            path.join(targetDir, "stage")
+        ).filter(
+            (file: string) => file.endsWith(".bin") || !file.includes(".")
+        ).map(
+            (stage: string) => stage.replace(/\.[^/\\]+$/, "")
+        )
+    )];
+}
+
+export function queStageInstallation(
+    targetDir: string,
+    foundStage: string,
+    filterInstallation: boolean,
+    updateStages: boolean,
+    location: string,
+    dir: string = global.gameDir
+): void {
+    const id: string = foundStage + "_" + new Date().getTime();
+    global.win.webContents.send("addOperation", {
+        id: id,
+        title: "Stage Installation",
+        body: "Installing a stage from " + location + ".",
+        state: OpState.queued,
+        icon: "folder_shared", // or archive?
+        animation: Math.floor(Math.random() * 3),
+        dependencies: [OpDep.stages],
+        call: {
+            name: "installStageOp",
+            args: [
+                targetDir, foundStage, filterInstallation, updateStages, id, location, dir
+            ]
+        }
+    });
+}
+
+export async function installStageOp(
+    targetDir: string,
+    foundStage: string,
+    filterInstallation: boolean,
+    updateStages: boolean,
+    id: string,
+    location: string,
+    dir: string = global.gameDir
+): Promise<void> {
+    const stage: Stage = await installStage(
+        targetDir, foundStage, filterInstallation, updateStages, dir
+    );
+    global.win.webContents.send("updateOperation", {
+        id: id,
+        body: "Installed stage: '" + stage.name + "' from " + location + ".",
+        image: "img://" + stage.icon,
+        state: OpState.finished,
+    });
+    global.win.webContents.send("installStage");
+}
+
+export async function installStage(
+    targetDir: string,
+    foundStage: string,
+    filterInstallation: boolean = true,
+    updateStages: boolean = false,
+    dir: string = global.gameDir
+): Promise<Stage | null> {
     const stageList: StageList = readStageList(dir);
-    if (!updateStages && stageList.getByName(stageName) != undefined) {
+    if (!updateStages && stageList.getByName(foundStage) != undefined) {
         throw new Error("Stage already installed, updates disabled.");
     }
 
-    let stage: Stage;
-    console.log(
-        path.join(correctedDir, "info.json"),
-        fs.existsSync(path.join(correctedDir, "info.json"))
-    );
-    if (fs.existsSync(path.join(correctedDir, "info.json"))) {
-        const infoTxt: string[] = general.readJSON(path.join(correctedDir, "info.json"));
+    let stage: Stage = {
+        name: foundStage,
+        menuName: undefined,
+        source: undefined,
+        series: undefined,
+        randomSelection: true,
+        number: stageList.getNextNumber(),
+        icon: path.join(dir, "gfx", "stgicons", foundStage + ".png")
+    };
+    if (fs.existsSync(path.join(targetDir, "info.json"))) {
+        const infoTxt: string[] = general.readJSON(path.join(targetDir, "info.json"));
         console.log(infoTxt);
-        stage = {
-            name: stageName,
-            menuName: infoTxt[0],
-            source: infoTxt[1],
-            series: infoTxt[2],
-            randomSelection: true,
-            number: stageList.getNextNumber(),
-            icon: path.join(dir, "gfx", "stgicons", stageName + ".png")
-        }
+        stage.menuName = infoTxt[0];
+        stage.source = infoTxt[1];
+        stage.series = infoTxt[2];
     } else {
-        if (!(await customDialogs.confirm({
-            id: "confirmStageInput",
-            title: "CMC Mod Manager | Stage Installation",
-            body: "Because of CMC+'s current modding format, you will be required to enter some " +
-                "information about the stage you are installing. This information can usually be " +
-                "found in a txt file in the mod's top level directory. (If such a txt file " +
-                "exists and contains four lines, the first one likely is unnecessary.)",
-            okLabel: "Continue"
-        }))) {
-            return null;
-        }
-
-        if (await customDialogs.confirm({
-            id: "openStageDir",
-            title: "CMC Mod Manager | Stage Installation",
-            body: "Would you like to open the mod's directory to find any txt files manually?",
-            okLabel: "Yes",
-            cancelLabel: "No"
-        })) {
-            general.openDir(correctedDir);
-        }
-
-        let menuName: string = "";
-        while (menuName == "") {
-            menuName = await customDialogs.prompt({
-                id: "inputStageMenuName",
-                title: "CMC Mod Manager | Stage Installation",
-                body: "Please enter the stage's 'menu name'. (The name that will be displayed " +
-                    "on the stage selection screen.)",
-                placeholder: "Stage's Menu Name"
-            });
-            if (menuName == undefined) return null;
-        }
-
-        let source: string = "";
-        while (source == "") {
-            source = await customDialogs.prompt({
-                id: "inputStageSource",
-                title: "CMC Mod Manager | Stage Installation",
-                body: "Please enter the stage's 'source'. (The name of the source content that " +
-                    "the stage is originally from, such as the title of the game.)",
-                placeholder: "Stage's Source"
-            });
-            if (source == undefined) return null;
-        }
-
-        let series: string = "";
-        while (series == "") {
-            series = await customDialogs.prompt({
-                id: "inputStageSeries",
-                title: "CMC Mod Manager | Stage Installation",
-                body: "Please enter the stage's 'series'. (This name will be used to select the " +
-                    "icon to use on the stage selection screen. This value is usually short and " +
-                    "in all lowercase letters.)",
-                placeholder: "Stage's Series"
-            });
-            if (series == undefined) return null;
-        }
-
-        stage = {
-            name: stageName,
-            menuName: menuName,
-            source: source,
-            series: series,
-            randomSelection: true,
-            number: stageList.getNextNumber(),
-            icon: path.join(dir, "gfx", "stgicons", stageName + ".png")
-        }
+        stage = await getMissingStageInfo(stage, targetDir);
     }
 
     if (updateStages) {
         if (
             (
-                fs.existsSync(path.join(correctedDir, "stage", stageName + ".bin")) ||
-                fs.existsSync(path.join(correctedDir, "stage", stageName))
+                fs.existsSync(path.join(targetDir, "stage", foundStage + ".bin")) ||
+                fs.existsSync(path.join(targetDir, "stage", foundStage))
             ) &&
             (
-                fs.existsSync(path.join(dir, "stage", stageName + ".bin")) ||
-                fs.existsSync(path.join(dir, "stage", stageName))
+                fs.existsSync(path.join(dir, "stage", foundStage + ".bin")) ||
+                fs.existsSync(path.join(dir, "stage", foundStage))
             )
         ) {
             console.log("Removing bin & folder for replacement.");
-            fs.removeSync(path.join(dir, "stage", stageName + ".bin"));
-            fs.removeSync(path.join(dir, "stage", stageName));
+            fs.removeSync(path.join(dir, "stage", foundStage + ".bin"));
+            fs.removeSync(path.join(dir, "stage", foundStage));
         }
     }
 
+    const toResolve: Promise<void>[] = [];
     if (filterInstallation) {
-        getStageFiles(stage, false, correctedDir).forEach((file: string) => {
-            const filePath: string = path.join(correctedDir, file);
+        getStageFiles(stage, false, targetDir).forEach((file: string) => {
+            const filePath: string = path.join(targetDir, file);
             const targetPath: string = path.join(dir, file);
             fs.ensureDirSync(path.parse(targetPath).dir);
             if (!updateStages && fs.existsSync(targetPath)) return;
@@ -350,11 +364,11 @@ export async function installStage(
             );
         });
     } else {
-        toResolve.push(fs.copy(correctedDir, dir, { overwrite: true }));
+        toResolve.push(fs.copy(targetDir, dir, { overwrite: true }));
     }
 
-    if (stageList.getByName(stageName) != undefined) {
-        return stageList.getByName(stageName);
+    if (stageList.getByName(foundStage) != undefined) {
+        return stageList.getByName(foundStage);
     }
     stageList.add(stage);
     toResolve.push(writeStages(stageList.toArray(), dir));
@@ -363,29 +377,70 @@ export async function installStage(
     return stage;
 }
 
-export async function installDownloadedStage(targetDir: string, id: string): Promise<void> {
-    const stage: Stage = await installStage(
-        targetDir,
-        true,
-        global.appData.config.updateStages,
-        global.gameDir
-    );
-    if (stage == null) {
-        global.win.webContents.send("updateOperation", {
-            id: id + "_install",
-            state: OpState.canceled
-        });
-        return;
+export async function getMissingStageInfo(stage: Stage, targetDir: string): Promise<Stage> {
+    if (!(await customDialogs.confirm({
+        id: "confirmStageInput",
+        title: "CMC Mod Manager | Stage Installation",
+        body: "Because of CMC+'s current modding format, you will be required to enter some " +
+            "information about the stage you are installing. This information can usually be " +
+            "found in a txt file in the mod's top level directory. (If such a txt file " +
+            "exists and contains four lines, the first one likely is unnecessary.)",
+        okLabel: "Continue"
+    }))) {
+        return null;
     }
-    global.win.webContents.send("updateOperation", {
-        id: id + "_install",
-        title: "Stage Installation",
-        body: "Installed stage: '" + stage.name + "' from GameBanana.",
-        image: "img://" + stage.icon,
-        state: OpState.finished
-    });
-    global.win.webContents.send("installStage");
-    return;
+
+    if (await customDialogs.confirm({
+        id: "openStageDir",
+        title: "CMC Mod Manager | Stage Installation",
+        body: "Would you like to open the mod's directory to find any txt files manually?",
+        okLabel: "Yes",
+        cancelLabel: "No"
+    })) {
+        general.openDir(targetDir);
+    }
+
+    let menuName: string = "";
+    while (menuName == "") {
+        menuName = await customDialogs.prompt({
+            id: "inputStageMenuName",
+            title: "CMC Mod Manager | Stage Installation",
+            body: "Please enter the stage's 'menu name'. (The name that will be displayed " +
+                "on the stage selection screen.)",
+            placeholder: "Stage's Menu Name"
+        });
+        if (menuName == undefined) return null;
+    }
+
+    let source: string = "";
+    while (source == "") {
+        source = await customDialogs.prompt({
+            id: "inputStageSource",
+            title: "CMC Mod Manager | Stage Installation",
+            body: "Please enter the stage's 'source'. (The name of the source content that " +
+                "the stage is originally from, such as the title of the game.)",
+            placeholder: "Stage's Source"
+        });
+        if (source == undefined) return null;
+    }
+
+    let series: string = "";
+    while (series == "") {
+        series = await customDialogs.prompt({
+            id: "inputStageSeries",
+            title: "CMC Mod Manager | Stage Installation",
+            body: "Please enter the stage's 'series'. (This name will be used to select the " +
+                "icon to use on the stage selection screen. This value is usually short and " +
+                "in all lowercase letters.)",
+            placeholder: "Stage's Series"
+        });
+        if (series == undefined) return null;
+    }
+
+    stage.menuName = menuName;
+    stage.source = source;
+    stage.series = series;
+    return stage;
 }
 
 export async function extractStage(extract: string, dir: string = global.gameDir): Promise<string> {

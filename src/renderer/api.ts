@@ -38,6 +38,10 @@ export default {
         targetDir: string
     ]): Promise<string> => ipcRenderer.invoke("correctCharacterDir", args)),
 
+    correctStageDir: ((...args: [
+        targetDir: string
+    ]): Promise<string> => ipcRenderer.invoke("correctStageDir", args)),
+
     downloadMod: ((...args: [
         url: string,
         modId: string,
@@ -78,6 +82,10 @@ export default {
         targetDir: string
     ]): Promise<FoundCharacter[]> => ipcRenderer.invoke("findCharacters", args)),
 
+    findStages: ((...args: [
+        targetDir: string
+    ]): Promise<string[]> => ipcRenderer.invoke("findStages", args)),
+
     focusWindow: ((): Promise<void> => ipcRenderer.invoke("focusWindow")),
 
     getCharacterFiles: ((...args: [
@@ -110,8 +118,13 @@ export default {
 
     getMissingDatInfo: ((...args: [
         dat: CharacterDat,
-        targetDir: string//
+        targetDir: string
     ]): Promise<CharacterDat> => ipcRenderer.invoke("getMissingDatInfo", args)),
+
+    getMissingStageInfo: ((...args: [
+        stage: Stage,
+        targetDir: string
+    ]): Promise<Stage> => ipcRenderer.invoke("getMissingStageInfo", args)),
 
     getOperations: ((... args: [
         operations: string
@@ -164,28 +177,34 @@ export default {
         targetDir: string
     ]): Promise<void> => ipcRenderer.invoke("installDownloadedCharacters", args)),
 
-    installDownloadedStage: ((...args: [
-        targetDir: string
-    ]): Promise<void> => ipcRenderer.invoke("installDownloadedStage", args)),
-
     installStage: ((...args: [
-        stageDir: string,
-        filterInstallation?: boolean,
-        updateCharacters?: boolean,
-        dir?: string
-    ]): Promise<Stage | null> => ipcRenderer.invoke("installStage", args)),
-
-    installStageArchive: ((...args: [
+        targetDir: string,
+        foundStage: string,
         filterInstallation: boolean,
         updateStages: boolean,
         dir?: string
-    ]): Promise<Stage | null> => ipcRenderer.invoke("installStageArchive", args)),
+    ]): Promise<void> => ipcRenderer.invoke("installStage", args)),
 
-    installStageDir: ((...args: [
+    installStages: ((...args: [
+        targetDir: string,
         filterInstallation: boolean,
         updateStages: boolean,
+        location: string,
         dir?: string
-    ]): Promise<Stage | null> => ipcRenderer.invoke("installStageDir", args)),
+    ]): Promise<void> => ipcRenderer.invoke("installStages", args)),
+
+    installStageOp: ((...args: [
+        targetDir: string,
+        foundStage: string,
+        filterInstallation: boolean,
+        updateStages: boolean,
+        id: string,
+        dir?: string
+    ]): Promise<void> => ipcRenderer.invoke("installStageOp", args)),
+
+    installDownloadedStages: ((...args: [
+        targetDir: string
+    ]): Promise<void> => ipcRenderer.invoke("installDownloadedStages", args)),
 
     installUpdate: ((...args: [
         id: string
@@ -220,6 +239,15 @@ export default {
         location: string,
         dir?: string
     ]): Promise<void> => ipcRenderer.invoke("queCharacterInstallation", args)),
+
+    queStageInstallation: ((...args: [
+        target: string,
+        foundStage: string,
+        filterInstallation: boolean,
+        updateStages: boolean,
+        location: string,
+        dir?: string
+    ]): Promise<void> => ipcRenderer.invoke("queStageInstallation", args)),
 
     readAlts: ((...args: [
         dir?: string
@@ -331,13 +359,18 @@ export default {
         dir?: string
     ]): Promise<void> => ipcRenderer.invoke("selectAndInstallCharacters", args)),
 
-    selectCharacterPathsArch: ((): Promise<string[]> =>
-        ipcRenderer.invoke("selectCharacterPathsArch")),
-
-    selectCharacterPathsDir: ((): Promise<string[]> =>
-        ipcRenderer.invoke("selectCharacterPathsDir")),
+    selectAndInstallStages: ((...args: [
+        filterInstallation?: boolean,
+        updateStages?: boolean,
+        fromArchive?: boolean,
+        dir?: string
+    ]): Promise<void> => ipcRenderer.invoke("selectAndInstallStages", args)),
 
     selectGameDir: ((): Promise<string | null> => ipcRenderer.invoke("selectGameDir")),
+
+    selectPathsArch: ((): Promise<string[]> => ipcRenderer.invoke("selectPathsArch")),
+
+    selectPathsDir: ((): Promise<string[]> => ipcRenderer.invoke("selectPathsDir")),
 
     writeAlts: ((...args: [
         alts: Alt[],

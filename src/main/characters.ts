@@ -1,4 +1,3 @@
-import { OpenDialogReturnValue, dialog } from "electron";
 import fs from "fs-extra";
 import path from "path";
 import ini from "ini";
@@ -450,7 +449,7 @@ export async function selectAndInstallCharacters(
     dir: string = global.gameDir
 ): Promise<void> {
     const targetDirs: string[] = (
-        fromArchive ? await selectCharacterPathsArch() : await selectCharacterPathsDir()
+        fromArchive ? await general.selectPathsArch() : await general.selectPathsDir()
     );
     if (targetDirs.length == 0) return;
     targetDirs.forEach((target: string) => {
@@ -470,48 +469,35 @@ export function installCharacters(
     location: string,
     dir: string = global.gameDir
 ): Promise<void> {
-    // TODO: catch error for no fighter dir
-    const correctedTarget: string = correctCharacterDir(targetDir);
-    // TODO: mention something about characters which fail?
-    const foundCharacters: FoundCharacter[] = findCharacters(correctedTarget);
-    if (foundCharacters.length == 0) return; // TODO: none found
-    if (foundCharacters.length == 1) {
-        queCharacterInstallation(
-            correctedTarget, foundCharacters[0], filterInstallation, updateCharacters, location, dir
-        );
-    } else {
-        // add operation to prompt user and discard filter and update prefs
-        // TODO: add user as a dependency - for prompts
-        throw new Error("Not implemented");
+    try {
+        const correctedTarget: string = correctCharacterDir(targetDir);
+        const foundCharacters: FoundCharacter[] = findCharacters(correctedTarget);
+        if (foundCharacters.length == 0)
+            throw new Error("No valid characters found in directory: '" + targetDir + "'.");
+        if (foundCharacters.length == 1) {
+            queCharacterInstallation(
+                correctedTarget,
+                foundCharacters[0],
+                filterInstallation,
+                updateCharacters,
+                location,
+                dir
+            );
+        } else {
+            // add operation to prompt user and discard filter and update prefs
+            throw new Error("Not implemented");
+        }
+    } catch (error: any) {
+        global.win.webContents.send("addOperation", {
+            title: "Character Installation",
+            body: (error as Error).message,
+            state: OpState.error,
+            icon: "folder_shared",
+            animation: Math.floor(Math.random() * 3),
+            dependencies: [],
+        });
     }
     return;
-}
-
-export async function selectCharacterPathsArch(): Promise<string[]> {
-    const selected: OpenDialogReturnValue = await dialog.showOpenDialog(global.win, {
-        filters: [
-            { name: "Archives", extensions: ["zip", "rar"] },
-            { name: "All Files", extensions: ["*"] }
-        ],
-        properties: ["openFile", "multiSelections"]
-    });
-    if (selected.filePaths == undefined) return [];
-    const promises: Promise<string>[] = selected.filePaths.map(
-        (archive: string) => general.extractArchive(
-            archive,
-            global.temp
-        )
-    );
-    const resolved: string[] = await Promise.all(promises);
-    // This is probably the same as awaiting in the map, but I'm not sure about unrar
-    return resolved;
-}
-
-export async function selectCharacterPathsDir(): Promise<string[]> {
-    const selected: OpenDialogReturnValue = await dialog.showOpenDialog(global.win, {
-        properties: ["openDirectory", "multiSelections"]
-    });
-    return selected.filePaths || [];
 }
 
 export function correctCharacterDir(targetDir: string): string {
@@ -532,16 +518,21 @@ export function correctCharacterDir(targetDir: string): string {
         }
     }
     if (!fs.readdirSync(correctedDir).includes("fighter")) {
-        throw new Error("No 'fighter' subdirectory found.");
+        throw new Error("No 'fighter' subdirectory found in directory: '" + targetDir + "'.");
     }
     return correctedDir;
 }
 
 export function findCharacters(targetDir: string): FoundCharacter[] {
-    const characterNames: string[] = fs.readdirSync(path.join(targetDir, "fighter"))
-        .filter((file: string) =>
-            file.endsWith(".bin") || !file.includes(".")
-        )[0].split(".");
+    const characterNames: string[] = [...new Set(
+        fs.readdirSync(
+            path.join(targetDir, "fighter")
+        ).filter(
+            (file: string) => file.endsWith(".bin") || !file.includes(".")
+        ).map(
+            (character: string) => character.replace(/\.[^/\\]+$/, "")
+        )
+    )];
     return characterNames.map((characterName: string) => {
         if (fs.existsSync(path.join(targetDir, "data", "dats", characterName + ".dat"))) {
             return {
