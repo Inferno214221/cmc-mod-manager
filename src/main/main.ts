@@ -148,7 +148,6 @@ app.on("before-quit", async () => {
 
 function createHandlers(module: any): void {
     /* eslint-disable import/namespace */
-    /* eslint-disable @typescript-eslint/ban-ts-comment */
     Object.keys(module).forEach((func: string & keyof typeof module) => {
         // console.log("Creating Handler For: " + func);
         if (typeof module[func] != "function") return;

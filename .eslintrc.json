@@ -51,6 +51,7 @@
             "args": "all",
             "argsIgnorePattern": "^_"
         }],
+        "@typescript-eslint/ban-ts-comment": "off",
         "no-case-declarations": "off",
         "import/no-named-as-default-member": "off",
         "sort-imports": ["warn", {

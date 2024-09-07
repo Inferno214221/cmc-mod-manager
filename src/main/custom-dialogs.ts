@@ -48,6 +48,10 @@ abstract class Dialog<OptionsType extends Options, ReturnType> {
         this.window.on("close", () => {
             this.clearHandlers();
             if (callback != undefined) callback(undefined);
+        });
+
+        // Calls even when destroyed
+        this.window.on("closed", () => {
             global.dialogs.splice(global.dialogs.indexOf(this.window), 1);
         });
 
@@ -60,7 +64,7 @@ abstract class Dialog<OptionsType extends Options, ReturnType> {
         ipcMain.handle(this.options.id + "_dialogCancel",
             () => this.cancel()
         );
-        
+
         this.window.loadURL(this.REACT_ENTRY);
         global.dialogs.push(this.window);
     }

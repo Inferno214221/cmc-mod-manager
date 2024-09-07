@@ -94,9 +94,9 @@ interface FoundCharacter {
     mug: string
 }
 
-interface MinimalCharacter {
-    name: string,
-    displayName: string
+interface V7CharacterInfo {
+    displayName: string,
+    series: string
 }
 
 interface AppConfig {

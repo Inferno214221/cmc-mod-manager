@@ -6,6 +6,8 @@ import { CharacterList, OpDep, OpState } from "../global/global";
 import * as general from "./general";
 import * as customDialogs from "./custom-dialogs";
 
+import V7_BUILTINS from "../assets/v7.json";
+
 const CHARACTER_FILES: string[] = [
     "arcade/routes/<fighter>.txt",
     "arcade/routes/<series>_series.txt",
@@ -77,7 +79,6 @@ export function readCharacterList(dir: string = global.gameDir): CharacterList {
                 mug: path.join(dir, "gfx", "mugs", character + ".png")
             });
         }
-        // TODO: else error quietly
     });
     const lockedTxt: string[] = fs.readFileSync(
         path.join(dir, "data", "fighter_lock.txt"),
@@ -602,13 +603,20 @@ export async function installCharacterOp(
     const character: Character = await installCharacter(
         targetDir, foundCharacter, filterInstallation, updateCharacters, dir
     );
-    general.updateOperation({
-        id: id,
-        body: "Installed character: '" + character.name + "' from " + location + ".",
-        image: "img://" + character.mug,
-        state: OpState.FINISHED,
-    });
-    general.updateCharacterPages();
+    if (character == null) {
+        general.updateOperation({
+            id: id,
+            state: OpState.CANCELED,
+        });
+    } else {
+        general.updateOperation({
+            id: id,
+            body: "Installed character: '" + character.name + "' from " + location + ".",
+            image: "img://" + character.mug,
+            state: OpState.FINISHED,
+        });
+        general.updateCharacterPages();
+    }
 }
 
 export async function installCharacter(
@@ -624,6 +632,7 @@ export async function installCharacter(
     }
     
     foundCharacter.dat = await getMissingDatInfo(foundCharacter.dat, targetDir);
+    if (foundCharacter.dat == null) return null;
 
     if (updateCharacters) {
         if (
@@ -661,11 +670,6 @@ export async function installCharacter(
         toResolve.push(fs.copy(targetDir, dir, { overwrite: true }));
     }
 
-    toResolve.push(writeCharacterDat(
-        foundCharacter.dat,
-        path.join(dir, "data", "dats")
-    ));
-
     const character: Character = {
         name: foundCharacter.name,
         menuName: foundCharacter.dat.menuName,
@@ -682,79 +686,96 @@ export async function installCharacter(
     characters.add(character);
     toResolve.push(writeCharacters(characters.toArray(), dir));
     await Promise.allSettled(toResolve);
+
+    // This needs to be done last to ensure that it overrides the other changes
+    await writeCharacterDat(foundCharacter.dat, path.join(dir, "data", "dats"));
     return character;
 }
 
 export async function getMissingDatInfo(
     dat: CharacterDat,
     targetDir: string
-): Promise<CharacterDat> {
-    if (
-        dat.displayName == undefined ||
-        dat.menuName == undefined ||
-        dat.battleName == undefined ||
-        dat.series == undefined
-    ) {
-        if (!(await customDialogs.confirm({
-            id: "confirmCharacterInput",
+): Promise<CharacterDat | null> {
+    if (!(
+        !dat.displayName ||
+        !dat.menuName ||
+        !dat.battleName ||
+        !dat.series
+    )) return dat;
+
+    const builtinInfo: V7CharacterInfo = v7CharacterLookup(dat.name);
+    if (builtinInfo != undefined) {
+        dat.displayName = dat.displayName || builtinInfo.displayName;
+        dat.menuName = dat.menuName || builtinInfo.displayName;
+        dat.battleName = dat.battleName || builtinInfo.displayName;
+        dat.series = dat.series || builtinInfo.series;
+        return dat;
+    }
+
+    if (!(await customDialogs.confirm({
+        id: "confirmCharacterInput",
+        title: "CMC Mod Manager | Character Installation",
+        body: "The character that is being installed's dat file uses the vanilla format and " +
+            "you will be required to enter some information for the installation. This " +
+            "information can usually be found in a txt file in the mod's top level directory.",
+        okLabel: "Continue"
+    }))) {
+        return null;
+    }
+
+    if (await customDialogs.confirm({
+        id: "openCharacterDir",
+        title: "CMC Mod Manager | Character Installation",
+        body: "Would you like to open the mod's directory to find any txt files manually?",
+        okLabel: "Yes",
+        cancelLabel: "No"
+    })) {
+        general.openDir(targetDir);
+    }
+
+    while (dat.menuName == undefined || dat.menuName == "") {
+        dat.menuName = await customDialogs.prompt({
+            id: "inputCharacterMenuName",
             title: "CMC Mod Manager | Character Installation",
-            body: "The character that is being installed's dat file uses the vanilla format and " +
-                "you will be required to enter some information for the installation. This " +
-                "information can usually be found in a txt file in the mod's top level directory.",
-            okLabel: "Continue"
-        }))) {
-            return null;
-        }
+            body: "Please enter the character's 'menu name'. (This is the name displayed " +
+                "on the when the character is selected on the character selection screen.)",
+            placeholder: "Character's Menu Name"
+        });
+        if (dat.menuName == undefined) return null;
+    }
 
-        if (await customDialogs.confirm({
-            id: "openCharacterDir",
+    if (dat.displayName == undefined || dat.displayName == "") {
+        dat.displayName = dat.menuName;
+    }
+
+    while (dat.battleName == undefined || dat.battleName == "") {
+        dat.battleName = await customDialogs.prompt({
+            id: "inputCharacterBattleName",
             title: "CMC Mod Manager | Character Installation",
-            body: "Would you like to open the mod's directory to find any txt files manually?",
-            okLabel: "Yes",
-            cancelLabel: "No"
-        })) {
-            general.openDir(targetDir);
-        }
+            body: "Please enter the character's 'battle name'. (This is the name displayed " +
+                "as a part of the HUD during a match.)",
+            placeholder: "Character's Battle Name"
+        });
+        if (dat.battleName == undefined) return null;
+    }
 
-        while (dat.menuName == undefined || dat.menuName == "") {
-            dat.menuName = await customDialogs.prompt({
-                id: "inputCharacterMenuName",
-                title: "CMC Mod Manager | Character Installation",
-                body: "Please enter the character's 'menu name'. (This is the name displayed " +
-                    "on the when the character is selected on the character selection screen.)",
-                placeholder: "Character's Menu Name"
-            });
-            if (dat.menuName == undefined) return null;
-        }
-
-        if (dat.displayName == undefined || dat.displayName == "") {
-            dat.displayName = dat.menuName;
-        }
-
-        while (dat.battleName == undefined || dat.battleName == "") {
-            dat.battleName = await customDialogs.prompt({
-                id: "inputCharacterBattleName",
-                title: "CMC Mod Manager | Character Installation",
-                body: "Please enter the character's 'battle name'. (This is the name displayed " +
-                    "as a part of the HUD during a match.)",
-                placeholder: "Character's Battle Name"
-            });
-            if (dat.battleName == undefined) return null;
-        }
-
-        while (dat.series == undefined || dat.series == "") {
-            dat.series = await customDialogs.prompt({
-                id: "inputCharacterSeries",
-                title: "CMC Mod Manager | Character Installation",
-                body: "Please enter the character's 'series'. (This name will be used to select " +
-                "the icon to use on the character selection screen. This value is usually short " +
-                "and in all lowercase letters.)",
-                placeholder: "Character's Series"
-            });
-            if (dat.series == undefined) return null;
-        }
+    while (dat.series == undefined || dat.series == "") {
+        dat.series = await customDialogs.prompt({
+            id: "inputCharacterSeries",
+            title: "CMC Mod Manager | Character Installation",
+            body: "Please enter the character's 'series'. (This name will be used to select " +
+            "the icon to use on the character selection screen. This value is usually short " +
+            "and in all lowercase letters.)",
+            placeholder: "Character's Series"
+        });
+        if (dat.series == undefined) return null;
     }
     return dat;
+}
+
+export function v7CharacterLookup(name: string): V7CharacterInfo {
+    // @ts-ignore: an expression of type 'string' can't be used to index typeof import("v7.json")
+    return V7_BUILTINS[name];
 }
 
 export async function extractCharacter(
@@ -787,11 +808,8 @@ export async function extractCharacter(
     });
     console.log(new Date().getTime());
 
-    toResolve.push(writeCharacterDat(
-        characterDat,
-        path.join(extractDir, "data", "dats")
-    ));
     await Promise.allSettled(toResolve);
+    await writeCharacterDat(characterDat, path.join(extractDir, "data", "dats"));
     return extractDir;
 }
 

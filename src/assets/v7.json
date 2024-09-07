@@ -1,0 +1,262 @@
+{
+  "mario": {
+    "displayName": "Mario",
+    "series": "mario"
+  },
+  "pika": {
+    "displayName": "Pikachu",
+    "series": "pokemon"
+  },
+  "ryu": {
+    "displayName": "Ryu",
+    "series": "sf"
+  },
+  "tails_cake": {
+    "displayName": "Tails",
+    "series": "sonic"
+  },
+  "luigi": {
+    "displayName": "Luigi",
+    "series": "mario"
+  },
+  "falco": {
+    "displayName": "Falco",
+    "series": "starfox"
+  },
+  "gooey": {
+    "displayName": "Gooey",
+    "series": "kirby"
+  },
+  "purin": {
+    "displayName": "Jigglypuff",
+    "series": "pokemon"
+  },
+  "samus": {
+    "displayName": "Samus",
+    "series": "metroid"
+  },
+  "lucario": {
+    "displayName": "Lucario",
+    "series": "pokemon"
+  },
+  "snivy": {
+    "displayName": "Snivy",
+    "series": "pokemon"
+  },
+  "sonic": {
+    "displayName": "Sonic",
+    "series": "sonic"
+  },
+  "chunli": {
+    "displayName": "Chun-Li",
+    "series": "sf"
+  },
+  "goku": {
+    "displayName": "Goku",
+    "series": "dbz"
+  },
+  "mrgw": {
+    "displayName": "Game & Watch",
+    "series": "gw"
+  },
+  "marth": {
+    "displayName": "Marth",
+    "series": "fe"
+  },
+  "link": {
+    "displayName": "Link",
+    "series": "zelda"
+  },
+  "snake": {
+    "displayName": "Snake",
+    "series": "mg"
+  },
+  "peach": {
+    "displayName": "Peach",
+    "series": "mario"
+  },
+  "wario": {
+    "displayName": "Wario",
+    "series": "wario"
+  },
+  "mega": {
+    "displayName": "Megaman",
+    "series": "megaman"
+  },
+  "yoshi": {
+    "displayName": "Yoshi",
+    "series": "mario"
+  },
+  "falcon": {
+    "displayName": "Captain Falcon",
+    "series": "fzero"
+  },
+  "wright": {
+    "displayName": "Pheonix Wright",
+    "series": "attorney"
+  },
+  "ridley": {
+    "displayName": "Ridley",
+    "series": "metroid"
+  },
+  "porky": {
+    "displayName": "Pork Minch",
+    "series": "mother"
+  },
+  "dhd": {
+    "displayName": "Duck Hunt Duo",
+    "series": "dhunt"
+  },
+  "bomber": {
+    "displayName": "Bomberman",
+    "series": "bomber"
+  },
+  "geno": {
+    "displayName": "Geno",
+    "series": "opm"
+  },
+  "metaknight": {
+    "displayName": "Meta Knight",
+    "series": "kirby"
+  },
+  "saki": {
+    "displayName": "Saki Amamiya",
+    "series": "sin"
+  },
+  "waluigi": {
+    "displayName": "Waluigi",
+    "series": "mario"
+  },
+  "fox": {
+    "displayName": "Fox",
+    "series": "starfox"
+  },
+  "clink": {
+    "displayName": "Toon Link",
+    "series": "zelda"
+  },
+  "lucas": {
+    "displayName": "Lucas",
+    "series": "mother"
+  },
+  "ristar": {
+    "displayName": "Ristar",
+    "series": "ristar"
+  },
+  "ness": {
+    "displayName": "Ness",
+    "series": "mother"
+  },
+  "mew2": {
+    "displayName": "Mewtwo",
+    "series": "pokemon"
+  },
+  "krystal": {
+    "displayName": "Krystal",
+    "series": "starfox"
+  },
+  "dk": {
+    "displayName": "Donkey Kong",
+    "series": "mario"
+  },
+  "rayman": {
+    "displayName": "Rayman",
+    "series": "rayman"
+  },
+  "mach": {
+    "displayName": "Mach Rider",
+    "series": "machrider"
+  },
+  "shadow": {
+    "displayName": "Shadow",
+    "series": "sonic"
+  },
+  "knux": {
+    "displayName": "Knuckles",
+    "series": "sonic"
+  },
+  "kirby": {
+    "displayName": "Kirby",
+    "series": "kirby"
+  },
+  "toad": {
+    "displayName": "Toad",
+    "series": "mario"
+  },
+  "ganon": {
+    "displayName": "Ganondorf",
+    "series": "zelda"
+  },
+  "climbers": {
+    "displayName": "Ice Climbers",
+    "series": "ic"
+  },
+  "rob": {
+    "displayName": "R.O.B.",
+    "series": "rob"
+  },
+  "ashley": {
+    "displayName": "Ashley",
+    "series": "wario"
+  },
+  "petey": {
+    "displayName": "Petey Piranha",
+    "series": "mario"
+  },
+  "pacman": {
+    "displayName": "Pacman",
+    "series": "pacman"
+  },
+  "bowser": {
+    "displayName": "Bowser",
+    "series": "mario"
+  },
+  "olimar": {
+    "displayName": "Olimar",
+    "series": "pikmin"
+  },
+  "tingle": {
+    "displayName": "Tingle",
+    "series": "zelda"
+  },
+  "mac": {
+    "displayName": "Little Mac",
+    "series": "pnchout"
+  },
+  "crash": {
+    "displayName": "Crash",
+    "series": "crashbandicoot"
+  },
+  "klonoa": {
+    "displayName": "Klonoa",
+    "series": "klonoa"
+  },
+  "pichu": {
+    "displayName": "Pichu",
+    "series": "pokemon"
+  },
+  "_": {
+    "displayName": "Sprite",
+    "series": "crusade"
+  },
+  "hand": {
+    "displayName": "Master Hand (Boss)",
+    "series": "ssb"
+  },
+  "drmario": {
+    "displayName": "Dr. Mario",
+    "series": "mario"
+  },
+  "shantae": {
+    "displayName": "Shantae",
+    "series": "shantae"
+  },
+  "nega": {
+    "displayName": "Nega Shantae",
+    "series": "shantae"
+  },
+  "evil": {
+    "displayName": "Evil Ryu",
+    "series": "sf"
+  }
+}
