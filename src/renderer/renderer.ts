@@ -1,5 +1,5 @@
 import { render } from "./app/app";
-import cmcmm from "../assets/icon.png";
+import CMCMM from "../assets/icon.png";
 
 render();
 
@@ -8,7 +8,7 @@ api.on("showNotification", (
     options?: NotificationOptions,
     onclick?: MainCall
 ) => {
-    options.icon = cmcmm;
+    options.icon = CMCMM;
     const notif: Notification = new Notification(title, options);
     if (onclick != undefined) notif.onclick = () => {
         if (api[onclick.name] != undefined) {

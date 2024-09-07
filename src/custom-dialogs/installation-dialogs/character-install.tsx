@@ -7,7 +7,7 @@ const styles: typeof import("../custom-dialogs.css") & typeof import("./installa
     typeof import("../../renderer/tabs/characters/characters.css") =
     Object.assign({}, dialogStyles, charactersStyles, installStyles);
 import { CharacterList } from "../../global/global";
-import missing from "../../assets/missing.png";
+import MISSING from "../../assets/missing.png";
 import IconButton from "../../renderer/icon-buttons/icon-button";
 
 declare const dialog: typeof import("../api").default;
@@ -157,7 +157,7 @@ function CharacterDisplay({
                             src={"img://" + character.mug}
                             draggable={false}
                             onError={(event: any) => {
-                                event.target.src = missing;
+                                event.target.src = MISSING;
                             }}
                         />
                     </div>

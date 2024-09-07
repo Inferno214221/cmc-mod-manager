@@ -7,7 +7,7 @@ import { TabStages } from "../tabs/stages/stages";
 import { TabStageSelectionScreen } from "../tabs/stage-ss/stage-ss";
 import { TabSettings } from "../tabs/settings/settings";
 import ToggleIconButton from "../icon-buttons/toggle-icon-button";
-import missing from "../../assets/missing.png";
+import MISSING from "../../assets/missing.png";
 import { OpDep, OpState } from "../../global/global";
 import styles from "./app.css";
 import IconButton from "../icon-buttons/icon-button";
@@ -337,7 +337,7 @@ export function OperationDisplay({ display }: { display: Operation }): JSX.Eleme
                         src={display.image}
                         draggable={false}
                         onError={(event: any) => {
-                            event.target.src = missing;
+                            event.target.src = MISSING;
                         }}
                     />
                 }

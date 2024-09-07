@@ -2,7 +2,7 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import IconButton from "../../icon-buttons/icon-button";
 import ToggleIconButton from "../../icon-buttons/toggle-icon-button";
 import CycleIconButton from "../../icon-buttons/cycle-icon-button";
-import missing from "../../../assets/missing.png";
+import MISSING from "../../../assets/missing.png";
 import { OpDep, OpState, SortTypeOptions } from "../../../global/global";
 import appStyles from "../../app/app.css";
 import charactersStyles from "./characters.css";
@@ -381,7 +381,7 @@ function CharacterDisplay({
                             src={"img://" + character.mug}
                             draggable={false}
                             onError={(event: any) => {
-                                event.target.src = missing;
+                                event.target.src = MISSING;
                             }}
                         />
                     </div>
@@ -522,7 +522,7 @@ function CharacterAltDisplay({
                     src={"img://" + alt.mug}
                     draggable={false}
                     onError={(event: any) => {
-                        event.target.src = missing;
+                        event.target.src = MISSING;
                     }}
                 />
             </div>

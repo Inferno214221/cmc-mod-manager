@@ -2,7 +2,7 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import IconButton from "../../icon-buttons/icon-button";
 import ToggleIconButton from "../../icon-buttons/toggle-icon-button";
 import CycleIconButton from "../../icon-buttons/cycle-icon-button";
-import missing from "../../../assets/missing.png";
+import MISSING from "../../../assets/missing.png";
 import { DndDataType, OpDep, OpState, SortTypeOptions, StageList } from "../../../global/global";
 import appStyles from "../../app/app.css";
 import stageSsStyles from "./stage-ss.css";
@@ -374,7 +374,7 @@ function StageDisplay({
                     src={"img://" + stage.icon}
                     draggable={false}
                     onError={(event: any) => {
-                        event.target.src = missing;
+                        event.target.src = MISSING;
                     }}
                 />
                 <div className={styles.excludedDisplayName}>
@@ -691,7 +691,7 @@ function SssStageDisplay({
                         src={"img://" + stage.icon}
                         draggable={false}
                         onError={(event: any) => {
-                            event.target.src = missing;
+                            event.target.src = MISSING;
                         }}
                     />
                     <span>{stage.menuName}</span>

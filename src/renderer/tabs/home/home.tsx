@@ -1,8 +1,8 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import cmcmm from "../../../assets/icon.png";
-import pfp from "../../../assets/pfp.png";
-import gh from "../../../assets/github.png";
-import gb from "../../../assets/gb.png";
+import CMCMM from "../../../assets/icon.png";
+import PFP from "../../../assets/pfp.png";
+import GH from "../../../assets/github.png";
+import GB from "../../../assets/gb.png";
 import IconButton from "../../icon-buttons/icon-button";
 import {
     CHARACTERS,
@@ -54,7 +54,7 @@ export function TabHome(): JSX.Element {
             <div id={styles.aboutDiv} className={styles.verticalOuterDiv}>
                 <div className={styles.verticalInnerDiv}>
                     <div className={styles.center + " " + styles.marginVertical}>
-                        <img src={cmcmm} id={styles.cmcmmIcon} draggable={false}/>
+                        <img src={CMCMM} id={styles.cmcmmIcon} draggable={false}/>
                         <h1>CMC Mod Manager</h1>
                         <h3>(v3.0.0-beta.4)</h3>
                     </div>
@@ -62,24 +62,24 @@ export function TabHome(): JSX.Element {
                         <h2>By</h2>
                     </div>
                     <div className={styles.center + " " + styles.marginVertical}>
-                        <img src={pfp} id={styles.pfp} draggable={false}/>
+                        <img src={PFP} id={styles.pfp} draggable={false}/>
                         <h2>Inferno214221</h2>
                     </div>
                     <div className={styles.center + " " + styles.marginVertical}>
                         <ExternalLinkImage
-                            icon={cmcmm}
+                            icon={CMCMM}
                             tooltip={"Home Page"}
                             location={"https://inferno214221.com/cmc-mod-manager"}
                             id={"homepage"}
                         />
                         <ExternalLinkImage
-                            icon={gh}
+                            icon={GH}
                             tooltip={"GitHub"}
                             location={"https://github.com/Inferno214221/cmc-mod-manager"}
                             id={"gh"}
                         />
                         <ExternalLinkImage
-                            icon={gb}
+                            icon={GB}
                             tooltip={"GameBanana"}
                             location={"https://gamebanana.com/tools/14136"}
                             id={"gb"}
