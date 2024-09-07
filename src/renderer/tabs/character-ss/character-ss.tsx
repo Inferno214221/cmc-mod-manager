@@ -12,9 +12,9 @@ const styles: typeof import("../../app/app.css") & typeof import("./character-ss
     Object.assign({}, appStyles, characterSsStyles);
 
 const sortTypes: SortTypeOptions[] = [
-    SortTypeOptions.number,
-    SortTypeOptions.series,
-    SortTypeOptions.menuName
+    SortTypeOptions.NUMBER,
+    SortTypeOptions.SERIES,
+    SortTypeOptions.MENU_NAME
 ];
 
 export function TabCharacterSelectionScreen({
@@ -108,16 +108,16 @@ export function TabCharacterSelectionScreen({
             operationId = newOperations.push({
                 title: "Write CSS Data",
                 body: "Writing modified CSS data to page: '" + activePage.name + "'.",
-                state: OpState.queued,
+                state: OpState.QUEUED,
                 icon: "pan_tool_alt",
                 animation: Math.floor(Math.random() * 3),
-                dependencies: [OpDep.css],
+                dependencies: [OpDep.CSS],
                 call: async () => {
                     await api.writeCssData(activePage, data);
                     getCssData();
                     setOperations((prev: Operation[]) => {
                         const newOperations: Operation[] = [...prev];
-                        newOperations[operationId].state = OpState.finished;
+                        newOperations[operationId].state = OpState.FINISHED;
                         newOperations[operationId].body = "Wrote modified CSS data to page: '" +
                             activePage.name + "'.";
                         return newOperations;
@@ -131,15 +131,15 @@ export function TabCharacterSelectionScreen({
     function characterDragAndDrop(from: DndData, to: DndData): void {
         console.log(from, to);
         const newCssData: CssData = cssData;
-        if (from.type == DndDataType.ssNumber) {
-            if (to.type == DndDataType.ssNumber) {
+        if (from.type == DndDataType.SS_NUMBER) {
+            if (to.type == DndDataType.SS_NUMBER) {
                 newCssData[from.y][from.x] = to.number;
                 newCssData[to.y][to.x] = from.number;
             } else {
                 newCssData[from.y][from.x] = "0000";
             }
         } else {
-            if (to.type == DndDataType.ssNumber) {
+            if (to.type == DndDataType.SS_NUMBER) {
                 newCssData[to.y][to.x] = from.number;
             } else {
                 return;
@@ -297,7 +297,7 @@ function ExcludedCharacters({
             <div id={styles.excludedDiv}>
                 <div className={styles.center}>
                     <div id={styles.excludedWrapper}>
-                        {sortType == sortTypes.indexOf(SortTypeOptions.series) ?
+                        {sortTypes[sortType] == SortTypeOptions.SERIES ?
                             sortedCharacters.map((
                                 character: Character,
                                 index: number
@@ -352,7 +352,7 @@ function CharacterDisplay({
     characterDragAndDrop: (from: DndData, to: DndData) => void
 }): JSX.Element {
     const dndData: DndData = {
-        type: DndDataType.excluded,
+        type: DndDataType.EXCLUDED,
         number: ("0000" + character.number).slice(-4)
     }
     return (
@@ -416,15 +416,15 @@ function CssPages({
                 title: "Reorder CSS Pages",
                 body: "Moving CSS page: '" + cssPages[from].name + "' to index: " +
                     (to > from ? to - 1 : to) + ".",
-                state: OpState.queued,
+                state: OpState.QUEUED,
                 icon: "swap_horiz",
                 animation: Math.floor(Math.random() * 3),
-                dependencies: [OpDep.gameSettings],
+                dependencies: [OpDep.GAME_SETTINGS],
                 call: async () => {
                     await api.reorderCssPage(from, to);
                     setOperations((prev: Operation[]) => {
                         const newOperations: Operation[] = [...prev];
-                        newOperations[operationId].state = OpState.finished;
+                        newOperations[operationId].state = OpState.FINISHED;
                         newOperations[operationId].body = "Moved CSS page: '" +
                             cssPages[from].name + "' to index: " + (to > from ? to - 1 : to) + ".";
                         return newOperations;
@@ -480,15 +480,15 @@ function CssPages({
                                 operationId = newOperations.push({
                                     title: "CSS Page Addition",
                                     body: "Adding new CSS page: '" + newPageName + "'.",
-                                    state: OpState.queued,
+                                    state: OpState.QUEUED,
                                     icon: "add",
                                     animation: Math.floor(Math.random() * 3),
-                                    dependencies: [OpDep.css, OpDep.gameSettings],
+                                    dependencies: [OpDep.CSS, OpDep.GAME_SETTINGS],
                                     call: async () => {
                                         await api.addCssPage(newPageName);
                                         setOperations((prev: Operation[]) => {
                                             const newOperations: Operation[] = [...prev];
-                                            newOperations[operationId].state = OpState.finished;
+                                            newOperations[operationId].state = OpState.FINISHED;
                                             newOperations[operationId].body = "Added new CSS " +
                                                 "page: '" + newPageName + "'.";
                                             return newOperations;
@@ -565,15 +565,15 @@ function CssPageDisplay({
                         operationId = newOperations.push({
                             title: "CSS Page Deletion",
                             body: "Deleting CSS page: '" + page.name + "'.",
-                            state: OpState.queued,
+                            state: OpState.QUEUED,
                             icon: "delete",
                             animation: Math.floor(Math.random() * 3),
-                            dependencies: [OpDep.css, OpDep.gameSettings],
+                            dependencies: [OpDep.CSS, OpDep.GAME_SETTINGS],
                             call: async () => {
                                 await api.removeCssPage(page);
                                 setOperations((prev: Operation[]) => {
                                     const newOperations: Operation[] = [...prev];
-                                    newOperations[operationId].state = OpState.finished;
+                                    newOperations[operationId].state = OpState.FINISHED;
                                     newOperations[operationId].body = "Deleted CSS page: '" +
                                         page.name + "'.";
                                     return newOperations;
@@ -683,7 +683,7 @@ function CssCharacterDisplay({
     characterDragAndDrop: (from: DndData, to: DndData) => void
 }): JSX.Element {
     const dndData: DndData = {
-        type: DndDataType.ssNumber,
+        type: DndDataType.SS_NUMBER,
         number: cell,
         x: x,
         y: y

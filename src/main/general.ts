@@ -182,7 +182,7 @@ export async function checkForUpdates(): Promise<void> {
                 id: id,
                 title: "Download Update",
                 body: "Downloading the latest version of CMC Mod Manager.",
-                state: OpState.queued,
+                state: OpState.QUEUED,
                 icon: "download",
                 animation: Math.floor(Math.random() * 3),
                 dependencies: [],
@@ -209,7 +209,7 @@ export async function downloadUpdate(tagName: string, id: string): Promise<void>
         if (isSelfContainedDir()) alertSelfContainedDir();
         global.win.webContents.send("updateOperation", {
             id: id,
-            state: OpState.canceled
+            state: OpState.CANCELED
         });
         return;
     }
@@ -241,7 +241,7 @@ export async function downloadUpdate(tagName: string, id: string): Promise<void>
                 id: id,
                 title: "Update Downloaded",
                 body: "Downloaded the latest version of CMC Mod Manager.",
-                state: OpState.finished
+                state: OpState.FINISHED
             });
             if (app.isPackaged) {
                 const updateDir: string = path.join(global.appDir, "update");
@@ -260,7 +260,7 @@ export async function downloadUpdate(tagName: string, id: string): Promise<void>
                 id: installId,
                 title: "Install Update",
                 body: "Installing the latest version of CMC Mod Manager.",
-                state: OpState.queued,
+                state: OpState.QUEUED,
                 icon: "install_desktop",
                 animation: Math.floor(Math.random() * 3),
                 dependencies: [],
@@ -290,7 +290,7 @@ export function installUpdate(id: string): void {
     global.win.webContents.send("updateOperation", {
         id: id,
         body: "Please close CMC Mod Manager to finish the update.",
-        state: OpState.finished
+        state: OpState.FINISHED
     });
     return;
 }
@@ -343,7 +343,7 @@ export async function handleURI(uri: string): Promise<void> {
         title: "Mod Download",
         body: "Downloading a mod from GameBanana.",
         image: "https://gamebanana.com/mods/embeddables/" + modId + "?type=medium_square",
-        state: OpState.queued,
+        state: OpState.QUEUED,
         icon: "download",
         animation: Math.floor(Math.random() * 3),
         dependencies: [],
@@ -398,10 +398,10 @@ export async function downloadMod(url: string, modId: string, id: string): Promi
                 let modType: ModTypes;
                 switch (modInfo[1].toLowerCase()) {
                     case "characters":
-                        modType = ModTypes.character;
+                        modType = ModTypes.CHARACTER;
                         break;
                     case "stages":
-                        modType = ModTypes.stage;
+                        modType = ModTypes.STAGE;
                         break;
                     default:
                         throw new Error("Unknown mod type.");
@@ -430,7 +430,7 @@ export async function downloadMod(url: string, modId: string, id: string): Promi
                     canceled = true;
                     global.win.webContents.send("updateOperation", {
                         id: id + "_download",
-                        state: OpState.canceled,
+                        state: OpState.CANCELED,
                     });
                     delete global.cancelFunctions[id + "_download"];
                 });
@@ -447,14 +447,14 @@ export async function downloadMod(url: string, modId: string, id: string): Promi
                     global.win.webContents.send("updateOperation", {
                         id: id + "_download",
                         body: "Downloaded mod: '" + modInfo[0] + "' from GameBanana.",
-                        state: OpState.finished,
+                        state: OpState.FINISHED,
                     });
                     resolve();
                     switch (modType) {
-                        case ModTypes.character:
+                        case ModTypes.CHARACTER:
                             characters.installDownloadedCharacters(output);
                             break;
-                        case ModTypes.stage:
+                        case ModTypes.STAGE:
                             stages.installDownloadedStages(output);
                             break;
                     }

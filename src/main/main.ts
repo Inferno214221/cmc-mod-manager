@@ -103,7 +103,7 @@ function createWindow(): void {
         const operations: Operation[] = await general.getOperations();
         console.log(operations);
         if (operations.filter((operation: Operation) =>
-            operation.state == OpState.started || operation.state == OpState.queued
+            operation.state == OpState.STARTED || operation.state == OpState.QUEUED
         ).length > 0) {
             if (!(await customDialogs.confirm({
                 id: "closeUnfinishedOperations",

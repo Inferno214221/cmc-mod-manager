@@ -208,7 +208,7 @@ export function installStages(
         global.win.webContents.send("addOperation", {
             title: "Stage Installation",
             body: (error as Error).message,
-            state: OpState.error,
+            state: OpState.ERROR,
             icon: "folder_shared",
             animation: Math.floor(Math.random() * 3),
             dependencies: [],
@@ -265,10 +265,10 @@ export function queStageInstallation(
         id: id,
         title: "Stage Installation",
         body: "Installing a stage from " + location + ".",
-        state: OpState.queued,
+        state: OpState.QUEUED,
         icon: "folder_shared",
         animation: Math.floor(Math.random() * 3),
-        dependencies: [OpDep.stages],
+        dependencies: [OpDep.STAGES],
         call: {
             name: "installStageOp",
             args: [
@@ -294,7 +294,7 @@ export async function installStageOp(
         id: id,
         body: "Installed stage: '" + stage.name + "' from " + location + ".",
         image: "img://" + stage.icon,
-        state: OpState.finished,
+        state: OpState.FINISHED,
     });
     global.win.webContents.send("installStage");
 }

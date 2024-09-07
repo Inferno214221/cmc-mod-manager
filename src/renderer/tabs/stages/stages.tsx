@@ -10,9 +10,9 @@ const styles: typeof import("../../app/app.css") & typeof import("./stages.css")
     Object.assign({}, appStyles, stagesStyles);
 
 const sortTypes: SortTypeOptions[] = [
-    SortTypeOptions.number,
-    SortTypeOptions.series,
-    SortTypeOptions.menuName
+    SortTypeOptions.NUMBER,
+    SortTypeOptions.SERIES,
+    SortTypeOptions.MENU_NAME
 ];
 
 export function TabStages({
@@ -179,7 +179,7 @@ export function TabStages({
                 <div className={styles.center}>
                     <table>
                         <tbody>
-                            {sortType == sortTypes.indexOf(SortTypeOptions.series) ?
+                            {sortTypes[sortType] == SortTypeOptions.SERIES ?
                                 sortedStages.map((
                                     stage: Stage,
                                     index: number
@@ -320,16 +320,16 @@ function StageDisplay({
                 body: "Toggling the ability for stage: '" + stage.name + "' to be " +
                     "selected at random.",
                 image: "img://" + stage.icon,
-                state: OpState.queued,
+                state: OpState.QUEUED,
                 icon: randomSelection ? "help" : "help_outline",
                 animation: Math.floor(Math.random() * 3),
-                dependencies: [OpDep.stageLock],
+                dependencies: [OpDep.STAGE_LOCK],
                 call: async () => {
                     api.writeStageRandom(stage.name, randomSelection);
                     stage.randomSelection = randomSelection;
                     setOperations((prev: Operation[]) => {
                         const newOperations: Operation[] = [...prev];
-                        newOperations[operationId].state = OpState.finished;
+                        newOperations[operationId].state = OpState.FINISHED;
                         newOperations[operationId].body = "Toggled the ability for stage: '" +
                             stage.name + "' to be selected at random."
                         return newOperations;
@@ -369,15 +369,15 @@ function StageDisplay({
                                         title: "Stage Deletion",
                                         body: "Deleting stage: '" + stage.name + "'.",
                                         image: "img://" + stage.icon,
-                                        state: OpState.queued,
+                                        state: OpState.QUEUED,
                                         icon: "delete",
                                         animation: Math.floor(Math.random() * 3),
-                                        dependencies: [OpDep.stages, OpDep.stageLock, OpDep.sss],
+                                        dependencies: [OpDep.STAGES, OpDep.STAGE_LOCK, OpDep.SSS],
                                         call: async () => {
                                             await api.removeStage(stage.name);
                                             setOperations((prev: Operation[]) => {
                                                 const newOperations: Operation[] = [...prev];
-                                                newOperations[operationId].state = OpState.finished;
+                                                newOperations[operationId].state = OpState.FINISHED;
                                                 newOperations[operationId].body = "Deleted " +
                                                     "stage: '" + stage.name + "'.";
                                                 return newOperations;
@@ -401,16 +401,16 @@ function StageDisplay({
                                         title: "Stage Extraction",
                                         body: "Extracting stage: '" + stage.name + "'.",
                                         image: "img://" + stage.icon,
-                                        state: OpState.queued,
+                                        state: OpState.QUEUED,
                                         icon: "drive_file_move",
                                         animation: Math.floor(Math.random() * 3),
-                                        dependencies: [OpDep.stages],
+                                        dependencies: [OpDep.STAGES],
                                         call: async () => {
                                             const extractDir: string =
                                                 await api.extractStage(stage.name);
                                             setOperations((prev: Operation[]) => {
                                                 const newOperations: Operation[] = [...prev];
-                                                newOperations[operationId].state = OpState.finished;
+                                                newOperations[operationId].state = OpState.FINISHED;
                                                 newOperations[operationId].body = "Extracted " +
                                                     "stage: '" + stage.name + "'.";
                                                 newOperations[operationId].postCompletition = {
@@ -471,15 +471,15 @@ function SeriesDisplay({
                             operationId = newOperations.push({
                                 title: "Series Deletion",
                                 body: "Deleting all stages in series: '" + series + "'.",
-                                state: OpState.queued,
+                                state: OpState.QUEUED,
                                 icon: "delete_sweep",
                                 animation: Math.floor(Math.random() * 3),
-                                dependencies: [OpDep.stages, OpDep.stageLock, OpDep.sss],
+                                dependencies: [OpDep.STAGES, OpDep.STAGE_LOCK, OpDep.SSS],
                                 call: async () => {
                                     await api.removeSeriesStages(series);
                                     setOperations((prev: Operation[]) => {
                                         const newOperations: Operation[] = [...prev];
-                                        newOperations[operationId].state = OpState.finished;
+                                        newOperations[operationId].state = OpState.FINISHED;
                                         newOperations[operationId].body = "Deleted all stages " +
                                             "in series: '" + series + "'.";
                                         return newOperations;

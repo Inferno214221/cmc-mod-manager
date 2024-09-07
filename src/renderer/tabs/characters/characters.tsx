@@ -10,9 +10,9 @@ const styles: typeof import("../../app/app.css") & typeof import("./characters.c
     Object.assign({}, appStyles, charactersStyles);
 
 const sortTypes: SortTypeOptions[] = [
-    SortTypeOptions.number,
-    SortTypeOptions.series,
-    SortTypeOptions.menuName
+    SortTypeOptions.NUMBER,
+    SortTypeOptions.SERIES,
+    SortTypeOptions.MENU_NAME
 ];
 
 export function TabCharacters({
@@ -192,7 +192,7 @@ export function TabCharacters({
                 <div className={styles.center}>
                     <table>
                         <tbody>
-                            {sortType == sortTypes.indexOf(SortTypeOptions.series) ?
+                            {sortTypes[sortType] == SortTypeOptions.SERIES ?
                                 sortedCharacters.map((
                                     character: Character,
                                     index: number
@@ -352,16 +352,16 @@ function CharacterDisplay({
                 body: "Toggling the ability for character: '" + character.name + "' to be " +
                     "selected at random.",
                 image: "img://" + character.mug,
-                state: OpState.queued,
+                state: OpState.QUEUED,
                 icon: randomSelection ? "help" : "help_outline",
                 animation: Math.floor(Math.random() * 3),
-                dependencies: [OpDep.fighterLock],
+                dependencies: [OpDep.FIGHTER_LOCK],
                 call: async () => {
                     api.writeCharacterRandom(character.name, randomSelection);
                     character.randomSelection = randomSelection;
                     setOperations((prev: Operation[]) => {
                         const newOperations: Operation[] = [...prev];
-                        newOperations[operationId].state = OpState.finished;
+                        newOperations[operationId].state = OpState.FINISHED;
                         newOperations[operationId].body = "Toggled the ability for character: '" +
                             character.name + "' to be selected at random."
                         return newOperations;
@@ -401,17 +401,18 @@ function CharacterDisplay({
                                         title: "Character Deletion",
                                         body: "Deleting character: '" + character.name + "'.",
                                         image: "img://" + character.mug,
-                                        state: OpState.queued,
+                                        state: OpState.QUEUED,
                                         icon: "delete",
                                         animation: Math.floor(Math.random() * 3),
                                         dependencies: [
-                                            OpDep.fighters, OpDep.alts, OpDep.fighterLock, OpDep.css
+                                            OpDep.FIGHTERS, OpDep.ALTS, OpDep.FIGHTER_LOCK,
+                                            OpDep.CSS
                                         ],
                                         call: async () => {
                                             await api.removeCharacter(character.name);
                                             setOperations((prev: Operation[]) => {
                                                 const newOperations: Operation[] = [...prev];
-                                                newOperations[operationId].state = OpState.finished;
+                                                newOperations[operationId].state = OpState.FINISHED;
                                                 newOperations[operationId].body = "Deleted " +
                                                     "character: '" + character.name + "'.";
                                                 return newOperations;
@@ -435,16 +436,16 @@ function CharacterDisplay({
                                         title: "Character Extraction",
                                         body: "Extracting character: '" + character.name + "'.",
                                         image: "img://" + character.mug,
-                                        state: OpState.queued,
+                                        state: OpState.QUEUED,
                                         icon: "drive_file_move",
                                         animation: Math.floor(Math.random() * 3),
-                                        dependencies: [OpDep.fighters],
+                                        dependencies: [OpDep.FIGHTERS],
                                         call: async () => {
                                             const extractDir: string =
                                                 await api.extractCharacter(character.name);
                                             setOperations((prev: Operation[]) => {
                                                 const newOperations: Operation[] = [...prev];
-                                                newOperations[operationId].state = OpState.finished;
+                                                newOperations[operationId].state = OpState.FINISHED;
                                                 newOperations[operationId].body = "Extracted " +
                                                     "character: '" + character.name + "'.";
                                                 newOperations[operationId].postCompletition = {
@@ -542,15 +543,15 @@ function CharacterAltDisplay({
                                 body: "Removing alt: '" + alt.alt + "' from character: '" +
                                     alt.base + "'.",
                                 image: "img://" + alt.mug,
-                                state: OpState.queued,
+                                state: OpState.QUEUED,
                                 icon: "group_remove",
                                 animation: Math.floor(Math.random() * 3),
-                                dependencies: [OpDep.fighters, OpDep.alts],
+                                dependencies: [OpDep.FIGHTERS, OpDep.ALTS],
                                 call: async () => {
                                     await api.removeAlt(alt);
                                     setOperations((prev: Operation[]) => {
                                         const newOperations: Operation[] = [...prev];
-                                        newOperations[operationId].state = OpState.finished;
+                                        newOperations[operationId].state = OpState.FINISHED;
                                         newOperations[operationId].body = "Removed alt: '" +
                                             alt.alt + "' from character: '" + alt.base + "'.";
                                         return newOperations;
@@ -618,16 +619,16 @@ function AddAltButton({
                         body: "Adding alt: '" + character.name + "' to character: '" +
                             altTarget.name + "'.",
                         image: "img://" + character.mug,
-                        state: OpState.queued,
+                        state: OpState.QUEUED,
                         icon: "person_add",
                         animation: Math.floor(Math.random() * 3),
-                        dependencies: [OpDep.fighters, OpDep.alts, OpDep.fighterLock, OpDep.css],
+                        dependencies: [OpDep.FIGHTERS, OpDep.ALTS, OpDep.FIGHTER_LOCK, OpDep.CSS],
                         call: async () => {
                             await api.addAlt(altTarget, character);
                             setAltTarget(null);
                             setOperations((prev: Operation[]) => {
                                 const newOperations: Operation[] = [...prev];
-                                newOperations[operationId].state = OpState.finished;
+                                newOperations[operationId].state = OpState.FINISHED;
                                 newOperations[operationId].body = "Added alt: '" + character.name +
                                     "' to character: '" + altTarget.name + "'.";
                                 return newOperations;
@@ -668,17 +669,17 @@ function SeriesDisplay({
                             operationId = newOperations.push({
                                 title: "Series Deletion",
                                 body: "Deleting all characters in series: '" + series + "'.",
-                                state: OpState.queued,
+                                state: OpState.QUEUED,
                                 icon: "delete_sweep",
                                 animation: Math.floor(Math.random() * 3),
                                 dependencies: [
-                                    OpDep.fighters, OpDep.alts, OpDep.fighterLock, OpDep.css
+                                    OpDep.FIGHTERS, OpDep.ALTS, OpDep.FIGHTER_LOCK, OpDep.CSS
                                 ],
                                 call: async () => {
                                     await api.removeSeriesCharacters(series);
                                     setOperations((prev: Operation[]) => {
                                         const newOperations: Operation[] = [...prev];
-                                        newOperations[operationId].state = OpState.finished;
+                                        newOperations[operationId].state = OpState.FINISHED;
                                         newOperations[operationId].body = "Deleted all " +
                                             "characters in series: '" + series + "'.";
                                         return newOperations;

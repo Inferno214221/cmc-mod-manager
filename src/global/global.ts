@@ -1,36 +1,36 @@
 export enum DndDataType {
-    ssNumber = "ssNumber",
-    excluded = "excluded"
+    SS_NUMBER = "ssNumber",
+    EXCLUDED = "excluded"
 }
 
 export enum ModTypes {
-    character = "Character",
-    stage = "Stage"
+    CHARACTER = "Character",
+    STAGE = "Stage"
 }
 
 export enum OpDep {
-    fighters,
-    fighterLock,
-    alts,
-    css,
-    gameSettings,
-    stages,
-    stageLock,
-    sss
+    FIGHTERS,
+    FIGHTER_LOCK,
+    ALTS,
+    CSS,
+    GAME_SETTINGS,
+    STAGES,
+    STAGE_LOCK,
+    SSS
 }
 
 export enum OpState {
-    queued = "Queued",
-    started = "Started",
-    finished = "Finished",
-    canceled = "Canceled",
-    error = "Error"
+    QUEUED = "Queued",
+    STARTED = "Started",
+    FINISHED = "Finished",
+    CANCELED = "Canceled",
+    ERROR = "Error"
 }
 
 export enum SortTypeOptions {
-    number = "number",
-    series = "series",
-    menuName = "menuName"
+    NUMBER = "number",
+    SERIES = "series",
+    MENU_NAME = "menuName"
 }
 
 export abstract class ModList<ModType extends Mod, ModUpdateType extends ModUpdate> {

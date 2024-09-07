@@ -10,9 +10,9 @@ const styles: typeof import("../../app/app.css") & typeof import("./stage-ss.css
     Object.assign({}, appStyles, stageSsStyles);
 
 const sortTypes: SortTypeOptions[] = [
-    SortTypeOptions.number,
-    SortTypeOptions.series,
-    SortTypeOptions.menuName
+    SortTypeOptions.NUMBER,
+    SortTypeOptions.SERIES,
+    SortTypeOptions.MENU_NAME
 ];
 
 export function TabStageSelectionScreen({
@@ -92,15 +92,15 @@ export function TabStageSelectionScreen({
         console.log("stageDragAndDrop");
         console.log(from, to);
         const newSssData: SssData = [...sssData];
-        if (from.type == DndDataType.ssNumber) {
-            if (to.type == DndDataType.ssNumber) {
+        if (from.type == DndDataType.SS_NUMBER) {
+            if (to.type == DndDataType.SS_NUMBER) {
                 newSssData[from.y][from.x] = to.number;
                 newSssData[to.y][to.x] = from.number;
             } else {
                 newSssData[from.y][from.x] = "0000";
             }
         } else {
-            if (to.type == DndDataType.ssNumber) {
+            if (to.type == DndDataType.SS_NUMBER) {
                 newSssData[to.y][to.x] = from.number;
             } else {
                 return;
@@ -128,15 +128,15 @@ export function TabStageSelectionScreen({
             operationId = newOperations.push({
                 title: "Write SSS Data",
                 body: "Writing modified SSS data to page: '" + sssPages[activePage].name + "'.",
-                state: OpState.queued,
+                state: OpState.QUEUED,
                 icon: "location_pin",
                 animation: Math.floor(Math.random() * 3),
-                dependencies: [OpDep.sss],
+                dependencies: [OpDep.SSS],
                 call: async () => {
                     await api.writeSssPages(sssPages);
                     setOperations((prev: Operation[]) => {
                         const newOperations: Operation[] = [...prev];
-                        newOperations[operationId].state = OpState.finished;
+                        newOperations[operationId].state = OpState.FINISHED;
                         newOperations[operationId].body = "Wrote modified SSS data to page: '" +
                             sssPages[activePage].name + "'.";
                         return newOperations;
@@ -294,7 +294,7 @@ function ExcludedStages({
             <div id={styles.excludedDiv}>
                 <div className={styles.center}>
                     <div id={styles.excludedWrapper}>
-                        {sortType == sortTypes.indexOf(SortTypeOptions.series) ?
+                        {sortTypes[sortType] == SortTypeOptions.SERIES ?
                             sortedStages.map((
                                 stage: Stage,
                                 index: number
@@ -349,7 +349,7 @@ function StageDisplay({
     stageDragAndDrop: (from: DndData, to: DndData) => void
 }): JSX.Element {
     const dndData: DndData = {
-        type: DndDataType.excluded,
+        type: DndDataType.EXCLUDED,
         number: ("0000" + stage.number).slice(-4)
     }
     return (
@@ -413,15 +413,15 @@ function SssPages({
                 title: "Reorder SSS Pages",
                 body: "Moving SSS page: '" + sssPages[from].name + "' to index: " +
                     (to > from ? to - 1 : to) + ".",
-                state: OpState.queued,
+                state: OpState.QUEUED,
                 icon: "swap_horiz",
                 animation: Math.floor(Math.random() * 3),
-                dependencies: [OpDep.sss],
+                dependencies: [OpDep.SSS],
                 call: async () => {
                     await api.reorderSssPage(from, to);
                     setOperations((prev: Operation[]) => {
                         const newOperations: Operation[] = [...prev];
-                        newOperations[operationId].state = OpState.finished;
+                        newOperations[operationId].state = OpState.FINISHED;
                         newOperations[operationId].body = "Moved SSS page: '" +
                             sssPages[from].name + "' to index: " + (to > from ? to - 1 : to) + ".";
                         return newOperations;
@@ -477,15 +477,15 @@ function SssPages({
                                 operationId = newOperations.push({
                                     title: "SSS Page Addition",
                                     body: "Adding new SSS page: '" + newPageName + "'.",
-                                    state: OpState.queued,
+                                    state: OpState.QUEUED,
                                     icon: "add",
                                     animation: Math.floor(Math.random() * 3),
-                                    dependencies: [OpDep.sss],
+                                    dependencies: [OpDep.SSS],
                                     call: async () => {
                                         await api.addSssPage(newPageName);
                                         setOperations((prev: Operation[]) => {
                                             const newOperations: Operation[] = [...prev];
-                                            newOperations[operationId].state = OpState.finished;
+                                            newOperations[operationId].state = OpState.FINISHED;
                                             newOperations[operationId].body = "Added new SSS " +
                                                 "page: '" + newPageName + "'.";
                                             return newOperations;
@@ -559,15 +559,15 @@ function SssPageDisplay({
                         operationId = newOperations.push({
                             title: "SSS Page Deletion",
                             body: "Deleting SSS page: '" + page.name + "'.",
-                            state: OpState.queued,
+                            state: OpState.QUEUED,
                             icon: "delete",
                             animation: Math.floor(Math.random() * 3),
-                            dependencies: [OpDep.sss],
+                            dependencies: [OpDep.SSS],
                             call: async () => {
                                 await api.removeSssPage(page);
                                 setOperations((prev: Operation[]) => {
                                     const newOperations: Operation[] = [...prev];
-                                    newOperations[operationId].state = OpState.finished;
+                                    newOperations[operationId].state = OpState.FINISHED;
                                     newOperations[operationId].body = "Deleted SSS page: '" +
                                         page.name + "'.";
                                     return newOperations;
@@ -631,7 +631,7 @@ function SssStageDisplay({
     stageDragAndDrop: (from: DndData, to: DndData) => void
 }): JSX.Element {
     const dndData: DndData = {
-        type: DndDataType.ssNumber,
+        type: DndDataType.SS_NUMBER,
         number: cell,
         x: x,
         y: y

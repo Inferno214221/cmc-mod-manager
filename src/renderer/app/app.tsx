@@ -274,7 +274,7 @@ export function OperationDisplay({ display }: { display: Operation }): JSX.Eleme
     let classes: string = styles.matIcon;
     let closeButton: JSX.Element = null;
     switch (display.state) {
-        case (OpState.started):
+        case (OpState.STARTED):
             classes += " " + styles[ANIMATIONS[display.animation]];
             if (display.cancelable) {
                 closeButton = (
@@ -287,19 +287,19 @@ export function OperationDisplay({ display }: { display: Operation }): JSX.Eleme
                 );
             }
             break
-        case (OpState.queued):
+        case (OpState.QUEUED):
             icon = "pending";
             closeButton = (
                 <IconButton
                     icon={"close"}
                     iconSize={"16px"}
                     tooltip={"Cancel Operation"}
-                    onClick={() => display.state = OpState.canceled}
+                    onClick={() => display.state = OpState.CANCELED}
                     // Pass by reference moment
                 />
             );
             break;
-        case (OpState.finished):
+        case (OpState.FINISHED):
             icon = "done";
             if (display.postCompletition) {
                 closeButton = (
@@ -317,10 +317,10 @@ export function OperationDisplay({ display }: { display: Operation }): JSX.Eleme
             // delete operations could be modified copies of extract, which target a tmp dir and que
             // a install operation on undo
             break;
-        case (OpState.canceled):
+        case (OpState.CANCELED):
             icon = "block";
             break;
-        case (OpState.error):
+        case (OpState.ERROR):
             icon = "error_outline";
             break;
     }
@@ -361,7 +361,7 @@ export function displayError(
 ): void {
     setOperations((prev: Operation[]) => {
         const newOperations: Operation[] = [...prev];
-        newOperations[operationId].state = OpState.error;
+        newOperations[operationId].state = OpState.ERROR;
         newOperations[operationId].body =
             error.message.replace(/(Error: Error)[\w:' ]*(?=Error)/, "");
         return newOperations;
@@ -374,14 +374,14 @@ export async function callQueuedOperations(
 ): Promise<void> {
     const depsInUse: OpDep[] = [];
     operations.forEach((operation: Operation) => {
-        if (operation.state == OpState.started) {
+        if (operation.state == OpState.STARTED) {
             operation.dependencies.forEach((dep: OpDep) => {
                 depsInUse.push(dep);
             });
         }
     });
     const toStart: Operation[] = operations.filter((operation: Operation) => {
-        if (operation.state == OpState.queued) {
+        if (operation.state == OpState.QUEUED) {
             if (
                 !operation.dependencies.map(
                     (dep: OpDep) => depsInUse.includes(dep)
@@ -402,7 +402,7 @@ export async function callQueuedOperations(
         console.log("Started: " + operation.title);
         setOperations((prev: Operation[]) => {
             const newOperations: Operation[] = [...prev];
-            newOperations[operationId].state = OpState.started;
+            newOperations[operationId].state = OpState.STARTED;
             return newOperations;
         });
         await runOperation(operation.call);
@@ -410,7 +410,7 @@ export async function callQueuedOperations(
     } catch (error: any) {
         setOperations((prev: Operation[]) => {
             const newOperations: Operation[] = [...prev];
-            newOperations[operationId].state = OpState.error;
+            newOperations[operationId].state = OpState.ERROR;
             newOperations[operationId].body =
                 error.message.replace(/(Error)[\w' ]*: (?=Error)/, "");
             return newOperations;

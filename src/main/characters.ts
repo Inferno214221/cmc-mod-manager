@@ -497,7 +497,7 @@ export function installCharacters(
         global.win.webContents.send("addOperation", {
             title: "Character Installation",
             body: (error as Error).message,
-            state: OpState.error,
+            state: OpState.ERROR,
             icon: "folder_shared",
             animation: Math.floor(Math.random() * 3),
             dependencies: [],
@@ -578,10 +578,10 @@ export function queCharacterInstallation(
         id: id,
         title: "Character Installation",
         body: "Installing a character from " + location + ".",
-        state: OpState.queued,
+        state: OpState.QUEUED,
         icon: "folder_shared",
         animation: Math.floor(Math.random() * 3),
-        dependencies: [OpDep.fighters],
+        dependencies: [OpDep.FIGHTERS],
         call: {
             name: "installCharacterOp",
             args: [
@@ -607,7 +607,7 @@ export async function installCharacterOp(
         id: id,
         body: "Installed character: '" + character.name + "' from " + location + ".",
         image: "img://" + character.mug,
-        state: OpState.finished,
+        state: OpState.FINISHED,
     });
     global.win.webContents.send("installCharacter");
 }
