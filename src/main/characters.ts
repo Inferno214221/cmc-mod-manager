@@ -484,23 +484,22 @@ export function installCharacters(
                 dir
             );
         } else {
-            // TODO: make operation
-            console.log(foundCharacters);
             customDialogs.characterInstallation({
-                id: "TODO",
+                id: "characterInstallation",
                 body: "Characters found in '" + correctedTarget + "':",
                 title: "Select Characters To Install",
                 targetDir: correctedTarget
             });
         }
     } catch (error: any) {
-        global.win.webContents.send("addOperation", {
+        general.addOperation({
             title: "Character Installation",
             body: (error as Error).message,
             state: OpState.ERROR,
             icon: "folder_shared",
             animation: Math.floor(Math.random() * 3),
             dependencies: [],
+            call: () => null
         });
     }
     return;
@@ -574,7 +573,7 @@ export function queCharacterInstallation(
     dir: string = global.gameDir
 ): void {
     const id: string = foundCharacter.name + "_" + new Date().getTime();
-    global.win.webContents.send("addOperation", {
+    general.addOperation({
         id: id,
         title: "Character Installation",
         body: "Installing a character from " + location + ".",
@@ -603,13 +602,13 @@ export async function installCharacterOp(
     const character: Character = await installCharacter(
         targetDir, foundCharacter, filterInstallation, updateCharacters, dir
     );
-    global.win.webContents.send("updateOperation", {
+    general.updateOperation({
         id: id,
         body: "Installed character: '" + character.name + "' from " + location + ".",
         image: "img://" + character.mug,
         state: OpState.FINISHED,
     });
-    global.win.webContents.send("installCharacter");
+    general.updateCharacterPages();
 }
 
 export async function installCharacter(

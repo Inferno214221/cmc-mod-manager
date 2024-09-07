@@ -13,8 +13,6 @@ api.on("showNotification", (
     if (onclick != undefined) notif.onclick = () => {
         if (api[onclick.name] != undefined) {
             api[onclick.name](...onclick.args);
-        } else {
-            // TODO: throw error
         }
     }
 });

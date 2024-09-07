@@ -205,13 +205,14 @@ export function installStages(
             throw new Error("Not implemented");
         }
     } catch (error: any) {
-        global.win.webContents.send("addOperation", {
+        general.addOperation({
             title: "Stage Installation",
             body: (error as Error).message,
             state: OpState.ERROR,
             icon: "folder_shared",
             animation: Math.floor(Math.random() * 3),
             dependencies: [],
+            call: () => null
         });
     }
     return;
@@ -261,7 +262,7 @@ export function queStageInstallation(
     dir: string = global.gameDir
 ): void {
     const id: string = foundStage + "_" + new Date().getTime();
-    global.win.webContents.send("addOperation", {
+    general.addOperation({
         id: id,
         title: "Stage Installation",
         body: "Installing a stage from " + location + ".",
@@ -290,13 +291,13 @@ export async function installStageOp(
     const stage: Stage = await installStage(
         targetDir, foundStage, filterInstallation, updateStages, dir
     );
-    global.win.webContents.send("updateOperation", {
+    general.updateOperation({
         id: id,
         body: "Installed stage: '" + stage.name + "' from " + location + ".",
         image: "img://" + stage.icon,
         state: OpState.FINISHED,
     });
-    global.win.webContents.send("installStage");
+    general.updateStagePages();
 }
 
 export async function installStage(

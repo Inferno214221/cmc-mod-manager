@@ -1,5 +1,5 @@
 import {
-    IpcMainInvokeEvent, OpenDialogReturnValue, app, dialog, ipcMain, shell
+    BrowserWindow, IpcMainInvokeEvent, OpenDialogReturnValue, app, dialog, ipcMain, shell
 } from "electron";
 import fs from "fs-extra";
 import path from "path";
@@ -178,7 +178,7 @@ export async function checkForUpdates(): Promise<void> {
                     return;
                 }
             }
-            global.win.webContents.send("addOperation", {
+            addOperation({
                 id: id,
                 title: "Download Update",
                 body: "Downloading the latest version of CMC Mod Manager.",
@@ -207,7 +207,7 @@ export async function downloadUpdate(tagName: string, id: string): Promise<void>
         okLabel: "Continue"
     })) || isSelfContainedDir()) {
         if (isSelfContainedDir()) alertSelfContainedDir();
-        global.win.webContents.send("updateOperation", {
+        updateOperation({
             id: id,
             state: OpState.CANCELED
         });
@@ -237,7 +237,7 @@ export async function downloadUpdate(tagName: string, id: string): Promise<void>
             );
         }).pipe(targetStream).on("close", async () => {
             if (targetStream.errored) return;
-            global.win.webContents.send("updateOperation", {
+            updateOperation({
                 id: id,
                 title: "Update Downloaded",
                 body: "Downloaded the latest version of CMC Mod Manager.",
@@ -256,7 +256,7 @@ export async function downloadUpdate(tagName: string, id: string): Promise<void>
             }
 
             const installId: string = new Date().getTime() + "_installUpdate";
-            global.win.webContents.send("addOperation", {
+            addOperation({
                 id: installId,
                 title: "Install Update",
                 body: "Installing the latest version of CMC Mod Manager.",
@@ -287,7 +287,7 @@ export function installUpdate(id: string): void {
         fs.copySync(path.join(updateDir, "updater"), updaterDir, { overwrite: true });
     }
     global.updateOnExit = true;
-    global.win.webContents.send("updateOperation", {
+    updateOperation({
         id: id,
         body: "Please close CMC Mod Manager to finish the update.",
         state: OpState.FINISHED
@@ -331,14 +331,14 @@ export async function handleURI(uri: string): Promise<void> {
     const modId: string = splitUri[2];
     const id: string = modId + "_" + new Date().getTime();
 
-    global.win.webContents.send("showNotification", "1-Click Download Initialised", {
+    showNotification("1-Click Download Initialised", {
         body: "Downloading mod with id: '" + modId + "' from GameBanana."
     }, {
         name: "focusWindow",
         args: []
     });
 
-    global.win.webContents.send("addOperation", {
+    addOperation({
         id: id + "_download",
         title: "Mod Download",
         body: "Downloading a mod from GameBanana.",
@@ -408,7 +408,7 @@ export async function downloadMod(url: string, modId: string, id: string): Promi
                 }
 
                 const downloadSize: number = parseInt(res.headers["content-length"]);
-                global.win.webContents.send("updateOperation", {
+                updateOperation({
                     id: id + "_download",
                     title: modType + " Download",
                     body: "Downloading mod: '" + modInfo[0] + "' from GameBanana. (0 / " +
@@ -428,13 +428,13 @@ export async function downloadMod(url: string, modId: string, id: string): Promi
                 global.cancelFunctions[id + "_download"] = (() => {
                     req.abort();
                     canceled = true;
-                    global.win.webContents.send("updateOperation", {
+                    updateOperation({
                         id: id + "_download",
                         state: OpState.CANCELED,
                     });
                     delete global.cancelFunctions[id + "_download"];
                 });
-                global.win.webContents.send("updateOperation", {
+                updateOperation({
                     id: id + "_download",
                     cancelable: true,
                 });
@@ -444,7 +444,7 @@ export async function downloadMod(url: string, modId: string, id: string): Promi
                     if (downloadStream.errored || canceled) return;
                     const output: string = await extractArchive(filePath, global.temp);
                     fs.removeSync(filePath);
-                    global.win.webContents.send("updateOperation", {
+                    updateOperation({
                         id: id + "_download",
                         body: "Downloaded mod: '" + modInfo[0] + "' from GameBanana.",
                         state: OpState.FINISHED,
@@ -479,7 +479,7 @@ export function updateDownloadProgress(
     setTimeout(() => {
         if (downloadStream.closed || downloadStream.errored) return;
         if (downloadStream.bytesWritten < downloadSize) {
-            global.win.webContents.send("updateOperation", {
+            updateOperation({
                 id: id,
                 body: body + " (" + toMb(downloadStream.bytesWritten) + " / " +
                     toMb(downloadSize) + " mb)",
@@ -518,6 +518,14 @@ export async function getOperations(): Promise<Operation[]> {
         );
         global.win.webContents.send("getOperations");
     });
+}
+
+export function addOperation(operation: Operation): void {
+    global.win.webContents.send("addOperation", operation);
+}
+
+export function updateOperation(update: OperationUpdate): void {
+    global.win.webContents.send("updateOperation", update);
 }
 
 export function cancelOperation(id: string): void {
@@ -628,4 +636,26 @@ export async function confirmDestructiveAction(): Promise<boolean> {
         title: "Destructive Action Confirmation",
         okLabel: "Continue",
     });
+}
+
+export function updateCharacterPages(): void {
+    global.win.webContents.send("updateCharacterPages");
+    global.dialogs.forEach(
+        (window: BrowserWindow) => window.webContents.send("updateCharacterPages")
+    );
+}
+
+export function updateStagePages(): void {
+    global.win.webContents.send("updateStagePages");
+    global.dialogs.forEach(
+        (window: BrowserWindow) => window.webContents.send("updateStagePages")
+    );
+}
+
+export function showNotification(
+    title: string,
+    options?: NotificationOptions,
+    onclick?: MainCall
+): void {
+    global.win.webContents.send("showNotification", title, options, onclick);
 }

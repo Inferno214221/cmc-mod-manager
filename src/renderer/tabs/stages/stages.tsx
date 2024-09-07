@@ -52,8 +52,8 @@ export function TabStages({
     [boolean, Dispatch<SetStateAction<boolean>>]
     = useState(false);
 
-    api.on("installCharacter", (): void => null);
-    api.on("installStage", readStages);
+    api.on("updateCharacterPages", (): void => null);
+    api.on("updateStagePages", readStages);
 
     useEffect(() => {
         readStages();

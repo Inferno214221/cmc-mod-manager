@@ -1,4 +1,4 @@
-import { ipcRenderer } from "electron";
+import { IpcRendererEvent, ipcRenderer } from "electron";
 
 export default {
     ok: (
@@ -12,4 +12,15 @@ export default {
         id: string,
         size: number
     ) => ipcRenderer.invoke(id + "_dialogResize", size),
+
+    on: ((
+        channel: string,
+        call: ((...args: any) => void)
+    ) => {
+        ipcRenderer.removeAllListeners(channel);
+        ipcRenderer.on(channel, (
+            _event: IpcRendererEvent,
+            ...args: any
+        ) => call(...args));
+    }),
 }

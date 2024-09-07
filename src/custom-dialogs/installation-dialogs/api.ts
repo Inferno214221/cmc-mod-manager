@@ -5,12 +5,6 @@ export default {
         targetDir: string
     ]): Promise<FoundCharacter[]> => ipcRenderer.invoke("findCharacters", args)),
 
-    // installCharacterDialog: ((...args: [
-    //     targetDir: string,
-    //     character: FoundCharacter,
-    //     dir?: string
-    // ]): Promise<void> => ipcRenderer.invoke("installCharacterDialog", args)),
-
     pathJoin: ((...args: [
         ...paths: string[]
     ]): Promise<string> => ipcRenderer.invoke("pathJoin", args)),

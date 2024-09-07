@@ -44,11 +44,11 @@ abstract class Dialog<OptionsType extends Options, ReturnType> {
                 additionalArguments: [JSON.stringify(this.options)]
             }
         });
-        this.window.loadURL(this.REACT_ENTRY);
 
         this.window.on("close", () => {
             this.clearHandlers();
             if (callback != undefined) callback(undefined);
+            global.dialogs.splice(global.dialogs.indexOf(this.window), 1);
         });
 
         ipcMain.handle(this.options.id + "_dialogResize",
@@ -60,6 +60,9 @@ abstract class Dialog<OptionsType extends Options, ReturnType> {
         ipcMain.handle(this.options.id + "_dialogCancel",
             () => this.cancel()
         );
+        
+        this.window.loadURL(this.REACT_ENTRY);
+        global.dialogs.push(this.window);
     }
 
     resize(height: number): void {

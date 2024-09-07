@@ -5,6 +5,7 @@ declare module "*.css";
 
 declare const global: {
     win: BrowserWindow,
+    dialogs: BrowserWindow[],
     gameDir: string,
     appData: AppData,
     appDir: string,

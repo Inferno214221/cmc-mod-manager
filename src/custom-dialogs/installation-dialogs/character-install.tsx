@@ -56,6 +56,9 @@ function Body(): JSX.Element {
 
     const [alts, setAlts]: [string[], Dispatch<SetStateAction<string[]>>] = useState([]);
 
+    dialog.on("updateCharacterPages", readGameCharacters);
+    dialog.on("updateStagePages", (): void => null);
+
     useEffect(() => {
         readGameCharacters();
         findCharacters();
@@ -111,6 +114,7 @@ function Body(): JSX.Element {
                 </div>
             </div>
             {/* <hr/> */}
+            {/* TODO: is a button even necessary??? */}
             <div id={styles.buttonDiv}>
                 <div className={styles.right}>
                     <button onClick={() => ok(options.id)}>
