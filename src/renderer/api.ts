@@ -232,7 +232,7 @@ export default {
     ]): Promise<string> => ipcRenderer.invoke("prompt", args)),
 
     queCharacterInstallation: ((...args: [
-        target: string,
+        targetDir: string,
         foundCharacter: FoundCharacter,
         filterInstallation: boolean,
         updateCharacters: boolean,

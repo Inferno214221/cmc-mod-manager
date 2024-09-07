@@ -10,6 +10,8 @@ abstract class Dialog<OptionsType extends Options, ReturnType> {
     abstract readonly PRELOAD_ENTRY: string;
     abstract readonly REACT_ENTRY: string;
 
+    readonly DEFAULT_WIDTH: number = 360;
+
     constructor(options: OptionsType) {
         this.options = options;
     }
@@ -61,7 +63,7 @@ abstract class Dialog<OptionsType extends Options, ReturnType> {
     }
 
     resize(height: number): void {
-        this.window.setContentSize(360, height);
+        this.window.setContentSize(this.DEFAULT_WIDTH, height);
     }
 
     ok(_value: ReturnType): void {
@@ -151,6 +153,8 @@ export class CharacterInstallDialog extends Dialog<CharacterInstallOptions, null
     readonly PRELOAD_ENTRY: string = DIALOG_CHARACTER_INSTALL_PRELOAD_WEBPACK_ENTRY;
     readonly REACT_ENTRY: string = DIALOG_CHARACTER_INSTALL_WEBPACK_ENTRY;
 
+    readonly DEFAULT_WIDTH: number = 600;
+
     ok(value: null): void {
         super.ok(value);
         this.callback();
@@ -159,8 +163,6 @@ export class CharacterInstallDialog extends Dialog<CharacterInstallOptions, null
         super.cancel();
         this.callback();
     }
-
-    // TODO: wait until rendered to show
 }
 
 export async function characterInstallation(options: CharacterInstallOptions): Promise<void> {

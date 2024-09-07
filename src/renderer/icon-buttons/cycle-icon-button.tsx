@@ -1,8 +1,5 @@
 import { Dispatch, SetStateAction } from "react";
-import appStyles from "../app/app.css";
-import iconButtonStyles from "./icon-buttons.css";
-const styles: typeof import("../app/app.css") & typeof import("./icon-buttons.css") =
-    Object.assign({}, appStyles, iconButtonStyles);
+import styles from "./icon-buttons.css";
 
 export default function CycleIconButton({
     index,

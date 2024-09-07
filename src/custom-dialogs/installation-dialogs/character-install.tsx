@@ -8,6 +8,7 @@ const styles: typeof import("../custom-dialogs.css") & typeof import("./installa
     Object.assign({}, dialogStyles, charactersStyles, installStyles);
 import { CharacterList } from "../../global/global";
 import missing from "../../assets/missing.png";
+import IconButton from "../../renderer/icon-buttons/icon-button";
 
 declare const dialog: typeof import("../api").default;
 declare const options: CharacterInstallOptions;
@@ -32,32 +33,34 @@ async function requestNextFrame(height: number, depth: number = 0): Promise<numb
                     resolve(await requestNextFrame(height, depth + 1));
                 }
             } else {
+                let newHeight: number = document.documentElement.getBoundingClientRect().height;
+                newHeight = Math.max(Math.min(newHeight, 720), 400);
                 dialog.resize(
                     options.id,
-                    Math.min(document.documentElement.getBoundingClientRect().height, 720)
+                    newHeight
                 );
-                resolve(Math.min(document.documentElement.getBoundingClientRect().height, 720));
+                resolve(newHeight);
             }
         });
     });
 }
 
 function Body(): JSX.Element {
-    const [height, setHeight]:
-    [number, Dispatch<SetStateAction<number>>]
-    = useState(0);
+    const [height, setHeight]: [number, Dispatch<SetStateAction<number>>] = useState(0);
 
     const [gameCharacters, setGameCharacters]:
-    [CharacterList, Dispatch<SetStateAction<CharacterList>>]
-    = useState(null);
+    [CharacterList, Dispatch<SetStateAction<CharacterList>>] = useState(null);
 
     const [foundCharacters, setFoundCharacters]:
-    [FoundCharacter[], Dispatch<SetStateAction<FoundCharacter[]>>]
-    = useState([]);
+    [FoundCharacter[], Dispatch<SetStateAction<FoundCharacter[]>>] = useState([]);
+
+    const [alts, setAlts]: [string[], Dispatch<SetStateAction<string[]>>] = useState([]);
 
     useEffect(() => {
         readGameCharacters();
         findCharacters();
+        readAlts();
+        (async () => setHeight(await requestNextFrame(height)))();
     }, []);
 
     async function readGameCharacters(): Promise<void> {
@@ -68,12 +71,12 @@ function Body(): JSX.Element {
         setFoundCharacters(await api.findCharacters(options.targetDir));
     }
 
-    useEffect(() => {
-        (async () => setHeight(await requestNextFrame(height)))();
-    });
+    async function readAlts(): Promise<void> {
+        setAlts((await api.readAlts()).map((alt: Alt) => alt.alt));
+    }
 
     return (
-        <div onKeyUp={(event: any) => {
+        <section onKeyUp={(event: any) => {
             switch (event.key) {
                 case " ":
                 case "Enter":
@@ -82,10 +85,12 @@ function Body(): JSX.Element {
                     break;
             }
         }}>
-            <div className={styles.center}>
-                <span>
-                    {options.body}
-                </span>
+            <div id={styles.sortDiv}>
+                <div className={styles.center}>
+                    <span>
+                        {options.body}
+                    </span>
+                </div>
             </div>
             <div id={styles.characterDiv}>
                 <div className={styles.center}>
@@ -94,8 +99,10 @@ function Body(): JSX.Element {
                             {/* TODO: sort, search characters */}
                             {foundCharacters.map((character: FoundCharacter) => (
                                 <CharacterDisplay
+                                    targetDir={options.targetDir}
                                     character={character}
                                     gameCharacters={gameCharacters}
+                                    alts={alts}
                                     key={character.name}
                                 />
                             ))}
@@ -103,13 +110,15 @@ function Body(): JSX.Element {
                     </table>
                 </div>
             </div>
-            <br/>
-            <div className={styles.right}>
-                <button onClick={() => ok(options.id)}>
-                    Done
-                </button>
+            {/* <hr/> */}
+            <div id={styles.buttonDiv}>
+                <div className={styles.right}>
+                    <button onClick={() => ok(options.id)}>
+                        Done
+                    </button>
+                </div>
             </div>
-        </div>
+        </section>
     );
 }
 
@@ -119,12 +128,22 @@ function ok(id: string): void {
 }
 
 function CharacterDisplay({
+    targetDir,
     character,
-    gameCharacters
+    gameCharacters,
+    alts
 }: {
+    targetDir: string,
     character: FoundCharacter,
-    gameCharacters: CharacterList
+    gameCharacters: CharacterList,
+    alts: string[]
 }): JSX.Element {
+
+    async function onClick(): Promise<void> {
+        api.queCharacterInstallation(targetDir, character, true, true, "filesystem");
+        // update this element
+    }
+
     return (
         <tr className={styles.characterDisplayRow}>
             <td>
@@ -139,12 +158,27 @@ function CharacterDisplay({
                         />
                     </div>
                     <div className={styles.characterDisplayName}>
-                        <span>{character.dat.menuName}</span>
+                        <span>
+                            {character.dat.menuName == "" ?
+                                "(" + character.name + ")" :
+                                character.dat.menuName
+                            }
+                        </span>
                     </div>
                     <div className={styles.characterDisplayActions}>
-                        {gameCharacters.getByName(character.name) ?
-                            <>Update</> :
-                            <>Install</>
+                        {(gameCharacters.getByName(character.name) ||
+                            alts.includes(character.name)) ?
+                            <IconButton
+                                icon={"sync"}
+                                iconSize={"30px"}
+                                tooltip={"Update Character"}
+                                onClick={onClick}
+                            /> : <IconButton
+                                icon={"add"}
+                                iconSize={"30px"}
+                                tooltip={"Install Character"}
+                                onClick={onClick}
+                            />
                         }
                     </div>
                 </div>
