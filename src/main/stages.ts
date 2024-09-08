@@ -378,12 +378,12 @@ export async function installStage(
         toResolve.push(fs.copy(targetDir, dir, { overwrite: true }));
     }
 
-    if (stageList.getByName(foundStage) != undefined) {
-        return stageList.getByName(foundStage);
+    if (stageList.getByName(foundStage) == undefined) {
+        stageList.add(stage);
+        toResolve.push(writeStages(stageList.toArray(), dir));
     }
-    stageList.add(stage);
-    toResolve.push(writeStages(stageList.toArray(), dir));
     await Promise.allSettled(toResolve);
+    
     fs.removeSync(path.join(dir, "info.json"));
     return stage;
 }

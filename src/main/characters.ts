@@ -684,13 +684,12 @@ export async function installCharacter(
         mug: path.join(dir, "gfx", "mugs", foundCharacter.name + ".png")
     };
 
-    if (characters.getByName(foundCharacter.name) != undefined) {
-        return character;
+    if (characters.getByName(foundCharacter.name) == undefined) {
+        characters.add(character);
+        toResolve.push(writeCharacters(characters.toArray(), dir));
     }
-    characters.add(character);
-    toResolve.push(writeCharacters(characters.toArray(), dir));
     await Promise.allSettled(toResolve);
-    
+
     // This needs to be done last to ensure that it overrides the other changes
     await writeCharacterDat(foundCharacter.dat, path.join(dir, "data", "dats"));
     return character;
