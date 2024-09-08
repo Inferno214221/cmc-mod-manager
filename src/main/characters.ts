@@ -474,6 +474,8 @@ export function installCharacters(
 ): void {
     try {
         const correctedTarget: string = correctCharacterDir(targetDir);
+        // FIXME: if this is the same as dir, the program will likely end up deleting files and then
+        // ! erroring
         const foundCharacters: FoundCharacter[] = findCharacters(correctedTarget);
         if (foundCharacters.length == 0)
             throw new Error("No valid characters found in directory: '" + targetDir + "'.");
@@ -487,12 +489,7 @@ export function installCharacters(
                 dir
             );
         } else {
-            customDialogs.characterInstallation({
-                id: "characterInstallation",
-                body: "Characters found in '" + correctedTarget + "':",
-                title: "Select Characters To Install",
-                targetDir: correctedTarget
-            });
+            customDialogs.characterInstallation(correctedTarget);
         }
     } catch (err: any) {
         general.addOperation({
@@ -543,8 +540,9 @@ export function findCharacters(targetDir: string): FoundCharacter[] {
         )
     ));
     return characterNames.map((characterName: string) => {
+        let found: FoundCharacter;
         if (fs.existsSync(path.join(targetDir, "data", "dats", characterName + ".dat"))) {
-            return {
+            found = {
                 name: characterName,
                 dat: readCharacterDatPath(
                     path.join(targetDir, "data", "dats", characterName + ".dat"),
@@ -553,7 +551,7 @@ export function findCharacters(targetDir: string): FoundCharacter[] {
                 mug: path.join(targetDir, "gfx", "mugs", characterName + ".png")
             };
         } else if (fs.existsSync(path.join(targetDir, "data", characterName + ".dat"))) {
-            return {
+            found = {
                 name: characterName,
                 dat: readCharacterDatPath(
                     path.join(targetDir, "data", characterName + ".dat"),
@@ -562,9 +560,18 @@ export function findCharacters(targetDir: string): FoundCharacter[] {
                 mug: path.join(targetDir, "gfx", "mugs", characterName + ".png")
             };
         } else {
-            // TODO: inform the user about characters without dats?
             return null;
         }
+
+        // Check for missing info available from v7
+        const builtinInfo: V7CharacterInfo = v7CharacterLookup(found.dat.name);
+        if (builtinInfo != undefined) {
+            found.dat.displayName = found.dat.displayName || builtinInfo.displayName;
+            found.dat.menuName = found.dat.menuName || builtinInfo.displayName;
+            found.dat.battleName = found.dat.battleName || builtinInfo.displayName;
+            found.dat.series = found.dat.series || builtinInfo.series;
+        }
+        return found;
     }).filter((found: FoundCharacter) => found != null) as FoundCharacter[];
 }
 

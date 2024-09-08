@@ -172,8 +172,11 @@ export class CharacterInstallDialog extends Dialog<CharacterInstallOptions, null
     }
 }
 
-export async function characterInstallation(
-    options: CharacterInstallOptions
-): Promise<null | void> {
-    return new CharacterInstallDialog(options).show();
+export async function characterInstallation(targetDir: string): Promise<null | void> {
+    return new CharacterInstallDialog({
+        id: "characterInstallation",
+        body: "",
+        title: "Select Characters To Install",
+        targetDir: targetDir
+    }).show();
 }

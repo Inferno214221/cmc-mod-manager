@@ -49,3 +49,46 @@ hr {
     border-radius: 5px;
     margin: 0px 0px 5px;
 }
+
+#dir-output {
+    width: auto;
+    field-sizing: content;
+}
+
+.tooltip-wrapper {
+    position: relative;
+}
+
+.tooltip {
+    visibility: hidden;
+    position: absolute;
+    top: 0px;
+    z-index: 1;
+    padding: 0px;
+    height: 100%;
+    width: max-content;
+    display: inline-flex;
+    align-items: center;
+}
+
+.tooltip span {
+    color: white;
+    font-size: 15px;
+    font-weight: bold;
+    background-color: var(--inf-grey1);
+    border-radius: 10px;
+    padding: 5px 10px;
+}
+
+.tooltip-wrapper:hover .tooltip {
+    visibility: visible;
+}
+
+.tooltip:hover {
+    visibility: hidden;
+    z-index: -1;
+}
+
+.inline-sort-options {
+    display: inline-block;
+}
