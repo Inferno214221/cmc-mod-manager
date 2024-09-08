@@ -39,8 +39,8 @@ function Body(): JSX.Element {
     [number, Dispatch<SetStateAction<number>>]
     = useState(0);
 
-    dialog.on("updateCharacterPages", (): void => null);
-    dialog.on("updateStagePages", (): void => null);
+    dialog.on("updateCharacterPages", () => null);
+    dialog.on("updateStagePages", () => null);
 
     useEffect(() => {
         (async () => setHeight(await requestNextFrame(height)))();

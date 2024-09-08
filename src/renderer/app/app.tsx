@@ -13,7 +13,7 @@ import styles from "./app.css";
 import IconButton from "../icon-buttons/icon-button";
 
 let root: Root;
-let activeTab: Tab = null;
+let activeTab: Tab | null = null;
 
 export function render(): void {
     root = createRoot(document.body);
@@ -24,7 +24,7 @@ export interface Tab {
     displayName: string,
     icon: string,
     element: (setOperations: Dispatch<SetStateAction<Operation[]>>) => JSX.Element,
-    allowTabSwitch: () => Promise<boolean>
+    allowTabSwitch?: () => Promise<boolean>
 }
 export const HOME: Tab = {
     name: "home",
@@ -38,16 +38,14 @@ export const CHARACTERS: Tab = {
     displayName: "Characters",
     icon: "groups",
     element: (setOperations: Dispatch<SetStateAction<Operation[]>>) =>
-        <TabCharacters setOperations={setOperations}/>,
-    allowTabSwitch: null
+        <TabCharacters setOperations={setOperations}/>
 };
 export const CHARACTER_SELECTION_SCREEN: Tab = {
     name: "characterSelectionScreen",
     displayName: "Character Selection Screen",
     icon: "pan_tool_alt",
     element: (setOperations: Dispatch<SetStateAction<Operation[]>>) =>
-        <TabCharacterSelectionScreen setOperations={setOperations}/>,
-    allowTabSwitch: null
+        <TabCharacterSelectionScreen setOperations={setOperations}/>
 };
 // export const PORT_CHARACTERS: Tab = {
 //     name: "portCharacters",
@@ -61,29 +59,26 @@ export const STAGES: Tab = {
     displayName: "Stages",
     icon: "terrain",
     element: (setOperations: Dispatch<SetStateAction<Operation[]>>) =>
-        <TabStages setOperations={setOperations}/>,
-    allowTabSwitch: null
+        <TabStages setOperations={setOperations}/>
 };
 export const STAGE_SELECTION_SCREEN: Tab = {
     name: "stageSelectionScreen",
     displayName: "Stage Selection Screen",
     icon: "location_pin",
     element: (setOperations: Dispatch<SetStateAction<Operation[]>>) =>
-        <TabStageSelectionScreen setOperations={setOperations}/>,
-    allowTabSwitch: null
+        <TabStageSelectionScreen setOperations={setOperations}/>
 };
 export const SETTINGS: Tab = {
     name: "settings",
     displayName: "Settings",
     icon: "settings",
-    element: () => <TabSettings/>,
-    allowTabSwitch: null
+    element: () => <TabSettings/>
 };
 
 export interface NavButtonInfo {
     displayName: string,
     icon: string,
-    function: VoidFunction
+    function: () => void
 }
 export const CHANGE_DIR: NavButtonInfo = {
     displayName: "Change CMC+ Directory",
@@ -121,7 +116,7 @@ export async function switchTabs(tab: Tab): Promise<void> {
 
 export function App({ tab }: { tab: Tab }): JSX.Element {
     const [showPanel, setShowPanel]:
-    [boolean, Dispatch<SetStateAction<boolean>>]
+    [boolean | null, Dispatch<SetStateAction<boolean | null>>]
     = useState(null);
 
     const [operations, setOperations]:
@@ -144,7 +139,7 @@ export function App({ tab }: { tab: Tab }): JSX.Element {
             const filtered: Operation[] = newOperations.filter(
                 (operation: Operation) => operation.id == update.id
             );
-            if (filtered.length < 1) return;
+            if (filtered.length < 1) return newOperations;
             const operation: Operation = filtered[0];
             Object.assign(operation, update);
             return newOperations;
@@ -230,7 +225,7 @@ export function OperationPanel({
     setShowPanel
 }: {
     operations: Operation[],
-    showPanel: boolean, 
+    showPanel: boolean | null, 
     setShowPanel: Dispatch<SetStateAction<boolean>>
 }): JSX.Element {
     useEffect(() => {
@@ -243,7 +238,7 @@ export function OperationPanel({
         <div className={styles.operationPanel}>
             <div className={styles.operationPanelToggle}>
                 <ToggleIconButton
-                    checked={showPanel}
+                    checked={!!showPanel}
                     trueIcon={"keyboard_arrow_right"}
                     trueTooltip={"Hide Operations"}
                     falseIcon={"keyboard_arrow_left"}
@@ -272,7 +267,7 @@ export function OperationPanel({
 export function OperationDisplay({ display }: { display: Operation }): JSX.Element {
     let icon: string = display.icon;
     let classes: string = styles.matIcon;
-    let closeButton: JSX.Element = null;
+    let closeButton: JSX.Element | null = null;
     switch (display.state) {
         case (OpState.STARTED):
             classes += " " + styles[ANIMATIONS[display.animation]];
@@ -307,7 +302,7 @@ export function OperationDisplay({ display }: { display: Operation }): JSX.Eleme
                         icon={display.postCompletition.icon}
                         iconSize={"16px"}
                         tooltip={display.postCompletition.tooltip}
-                        onClick={() => runOperation(display.postCompletition.call)}
+                        onClick={() => runOperation(display.postCompletition!.call)}
                     />
                 );
             }
@@ -355,7 +350,7 @@ export function OperationDisplay({ display }: { display: Operation }): JSX.Eleme
 }
 
 export function displayError(
-    error: any,
+    err: any,
     operationId: number,
     setOperations: Dispatch<SetStateAction<Operation[]>>
 ): void {
@@ -363,7 +358,7 @@ export function displayError(
         const newOperations: Operation[] = [...prev];
         newOperations[operationId].state = OpState.ERROR;
         newOperations[operationId].body =
-            error.message.replace(/(Error: Error)[\w:' ]*(?=Error)/, "");
+            err.message.replace(/(Error: Error)[\w:' ]*(?=Error)/, "");
         return newOperations;
     });
 }
@@ -405,14 +400,14 @@ export async function callQueuedOperations(
             newOperations[operationId].state = OpState.STARTED;
             return newOperations;
         });
-        await runOperation(operation.call);
+        if (operation.call != undefined) await runOperation(operation.call);
         console.log("Finished: " + operation.title);
-    } catch (error: any) {
+    } catch (err: any) {
         setOperations((prev: Operation[]) => {
             const newOperations: Operation[] = [...prev];
             newOperations[operationId].state = OpState.ERROR;
             newOperations[operationId].body =
-                error.message.replace(/(Error)[\w' ]*: (?=Error)/, "");
+                err.message.replace(/(Error)[\w' ]*: (?=Error)/, "");
             return newOperations;
         });
     }

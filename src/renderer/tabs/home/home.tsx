@@ -46,8 +46,8 @@ export async function AllowTabSwitchHome(): Promise<boolean> {
 }
 
 export function TabHome(): JSX.Element {
-    api.on("updateCharacterPages", (): void => null);
-    api.on("updateStagePages", (): void => null);
+    api.on("updateCharacterPages", () => null);
+    api.on("updateStagePages", () => null);
     
     return (
         <section>

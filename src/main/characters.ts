@@ -1,7 +1,7 @@
 import fs from "fs-extra";
 import path from "path";
 import ini from "ini";
-import { CharacterList, OpDep, OpState } from "../global/global";
+import { CharacterList, OpDep, OpState, error } from "../global/global";
 
 import * as general from "./general";
 import * as customDialogs from "./custom-dialogs";
@@ -68,11 +68,11 @@ export function readCharacterList(dir: string = global.gameDir): CharacterList {
     charactersTxt.shift(); // Drop the number
     charactersTxt.forEach((character: string, index: number) => {
         if (fs.existsSync(path.join(dir, "data", "dats", character + ".dat"))) {
-            const characterDat: CharacterDat = readCharacterDat(character, dir);
+            const characterDat: CharacterDat | null = readCharacterDat(character, dir);
             characterList.add({
                 name: character,
-                menuName: characterDat.menuName,
-                series: characterDat.series,
+                menuName: characterDat?.menuName ?? character,
+                series: characterDat?.series ?? "",
                 randomSelection: true, // Assume true and then iterate through false list
                 number: index + 1,
                 alts: alts.filter((alt: Alt) => alt.base == character),
@@ -189,13 +189,13 @@ export async function addAlt(
     alts.filter((alt: Alt) => alt.base == base.name).forEach((alt: Alt) => {
         if (alt.number > altNumber) altNumber = alt.number;
     });
-    const newAltDat: CharacterDat = readCharacterDat(newAlt.name, dir);
+    const newAltDat: CharacterDat | null = readCharacterDat(newAlt.name, dir);
     alts.push({
         base: base.name,
         alt: newAlt.name,
         number: altNumber + 1,
         menuName: newAlt.menuName,
-        battleName: newAltDat.battleName,
+        battleName: newAltDat?.battleName ?? newAlt.menuName,
         mug: newAlt.mug
     });
     await writeAlts(alts, dir);
@@ -251,12 +251,12 @@ export async function ensureAltIsCharacter(alt: Alt, dir: string = global.gameDi
         return;
     }
 
-    const characterDat: CharacterDat = readCharacterDat(alt.alt, dir);
+    const characterDat: CharacterDat | null = readCharacterDat(alt.alt, dir);
     const baseCharacter: Character = characterList.getByName(alt.base);
     characterList.add({
         name: alt.alt,
-        menuName: characterDat == null ? alt.menuName : characterDat.menuName,
-        series: characterDat == null ? baseCharacter.series : characterDat.series,
+        menuName: characterDat?.menuName ?? alt.menuName,
+        series: characterDat?.series ?? baseCharacter.series,
         randomSelection: true,
         number: characterList.getNextNumber(),
         alts: [],
@@ -325,7 +325,10 @@ export async function removeAllAlts(
     return;
 }
 
-export function readCharacterDat(character: string, dir: string = global.gameDir): CharacterDat {
+export function readCharacterDat(
+    character: string,
+    dir: string = global.gameDir
+): CharacterDat | null {
     return readCharacterDatPath(path.join(dir, "data", "dats", character + ".dat"), character);
 }
 
@@ -338,14 +341,13 @@ export function readCharacterDatPath(
         datPath,
         "ascii"
     ).split(/\r?\n/);
-    // TODO: handle empty v7 names for builtin characters
     const isVanilla: boolean = general.isNumber(characterDatTxt[3]);
     const isV7: boolean = isVanilla || general.isNumber(characterDatTxt[4]);
 
-    let displayName: string;
-    let menuName: string;
-    let battleName: string;
-    let series: string;
+    let displayName: string | undefined;
+    let menuName: string | undefined;
+    let battleName: string | undefined;
+    let series: string | undefined;
     
     if (!isVanilla) {
         displayName = characterDatTxt[0];
@@ -469,7 +471,7 @@ export function installCharacters(
     updateCharacters: boolean,
     location: string,
     dir: string = global.gameDir
-): Promise<void> {
+): void {
     try {
         const correctedTarget: string = correctCharacterDir(targetDir);
         const foundCharacters: FoundCharacter[] = findCharacters(correctedTarget);
@@ -492,15 +494,14 @@ export function installCharacters(
                 targetDir: correctedTarget
             });
         }
-    } catch (error: any) {
+    } catch (err: any) {
         general.addOperation({
             title: "Character Installation",
-            body: (error as Error).message,
+            body: (err as Error).message,
             state: OpState.ERROR,
             icon: "folder_shared",
             animation: Math.floor(Math.random() * 3),
-            dependencies: [],
-            call: () => null
+            dependencies: []
         });
     }
     return;
@@ -514,11 +515,13 @@ export function correctCharacterDir(targetDir: string): string {
         file = path.join(file).split(path.sep).join(path.posix.sep);
         const fileDir: string = path.posix.parse(file).dir + "/";
         if (fileDir.includes("/fighter/") && !file.includes("/announcer/")) {
-            let topDir: string = file.split("/").shift();
+            let topDir: string | undefined = file.split("/").shift() ??
+                error("Top dir not found for file: '" + file + "'");
             while (topDir != "fighter") {
                 correctedDir = path.join(correctedDir, topDir);
                 file = file.replace(topDir + "/", "");
-                topDir = file.split("/").shift();
+                topDir = file.split("/").shift() ??
+                    error("Top dir not found for file: '" + file + "'");
             }
             break;
         }
@@ -546,7 +549,7 @@ export function findCharacters(targetDir: string): FoundCharacter[] {
                 dat: readCharacterDatPath(
                     path.join(targetDir, "data", "dats", characterName + ".dat"),
                     characterName
-                ),
+                )!,
                 mug: path.join(targetDir, "gfx", "mugs", characterName + ".png")
             };
         } else if (fs.existsSync(path.join(targetDir, "data", characterName + ".dat"))) {
@@ -555,14 +558,14 @@ export function findCharacters(targetDir: string): FoundCharacter[] {
                 dat: readCharacterDatPath(
                     path.join(targetDir, "data", characterName + ".dat"),
                     characterName
-                ),
+                )!,
                 mug: path.join(targetDir, "gfx", "mugs", characterName + ".png")
             };
         } else {
             // TODO: inform the user about characters without dats?
             return null;
         }
-    }).filter((found: FoundCharacter) => found != null);
+    }).filter((found: FoundCharacter) => found != null) as FoundCharacter[];
 }
 
 export function queCharacterInstallation(
@@ -600,7 +603,7 @@ export async function installCharacterOp(
     location: string,
     dir: string = global.gameDir
 ): Promise<void> {
-    const character: Character = await installCharacter(
+    const character: Character | null = await installCharacter(
         targetDir, foundCharacter, filterInstallation, updateCharacters, dir
     );
     if (character == null) {
@@ -625,14 +628,15 @@ export async function installCharacter(
     filterInstallation: boolean,
     updateCharacters: boolean,
     dir: string = global.gameDir
-): Promise<Character> {
+): Promise<Character | null> {
     const characters: CharacterList = readCharacterList(dir);
     if (!updateCharacters && characters.getByName(foundCharacter.name) != undefined) {
         throw new Error("Character already installed, updates disabled.");
     }
     
-    foundCharacter.dat = await getMissingDatInfo(foundCharacter.dat, targetDir);
-    if (foundCharacter.dat == null) return null;
+    const temp: CharacterDat | null = await getMissingDatInfo(foundCharacter.dat, targetDir);
+    if (temp == null) return null;
+    foundCharacter.dat = temp;
 
     if (updateCharacters) {
         if (
@@ -672,8 +676,8 @@ export async function installCharacter(
 
     const character: Character = {
         name: foundCharacter.name,
-        menuName: foundCharacter.dat.menuName,
-        series: foundCharacter.dat.series,
+        menuName: foundCharacter.dat.menuName!,
+        series: foundCharacter.dat.series!,
         randomSelection: true,
         number: characters.getNextNumber(),
         alts: [],
@@ -686,7 +690,7 @@ export async function installCharacter(
     characters.add(character);
     toResolve.push(writeCharacters(characters.toArray(), dir));
     await Promise.allSettled(toResolve);
-
+    
     // This needs to be done last to ensure that it overrides the other changes
     await writeCharacterDat(foundCharacter.dat, path.join(dir, "data", "dats"));
     return character;
@@ -785,7 +789,8 @@ export async function extractCharacter(
     const toResolve: Promise<void>[] = [];
     const characters: Character[] = readCharacters(dir);
     const similarNames: string[] = [];
-    const characterDat: CharacterDat = readCharacterDat(extract, dir);
+    const characterDat: CharacterDat =
+        readCharacterDat(extract, dir) ?? error("Character has no dat file.");
     const extractDir: string = path.join(dir, "0extracted", extract);
     characters.forEach((character: Character) => {
         if (character.name.includes(extract) && character.name != extract) {
@@ -793,7 +798,6 @@ export async function extractCharacter(
         }
     });
     
-    console.log(new Date().getTime());
     getCharacterFiles(characterDat, true, false, dir, similarNames).forEach((file: string) => {
         const filePath: string = path.join(dir, file);
         const targetPath: string = path.join(extractDir, file);
@@ -806,7 +810,6 @@ export async function extractCharacter(
             )
         );
     });
-    console.log(new Date().getTime());
 
     await Promise.allSettled(toResolve);
     await writeCharacterDat(characterDat, path.join(extractDir, "data", "dats"));
@@ -818,7 +821,8 @@ export async function removeCharacter(remove: string, dir: string = global.gameD
     const character: Character = readCharacterList(dir).getByName(remove);
     await removeAllAlts(character, dir);
     const characters: CharacterList = readCharacterList(dir);
-    const characterDat: CharacterDat = readCharacterDat(remove, dir);
+    const characterDat: CharacterDat =
+        readCharacterDat(remove, dir) ?? error("Character has no dat file.");
 
     const similarNames: string[] = [];
     characters.toArray().forEach((character: Character) => {
@@ -852,7 +856,9 @@ export function getCharacterRegExps(
     const files: RegExp[] = [];
     (includeExtraFiles ? EXTRA_CHARACTER_FILES : CHARACTER_FILES).forEach((file: string) => {
         let wipString: string = file.replaceAll("<fighter>", characterDat.name);
-        if (!ignoreSeries) wipString = wipString.replaceAll("<series>", characterDat.series);
+        if (!ignoreSeries) wipString = wipString.replaceAll(
+            "<series>", characterDat.series ?? error("Character dat has no series.")
+        );
         wipString = general.escapeRegex(wipString);
         wipString += "$";
         wipString = wipString.replaceAll("<audio>", "(mp3|wav|ogg)");
@@ -885,7 +891,9 @@ export function getCharacterFiles(
     });
     similarNames.forEach((name: string) => {
         const validFilesString: string = validFiles.join("\n");
-        getCharacterRegExps(readCharacterDat(name, dir), includeExtraFiles, ignoreSeries)
+        const similarDat: CharacterDat = readCharacterDat(name, dir) ??
+            error("Similarly named character: '" + name + "' has no dat.");
+        getCharacterRegExps(similarDat, includeExtraFiles, ignoreSeries)
             .forEach((exp: RegExp) => {
                 for (const match of validFilesString.matchAll(exp)) {
                     validFiles.splice(validFiles.indexOf(match[0]), 1);

@@ -27,7 +27,7 @@ export function TabCharacterSelectionScreen({
     = useState([]);
 
     const [characterList, setCharacterList]:
-    [CharacterList, Dispatch<SetStateAction<CharacterList>>]
+    [CharacterList | null, Dispatch<SetStateAction<CharacterList | null>>]
     = useState(null);
 
     const [excluded, setExcluded]:
@@ -39,15 +39,15 @@ export function TabCharacterSelectionScreen({
     = useState([]);
 
     const [activePage, setActivePage]:
-    [CssPage, Dispatch<SetStateAction<CssPage>>]
+    [CssPage | null, Dispatch<SetStateAction<CssPage | null>>]
     = useState(null);
 
     const [cssData, setCssData]:
-    [CssData, Dispatch<SetStateAction<CssData>>]
+    [CssData | null, Dispatch<SetStateAction<CssData | null>>]
     = useState(null);
 
     api.on("updateCharacterPages", getInfo);
-    api.on("updateStagePages", (): void => null);
+    api.on("updateStagePages", () => null);
 
     async function getInfo(): Promise<void> {
         const characters: Character[] = await api.readCharacters();
@@ -92,7 +92,7 @@ export function TabCharacterSelectionScreen({
     useEffect(() => {
         if (characters == null || cssData == null) return;
         setExcluded(characters.filter((character: Character) => {
-            for (const row of cssData) {
+            for (const row of cssData as CssData) {
                 if (row.includes(("0000" + character.number).slice(-4))) {
                     return false;
                 }
@@ -103,23 +103,24 @@ export function TabCharacterSelectionScreen({
 
     async function updateCssData(data: CssData): Promise<void> {
         let operationId: number;
+        // Can't be called unless activePage has a value
         setOperations((prev: Operation[]) => {
             const newOperations: Operation[] = [...prev];
             operationId = newOperations.push({
                 title: "Write CSS Data",
-                body: "Writing modified CSS data to page: '" + activePage.name + "'.",
+                body: "Writing modified CSS data to page: '" + activePage!.name + "'.",
                 state: OpState.QUEUED,
                 icon: "pan_tool_alt",
                 animation: Math.floor(Math.random() * 3),
                 dependencies: [OpDep.CSS],
                 call: async () => {
-                    await api.writeCssData(activePage, data);
+                    await api.writeCssData(activePage!, data);
                     getCssData();
                     setOperations((prev: Operation[]) => {
                         const newOperations: Operation[] = [...prev];
                         newOperations[operationId].state = OpState.FINISHED;
                         newOperations[operationId].body = "Wrote modified CSS data to page: '" +
-                            activePage.name + "'.";
+                            activePage!.name + "'.";
                         return newOperations;
                     });
                 }
@@ -130,17 +131,18 @@ export function TabCharacterSelectionScreen({
 
     function characterDragAndDrop(from: DndData, to: DndData): void {
         console.log(from, to);
-        const newCssData: CssData = cssData;
+        // Can't be called unless cssData has a value
+        const newCssData: CssData = [...cssData!];
         if (from.type == DndDataType.SS_NUMBER) {
             if (to.type == DndDataType.SS_NUMBER) {
-                newCssData[from.y][from.x] = to.number;
-                newCssData[to.y][to.x] = from.number;
+                newCssData[(from as DndDataSsNumber).y][(from as DndDataSsNumber).x] = to.number;
+                newCssData[(to as DndDataSsNumber).y][(to as DndDataSsNumber).x] = from.number;
             } else {
-                newCssData[from.y][from.x] = "0000";
+                newCssData[(from as DndDataSsNumber).y][(from as DndDataSsNumber).x] = "0000";
             }
         } else {
             if (to.type == DndDataType.SS_NUMBER) {
-                newCssData[to.y][to.x] = from.number;
+                newCssData[(to as DndDataSsNumber).y][(to as DndDataSsNumber).x] = from.number;
             } else {
                 return;
             }
@@ -399,8 +401,8 @@ function CssPages({
     setOperations
 }: {
     cssPages: CssPage[],
-    activePage: CssPage,
-    setActivePage: Dispatch<SetStateAction<CssPage>>,
+    activePage: CssPage | null,
+    setActivePage: Dispatch<SetStateAction<CssPage | null>>,
     getPages: () => Promise<void>,
     setOperations: Dispatch<SetStateAction<Operation[]>>
 }): JSX.Element {
@@ -516,9 +518,9 @@ function CssPageDisplay({
     reorderCssPage
 }: {
     page: CssPage,
-    activePage: CssPage,
+    activePage: CssPage | null,
     pageIndex: number,
-    setActivePage: (state: CssPage) => void,
+    setActivePage: Dispatch<SetStateAction<CssPage | null>>,
     getPages: () => Promise<void>,
     setOperations: Dispatch<SetStateAction<Operation[]>>,
     reorderCssPage: (from: number, to: number) => void
@@ -526,7 +528,7 @@ function CssPageDisplay({
     return (
         <div
             className={
-                styles.cssPage + (activePage.path == page.path ? " " + styles.cssPageActive : "")
+                styles.cssPage + (activePage?.path == page.path ? " " + styles.cssPageActive : "")
             }
         >
             <button
@@ -596,12 +598,12 @@ function CssTableContents({
     updateCssData,
     characterDragAndDrop
 }: {
-    cssData: CssData,
-    setCssData: Dispatch<SetStateAction<CssData>>,
-    characterList: CharacterList,
+    cssData: CssData | null,
+    setCssData: Dispatch<SetStateAction<CssData | null>>,
+    characterList: CharacterList | null,
     updateCssData: (data: CssData) => Promise<void>,
     characterDragAndDrop: (from: DndData, to: DndData) => void
-}): JSX.Element {
+}): JSX.Element | null {
     return (cssData == null || characterList == null) ? null : (
         <>
             <tr>

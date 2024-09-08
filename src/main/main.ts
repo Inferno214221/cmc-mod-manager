@@ -12,7 +12,7 @@ declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 global.win = null;
 global.dialogs = [];
 global.gameDir = "";
-global.appData = null;
+// global.appData = null;
 global.appDir = app.isPackaged ?
     path.parse(app.getPath("exe")).dir :
     path.join(path.parse(app.getPath("exe")).dir, "..", "..", "..");

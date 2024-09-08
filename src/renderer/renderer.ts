@@ -5,7 +5,7 @@ render();
 
 api.on("showNotification", (
     title: string,
-    options?: NotificationOptions,
+    options: NotificationOptions = {},
     onclick?: MainCall
 ) => {
     options.icon = CMCMM;

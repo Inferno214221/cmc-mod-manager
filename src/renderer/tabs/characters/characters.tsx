@@ -21,15 +21,15 @@ export function TabCharacters({
     setOperations: Dispatch<SetStateAction<Operation[]>>
 }): JSX.Element {
     const [filterInstallation, setFilterInstallation]:
-    [boolean, Dispatch<SetStateAction<boolean>>]
+    [boolean | null, Dispatch<SetStateAction<boolean | null>>]
     = useState(null);
     
     const [updateCharacters, setUpdateCharacters]:
-    [boolean, Dispatch<SetStateAction<boolean>>]
+    [boolean | null, Dispatch<SetStateAction<boolean | null>>]
     = useState(null);
 
     const [altsAsCharacters, setAltsAsCharacters]:
-    [boolean, Dispatch<SetStateAction<boolean>>]
+    [boolean | null, Dispatch<SetStateAction<boolean | null>>]
     = useState(null);
 
     const [characters, setCharacters]:
@@ -57,11 +57,11 @@ export function TabCharacters({
     = useState(false);
 
     const [altTarget, setAltTarget]:
-    [Character, Dispatch<SetStateAction<Character>>]
+    [Character | null, Dispatch<SetStateAction<Character | null>>]
     = useState(null);
 
     api.on("updateCharacterPages", readCharacters);
-    api.on("updateStagePages", (): void => null);
+    api.on("updateStagePages", () => null);
 
     useEffect(() => {
         readCharacters();
@@ -122,7 +122,7 @@ export function TabCharacters({
 
     async function writeSetting(
         name: "filterCharacterInstallation" | "updateCharacters" | "altsAsCharacters",
-        value: boolean
+        value: boolean | null
     ): Promise<void> {
         const appData: AppData = await api.readAppData();
         if (value != null && appData.config[name] != value) {
@@ -131,7 +131,7 @@ export function TabCharacters({
         }
     }
 
-    async function writeAltsAsCharacters(value: boolean): Promise<void> {
+    async function writeAltsAsCharacters(value: boolean | null): Promise<void> {
         const appData: AppData = await api.readAppData();
         if (value != null && appData.config["altsAsCharacters"] != value) {
             appData.config["altsAsCharacters"] = value;
@@ -291,7 +291,7 @@ export function TabCharacters({
                     /> */}
                     <hr className={styles.vr}/>
                     <ToggleIconButton
-                        checked={filterInstallation}
+                        checked={!!filterInstallation}
                         trueIcon={"filter_alt"}
                         trueTooltip={"Installation: Only Necessary Files"}
                         falseIcon={"filter_alt_off"}
@@ -300,7 +300,7 @@ export function TabCharacters({
                         setter={setFilterInstallation}
                     />
                     <ToggleIconButton
-                        checked={updateCharacters}
+                        checked={!!updateCharacters}
                         trueIcon={"sync"}
                         trueTooltip={"Existing Characters: Update"}
                         falseIcon={"sync_disabled"}
@@ -309,7 +309,7 @@ export function TabCharacters({
                         setter={setUpdateCharacters}
                     />
                     <ToggleIconButton
-                        checked={altsAsCharacters}
+                        checked={!!altsAsCharacters}
                         // trueIcon={"group"}
                         trueIcon={"diversity_3"}
                         trueTooltip={"Alts: Included As Characters"}
@@ -334,8 +334,8 @@ function CharacterDisplay({
 }: {
     character: Character,
     readCharacters: () => Promise<void>,
-    altTarget: Character,
-    setAltTarget: Dispatch<SetStateAction<Character>>,
+    altTarget: Character | null,
+    setAltTarget: Dispatch<SetStateAction<Character | null>>,
     setOperations: Dispatch<SetStateAction<Operation[]>>
 }): JSX.Element {
     const [randomSelection, setRandomSelection]:
@@ -576,8 +576,8 @@ function AddAltButton({
     setOperations
 }: {
     character: Character,
-    altTarget: Character,
-    setAltTarget: Dispatch<SetStateAction<Character>>,
+    altTarget: Character | null,
+    setAltTarget: Dispatch<SetStateAction<Character | null>>,
     readCharacters: () => Promise<void>,
     setOperations: Dispatch<SetStateAction<Operation[]>>
 }): JSX.Element {

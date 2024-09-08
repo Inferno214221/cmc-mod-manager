@@ -116,3 +116,7 @@ export abstract class ModList<ModType extends Mod, ModUpdateType extends ModUpda
 export class CharacterList extends ModList<Character, CharacterUpdate> {}
 
 export class StageList extends ModList<Stage, StageUpdate> {}
+
+export function error(message: string): never {
+    throw new Error(message);
+}

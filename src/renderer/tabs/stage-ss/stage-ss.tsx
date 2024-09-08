@@ -25,7 +25,7 @@ export function TabStageSelectionScreen({
     = useState([]);
 
     const [stageList, setStageList]:
-    [StageList, Dispatch<SetStateAction<StageList>>]
+    [StageList | null, Dispatch<SetStateAction<StageList | null>>]
     = useState(null);
 
     const [excluded, setExcluded]:
@@ -41,10 +41,10 @@ export function TabStageSelectionScreen({
     = useState(0);
 
     const [sssData, setSssData]:
-    [SssData, Dispatch<SetStateAction<SssData>>]
+    [SssData | null, Dispatch<SetStateAction<SssData | null>>]
     = useState(null);
 
-    api.on("updateCharacterPages", (): void => null);
+    api.on("updateCharacterPages", () => null);
     api.on("updateStagePages", getInfo);
 
     async function getInfo(): Promise<void> {
@@ -91,17 +91,18 @@ export function TabStageSelectionScreen({
     function stageDragAndDrop(from: DndData, to: DndData): void {
         console.log("stageDragAndDrop");
         console.log(from, to);
-        const newSssData: SssData = [...sssData];
+        // Can't be called unless sssData has a value
+        const newSssData: SssData = [...sssData!];
         if (from.type == DndDataType.SS_NUMBER) {
             if (to.type == DndDataType.SS_NUMBER) {
-                newSssData[from.y][from.x] = to.number;
-                newSssData[to.y][to.x] = from.number;
+                newSssData[(from as DndDataSsNumber).y][(from as DndDataSsNumber).x] = to.number;
+                newSssData[(to as DndDataSsNumber).y][(to as DndDataSsNumber).x] = from.number;
             } else {
-                newSssData[from.y][from.x] = "0000";
+                newSssData[(from as DndDataSsNumber).y][(from as DndDataSsNumber).x] = "0000";
             }
         } else {
             if (to.type == DndDataType.SS_NUMBER) {
-                newSssData[to.y][to.x] = from.number;
+                newSssData[(to as DndDataSsNumber).y][(to as DndDataSsNumber).x] = from.number;
             } else {
                 return;
             }
@@ -120,7 +121,7 @@ export function TabStageSelectionScreen({
         if (sssPages[activePage] == undefined) return;
         if (sssData == sssPages[activePage].data) return;
         const updatedPages: SssPage[] = [...sssPages];
-        updatedPages[activePage].data = sssData;
+        updatedPages[activePage].data = sssData!;
         setSssPages(updatedPages);
         let operationId: number;
         setOperations((prev: Operation[]) => {
@@ -588,10 +589,10 @@ function SssTableContents({
     stageList,
     stageDragAndDrop
 }: {
-    sssData: SssData,
-    stageList: StageList,
+    sssData: SssData | null,
+    stageList: StageList | null,
     stageDragAndDrop: (from: DndData, to: DndData) => void
-}): JSX.Element {
+}): JSX.Element | null {
     return (sssData == null || stageList == null) ? null : (
         <>
             <tr>

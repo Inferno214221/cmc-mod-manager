@@ -4,8 +4,8 @@ const styles: typeof import("../../app/app.css") & typeof import("./settings.css
     Object.assign({}, appStyles, settingsStyles);
 
 export function TabSettings(): JSX.Element {
-    api.on("updateCharacterPages", (): void => null);
-    api.on("updateStagePages", (): void => null);
+    api.on("updateCharacterPages", () => null);
+    api.on("updateStagePages", () => null);
     
     return (
         <section>

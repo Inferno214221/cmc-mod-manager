@@ -20,7 +20,6 @@ export default function ToggleIconButton({
     iconSize: string,
     setter: Dispatch<SetStateAction<boolean>>
 }): JSX.Element {
-    if (checked == null) return null;
     return (
         <div className={styles.iconButtonWrapper}>
             <button  className={styles.iconButton} onClick={() => {

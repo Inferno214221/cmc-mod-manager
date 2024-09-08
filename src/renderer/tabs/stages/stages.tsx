@@ -21,11 +21,11 @@ export function TabStages({
     setOperations: Dispatch<SetStateAction<Operation[]>>
 }): JSX.Element {
     const [filterInstallation, setFilterInstallation]:
-    [boolean, Dispatch<SetStateAction<boolean>>]
+    [boolean | null, Dispatch<SetStateAction<boolean | null>>]
     = useState(null);
     
     const [updateStages, setUpdateStages]:
-    [boolean, Dispatch<SetStateAction<boolean>>]
+    [boolean | null, Dispatch<SetStateAction<boolean | null>>]
     = useState(null);
 
     const [stages, setStages]:
@@ -52,7 +52,7 @@ export function TabStages({
     [boolean, Dispatch<SetStateAction<boolean>>]
     = useState(false);
 
-    api.on("updateCharacterPages", (): void => null);
+    api.on("updateCharacterPages", () => null);
     api.on("updateStagePages", readStages);
 
     useEffect(() => {
@@ -274,7 +274,7 @@ export function TabStages({
                     /> */}
                     <hr className={styles.vr}/>
                     <ToggleIconButton
-                        checked={filterInstallation}
+                        checked={!!filterInstallation}
                         trueIcon={"filter_alt"}
                         trueTooltip={"Installation: Only Necessary Files"}
                         falseIcon={"filter_alt_off"}
@@ -283,7 +283,7 @@ export function TabStages({
                         setter={setFilterInstallation}
                     />
                     <ToggleIconButton
-                        checked={updateStages}
+                        checked={!!updateStages}
                         trueIcon={"sync"}
                         trueTooltip={"Existing Stages: Update"}
                         falseIcon={"sync_disabled"}

@@ -16,7 +16,7 @@ abstract class Dialog<OptionsType extends Options, ReturnType> {
         this.options = options;
     }
 
-    async show(): Promise<ReturnType> {
+    async show(): Promise<ReturnType | undefined> {
         return new Promise((resolve: (result?: ReturnType) => void) => {
             this.showSync(resolve);
         });
@@ -108,7 +108,7 @@ export class AlertDialog extends Dialog<AlertOptions, null> {
 }
 
 export async function alert(options: AlertOptions): Promise<void> {
-    return new AlertDialog(options).show();
+    await new AlertDialog(options).show(); return;
 }
 
 declare const DIALOG_CONFIRM_PRELOAD_WEBPACK_ENTRY: string;
@@ -129,7 +129,7 @@ export class ConfirmDialog extends Dialog<ConfirmOptions, boolean> {
 }
 
 export async function confirm(options: ConfirmOptions): Promise<boolean> {
-    return new ConfirmDialog(options).show();
+    return !!(await new ConfirmDialog(options).show());
 }
 
 declare const DIALOG_PROMPT_PRELOAD_WEBPACK_ENTRY: string;
@@ -149,7 +149,7 @@ export class PromptDialog extends Dialog<PromptOptions, string> {
     }
 }
 
-export async function prompt(options: PromptOptions): Promise<string> {
+export async function prompt(options: PromptOptions): Promise<string | undefined> {
     return new PromptDialog(options).show();
 }
 
@@ -172,6 +172,8 @@ export class CharacterInstallDialog extends Dialog<CharacterInstallOptions, null
     }
 }
 
-export async function characterInstallation(options: CharacterInstallOptions): Promise<void> {
+export async function characterInstallation(
+    options: CharacterInstallOptions
+): Promise<null | void> {
     return new CharacterInstallDialog(options).show();
 }

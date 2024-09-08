@@ -31,7 +31,11 @@
         "@stylistic/ts/key-spacing": ["error"],
         "@stylistic/ts/object-curly-spacing": ["error", "always"],
         "@stylistic/ts/quotes": ["error", "double"],
-        "@stylistic/ts/space-before-function-paren": ["error", {"anonymous": "always", "named": "never", "asyncArrow": "always"}],
+        "@stylistic/ts/space-before-function-paren": ["error", {
+            "anonymous": "always",
+            "named": "never",
+            "asyncArrow": "always"
+        }],
         "@stylistic/ts/type-annotation-spacing": ["error"],
         "@stylistic/jsx/jsx-curly-spacing": ["error", {"when": "never" }],
         "@typescript-eslint/no-explicit-any": "off",
@@ -52,6 +56,7 @@
             "argsIgnorePattern": "^_"
         }],
         "@typescript-eslint/ban-ts-comment": "off",
+        "@typescript-eslint/no-non-null-assertion": "off",
         "no-case-declarations": "off",
         "import/no-named-as-default-member": "off",
         "sort-imports": ["warn", {

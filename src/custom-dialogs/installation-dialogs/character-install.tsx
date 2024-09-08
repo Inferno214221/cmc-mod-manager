@@ -49,7 +49,7 @@ function Body(): JSX.Element {
     const [height, setHeight]: [number, Dispatch<SetStateAction<number>>] = useState(0);
 
     const [gameCharacters, setGameCharacters]:
-    [CharacterList, Dispatch<SetStateAction<CharacterList>>] = useState(null);
+    [CharacterList | null, Dispatch<SetStateAction<CharacterList | null>>] = useState(null);
 
     const [foundCharacters, setFoundCharacters]:
     [FoundCharacter[], Dispatch<SetStateAction<FoundCharacter[]>>] = useState([]);
@@ -57,7 +57,7 @@ function Body(): JSX.Element {
     const [alts, setAlts]: [string[], Dispatch<SetStateAction<string[]>>] = useState([]);
 
     dialog.on("updateCharacterPages", readGameCharacters);
-    dialog.on("updateStagePages", (): void => null);
+    dialog.on("updateStagePages", () => null);
 
     useEffect(() => {
         readGameCharacters();
@@ -100,15 +100,17 @@ function Body(): JSX.Element {
                     <table>
                         <tbody>
                             {/* TODO: sort, search characters */}
-                            {foundCharacters.map((character: FoundCharacter) => (
-                                <CharacterDisplay
-                                    targetDir={options.targetDir}
-                                    character={character}
-                                    gameCharacters={gameCharacters}
-                                    alts={alts}
-                                    key={character.name}
-                                />
-                            ))}
+                            {gameCharacters == undefined ? null :
+                                foundCharacters.map((character: FoundCharacter) => (
+                                    <CharacterDisplay
+                                        targetDir={options.targetDir}
+                                        character={character}
+                                        gameCharacters={gameCharacters}
+                                        alts={alts}
+                                        key={character.name}
+                                    />
+                                ))
+                            }
                         </tbody>
                     </table>
                 </div>

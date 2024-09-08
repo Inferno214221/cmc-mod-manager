@@ -9,7 +9,7 @@ import { execSync, spawn } from "child_process";
 import request from "request";
 import http from "http";
 import semver from "semver";
-import { ModTypes, OpState } from "../global/global";
+import { ModTypes, OpState, error } from "../global/global";
 
 require.resolve("./unrar.wasm");
 const WASM_BINARY: Buffer = fs.readFileSync(path.join(__dirname, "unrar.wasm"));
@@ -79,12 +79,10 @@ export function isNumber(num: string): boolean {
     return /^\d+$/.test(num);
 }
 
-export function getAllFiles(dirPath: string, arrayOfFiles?: string[]): string[] {
-    const files: string[] = fs.readdirSync(dirPath);
+export function getAllFiles(dirPath: string, arrayOfFiles: string[] = []): string[] {
+    const contents: string[] = fs.readdirSync(dirPath);
 
-    arrayOfFiles = arrayOfFiles || [];
-
-    files.forEach((file: string) => {
+    contents.forEach((file: string) => {
         if (fs.statSync(dirPath + "/" + file).isDirectory()) {
             arrayOfFiles = getAllFiles(dirPath + "/" + file, arrayOfFiles);
         } else {
@@ -153,14 +151,15 @@ export async function selectPathsDir(): Promise<string[]> {
 }
 
 export async function checkForUpdates(): Promise<void> {
-    const currentVersion: string = semver.clean(app.getVersion());
+    const currentVersion: string = semver.clean(app.getVersion()) ??
+        error("Invalid semver string: '" + app.getVersion() + "'");
     request.get("https://api.github.com/repos/Inferno214221/cmc-mod-manager/releases", {
         headers: {
             "Accept": "application/vnd.github.v3+json",
             "User-Agent": "CMC-Mod-Manager",
         }
-    }, async (error: any, _res: http.IncomingMessage, body: string) => {
-        if (error != null) return;
+    }, async (err: any, _res: http.IncomingMessage, body: string) => {
+        if (err != null) return;
         const releases: any[] = JSON.parse(body).toSorted((a: any, b: any) => {
             if (!semver.valid(a.tag_name)) {
                 return 1;
@@ -169,7 +168,8 @@ export async function checkForUpdates(): Promise<void> {
             }
             return (semver.gte(a.tag_name, b.tag_name) ? -1 : 1);
         });
-        const latestVersion: string = semver.clean(releases[0].tag_name);
+        const latestVersion: string = semver.clean(releases[0].tag_name) ??
+            error("Invalid semver string: '" + app.getVersion() + "'");
         console.log("Latest Version: " + latestVersion);
         const id: string = new Date().getTime() + "_downloadUpdate";
         if (semver.lt(currentVersion, latestVersion)) {
@@ -223,12 +223,12 @@ export async function downloadUpdate(tagName: string, id: string): Promise<void>
     const url: string = "https://github.com/Inferno214221/cmc-mod-manager/releases/download/" +
         tagName + "/cmc-mod-manager-" + buildInfo.platform + "-" + buildInfo.arch + ".zip";
     request.get(url)
-        .on("error", (error: Error) => {
-            console.log(error);
+        .on("error", (err: Error) => {
+            console.log(err);
             targetStream.close();
-            throw new Error("A stream error occurred: \"" + error.message + "\"");
+            throw new Error("A stream error occurred: \"" + err.message + "\"");
         }).on("response", (res: request.Response) => {
-            const downloadSize: number = parseInt(res.headers["content-length"]);
+            const downloadSize: number = parseInt(res.headers["content-length"] ?? "");
             updateDownloadProgress(
                 id,
                 "Downloading the latest version of CMC Mod Manager.",
@@ -321,7 +321,7 @@ export function runUpdater(): void {
     return;
 }
 
-export async function handleURI(uri: string): Promise<void> {
+export async function handleURI(uri: string | undefined): Promise<void> {
     if (uri == undefined || global.gameDir == null) {
         return;
     }
@@ -377,10 +377,10 @@ export async function downloadMod(url: string, modId: string, id: string): Promi
         const infoPromise: Promise<string[]> = getDownloadInfo(modId);
         let file: string = id + "_download.";
         request.get(url)
-            .on("error", (error: Error) => {
-                throw error;
+            .on("error", (err: Error) => {
+                throw err;
             }).on("response", async (res: request.Response) => {
-                switch (res.headers["content-type"].split("/")[1]) {
+                switch (res.headers["content-type"]?.split("/")[1]) {
                     case "zip":
                         file += "zip";
                         break;
@@ -390,7 +390,7 @@ export async function downloadMod(url: string, modId: string, id: string): Promi
                         break;
                     default:
                         throw new Error(
-                            "Invalid archive type: " + res.headers["content-type"].split("/")[1]
+                            "Invalid archive type: " + res.headers["content-type"]?.split("/")[1]
                         );
                 }
                 const filePath: string = path.join(global.temp, file);
@@ -407,7 +407,7 @@ export async function downloadMod(url: string, modId: string, id: string): Promi
                         throw new Error("Unknown mod type.");
                 }
 
-                const downloadSize: number = parseInt(res.headers["content-length"]);
+                const downloadSize: number = parseInt(res.headers["content-length"] ?? "");
                 updateOperation({
                     id: id + "_download",
                     title: modType + " Download",
@@ -419,10 +419,10 @@ export async function downloadMod(url: string, modId: string, id: string): Promi
                 let canceled: boolean = false;
                 const req: any = request.get(
                     res.request.uri.href
-                ).on("error", (error: Error & { code: string }) => {
+                ).on("error", (err: Error & { code: string }) => {
                     downloadStream.close();
                     if (canceled) return;
-                    throw error;
+                    throw err;
                 });
 
                 global.cancelFunctions[id + "_download"] = (() => {
@@ -500,8 +500,8 @@ export async function getDownloadInfo(modId: string): Promise<string[]> {
                 url: "https://api.gamebanana.com/Core/Item/Data?itemtype=Mod&itemid=" +
                     modId + "&fields=name,RootCategory().name"
             },
-            async (error: any, _res: http.IncomingMessage, body: string) => {
-                if (error != null) return;
+            async (err: any, _res: http.IncomingMessage, body: string) => {
+                if (err != null) return;
                 resolve(JSON.parse(body));
             }
         );

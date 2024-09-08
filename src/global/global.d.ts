@@ -56,10 +56,10 @@ interface CharacterUpdate extends ModUpdate {
 
 interface CharacterDat {
     name: string, // File name
-    displayName: string, // Line 1
-    menuName: string, // Line 2
-    battleName: string, //Line 3
-    series: string, // Line 4
+    displayName?: string, // Line 1
+    menuName?: string, // Line 2
+    battleName?: string, //Line 3
+    series?: string, // Line 4
     homeStages: string[], // After "---Classic Home Stages Below---"
     randomDatas: string[], // After "---Random Datas---""
     palettes: CharacterPalette[] // After "---From Here is Individual Palettes data---"
@@ -81,12 +81,19 @@ interface CssPage {
 
 type CssData = string[][];
 
-interface DndData {
-    type: DndDataType,
+interface DndDataSsNumber {
+    type: DndDataType.SS_NUMBER,
     number: string,
-    x?: number,
-    y?: number
+    x: number,
+    y: number
 }
+
+interface DndDataExcluded {
+    type: DndDataType.EXCLUDED,
+    number: string
+}
+
+type DndData = DndDataSsNumber | DndDataExcluded;
 
 interface FoundCharacter {
     name: string
@@ -113,14 +120,20 @@ interface AppData {
     config: AppConfig
 }
 
-interface Stage extends Mod {
+interface WipStage extends Mod {
     name: string,
-    menuName: string,
-    source: string,
-    series: string,
+    menuName?: string,
+    source?: string,
+    series?: string,
     randomSelection: boolean,
     number: number,
     icon: string
+}
+
+interface Stage extends WipStage {
+    menuName: string,
+    source: string,
+    series: string,
 }
 
 interface StageUpdate extends ModUpdate {
@@ -150,7 +163,7 @@ interface Operation {
     icon: string,
     animation: number,
     dependencies: OpDep[],
-    call: (() => Promise<void>) | MainCall,
+    call?: (() => Promise<void>) | MainCall,
     cancelable?: boolean,
     postCompletition?: {
         icon: string,
