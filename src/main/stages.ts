@@ -470,7 +470,6 @@ export async function extractStage(extract: string, dir: string = global.gameDir
         }
     });
     
-    console.log(new Date().getTime());
     getStageFiles(stage, false, dir, similarNames).forEach((file: string) => {
         const filePath: string = path.join(dir, file);
         const targetPath: string = path.join(extractDir, file);
@@ -483,7 +482,6 @@ export async function extractStage(extract: string, dir: string = global.gameDir
             )
         );
     });
-    console.log(new Date().getTime());
 
     toResolve.push(fs.writeFile(
         path.join(extractDir, "info.json"),
@@ -507,14 +505,12 @@ export async function removeStage(remove: string, dir: string = global.gameDir):
         }
     });
 
-    console.log(new Date().getTime());
     getStageFiles(stage, true, dir, similarNames).forEach((file: string) => {
         const filePath: string = path.join(dir, file);
         toResolve.push(
             fs.remove(filePath)
         );
     });
-    console.log(new Date().getTime());
     
     stageList.removeByName(remove);
     toResolve.push(writeStages(stageList.toArray(), dir));

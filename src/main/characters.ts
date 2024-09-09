@@ -157,7 +157,23 @@ export function readAlts(dir: string = global.gameDir): Alt[] {
 }
 
 export async function writeAlts(alts: Alt[], dir: string = global.gameDir): Promise<void> {
-    // TODO: verify alt numbers
+    const altsByBase: { [key: string]: Alt[] } = {};
+    alts.forEach((alt: Alt) => {
+        altsByBase[alt.base] = altsByBase[alt.base] ?? [];
+        altsByBase[alt.base].push(alt);
+    });
+    alts = [];
+    // Sort alts by base and correct their numbers
+    Object.keys(altsByBase).forEach((key: string) => {
+        altsByBase[key] = altsByBase[key].sort((a: Alt, b: Alt) =>
+            (a.number > b.number ? 1 : -1)
+        ).map((alt: Alt, index: number) => {
+            alt.number = 2 + index; // Numbers start at 2
+            return alt;
+        });
+        alts.push(...altsByBase[key]);
+    });
+
     const output: string = [
         alts.length,
         alts.map((alt: Alt) =>
@@ -183,10 +199,17 @@ export async function addAlt(
     newAlt: Character,
     dir: string = global.gameDir
 ): Promise<void> {
+    if (newAlt.alts.length != 0)
+        throw new Error("A character with alts can't be assigned as an alt.");
+
     const toResolve: Promise<void>[] = [];
     const alts: Alt[] = readAlts(dir);
     let altNumber: number = 1;
-    alts.filter((alt: Alt) => alt.base == base.name).forEach((alt: Alt) => {
+    const sameBase: Alt[] = alts.filter((alt: Alt) => alt.base == base.name);
+    if (sameBase.length > 6)
+        throw new Error("Character already has the maximum number of alts.");
+
+    sameBase.forEach((alt: Alt) => {
         if (alt.number > altNumber) altNumber = alt.number;
     });
     const newAltDat: CharacterDat | null = readCharacterDat(newAlt.name, dir);
@@ -838,14 +861,12 @@ export async function removeCharacter(remove: string, dir: string = global.gameD
         }
     });
 
-    console.log(new Date().getTime());
     getCharacterFiles(characterDat, true, true, dir, similarNames).forEach((file: string) => {
         const filePath: string = path.join(dir, file);
         toResolve.push(
             fs.remove(filePath)
         );
     });
-    console.log(new Date().getTime());
     
     characters.removeByName(remove);
     toResolve.push(writeCharacters(characters.toArray(), dir));
