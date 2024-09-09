@@ -474,8 +474,9 @@ export function installCharacters(
 ): void {
     try {
         const correctedTarget: string = correctCharacterDir(targetDir);
-        // FIXME: if this is the same as dir, the program will likely end up deleting files and then
-        // ! erroring
+        if (path.relative(correctedTarget, dir) == "") throw new Error(
+            "Cannot install characters from the directory that they are being installed to."
+        );
         const foundCharacters: FoundCharacter[] = findCharacters(correctedTarget);
         if (foundCharacters.length == 0)
             throw new Error("No valid characters found in directory: '" + targetDir + "'.");

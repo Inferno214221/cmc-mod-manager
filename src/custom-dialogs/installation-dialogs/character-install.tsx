@@ -63,52 +63,55 @@ function Body(): JSX.Element {
 
     const [alts, setAlts]: [string[], Dispatch<SetStateAction<string[]>>] = useState([]);
 
-    const [preSorted, setPreSorted]:
-    [FoundCharacter[][], Dispatch<SetStateAction<FoundCharacter[][]>>]
-    = useState([[], [], []]);
-
     const [sortedCharacters, setSortedCharacters]:
-    [FoundCharacter[], Dispatch<SetStateAction<FoundCharacter[]>>]
-    = useState([]);
+    [FoundCharacter[], Dispatch<SetStateAction<FoundCharacter[]>>] = useState([]);
 
-    const [searchValue, setSearchValue]:
-    [string, Dispatch<SetStateAction<string>>]
-    = useState("");
+    const [searchValue, setSearchValue]: [string, Dispatch<SetStateAction<string>>] = useState("");
 
-    const [sortType, setSortType]:
-    [number, Dispatch<SetStateAction<number>>]
-    = useState(0);
+    const [sortType, setSortType]: [number, Dispatch<SetStateAction<number>>] = useState(0);
 
-    const [reverseSort, setReverseSort]:
-    [boolean, Dispatch<SetStateAction<boolean>>]
-    = useState(false);
+    const [reverseSort, setReverseSort]: [boolean, Dispatch<SetStateAction<boolean>>] =
+        useState(false);
+
+    const [showAllCharacters, setShowAllCharacters]: [boolean, Dispatch<SetStateAction<boolean>>]  =
+        useState(true);
+
+    const [newFoundCharacters, setNewFoundCharacters]:
+    [FoundCharacter[], Dispatch<SetStateAction<FoundCharacter[]>>] = useState([]);
+
+    // useEffect(() => {
+    //     setPreSorted(() => {
+    //         const retVal: FoundCharacter[][] = [];
+    //         sortTypes.forEach((sortType: SortTypeOptions, index: number) => {
+    //             retVal[index] = foundCharacters.toSorted(
+    //                 (a: FoundCharacter, b: FoundCharacter) =>
+    //                     // @ts-ignore; Property '[SortTypeOptions.NUMBER]' does not exist on type
+    //                     // 'CharacterDat'.
+    //                     (a.dat[sortType] > b.dat[sortType] ? 1 : -1)
+    //             );
+    //         });
+    //         return retVal;
+    //     });
+    // }, [foundCharacters]);
 
     useEffect(() => {
-        setPreSorted(() => {
-            const retVal: FoundCharacter[][] = [];
-            sortTypes.forEach((sortType: SortTypeOptions, index: number) => {
-                retVal[index] = foundCharacters.toSorted(
-                    (a: FoundCharacter, b: FoundCharacter) =>
-                        // @ts-ignore; Property '[SortTypeOptions.NUMBER]' does not exist on type
-                        // 'CharacterDat'.
-                        (a.dat[sortType] > b.dat[sortType] ? 1 : -1)
-                );
-            });
-            return retVal;
-        });
-    }, [foundCharacters]);
+        setSortedCharacters(sortCharacters());
+    }, [
+        foundCharacters, newFoundCharacters, sortType, reverseSort, searchValue, showAllCharacters
+    ]);
 
-    useEffect(() => {
-        setSortedCharacters(sortCharacters(preSorted[sortType]));
-    }, [preSorted, sortType, reverseSort, searchValue]);
-
-    function sortCharacters(characters: FoundCharacter[]): FoundCharacter[] {
-        let sortedCharacters: FoundCharacter[] = characters;
+    function sortCharacters(): FoundCharacter[] {
+        let sortedCharacters: FoundCharacter[] = showAllCharacters ?
+            foundCharacters : newFoundCharacters;
         if (searchValue != "") {
             sortedCharacters = sortedCharacters.filter((character: FoundCharacter) =>
                 ((character.dat.menuName ?? character.name).toLowerCase().includes(searchValue))
             );
         }
+        sortedCharacters = sortedCharacters.toSorted((a: FoundCharacter, b: FoundCharacter) =>
+            // @ts-ignore: 'SortTypeOptions' can't be used to index type 'CharacterDat'.
+            (a.dat[sortTypes[sortType]] > b.dat[sortTypes[sortType]] ? 1 : -1)
+        );
         if (reverseSort) {
             return sortedCharacters.toReversed();
         }
@@ -124,6 +127,14 @@ function Body(): JSX.Element {
         readAlts();
         (async () => setHeight(await requestNextFrame(height)))();
     }, []);
+
+    useEffect(() => {
+        if (gameCharacters == null) return;
+        setNewFoundCharacters(foundCharacters.filter((character: FoundCharacter) =>
+            // @ts-ignore: Property 'getByName' does not exist on type 'never'.
+            !(gameCharacters.getByName(character.name) || alts.includes(character.name))
+        ));
+    }, [foundCharacters, gameCharacters]);
 
     async function readGameCharacters(): Promise<void> {
         setGameCharacters(new CharacterList(await api.readCharacters()));
@@ -198,7 +209,15 @@ function Body(): JSX.Element {
                             iconSize={"30px"}
                             setter={setReverseSort}
                         />
-                        {/* TODO: add option for 'excluded' characters */}
+                        <ToggleIconButton
+                            checked={showAllCharacters}
+                            trueIcon={"groups"}
+                            trueTooltip={"Showing: All Characters"}
+                            falseIcon={"person_outline"}
+                            falseTooltip={"Showing: New Characters"}
+                            iconSize={"30px"}
+                            setter={setShowAllCharacters}
+                        />
                     </div>
                 </div>
             </div>

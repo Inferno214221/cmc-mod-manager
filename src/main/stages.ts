@@ -187,8 +187,10 @@ export function installStages(
 ): void {
     try {
         const correctedTarget: string = correctStageDir(targetDir);
+        if (path.relative(correctedTarget, dir) == "") throw new Error(
+            "Cannot install stage from the directory that they are being installed to."
+        );
         const foundStages: string[] = findStages(correctedTarget);
-        console.log(foundStages);
         if (foundStages.length == 0)
             throw new Error("No valid stages found in directory: '" + targetDir + "'.");
         if (foundStages.length == 1) {
