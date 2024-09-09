@@ -615,7 +615,7 @@ export function queCharacterInstallation(
         state: OpState.QUEUED,
         icon: "folder_shared",
         animation: Math.floor(Math.random() * 3),
-        dependencies: [OpDep.FIGHTERS],
+        dependencies: [OpDep.FIGHTERS, OpDep.USER],
         call: {
             name: "installCharacterOp",
             args: [

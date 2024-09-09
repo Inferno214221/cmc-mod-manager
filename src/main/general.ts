@@ -9,7 +9,7 @@ import { execSync, spawn } from "child_process";
 import request from "request";
 import http from "http";
 import semver from "semver";
-import { ModTypes, OpState, error } from "../global/global";
+import { ModTypes, OpDep, OpState, error } from "../global/global";
 
 require.resolve("./unrar.wasm");
 const WASM_BINARY: Buffer = fs.readFileSync(path.join(__dirname, "unrar.wasm"));
@@ -185,7 +185,7 @@ export async function checkForUpdates(): Promise<void> {
                 state: OpState.QUEUED,
                 icon: "download",
                 animation: Math.floor(Math.random() * 3),
-                dependencies: [],
+                dependencies: [OpDep.USER],
                 call: {
                     name: "downloadUpdate",
                     args: [releases[0].tag_name, id]

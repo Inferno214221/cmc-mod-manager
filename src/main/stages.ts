@@ -271,7 +271,7 @@ export function queStageInstallation(
         state: OpState.QUEUED,
         icon: "folder_shared",
         animation: Math.floor(Math.random() * 3),
-        dependencies: [OpDep.STAGES],
+        dependencies: [OpDep.STAGES, OpDep.USER],
         call: {
             name: "installStageOp",
             args: [

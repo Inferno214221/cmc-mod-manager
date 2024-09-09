@@ -16,7 +16,8 @@ export enum OpDep {
     GAME_SETTINGS,
     STAGES,
     STAGE_LOCK,
-    SSS
+    SSS,
+    USER
 }
 
 export enum OpState {
