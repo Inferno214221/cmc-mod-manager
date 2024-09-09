@@ -436,7 +436,7 @@ export function readCharacterDatPath(
     return characterDat;
 }
 
-export async function writeCharacterDat(dat: CharacterDat, destination: string): Promise<void> {
+export function writeCharacterDat(dat: CharacterDat, destination: string): void {
     let output: string = [
         dat.displayName,
         dat.menuName,
@@ -583,9 +583,7 @@ export function findCharacters(targetDir: string): FoundCharacter[] {
                 )!,
                 mug: path.join(targetDir, "gfx", "mugs", characterName + ".png")
             };
-        } else {
-            return null;
-        }
+        } else return null;
 
         // Check for missing info available from v7
         const builtinInfo: V7CharacterInfo = v7CharacterLookup(found.dat.name);
@@ -722,7 +720,7 @@ export async function installCharacter(
     await Promise.allSettled(toResolve);
 
     // This needs to be done last to ensure that it overrides the other changes
-    await writeCharacterDat(foundCharacter.dat, path.join(dir, "data", "dats"));
+    writeCharacterDat(foundCharacter.dat, path.join(dir, "data", "dats"));
     return character;
 }
 
@@ -842,7 +840,7 @@ export async function extractCharacter(
     });
 
     await Promise.allSettled(toResolve);
-    await writeCharacterDat(characterDat, path.join(extractDir, "data", "dats"));
+    writeCharacterDat(characterDat, path.join(extractDir, "data", "dats"));
     return extractDir;
 }
 

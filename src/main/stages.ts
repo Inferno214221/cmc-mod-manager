@@ -6,6 +6,7 @@ import * as general from "./general";
 import * as customDialogs from "./custom-dialogs";
 
 const STAGE_FILES: string[] = [
+    "data/sinfo/<stage>.json",
     "stage/<stage>.bin",
     "stage/<stage>/<any>",
     "music/stage/<stage>/<any>",
@@ -135,9 +136,7 @@ export function getStageFiles(
     let stageFilesString: string = stageFiles.join("\n");
     const validFiles: string[] = [];
     getStageRegExps(stage, ignoreSeries).forEach((exp: RegExp) => {
-        // console.log(exp);
         for (const match of stageFilesString.matchAll(exp)) {
-            // console.log(match);
             validFiles.push(match[0]);
             stageFiles.splice(stageFiles.indexOf(match[0]), 1);
         }
@@ -156,6 +155,38 @@ export function getStageFiles(
         });
     }
     return validFiles;
+}
+
+export function readStageInfoPath(targetInfo: string): StageInfo | null {
+    const infoTxt: string[] | StageInfo = general.readJSON(targetInfo);
+    if (Array.isArray(infoTxt)) {
+        return {
+            menuName: infoTxt[0],
+            source: infoTxt[1],
+            series: infoTxt[2]
+        };
+    }
+    if (
+        !infoTxt.menuName ||
+        !infoTxt.source ||
+        !infoTxt.series
+    ) {
+        return null;
+    }
+    return infoTxt as StageInfo;
+}
+
+export function writeStageInfo(stage: Stage, destination: string): void {
+    fs.ensureFileSync(path.join(destination, stage.name + ".json"));
+    fs.writeFileSync(
+        path.join(destination, stage.name + ".json"),
+        JSON.stringify({
+            menuName: stage.menuName,
+            source: stage.source,
+            series: stage.series
+        }, null, 2)
+    );
+    return;
 }
 
 export async function selectAndInstallStages(
@@ -190,7 +221,7 @@ export function installStages(
         if (path.relative(correctedTarget, dir) == "") throw new Error(
             "Cannot install stage from the directory that they are being installed to."
         );
-        const foundStages: string[] = findStages(correctedTarget);
+        const foundStages: FoundStage[] = findStages(correctedTarget);
         if (foundStages.length == 0)
             throw new Error("No valid stages found in directory: '" + targetDir + "'.");
         if (foundStages.length == 1) {
@@ -243,8 +274,8 @@ export function correctStageDir(targetDir: string): string {
     return correctedDir;
 }
 
-export function findStages(targetDir: string): string[] {
-    return Array.from(new Set(
+export function findStages(targetDir: string): FoundStage[] {
+    const stageNames: string[] = Array.from(new Set(
         fs.readdirSync(
             path.join(targetDir, "stage")
         ).filter(
@@ -253,17 +284,31 @@ export function findStages(targetDir: string): string[] {
             (stage: string) => stage.replace(/\.[^/\\]+$/, "")
         )
     ));
+    return stageNames.map((stageName: string) => {
+        const found: FoundStage = {
+            name: stageName,
+            icon: path.join(targetDir, "gfx", "stgicons", stageName + ".png")
+        };
+        if (fs.existsSync(path.join(targetDir, "info.json"))) {
+            found.info = readStageInfoPath(path.join(targetDir, "info.json")) ?? undefined;
+        } else if (fs.existsSync(path.join(targetDir, "data", "sinfo", stageName + ".json"))) {
+            found.info =
+                readStageInfoPath(path.join(targetDir, "data", "sinfo", stageName + ".json")) ??
+                undefined;
+        }
+        return found;
+    }).filter((found: FoundStage) => found != null) as FoundStage[];
 }
 
 export function queStageInstallation(
     targetDir: string,
-    foundStage: string,
+    foundStage: FoundStage,
     filterInstallation: boolean,
     updateStages: boolean,
     location: string,
     dir: string = global.gameDir
 ): void {
-    const id: string = foundStage + "_" + new Date().getTime();
+    const id: string = foundStage.name + "_" + new Date().getTime();
     general.addOperation({
         id: id,
         title: "Stage Installation",
@@ -283,7 +328,7 @@ export function queStageInstallation(
 
 export async function installStageOp(
     targetDir: string,
-    foundStage: string,
+    foundStage: FoundStage,
     filterInstallation: boolean,
     updateStages: boolean,
     id: string,
@@ -311,53 +356,52 @@ export async function installStageOp(
 
 export async function installStage(
     targetDir: string,
-    foundStage: string,
+    foundStage: FoundStage,
     filterInstallation: boolean = true,
     updateStages: boolean = false,
     dir: string = global.gameDir
 ): Promise<Stage | null> {
     const stageList: StageList = readStageList(dir);
-    if (!updateStages && stageList.getByName(foundStage) != undefined) {
+    if (!updateStages && stageList.getByName(foundStage.name) != undefined) {
         throw new Error("Stage already installed, updates disabled.");
     }
 
     const wipStage: WipStage = {
-        name: foundStage,
-        menuName: undefined,
-        source: undefined,
-        series: undefined,
+        name: foundStage.name,
+        menuName: foundStage.info?.menuName,
+        source: foundStage.info?.source,
+        series: foundStage.info?.series,
         randomSelection: true,
         number: stageList.getNextNumber(),
         icon: path.join(dir, "gfx", "stgicons", foundStage + ".png")
     };
     let stage: Stage;
-    if (fs.existsSync(path.join(targetDir, "info.json"))) {
-        const infoTxt: string[] = general.readJSON(path.join(targetDir, "info.json"));
-        console.log(infoTxt);
-        wipStage.menuName = infoTxt[0];
-        wipStage.source = infoTxt[1];
-        wipStage.series = infoTxt[2];
-        stage = wipStage as Stage;
-    } else {
+    if (
+        !wipStage.menuName ||
+        !wipStage.source ||
+        !wipStage.series
+    ) {
         const temp: Stage | null = await getMissingStageInfo(wipStage, targetDir);
         if (temp == null) return null;
         stage = temp;
+    } else {
+        stage = wipStage as Stage;
     }
 
     if (updateStages) {
         if (
             (
-                fs.existsSync(path.join(targetDir, "stage", foundStage + ".bin")) ||
-                fs.existsSync(path.join(targetDir, "stage", foundStage))
+                fs.existsSync(path.join(targetDir, "stage", foundStage.name + ".bin")) ||
+                fs.existsSync(path.join(targetDir, "stage", foundStage.name))
             ) &&
             (
-                fs.existsSync(path.join(dir, "stage", foundStage + ".bin")) ||
-                fs.existsSync(path.join(dir, "stage", foundStage))
+                fs.existsSync(path.join(dir, "stage", foundStage.name + ".bin")) ||
+                fs.existsSync(path.join(dir, "stage", foundStage.name))
             )
         ) {
             console.log("Removing bin & folder for replacement.");
-            fs.removeSync(path.join(dir, "stage", foundStage + ".bin"));
-            fs.removeSync(path.join(dir, "stage", foundStage));
+            fs.removeSync(path.join(dir, "stage", foundStage.name + ".bin"));
+            fs.removeSync(path.join(dir, "stage", foundStage.name));
         }
     }
 
@@ -380,13 +424,14 @@ export async function installStage(
         toResolve.push(fs.copy(targetDir, dir, { overwrite: true }));
     }
 
-    if (stageList.getByName(foundStage) == undefined) {
+    if (stageList.getByName(foundStage.name) == undefined) {
         stageList.add(stage);
         toResolve.push(writeStages(stageList.toArray(), dir));
     }
     await Promise.allSettled(toResolve);
     
     fs.removeSync(path.join(dir, "info.json"));
+    writeStageInfo(stage, path.join(dir, "data", "sinfo"));
     return stage;
 }
 
@@ -482,14 +527,8 @@ export async function extractStage(extract: string, dir: string = global.gameDir
             )
         );
     });
-
-    toResolve.push(fs.writeFile(
-        path.join(extractDir, "info.json"),
-        JSON.stringify([
-            stage.menuName, stage.source, stage.series
-        ], null, 2)
-    ));
     await Promise.allSettled(toResolve);
+    writeStageInfo(stage, path.join(extractDir, "data", "sinfo"));
     return extractDir;
 }
 

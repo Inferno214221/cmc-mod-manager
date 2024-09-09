@@ -96,9 +96,21 @@ interface DndDataExcluded {
 type DndData = DndDataSsNumber | DndDataExcluded;
 
 interface FoundCharacter {
-    name: string
+    name: string,
     dat: CharacterDat,
     mug: string
+}
+
+interface FoundStage {
+    name: string,
+    info?: StageInfo,
+    icon: string
+}
+
+interface StageInfo {
+    menuName: string,
+    source: string,
+    series: string
 }
 
 interface V7CharacterInfo {
