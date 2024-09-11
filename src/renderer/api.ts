@@ -25,6 +25,15 @@ export default {
         id: string
     ]): Promise<void> => ipcRenderer.invoke("cancelOperation", args)),
 
+    characterInstallation: ((...args: [
+        targetDir: string
+    ]): Promise<void> => ipcRenderer.invoke("characterInstallation", args)),
+
+    characterInstallationOp: ((...args: [
+        targetDir: string,
+        id: string
+    ]): Promise<void> => ipcRenderer.invoke("characterInstallationOp", args)),
+
     checkForUpdates: ((): Promise<void> => ipcRenderer.invoke("checkForUpdates")),
 
     confirm: ((...args: [

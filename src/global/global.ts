@@ -17,7 +17,8 @@ export enum OpDep {
     STAGES,
     STAGE_LOCK,
     SSS,
-    USER
+    USER,
+    USER_SLOW // For operations which don't block USER operations
 }
 
 export enum OpState {

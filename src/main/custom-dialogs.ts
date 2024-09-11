@@ -47,7 +47,7 @@ abstract class Dialog<OptionsType extends Options, ReturnType> {
 
         this.window.on("close", () => {
             this.clearHandlers();
-            if (callback != undefined) callback(undefined);
+            if (callback != undefined) callback();
         });
 
         // Calls even when destroyed
@@ -172,11 +172,12 @@ export class CharacterInstallDialog extends Dialog<CharacterInstallOptions, null
     }
 }
 
-export async function characterInstallation(targetDir: string): Promise<null | void> {
-    return new CharacterInstallDialog({
+export async function characterInstallation(targetDir: string): Promise<void> {
+    await new CharacterInstallDialog({
         id: "characterInstallation",
         body: "",
         title: "Select Characters To Install",
         targetDir: targetDir
     }).show();
+    return;
 }

@@ -513,7 +513,20 @@ export function installCharacters(
                 dir
             );
         } else {
-            customDialogs.characterInstallation(correctedTarget);
+            const id: string = "characterInstallation_" + Date.now();
+            general.addOperation({
+                id: id,
+                title: "Character Installation",
+                body: "Selecting characters to install from '" + correctedTarget + "'.",
+                state: OpState.QUEUED,
+                icon: "playlist_add",
+                animation: Math.floor(Math.random() * 3),
+                dependencies: [OpDep.USER_SLOW],
+                call: {
+                    name: "characterInstallationOp",
+                    args: [correctedTarget, id]
+                }
+            });
         }
     } catch (err: any) {
         general.addOperation({
@@ -649,6 +662,15 @@ export async function installCharacterOp(
         });
         general.updateCharacterPages();
     }
+}
+
+export async function characterInstallationOp(targetDir: string, id: string): Promise<void> {
+    await customDialogs.characterInstallation(targetDir);
+    general.updateOperation({
+        id: id,
+        body: "Selected characters to install from '" + targetDir + "'.",
+        state: OpState.FINISHED,
+    });
 }
 
 export async function installCharacter(
