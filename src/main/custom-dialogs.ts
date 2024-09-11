@@ -23,7 +23,7 @@ abstract class Dialog<OptionsType extends Options, ReturnType> {
     }
 
     showSync(callback: ((result?: ReturnType) => void)): void {
-        this.options.id = new Date().getTime() + "_" + this.options.id;
+        this.options.id = this.options.id + "_" + Date.now();
         this.callback = callback;
 
         this.window = new BrowserWindow({

@@ -605,7 +605,7 @@ export function queCharacterInstallation(
     location: string,
     dir: string = global.gameDir
 ): void {
-    const id: string = foundCharacter.name + "_" + new Date().getTime();
+    const id: string = foundCharacter.name + "_" + Date.now();
     general.addOperation({
         id: id,
         title: "Character Installation",
@@ -1091,7 +1091,7 @@ export async function removeSeriesCharacters(
             if (alt.alt != alt.base) altsToRemove.push(alt);
         });
     });
-    console.log(new Date().getTime());
+    console.log(Date.now());
     for (const character of charactersToRemove) {
         console.log(character);
         await removeCharacter(character.name, dir);
@@ -1100,6 +1100,6 @@ export async function removeSeriesCharacters(
         console.log(alt);
         await removeCharacter(alt.alt, dir);
     }
-    console.log(new Date().getTime());
+    console.log(Date.now());
     return;
 }

@@ -171,7 +171,7 @@ export async function checkForUpdates(): Promise<void> {
         const latestVersion: string = semver.clean(releases[0].tag_name) ??
             error("Invalid semver string: '" + app.getVersion() + "'");
         console.log("Latest Version: " + latestVersion);
-        const id: string = new Date().getTime() + "_downloadUpdate";
+        const id: string = "downloadUpdate_" + Date.now();
         if (semver.lt(currentVersion, latestVersion)) {
             if (semver.prerelease(latestVersion)) {
                 if (!semver.prerelease(currentVersion)) {
@@ -255,7 +255,7 @@ export async function downloadUpdate(tagName: string, id: string): Promise<void>
                 fs.moveSync(updateTemp, updateDir, { overwrite: true });
             }
 
-            const installId: string = new Date().getTime() + "_installUpdate";
+            const installId: string = "installUpdate_" + Date.now();
             addOperation({
                 id: installId,
                 title: "Install Update",
@@ -329,7 +329,7 @@ export async function handleURI(uri: string | undefined): Promise<void> {
     if (splitUri[1].toLowerCase() != "mod") return;
     const url: string = splitUri[0];
     const modId: string = splitUri[2];
-    const id: string = modId + "_" + new Date().getTime();
+    const id: string = modId + "_" + Date.now();
 
     showNotification("1-Click Download Initialised", {
         body: "Downloading mod with id: '" + modId + "' from GameBanana."
@@ -339,7 +339,7 @@ export async function handleURI(uri: string | undefined): Promise<void> {
     });
 
     addOperation({
-        id: id + "_download",
+        id: "download_" + id,
         title: "Mod Download",
         body: "Downloading a mod from GameBanana.",
         image: "https://gamebanana.com/mods/embeddables/" + modId + "?type=medium_square",
@@ -375,7 +375,8 @@ export async function downloadMod(url: string, modId: string, id: string): Promi
         fs.ensureDirSync(global.temp);
 
         const infoPromise: Promise<string[]> = getDownloadInfo(modId);
-        let file: string = id + "_download.";
+        const operationId: string = "download_" + id;
+        let file: string = operationId;
         request.get(url)
             .on("error", (err: Error) => {
                 throw err;
@@ -409,7 +410,7 @@ export async function downloadMod(url: string, modId: string, id: string): Promi
 
                 const downloadSize: number = parseInt(res.headers["content-length"] ?? "");
                 updateOperation({
-                    id: id + "_download",
+                    id: operationId,
                     title: modType + " Download",
                     body: "Downloading mod: '" + modInfo[0] + "' from GameBanana. (0 / " +
                         toMb(downloadSize) + " mb)",
@@ -425,27 +426,27 @@ export async function downloadMod(url: string, modId: string, id: string): Promi
                     throw err;
                 });
 
-                global.cancelFunctions[id + "_download"] = (() => {
+                global.cancelFunctions[operationId] = (() => {
                     req.abort();
                     canceled = true;
                     updateOperation({
-                        id: id + "_download",
+                        id: operationId,
                         state: OpState.CANCELED,
                     });
-                    delete global.cancelFunctions[id + "_download"];
+                    delete global.cancelFunctions[operationId];
                 });
                 updateOperation({
-                    id: id + "_download",
+                    id: operationId,
                     cancelable: true,
                 });
 
                 req.pipe(downloadStream).on("close", async () => {
-                    delete global.cancelFunctions[id + "_download"];
+                    delete global.cancelFunctions[operationId];
                     if (downloadStream.errored || canceled) return;
                     const output: string = await extractArchive(filePath, global.temp);
                     fs.removeSync(filePath);
                     updateOperation({
-                        id: id + "_download",
+                        id: operationId,
                         body: "Downloaded mod: '" + modInfo[0] + "' from GameBanana.",
                         state: OpState.FINISHED,
                     });
@@ -461,7 +462,7 @@ export async function downloadMod(url: string, modId: string, id: string): Promi
                 });
 
                 updateDownloadProgress(
-                    id + "_download",
+                    operationId,
                     "Downloading mod: '" + modInfo[0] + "' from GameBanana.",
                     downloadStream,
                     downloadSize

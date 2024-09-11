@@ -308,7 +308,7 @@ export function queStageInstallation(
     location: string,
     dir: string = global.gameDir
 ): void {
-    const id: string = foundStage.name + "_" + new Date().getTime();
+    const id: string = foundStage.name + "_" + Date.now();
     general.addOperation({
         id: id,
         title: "Stage Installation",
@@ -632,12 +632,12 @@ export async function removeSeriesStages(
 ): Promise<void> {
     const stagesToRemove: Stage[] = readStages(dir)
         .filter((stage: Stage) => stage.series == series);
-    console.log(new Date().getTime());
+    console.log(Date.now());
     for (const stage of stagesToRemove) {
         console.log(stage);
         await removeStage(stage.name, dir);
     }
-    console.log(new Date().getTime());
+    console.log(Date.now());
     return;
 }
 
