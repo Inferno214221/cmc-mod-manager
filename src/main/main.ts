@@ -5,6 +5,7 @@ import {
 import path from "path";
 import fs from "fs-extra";
 import { OpState } from "../global/global";
+import CMCMM from "../assets/icon.png";
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
@@ -57,7 +58,8 @@ function createWindow(): void {
             preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
         },
         autoHideMenuBar: true,
-        darkTheme: true
+        darkTheme: true,
+        icon: CMCMM
     });
     global.win.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
 

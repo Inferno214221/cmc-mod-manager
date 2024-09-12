@@ -3,6 +3,7 @@
   "version": "3.0.0-beta.4",
   "description": "A Mod Manager For SSBC CMC+ v8 Made With Electron",
   "main": ".webpack/main",
+  "icon": "./gb/icon.png",
   "scripts": {
     "start": "electron-forge start",
     "package": "electron-forge package",

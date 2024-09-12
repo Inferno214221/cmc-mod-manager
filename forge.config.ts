@@ -14,6 +14,7 @@ import { rendererConfig } from "./webpack.renderer.config";
 const config: ForgeConfig = {
     packagerConfig: {
         asar: false,
+        icon: "./gb/icon"
     },
     rebuildConfig: {},
     makers: [
@@ -21,14 +22,15 @@ const config: ForgeConfig = {
             name: "@electron-forge/maker-squirrel",
             config: {
                 authors: "Inferno214221",
-                name: "CMC Mod Manager",
-                iconUrl: "https://github.com/Inferno214221/CMCModManager/blob/main/gb/cmcmm.ico",
+                name: "CMC Mod Manager"
             },
         },
         {
             name: "@electron-forge/maker-zip",
             platforms: ["darwin", "linux", "win32"],
-            config: {}
+            config: { 
+                icon: "./gb/icon.ico"
+            }
         },
         {
             name: "@electron-forge/maker-deb",
@@ -54,10 +56,6 @@ const config: ForgeConfig = {
                 version: "3.0.0-beta.4",
             },
         },
-        // new MakerSquirrel({}),
-        // new MakerZIP({}, ["darwin"]),
-        // new MakerRpm({}),
-        // new MakerDeb({})
     ],
     plugins: [
         // new AutoUnpackNativesPlugin({}),
