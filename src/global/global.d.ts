@@ -12,7 +12,9 @@ declare const global: {
     temp: string,
     confirmedClose: boolean,
     updateOnExit: boolean
-    cancelFunctions: { [id: string]: () => void }
+    cancelFunctions: { [id: string]: () => void },
+    platform: string,
+    arch: string
 };
 
 interface Mod {

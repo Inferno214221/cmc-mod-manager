@@ -112,23 +112,33 @@ const config: ForgeConfig = {
         }),
     ],
     hooks: {
+        generateAssets: async (_config: any, platform: string, arch: string) => {
+            fs.writeFileSync(
+                "build.json",
+                JSON.stringify({
+                    platform: platform,
+                    arch: arch
+                }, null, 2),
+                { encoding: "utf-8" }
+            )
+        },
         postPackage: async (_config: any, packageResult: any) => {
             fs.copySync(
                 path.join(__dirname, "LICENSE"),
                 path.join(packageResult.outputPaths[0], "LICENSE"),
                 { overwrite: true }
             );
-            fs.writeFileSync(
-                path.join(packageResult.outputPaths[0], "resources", "app", "build.json"),
-                JSON.stringify({
-                    platform: packageResult.platform,
-                    arch: packageResult.arch
-                }, null, 2),
-                { encoding: "utf-8" }
-            );
+            let updateScript: string = "update.";
+            if (packageResult.platform == "win32") {
+                updateScript += "bat";
+            } else if (packageResult.platform == "linux") {
+                updateScript += "sh"
+            } else {
+                throw new Error("Invalid platform");
+            }
             fs.copySync(
-                path.join(__dirname, "src", "updater"),
-                path.join(packageResult.outputPaths[0], "updater"),
+                path.join(__dirname, "src", "updater", updateScript),
+                path.join(packageResult.outputPaths[0], "updater", updateScript),
                 { overwrite: true }
             );
         },

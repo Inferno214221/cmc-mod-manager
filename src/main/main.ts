@@ -6,6 +6,7 @@ import path from "path";
 import fs from "fs-extra";
 import { OpState } from "../global/global";
 import CMCMM from "../assets/icon.png";
+import * as buildInfo from "../../build.json";
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
@@ -21,6 +22,8 @@ global.temp = path.join(app.getPath("temp"), "cmc-mod-manager");
 global.confirmedClose = false;
 global.updateOnExit = false;
 global.cancelFunctions = {};
+global.platform = buildInfo.platform;
+global.arch = buildInfo.arch;
 
 import * as general from "./general";
 import * as characters from "./characters";

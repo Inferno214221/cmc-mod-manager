@@ -213,15 +213,11 @@ export async function downloadUpdate(tagName: string, id: string): Promise<void>
         });
         return;
     }
-    const buildInfo: any = JSON.parse(fs.readFileSync(
-        path.join(__dirname, "..", "..", "build.json"),
-        "utf-8"
-    ));
     const targetPath: string = path.join(global.temp, "update.zip");
     fs.createFileSync(targetPath);
     const targetStream: fs.WriteStream = fs.createWriteStream(targetPath);
     const url: string = "https://github.com/Inferno214221/cmc-mod-manager/releases/download/" +
-        tagName + "/cmc-mod-manager-" + buildInfo.platform + "-" + buildInfo.arch + ".zip";
+        tagName + "/cmc-mod-manager-" + global.platform + "-" + global.arch + ".zip";
     request.get(url)
         .on("error", (err: Error) => {
             console.log(err);
@@ -297,19 +293,15 @@ export function installUpdate(id: string): void {
 
 export function runUpdater(): void {
     if (!app.isPackaged) throw new Error("Cannot update in dev mode.");
-    const buildInfo: any = JSON.parse(fs.readFileSync(
-        path.join(__dirname, "..", "..", "build.json"),
-        "utf-8"
-    ));
     const updaterDir: string = path.join(global.appDir, "updater");
 
-    if (buildInfo.platform == "win32") {
+    if (global.platform == "win32") {
         spawn(path.join(updaterDir, "update.bat"), {
             cwd: updaterDir,
             detached: true,
             stdio: ["ignore", "ignore", "ignore"]
         }).unref();
-    } else if (buildInfo.platform == "linux") {
+    } else if (global.platform == "linux") {
         execSync("chmod +x \"" + path.join(updaterDir, "update.sh")
             .replaceAll("\"", "\\\"").replaceAll("'", "\\'") + "\"");
         spawn(path.join(updaterDir, "update.sh"), {
