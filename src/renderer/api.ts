@@ -152,7 +152,7 @@ export default {
     ]): Promise<RegExp[]> => ipcRenderer.invoke("getStageRegExps", args)),
 
     handleURI: ((... args: [
-        uri: string
+        uri: string | undefined
     ]): Promise<void> => ipcRenderer.invoke("handleURI", args)),
 
     handleProcessArgs: ((): Promise<void> => ipcRenderer.invoke("handleProcessArgs")),
@@ -163,7 +163,7 @@ export default {
         filterInstallation: boolean,
         updateCharacters: boolean,
         dir?: string
-    ]): Promise<void> => ipcRenderer.invoke("installCharacter", args)),
+    ]): Promise<Character | null> => ipcRenderer.invoke("installCharacter", args)),
 
     installCharacters: ((...args: [
         targetDir: string,
@@ -192,7 +192,7 @@ export default {
         filterInstallation: boolean,
         updateStages: boolean,
         dir?: string
-    ]): Promise<void> => ipcRenderer.invoke("installStage", args)),
+    ]): Promise<Stage | null> => ipcRenderer.invoke("installStage", args)),
 
     installStages: ((...args: [
         targetDir: string,
@@ -238,7 +238,7 @@ export default {
 
     prompt: ((...args: [
         options: PromptOptions
-    ]): Promise<string> => ipcRenderer.invoke("prompt", args)),
+    ]): Promise<string | undefined> => ipcRenderer.invoke("prompt", args)),
 
     queCharacterInstallation: ((...args: [
         targetDir: string,
@@ -267,7 +267,7 @@ export default {
     readCharacterDat: ((...args: [
         character: string,
         dir?: string
-    ]): Promise<CharacterDat> => ipcRenderer.invoke("readCharacterDat", args)),
+    ]): Promise<CharacterDat | null> => ipcRenderer.invoke("readCharacterDat", args)),
 
     readCharacterDatPath: ((...args: [
         datPath: string,
