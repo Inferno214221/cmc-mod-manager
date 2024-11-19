@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=CMC Mod Manager
+Comment=A mod manager for CMC+ v8 made with Electron
+GenericName=cmc-mod-manager
+Exec=cmc-mod-manager %U
+Icon=cmc-mod-manager
+Type=Application
+StartupNotify=true
+Categories=Utility;
+MimeType=x-scheme-handler/cmcmm;

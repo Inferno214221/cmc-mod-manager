@@ -42,6 +42,7 @@ const config: ForgeConfig = {
                 categories: ["Utility"],
                 icon: "./gb/icon.png",
                 version: "3.0.0-beta.4",
+                mimeType: ["x-scheme-handler/cmcmm"]
             },
         },
         {
@@ -54,6 +55,7 @@ const config: ForgeConfig = {
                 categories: ["Utility"],
                 icon: "./gb/icon.png",
                 version: "3.0.0-beta.4",
+                mimeType: ["x-scheme-handler/cmcmm"]
             },
         },
     ],
@@ -126,6 +128,11 @@ const config: ForgeConfig = {
             fs.copySync(
                 path.join(__dirname, "LICENSE"),
                 path.join(packageResult.outputPaths[0], "LICENSE"),
+                { overwrite: true }
+            );
+            fs.copySync(
+                path.join(__dirname, "src", "assets", "cmc-mod-manager.desktop"),
+                path.join(packageResult.outputPaths[0], "cmc-mod-manager.desktop"),
                 { overwrite: true }
             );
             let updateScript: string = "update.";
