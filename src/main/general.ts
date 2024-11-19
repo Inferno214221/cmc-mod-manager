@@ -178,6 +178,25 @@ export async function checkForUpdates(): Promise<void> {
                     return;
                 }
             }
+
+            try {
+                fs.accessSync(global.appDir, fs.constants.W_OK | fs.constants.X_OK);
+            } catch (error: any) {
+                addOperation({
+                    id: id,
+                    title: "Download Update",
+                    body: `Due to the way CMC Mod Manager has been installed, it can't be updated
+                        automatically. Please download the latest version from GitHub or GameBanana.
+                        (Check the Home tab for links.)`,
+                    state: OpState.ERROR,
+                    icon: "download",
+                    animation: Math.floor(Math.random() * 3),
+                    dependencies: [],
+                    call: undefined
+                });
+                return;
+            }
+
             addOperation({
                 id: id,
                 title: "Download Update",
@@ -275,8 +294,7 @@ export function installUpdate(id: string): void {
     const updaterDir: string = path.join(global.appDir, "updater");
     if (!fs.existsSync(path.join(updateDir))) throw new Error("Update files not found.");
     if (
-        fs.existsSync(path.join(updateDir, "updater")) &&
-        fs.existsSync(path.join(updateDir, "updater", "update.sh")) &&
+        fs.existsSync(path.join(updateDir, "updater", "update.sh")) ||
         fs.existsSync(path.join(updateDir, "updater", "update.bat"))
     ) {
         fs.removeSync(updaterDir);
