@@ -62,10 +62,10 @@ export function TabStageSelectionScreen({
         getPages();
     }
 
-    async function getPages(): Promise<void> {
+    async function getPages(newActivePage?: number): Promise<void> {
         const pages: SssPage[] = await api.readSssPages();
         setSssPages(pages);
-        setActivePage(0);
+        setActivePage(newActivePage ?? 0);
     }
 
     useEffect(() => {
@@ -399,7 +399,7 @@ function SssPages({
     sssPages: SssPage[],
     activePage: number,
     setActivePage: Dispatch<SetStateAction<number>>,
-    getPages: () => Promise<void>,
+    getPages: (newActivePage?: number) => Promise<void>,
     setOperations: Dispatch<SetStateAction<Operation[]>>
 }): JSX.Element {
     const [newPageName, setNewPageName]:
@@ -434,13 +434,41 @@ function SssPages({
         });
     }
 
+    function createNewPage(): void {
+        if (newPageName == "") return;
+        let operationId: number;
+        setOperations((prev: Operation[]) => {
+            const newOperations: Operation[] = [...prev];
+            operationId = newOperations.push({
+                title: "SSS Page Addition",
+                body: "Adding new SSS page: '" + newPageName + "'.",
+                state: OpState.QUEUED,
+                icon: "add",
+                animation: Math.floor(Math.random() * 3),
+                dependencies: [OpDep.SSS],
+                call: async () => {
+                    const newPage: SssPage = await api.addSssPage(newPageName);
+                    setOperations((prev: Operation[]) => {
+                        const newOperations: Operation[] = [...prev];
+                        newOperations[operationId].state = OpState.FINISHED;
+                        newOperations[operationId].body = "Added new SSS " +
+                            "page: '" + newPageName + "'.";
+                        return newOperations;
+                    });
+                    getPages(newPage.pageNumber);
+                }
+            }) - 1;
+            return newOperations;
+        });
+    }
+
     return (
         <div id={styles.pagesWrapper}>
-            {sssPages.map((page: SssPage) =>
+            {sssPages.map((page: SssPage, index: number) =>
                 <SssPageDisplay
                     page={page}
-                    sssPages={sssPages}
                     activePage={activePage}
+                    pageIndex={index}
                     setActivePage={setActivePage}
                     getPages={getPages}
                     setOperations={setOperations}
@@ -465,38 +493,20 @@ function SssPages({
                             sssPages.length
                         );
                     }}
+                    onKeyUp={(event: any) => {
+                        if (event.key == "Enter") {
+                            createNewPage();
+                            event.target.value = "";
+                            setNewPageName("");
+                        }
+                    }}
                 />
                 <IconButton
                     icon={"add"}
                     iconSize={"18px"}
                     tooltip={"Add Page"}
                     onClick={async () => {
-                        if (newPageName != "") {
-                            let operationId: number;
-                            setOperations((prev: Operation[]) => {
-                                const newOperations: Operation[] = [...prev];
-                                operationId = newOperations.push({
-                                    title: "SSS Page Addition",
-                                    body: "Adding new SSS page: '" + newPageName + "'.",
-                                    state: OpState.QUEUED,
-                                    icon: "add",
-                                    animation: Math.floor(Math.random() * 3),
-                                    dependencies: [OpDep.SSS],
-                                    call: async () => {
-                                        await api.addSssPage(newPageName);
-                                        setOperations((prev: Operation[]) => {
-                                            const newOperations: Operation[] = [...prev];
-                                            newOperations[operationId].state = OpState.FINISHED;
-                                            newOperations[operationId].body = "Added new SSS " +
-                                                "page: '" + newPageName + "'.";
-                                            return newOperations;
-                                        });
-                                        getPages();
-                                    }
-                                }) - 1;
-                                return newOperations;
-                            });
-                        }
+                        createNewPage();
                     }}
                 />
             </div>
@@ -506,48 +516,110 @@ function SssPages({
 
 function SssPageDisplay({
     page,
-    sssPages,
     activePage,
+    pageIndex,
     setActivePage,
     getPages,
     setOperations,
     reorderSssPage
 }: {
     page: SssPage,
-    sssPages: SssPage[],
     activePage: number,
+    pageIndex: number,
     setActivePage: Dispatch<SetStateAction<number>>,
-    getPages: () => Promise<void>,
+    getPages: (newActivePage?: number) => Promise<void>,
     setOperations: Dispatch<SetStateAction<Operation[]>>,
     reorderSssPage: (from: number, to: number) => void
 }): JSX.Element {
-    return (
-        <div className={styles.sssPage + (sssPages[activePage].pageNumber == page.pageNumber ?
-            " " + styles.sssPageActive : "")}>
-            <button
-                type={"button"}
-                onClick={() => {
+    const [editingName, setEditingName]:
+    [string | null, Dispatch<SetStateAction<string | null>>] = useState(null);
+    if (editingName != null && activePage != pageIndex) {
+        updatePageName();
+        // Reset regardless of status
+        setEditingName(null);
+    }
+
+    function updatePageName(): void {
+        if (editingName == "" || editingName == null) return;
+        let operationId: number;
+        setOperations((prev: Operation[]) => {
+            const newOperations: Operation[] = [...prev];
+            operationId = newOperations.push({
+                title: "Rename SSS Page",
+                body: "Renaming SSS page: '" + page.name + "' to '" + editingName + "'.",
+                state: OpState.QUEUED,
+                icon: "edit",
+                animation: Math.floor(Math.random() * 3),
+                dependencies: [OpDep.SSS],
+                call: async () => {
+                    const editedPage: SssPage = await api.renameSssPage(pageIndex, editingName);
+                    setOperations((prev: Operation[]) => {
+                        const newOperations: Operation[] = [...prev];
+                        newOperations[operationId].state = OpState.FINISHED;
+                        newOperations[operationId].body = "Renamed SSS page: '" + page.name +
+                            "' to '" + editingName + "'.";
+                        return newOperations;
+                    });
+                    getPages(editedPage.pageNumber);
+                }
+            }) - 1;
+            return newOperations;
+        });
+        setEditingName(null);
+    }
+
+    const mainComponent: JSX.Element = editingName != null ? (
+        <input
+            type={"text"}
+            className={styles.sssPageEdit}
+            autoFocus={true}
+            draggable={false}
+            placeholder={page.name}
+            onInput={(event: any) => {
+                event.target.value = event.target.value.replace(/'|"/g, "");
+                setEditingName(event.target.value);
+            }}
+            onKeyUp={(event: any) => {
+                if (event.key == "Enter") updatePageName();
+                else if (event.key == "Escape") setEditingName(null);
+            }}
+            onBlur={() => setEditingName(null)}
+        />
+    ) : (
+        <button
+            type={"button"}
+            onClick={() => {
+                if (activePage == pageIndex) {
+                    setEditingName("");
+                } else {
                     setActivePage(page.pageNumber);
-                }}
-                className={styles.sssPageButton}
-                draggable={true}
-                onDragStart={(event: any) => {
-                    event.dataTransfer.setData("data", page.pageNumber);
-                }}
-                onDragOver={(event: any) => {
-                    event.preventDefault();
-                }}
-                onDrop={(event: any) => {
-                    const from: number = parseInt(event.dataTransfer.getData("data"));
-                    if (from == page.pageNumber) return;
-                    reorderSssPage(
-                        from,
-                        page.pageNumber
-                    );
-                }}
-            >
-                {page.name}
-            </button>
+                }
+            }}
+            className={styles.sssPageButton}
+            draggable={true}
+            onDragStart={(event: any) => {
+                event.dataTransfer.setData("data", page.pageNumber);
+            }}
+            onDragOver={(event: any) => {
+                event.preventDefault();
+            }}
+            onDrop={(event: any) => {
+                const from: number = parseInt(event.dataTransfer.getData("data"));
+                if (from == page.pageNumber) return;
+                reorderSssPage(
+                    from,
+                    page.pageNumber
+                );
+            }}
+        >
+            {page.name}
+        </button>
+    );
+    
+    return (
+        <div className={styles.sssPage + (activePage == pageIndex ?
+            " " + styles.sssPageActive : "")}>
+            {mainComponent}
             <IconButton
                 icon={"delete"}
                 iconSize={"18px"}

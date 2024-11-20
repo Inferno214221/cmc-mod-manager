@@ -191,7 +191,8 @@
     overflow-anchor: auto;
 } */
 
-.add-sss-page input[type="text"] {
+.add-sss-page input[type="text"],
+.sss-page-edit {
     margin: 2px 0px 0px 2px;
 }
 
@@ -209,7 +210,8 @@
 }
 
 #excluded-search,
-.add-sss-page input[type="text"] {
+.add-sss-page input[type="text"],
+.sss-page-edit {
     width: 150px;
 }
 

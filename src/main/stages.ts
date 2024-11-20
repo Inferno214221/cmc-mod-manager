@@ -641,12 +641,17 @@ export async function removeSeriesStages(
     return;
 }
 
-export async function addSssPage(pageName: string, dir: string = global.gameDir): Promise<void> {
+export async function addSssPage(pageName: string, dir: string = global.gameDir): Promise<SssPage> {
     pageName = pageName.replace(/'|"/g, "");
     const pages: SssPage[] = readSssPages(dir);
-    pages.push({ name: pageName, pageNumber: pages.length, data: BLANK_SSS_PAGE_DATA });
+    const newPage: SssPage = {
+        name: pageName,
+        pageNumber: pages.length,
+        data: BLANK_SSS_PAGE_DATA
+    };
+    pages.push(newPage);
     writeSssPages(pages);
-    return;
+    return newPage;
 }
 
 export async function removeSssPage(page: SssPage, dir: string = global.gameDir): Promise<void> {
@@ -681,4 +686,15 @@ export async function reorderSssPage(
         dir
     );
     return;
+}
+
+export async function renameSssPage(
+    index: number,
+    pageName: string,
+    dir: string = global.gameDir
+): Promise<SssPage> {
+    const pages: SssPage[] = readSssPages(dir);
+    pages[index].name = pageName;
+    await writeSssPages(pages, dir);
+    return pages[index];
 }

@@ -74,9 +74,9 @@ export function TabCharacterSelectionScreen({
         );
         if (pageMatch.length == 1) {
             setActivePage(pageMatch[0]);
-        } else {
-            setActivePage(pages[0]);
+            return;
         }
+        setActivePage(pages[0]);
     }
 
     useEffect(() => {

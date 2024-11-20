@@ -10,7 +10,7 @@ export default {
     addCssPage: ((...args: [
         pageName: string,
         dir?: string
-    ]): Promise<void> => ipcRenderer.invoke("addCssPage", args)),
+    ]): Promise<CssPage> => ipcRenderer.invoke("addCssPage", args)),
 
     addSssPage: ((...args: [
         pageName: string,
@@ -349,7 +349,13 @@ export default {
         index: number,
         pageName: string,
         dir?: string
-    ]): Promise<void> => ipcRenderer.invoke("renameCssPage", args)),
+    ]): Promise<CssPage> => ipcRenderer.invoke("renameCssPage", args)),
+
+    renameSssPage: ((...args: [
+        index: number,
+        pageName: string,
+        dir?: string
+    ]): Promise<SssPage> => ipcRenderer.invoke("renameSssPage", args)),
 
     reorderCssPage: ((...args: [
         from: number,
