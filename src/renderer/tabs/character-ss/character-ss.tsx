@@ -65,10 +65,18 @@ export function TabCharacterSelectionScreen({
         getPages();
     }
 
-    async function getPages(): Promise<void> {
+    async function getPages(newActivePage?: CssPage): Promise<void> {
+        if (newActivePage == null) newActivePage = activePage ?? undefined;
         const pages: CssPage[] = await api.readCssPages();
         setCssPages(pages);
-        setActivePage(pages[0]);
+        const pageMatch: CssPage[] = pages.filter(
+            (page: CssPage) => page.path == newActivePage?.path
+        );
+        if (pageMatch.length == 1) {
+            setActivePage(pageMatch[0]);
+        } else {
+            setActivePage(pages[0]);
+        }
     }
 
     useEffect(() => {
@@ -403,7 +411,7 @@ function CssPages({
     cssPages: CssPage[],
     activePage: CssPage | null,
     setActivePage: Dispatch<SetStateAction<CssPage | null>>,
-    getPages: () => Promise<void>,
+    getPages: (newActivePage?: CssPage) => Promise<void>,
     setOperations: Dispatch<SetStateAction<Operation[]>>
 }): JSX.Element {
     const [newPageName, setNewPageName]:
@@ -438,6 +446,34 @@ function CssPages({
         });
     }
 
+    function createNewPage(): void {
+        if (newPageName == "") return;
+        let operationId: number;
+        setOperations((prev: Operation[]) => {
+            const newOperations: Operation[] = [...prev];
+            operationId = newOperations.push({
+                title: "CSS Page Addition",
+                body: "Adding new CSS page: '" + newPageName + "'.",
+                state: OpState.QUEUED,
+                icon: "add",
+                animation: Math.floor(Math.random() * 3),
+                dependencies: [OpDep.CSS, OpDep.GAME_SETTINGS],
+                call: async () => {
+                    const newPage: CssPage = await api.addCssPage(newPageName);
+                    setOperations((prev: Operation[]) => {
+                        const newOperations: Operation[] = [...prev];
+                        newOperations[operationId].state = OpState.FINISHED;
+                        newOperations[operationId].body = "Added new CSS " +
+                            "page: '" + newPageName + "'.";
+                        return newOperations;
+                    });
+                    getPages(newPage);
+                }
+            }) - 1;
+            return newOperations;
+        });
+    }
+
     return (
         <div id={styles.pagesWrapper}>
             {cssPages.map((page: CssPage, index: number) =>
@@ -449,7 +485,7 @@ function CssPages({
                     getPages={getPages}
                     setOperations={setOperations}
                     reorderCssPage={reorderCssPage}
-                    key={page.name}
+                    key={page.path}
                 />
             )}
             <div className={styles.cssPage + " " + styles.addCssPage}>
@@ -469,38 +505,21 @@ function CssPages({
                             cssPages.length
                         );
                     }}
+                    onKeyUp={(event: any) => {
+                        if (event.key == "Enter") {
+                            createNewPage();
+                            event.target.value = "";
+                            setNewPageName("");
+                        }
+                    }}
                 />
                 <IconButton
                     icon={"add"}
                     iconSize={"18px"}
                     tooltip={"Add Page"}
                     onClick={async () => {
-                        if (newPageName != "") {
-                            let operationId: number;
-                            setOperations((prev: Operation[]) => {
-                                const newOperations: Operation[] = [...prev];
-                                operationId = newOperations.push({
-                                    title: "CSS Page Addition",
-                                    body: "Adding new CSS page: '" + newPageName + "'.",
-                                    state: OpState.QUEUED,
-                                    icon: "add",
-                                    animation: Math.floor(Math.random() * 3),
-                                    dependencies: [OpDep.CSS, OpDep.GAME_SETTINGS],
-                                    call: async () => {
-                                        await api.addCssPage(newPageName);
-                                        setOperations((prev: Operation[]) => {
-                                            const newOperations: Operation[] = [...prev];
-                                            newOperations[operationId].state = OpState.FINISHED;
-                                            newOperations[operationId].body = "Added new CSS " +
-                                                "page: '" + newPageName + "'.";
-                                            return newOperations;
-                                        });
-                                        getPages();
-                                    }
-                                }) - 1;
-                                return newOperations;
-                            });
-                        }
+                        createNewPage();
+                        // TODO: clear the input
                     }}
                 />
             </div>
@@ -521,40 +540,103 @@ function CssPageDisplay({
     activePage: CssPage | null,
     pageIndex: number,
     setActivePage: Dispatch<SetStateAction<CssPage | null>>,
-    getPages: () => Promise<void>,
+    getPages: (newActivePage?: CssPage) => Promise<void>,
     setOperations: Dispatch<SetStateAction<Operation[]>>,
     reorderCssPage: (from: number, to: number) => void
 }): JSX.Element {
+    const [editingName, setEditingName]:
+    [string | null, Dispatch<SetStateAction<string | null>>] = useState(null);
+    if (editingName != null && activePage?.path != page.path) {
+        updatePageName();
+        // Reset regardless of status
+        setEditingName(null);
+    }
+
+    function updatePageName(): void {
+        if (editingName == "" || editingName == null) return;
+        let operationId: number;
+        setOperations((prev: Operation[]) => {
+            const newOperations: Operation[] = [...prev];
+            operationId = newOperations.push({
+                title: "Rename CSS Page",
+                body: "Renaming CSS page: '" + page.name + "' to '" + editingName + "'.",
+                state: OpState.QUEUED,
+                icon: "edit",
+                animation: Math.floor(Math.random() * 3),
+                dependencies: [OpDep.CSS, OpDep.GAME_SETTINGS],
+                call: async () => {
+                    const editedPage: CssPage = await api.renameCssPage(pageIndex, editingName);
+                    setOperations((prev: Operation[]) => {
+                        const newOperations: Operation[] = [...prev];
+                        newOperations[operationId].state = OpState.FINISHED;
+                        newOperations[operationId].body = "Renamed CSS page: '" + page.name +
+                            "' to '" + editingName + "'.";
+                        return newOperations;
+                    });
+                    getPages(editedPage);
+                }
+            }) - 1;
+            return newOperations;
+        });
+        setEditingName(null);
+    }
+
+    const mainComponent: JSX.Element = editingName != null ? (
+        <input
+            type={"text"}
+            className={styles.cssPageEdit}
+            autoFocus={true}
+            draggable={false}
+            placeholder={page.name}
+            onInput={(event: any) => {
+                event.target.value = event.target.value.replace(/'|"/g, "");
+                setEditingName(event.target.value);
+            }}
+            onKeyUp={(event: any) => {
+                if (event.key == "Enter") updatePageName();
+                else if (event.key == "Escape") setEditingName(null);
+            }}
+            onBlur={() => setEditingName(null)}
+        />
+    ) : (
+        <button
+            type={"button"}
+            onClick={() => {
+                if (activePage?.path == page.path) {
+                    setEditingName("");
+                } else {
+                    setActivePage(page);
+                }
+            }}
+            className={styles.cssPageButton}
+            draggable={true}
+            onDragStart={(event: any) => {
+                event.dataTransfer.setData("data", pageIndex);
+            }}
+            onDragOver={(event: any) => {
+                // TODO: apply styles on drag over
+                event.preventDefault();
+            }}
+            onDrop={(event: any) => {
+                const from: number = parseInt(event.dataTransfer.getData("data"));
+                if (from == pageIndex) return;
+                reorderCssPage(
+                    from,
+                    pageIndex
+                );
+            }}
+        >
+            {page.name}
+        </button>
+    );
+
     return (
         <div
             className={
                 styles.cssPage + (activePage?.path == page.path ? " " + styles.cssPageActive : "")
             }
         >
-            <button
-                type={"button"}
-                onClick={() => {
-                    setActivePage(page);
-                }}
-                className={styles.cssPageButton}
-                draggable={true}
-                onDragStart={(event: any) => {
-                    event.dataTransfer.setData("data", pageIndex);
-                }}
-                onDragOver={(event: any) => {
-                    event.preventDefault();
-                }}
-                onDrop={(event: any) => {
-                    const from: number = parseInt(event.dataTransfer.getData("data"));
-                    if (from == pageIndex) return;
-                    reorderCssPage(
-                        from,
-                        pageIndex
-                    );
-                }}
-            >
-                {page.name}
-            </button>
+            {mainComponent}
             <IconButton
                 icon={"delete"}
                 iconSize={"18px"}

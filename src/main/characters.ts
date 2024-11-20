@@ -1024,25 +1024,30 @@ export async function removeCssPage(page: CssPage, dir: string = global.gameDir)
     return;
 }
 
-export async function addCssPage(pageName: string, dir: string = global.gameDir): Promise<void> {
+export async function addCssPage(pageName: string, dir: string = global.gameDir): Promise<CssPage> {
     pageName = pageName.replace(/'|"/g, "");
-    const pagePath: string = path.join(
-        dir, "data", "css",
-        pageName.replace(/[\\/:*?|. ]/g, "-") + ".txt"
-    );
-    const pages: CssPage[] = readCssPages(dir);
-    pages.push({ name: pageName, path: pagePath });
-    await writeCssPages(pages, dir);
-    if (fs.existsSync(pagePath)) {
-        throw new Error("File already exists with the same name as the new CSS page.");
+    const newFile: string = pageName.replace(/[\\/:*?|. ]/g, "-");
+    let newPath: string = path.join(dir, "data", "css", newFile + ".txt");
+
+    if (fs.existsSync(newPath)) {
+        newPath = await general.createUniqueFileName(
+            path.join(dir, "data", "css"),
+            newFile, ".txt"
+        );
     }
-    fs.ensureFileSync(pagePath);
+
+    const pages: CssPage[] = readCssPages(dir);
+    const newPage: CssPage = { name: pageName, path: newPath };
+    pages.push(newPage);
+    await writeCssPages(pages, dir);
+
+    fs.ensureFileSync(newPath);
     fs.writeFileSync(
-        pagePath,
+        newPath,
         BLANK_CSS_PAGE_DATA,
         { encoding: "ascii" }
     );
-    return;
+    return newPage;
 }
 
 export async function reorderCssPage(
@@ -1058,6 +1063,33 @@ export async function reorderCssPage(
     pages.splice(to, 0, target);
     await writeCssPages(pages, dir);
     return;
+}
+
+export async function renameCssPage(
+    index: number,
+    pageName: string,
+    dir: string = global.gameDir
+): Promise<CssPage> {
+    const toResolve: Promise<void>[] = [];
+    const pages: CssPage[] = readCssPages(dir);
+    const newFile: string = pageName.replace(/[\\/:*?|. ]/g, "-");
+    let newPath: string = path.join(dir, "data", "css", newFile + ".txt");
+    
+    if (newPath != pages[index].path) {
+        if (fs.existsSync(newPath)) {
+            newPath = await general.createUniqueFileName(
+                path.join(dir, "data", "css"),
+                newFile, ".txt"
+            );
+        }
+        toResolve.push(fs.move(pages[index].path, newPath));
+    }
+
+    const newPage: CssPage = { name: pageName, path: newPath };
+    pages[index] = newPage;
+    toResolve.push(writeCssPages(pages, dir));
+    await Promise.allSettled(toResolve);
+    return newPage;
 }
 
 export function readCssData(page: CssPage): CssData {

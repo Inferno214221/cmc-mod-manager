@@ -191,7 +191,8 @@
     overflow-anchor: auto;
 } */
 
-.add-css-page input[type="text"] {
+.add-css-page input[type="text"],
+.css-page-edit {
     margin: 2px 0px 0px 2px;
 }
 
@@ -209,7 +210,8 @@
 }
 
 #excluded-search,
-.add-css-page input[type="text"] {
+.add-css-page input[type="text"],
+.css-page-edit {
     width: 150px;
 }
 

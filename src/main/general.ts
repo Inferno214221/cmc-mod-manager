@@ -670,3 +670,17 @@ export function showNotification(
 ): void {
     global.win.webContents.send("showNotification", title, options, onclick);
 }
+
+export async function createUniqueFileName(
+    dir: string,
+    base: string,
+    ext: string
+): Promise<string> {
+    const files: string[] = (await fs.readdir(dir))
+        .map((file: string) => file.toLocaleLowerCase());
+    let i: number = 1;
+    while (files.includes((base + "-" + i + ext).toLocaleLowerCase())) {
+        i++;
+    }
+    return path.join(dir, base + "-" + i + ext);
+}

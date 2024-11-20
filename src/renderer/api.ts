@@ -15,7 +15,7 @@ export default {
     addSssPage: ((...args: [
         pageName: string,
         dir?: string
-    ]): Promise<void> => ipcRenderer.invoke("addSssPage", args)),
+    ]): Promise<CssPage> => ipcRenderer.invoke("addSssPage", args)),
 
     alert: ((...args: [
         options: AlertOptions
@@ -344,6 +344,12 @@ export default {
         page: SssPage,
         dir?: string
     ]): Promise<void> => ipcRenderer.invoke("removeStageSss", args)),
+
+    renameCssPage: ((...args: [
+        index: number,
+        pageName: string,
+        dir?: string
+    ]): Promise<void> => ipcRenderer.invoke("renameCssPage", args)),
 
     reorderCssPage: ((...args: [
         from: number,
