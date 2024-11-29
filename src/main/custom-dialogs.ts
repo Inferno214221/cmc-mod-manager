@@ -181,3 +181,32 @@ export async function characterInstallation(targetDir: string): Promise<void> {
     }).show();
     return;
 }
+
+declare const DIALOG_STAGE_INSTALL_PRELOAD_WEBPACK_ENTRY: string;
+declare const DIALOG_STAGE_INSTALL_WEBPACK_ENTRY: string;
+
+export class StageInstallDialog extends Dialog<StageInstallOptions, null> {
+    readonly PRELOAD_ENTRY: string = DIALOG_STAGE_INSTALL_PRELOAD_WEBPACK_ENTRY;
+    readonly REACT_ENTRY: string = DIALOG_STAGE_INSTALL_WEBPACK_ENTRY;
+
+    readonly DEFAULT_WIDTH: number = 600;
+
+    ok(value: null): void {
+        super.ok(value);
+        this.callback();
+    }
+    cancel(): void {
+        super.cancel();
+        this.callback();
+    }
+}
+
+export async function stageInstallation(targetDir: string): Promise<void> {
+    await new StageInstallDialog({
+        id: "stageInstallation",
+        body: "",
+        title: "Select Stages To Install",
+        targetDir: targetDir
+    }).show();
+    return;
+}

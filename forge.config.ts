@@ -108,6 +108,14 @@ const config: ForgeConfig = {
                         preload: {
                             js: "./src/custom-dialogs/installation-dialogs/preload.ts",
                         },
+                    },
+                    {
+                        html: "./src/custom-dialogs/custom-dialogs.html",
+                        js: "./src/custom-dialogs/installation-dialogs/stage-install.tsx",
+                        name: "dialog_stage_install",
+                        preload: {
+                            js: "./src/custom-dialogs/installation-dialogs/preload.ts",
+                        },
                     }
                 ],
             },

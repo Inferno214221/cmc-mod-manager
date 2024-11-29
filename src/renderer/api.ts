@@ -393,6 +393,11 @@ export default {
 
     selectPathsDir: ((): Promise<string[]> => ipcRenderer.invoke("selectPathsDir")),
 
+    stageInstallationOp: ((...args: [
+        targetDir: string,
+        id: string
+    ]): Promise<void> => ipcRenderer.invoke("stageInstallationOp", args)),
+
     v7CharacterLookup: ((...args: [
         name: string
     ]): Promise<V7CharacterInfo> => ipcRenderer.invoke("v7CharacterLookup", args)),

@@ -230,3 +230,7 @@ interface PromptOptions extends Options {
 interface CharacterInstallOptions extends Options {
     targetDir: string
 }
+
+interface StageInstallOptions extends Options {
+    targetDir: string
+}

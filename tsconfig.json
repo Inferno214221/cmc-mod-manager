@@ -1,6 +1,8 @@
 {
     "compilerOptions": {
-        "target": "ES6",
+        // Optional chaining moment :/
+        // https://github.com/webpack/webpack/issues/10227
+        "target": "es2019",
         "allowJs": true,
         "module": "commonjs",
         "skipLibCheck": true,

@@ -234,7 +234,20 @@ export function installStages(
                 dir
             );
         } else {
-            throw new Error("Not implemented");
+            const id: string = "stageInstallation_" + Date.now();
+            general.addOperation({
+                id: id,
+                title: "Stage Installation",
+                body: "Selecting stages to install from '" + correctedTarget + "'.",
+                state: OpState.QUEUED,
+                icon: "playlist_add",
+                animation: Math.floor(Math.random() * 3),
+                dependencies: [OpDep.USER_SLOW],
+                call: {
+                    name: "stageInstallationOp",
+                    args: [correctedTarget, id]
+                }
+            });
         }
     } catch (err: any) {
         general.addOperation({
@@ -297,7 +310,7 @@ export function findStages(targetDir: string): FoundStage[] {
                 undefined;
         }
         return found;
-    }).filter((found: FoundStage) => found != null) as FoundStage[];
+    }) as FoundStage[];
 }
 
 export function queStageInstallation(
@@ -352,6 +365,15 @@ export async function installStageOp(
         });
         general.updateStagePages();
     }
+}
+
+export async function stageInstallationOp(targetDir: string, id: string): Promise<void> {
+    await customDialogs.stageInstallation(targetDir);
+    general.updateOperation({
+        id: id,
+        body: "Selected stages to install from '" + targetDir + "'.",
+        state: OpState.FINISHED,
+    });
 }
 
 export async function installStage(
@@ -563,7 +585,7 @@ export function readSssPages(dir: string = global.gameDir): SssPage[] {
     const pages: SssPage[] = [];
     // Currently SSS Pages are a fixed size - 10x6. Although it is possible that his may change in
     // the future, if any changes would be made to the stage format, it would likely become more
-    // consistent with the current character format and therefor need major adjustments anyway
+    // consistent with the current character format and therefore need major adjustments anyway
     const sssTxt: string[] = fs.readFileSync(
         path.join(dir, "data", "sss.txt"),
         "ascii"
