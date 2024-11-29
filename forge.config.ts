@@ -130,15 +130,15 @@ const config: ForgeConfig = {
                 path.join(packageResult.outputPaths[0], "LICENSE"),
                 { overwrite: true }
             );
-            fs.copySync(
-                path.join(__dirname, "src", "assets", "cmc-mod-manager.desktop"),
-                path.join(packageResult.outputPaths[0], "cmc-mod-manager.desktop"),
-                { overwrite: true }
-            );
             let updateScript: string = "update.";
             if (packageResult.platform == "win32") {
                 updateScript += "bat";
             } else if (packageResult.platform == "linux") {
+                fs.copySync(
+                    path.join(__dirname, "src", "assets", "cmc-mod-manager.desktop"),
+                    path.join(packageResult.outputPaths[0], "cmc-mod-manager.desktop"),
+                    { overwrite: true }
+                );
                 updateScript += "sh"
             } else {
                 throw new Error("Invalid platform");
