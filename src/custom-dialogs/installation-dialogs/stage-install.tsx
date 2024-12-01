@@ -110,8 +110,8 @@ function Body(): JSX.Element {
         return sortedStages;
     }
 
+    dialog.on("updateCharacterPages", () => null);
     dialog.on("updateStagePages", readGameStages);
-    dialog.on("updateStagePages", () => null);
 
     useEffect(() => {
         readGameStages();

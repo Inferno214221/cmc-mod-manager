@@ -750,12 +750,7 @@ export async function getMissingDatInfo(
     dat: CharacterDat,
     targetDir: string
 ): Promise<CharacterDat | null> {
-    if (!(
-        !dat.displayName ||
-        !dat.menuName ||
-        !dat.battleName ||
-        !dat.series
-    )) return dat;
+    if (dat.displayName && dat.menuName && dat.battleName && dat.series) return dat;
 
     const builtinInfo: V7CharacterInfo = v7CharacterLookup(dat.name);
     if (builtinInfo != undefined) {
@@ -787,7 +782,7 @@ export async function getMissingDatInfo(
         general.openDir(targetDir);
     }
 
-    while (dat.menuName == undefined || dat.menuName == "") {
+    while (!dat.menuName) {
         dat.menuName = await customDialogs.prompt({
             id: "inputCharacterMenuName",
             title: "CMC Mod Manager | Character Installation",
@@ -798,11 +793,11 @@ export async function getMissingDatInfo(
         if (dat.menuName == undefined) return null;
     }
 
-    if (dat.displayName == undefined || dat.displayName == "") {
+    if (!dat.displayName) {
         dat.displayName = dat.menuName;
     }
 
-    while (dat.battleName == undefined || dat.battleName == "") {
+    while (!dat.battleName) {
         dat.battleName = await customDialogs.prompt({
             id: "inputCharacterBattleName",
             title: "CMC Mod Manager | Character Installation",
@@ -813,7 +808,7 @@ export async function getMissingDatInfo(
         if (dat.battleName == undefined) return null;
     }
 
-    while (dat.series == undefined || dat.series == "") {
+    while (!dat.series) {
         dat.series = await customDialogs.prompt({
             id: "inputCharacterSeries",
             title: "CMC Mod Manager | Character Installation",

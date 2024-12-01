@@ -397,18 +397,10 @@ export async function installStage(
         number: stageList.getNextNumber(),
         icon: path.join(dir, "gfx", "stgicons", foundStage + ".png")
     };
-    let stage: Stage;
-    if (
-        !wipStage.menuName ||
-        !wipStage.source ||
-        !wipStage.series
-    ) {
-        const temp: Stage | null = await getMissingStageInfo(wipStage, targetDir);
-        if (temp == null) return null;
-        stage = temp;
-    } else {
-        stage = wipStage as Stage;
-    }
+    
+    const temp: Stage | null = await getMissingStageInfo(wipStage, targetDir);
+    if (temp == null) return null;
+    const stage: Stage = temp;
 
     if (updateStages) {
         if (
@@ -461,11 +453,8 @@ export async function getMissingStageInfo(
     stage: WipStage,
     targetDir: string
 ): Promise<Stage | null> {
-    if (!(
-        !stage.menuName ||
-        !stage.source ||
-        !stage.series
-    )) return stage as Stage;
+    // FIXME: when *updating*, missing info could be prefilled
+    if (stage.menuName && stage.source && stage.series) return stage as Stage;
 
     if (!(await customDialogs.confirm({
         id: "confirmStageInput",
@@ -489,7 +478,7 @@ export async function getMissingStageInfo(
         general.openDir(targetDir);
     }
 
-    while (stage.menuName == "") {
+    while (!stage.menuName) {
         stage.menuName = await customDialogs.prompt({
             id: "inputStageMenuName",
             title: "CMC Mod Manager | Stage Installation",
@@ -500,7 +489,7 @@ export async function getMissingStageInfo(
         if (stage.menuName == undefined) return null;
     }
 
-    while (stage.source == "") {
+    while (!stage.source) {
         stage.source = await customDialogs.prompt({
             id: "inputStageSource",
             title: "CMC Mod Manager | Stage Installation",
@@ -511,7 +500,7 @@ export async function getMissingStageInfo(
         if (stage.source == undefined) return null;
     }
 
-    while (stage.series == "") {
+    while (!stage.series) {
         stage.series = await customDialogs.prompt({
             id: "inputStageSeries",
             title: "CMC Mod Manager | Stage Installation",
