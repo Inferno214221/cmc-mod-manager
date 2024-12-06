@@ -125,16 +125,6 @@ export default {
         list?: string[]
     ]): Promise<string | null> => ipcRenderer.invoke("getGameVersion", args)),
 
-    getMissingDatInfo: ((...args: [
-        dat: CharacterDat,
-        targetDir: string
-    ]): Promise<CharacterDat> => ipcRenderer.invoke("getMissingDatInfo", args)),
-
-    getMissingStageInfo: ((...args: [
-        stage: Stage,
-        targetDir: string
-    ]): Promise<Stage> => ipcRenderer.invoke("getMissingStageInfo", args)),
-
     getOperations: ((... args: [
         operations: string
     ]): Promise<void> => ipcRenderer.invoke("getOperations", args)),

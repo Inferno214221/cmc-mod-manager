@@ -146,7 +146,9 @@ export function getStageFiles(
         const stageList: StageList = readStageList(dir);
         similarNames.forEach((name: string) => {
             const validFilesString: string = validFiles.join("\n");
-            getStageRegExps(stageList.getByName(name), ignoreSeries)
+            const stage: Stage | undefined = stageList.getByName(name);
+            if (!stage) throw new Error("Stage not found: \"" + name + "\"");
+            getStageRegExps(stage, ignoreSeries)
                 .forEach((exp: RegExp) => {
                     for (const match of validFilesString.matchAll(exp)) {
                         validFiles.splice(validFiles.indexOf(match[0]), 1);
@@ -398,9 +400,8 @@ export async function installStage(
         icon: path.join(dir, "gfx", "stgicons", foundStage + ".png")
     };
     
-    const temp: Stage | null = await getMissingStageInfo(wipStage, targetDir);
-    if (temp == null) return null;
-    const stage: Stage = temp;
+    const stage: Stage | null = await getMissingStageInfo(wipStage, targetDir, stageList);
+    if (stage == null) return null;
 
     if (updateStages) {
         if (
@@ -438,10 +439,14 @@ export async function installStage(
         toResolve.push(fs.copy(targetDir, dir, { overwrite: true }));
     }
 
-    if (stageList.getByName(foundStage.name) == undefined) {
+    const toUpdate: Stage | undefined = stageList.getByName(foundStage.name);
+    if (toUpdate == undefined) {
         stageList.add(stage);
-        toResolve.push(writeStages(stageList.toArray(), dir));
+    } else {
+        stage.number = toUpdate.number;
+        stageList.setByName(foundStage.name, stage);
     }
+    toResolve.push(writeStages(stageList.toArray(), dir));
     await Promise.allSettled(toResolve);
     
     fs.removeSync(path.join(dir, "info.json"));
@@ -451,10 +456,22 @@ export async function installStage(
 
 export async function getMissingStageInfo(
     stage: WipStage,
-    targetDir: string
+    targetDir: string,
+    installedStages?: StageList
 ): Promise<Stage | null> {
-    // FIXME: when *updating*, missing info could be prefilled
     if (stage.menuName && stage.source && stage.series) return stage as Stage;
+
+    let prefillInfo: StageInfo | undefined;
+    if (installedStages) {
+        const toUpdate: Stage | undefined = installedStages.getByName(stage.name);
+        if (toUpdate) {
+            prefillInfo = {
+                menuName: toUpdate.menuName,
+                source: toUpdate.source,
+                series: toUpdate.series
+            };
+        }
+    }
 
     if (!(await customDialogs.confirm({
         id: "confirmStageInput",
@@ -484,7 +501,8 @@ export async function getMissingStageInfo(
             title: "CMC Mod Manager | Stage Installation",
             body: "Please enter the stage's 'menu name'. (The name that will be displayed " +
                 "on the stage selection screen.)",
-            placeholder: "Stage's Menu Name"
+            placeholder: "Stage's Menu Name",
+            defaultValue: prefillInfo?.menuName
         });
         if (stage.menuName == undefined) return null;
     }
@@ -495,7 +513,8 @@ export async function getMissingStageInfo(
             title: "CMC Mod Manager | Stage Installation",
             body: "Please enter the stage's 'source'. (The name of the source content that " +
                 "the stage is originally from, such as the title of the game.)",
-            placeholder: "Stage's Source"
+            placeholder: "Stage's Source",
+            defaultValue: prefillInfo?.source
         });
         if (stage.source == undefined) return null;
     }
@@ -507,7 +526,8 @@ export async function getMissingStageInfo(
             body: "Please enter the stage's 'series'. (This name will be used to select the " +
                 "icon to use on the stage selection screen. This value is usually short and " +
                 "in all lowercase letters.)",
-            placeholder: "Stage's Series"
+            placeholder: "Stage's Series",
+            defaultValue: prefillInfo?.series
         });
         if (stage.series == undefined) return null;
     }
@@ -518,7 +538,8 @@ export async function extractStage(extract: string, dir: string = global.gameDir
     const toResolve: Promise<void>[] = [];
     const stageList: StageList = readStageList(dir);
     const similarNames: string[] = [];
-    const stage: Stage = stageList.getByName(extract);
+    const stage: Stage | undefined = stageList.getByName(extract);
+    if (!stage) throw new Error("Stage not found: \"" + extract + "\"");
     const extractDir: string = path.join(dir, "0extracted", extract);
     stageList.toArray().forEach((stage: Stage) => {
         if (stage.name.includes(extract) && stage.name != extract) {
@@ -546,8 +567,8 @@ export async function extractStage(extract: string, dir: string = global.gameDir
 export async function removeStage(remove: string, dir: string = global.gameDir): Promise<void> {
     const toResolve: Promise<void>[] = [];
     const stageList: StageList = readStageList(dir);
-    const stage: Stage = stageList.getByName(remove);
-
+    const stage: Stage | undefined = stageList.getByName(remove);
+    if (!stage) throw new Error("Stage not found: \"" + remove + "\"");
     const similarNames: string[] = [];
     stageList.toArray().forEach((stage: Stage) => {
         if (stage.name.startsWith(remove) && stage.name != remove) {

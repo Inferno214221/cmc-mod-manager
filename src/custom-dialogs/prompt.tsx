@@ -41,7 +41,7 @@ function Body(): JSX.Element {
 
     const [inputValue, setInputValue]:
     [string, Dispatch<SetStateAction<string>>]
-    = useState("");
+    = useState(options.defaultValue ?? "");
 
     dialog.on("updateCharacterPages", () => null);
     dialog.on("updateStagePages", () => null);
@@ -69,11 +69,8 @@ function Body(): JSX.Element {
             <input
                 autoFocus
                 type={"text"}
-                placeholder={
-                    (options.placeholder == undefined) ?
-                        "" :
-                        options.placeholder
-                }
+                placeholder={options.placeholder ?? ""}
+                value={inputValue}
                 onInput={
                     (options.invalidCharacters == undefined) ?
                         ((event: any) => setInputValue(event.target.value)) :

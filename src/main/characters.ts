@@ -275,7 +275,8 @@ export async function ensureAltIsCharacter(alt: Alt, dir: string = global.gameDi
     }
 
     const characterDat: CharacterDat | null = readCharacterDat(alt.alt, dir);
-    const baseCharacter: Character = characterList.getByName(alt.base);
+    const baseCharacter: Character | undefined = characterList.getByName(alt.base);
+    if (!baseCharacter) throw new Error("Character not found: \"" + alt.base + "\"");
     characterList.add({
         name: alt.alt,
         menuName: characterDat?.menuName ?? alt.menuName,
@@ -296,7 +297,8 @@ export async function ensureAltIsntCharacter(
 ): Promise<void> {
     const toResolve: Promise<void>[] = [];
     const characterList: CharacterList = readCharacterList(dir);
-    const character: Character = characterList.getByName(alt.alt);
+    const character: Character | undefined = characterList.getByName(alt.alt);
+    if (!character) throw new Error("Character not found: \"" + alt.alt + "\"");
     if (character == undefined || isCharacterOnCSS(character, dir)) {
         return;
     }
@@ -685,7 +687,8 @@ export async function installCharacter(
         throw new Error("Character already installed, updates disabled.");
     }
     
-    const temp: CharacterDat | null = await getMissingDatInfo(foundCharacter.dat, targetDir);
+    const temp: CharacterDat | null =
+        await getMissingDatInfo(foundCharacter.dat, targetDir, characters);
     if (temp == null) return null;
     foundCharacter.dat = temp;
 
@@ -748,8 +751,10 @@ export async function installCharacter(
 
 export async function getMissingDatInfo(
     dat: CharacterDat,
-    targetDir: string
+    targetDir: string,
+    installedCharacters?: CharacterList
 ): Promise<CharacterDat | null> {
+    // TODO: prefill needs an explicit test
     if (dat.displayName && dat.menuName && dat.battleName && dat.series) return dat;
 
     const builtinInfo: V7CharacterInfo = v7CharacterLookup(dat.name);
@@ -759,6 +764,19 @@ export async function getMissingDatInfo(
         dat.battleName = dat.battleName || builtinInfo.displayName;
         dat.series = dat.series || builtinInfo.series;
         return dat;
+    }
+
+    let prefillInfo: PartialDatInfo | undefined;
+    if (installedCharacters) {
+        const toUpdate: CharacterDat | null = readCharacterDat(dat.name);
+        if (toUpdate) {
+            prefillInfo = {
+                displayName: toUpdate.displayName,
+                menuName: toUpdate.menuName,
+                battleName: toUpdate.battleName,
+                series: toUpdate.series
+            };
+        }
     }
 
     if (!(await customDialogs.confirm({
@@ -788,7 +806,8 @@ export async function getMissingDatInfo(
             title: "CMC Mod Manager | Character Installation",
             body: "Please enter the character's 'menu name'. (This is the name displayed " +
                 "on the when the character is selected on the character selection screen.)",
-            placeholder: "Character's Menu Name"
+            placeholder: "Character's Menu Name",
+            defaultValue: prefillInfo?.menuName ?? prefillInfo?.displayName
         });
         if (dat.menuName == undefined) return null;
     }
@@ -803,7 +822,8 @@ export async function getMissingDatInfo(
             title: "CMC Mod Manager | Character Installation",
             body: "Please enter the character's 'battle name'. (This is the name displayed " +
                 "as a part of the HUD during a match.)",
-            placeholder: "Character's Battle Name"
+            placeholder: "Character's Battle Name",
+            defaultValue: prefillInfo?.battleName
         });
         if (dat.battleName == undefined) return null;
     }
@@ -815,7 +835,8 @@ export async function getMissingDatInfo(
             body: "Please enter the character's 'series'. (This name will be used to select " +
             "the icon to use on the character selection screen. This value is usually short " +
             "and in all lowercase letters.)",
-            placeholder: "Character's Series"
+            placeholder: "Character's Series",
+            defaultValue: prefillInfo?.series
         });
         if (dat.series == undefined) return null;
     }
@@ -863,7 +884,8 @@ export async function extractCharacter(
 
 export async function removeCharacter(remove: string, dir: string = global.gameDir): Promise<void> {
     const toResolve: Promise<void>[] = [];
-    const character: Character = readCharacterList(dir).getByName(remove);
+    const character: Character | undefined = readCharacterList(dir).getByName(remove);
+    if (!character) throw new Error("Character not found: \"" + remove + "\"");
     await removeAllAlts(character, dir);
     const characters: CharacterList = readCharacterList(dir);
     const characterDat: CharacterDat =

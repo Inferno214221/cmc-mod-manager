@@ -709,7 +709,7 @@ function SssStageDisplay({
         x: x,
         y: y
     };
-    const stage: Stage = stageList.getByNum(parseInt(cell));
+    const stage: Stage | undefined = stageList.getByNum(parseInt(cell));
     if (stage == undefined) {
         return (
             <td

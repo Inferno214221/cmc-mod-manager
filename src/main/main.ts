@@ -107,7 +107,6 @@ function createWindow(): void {
         if (global.confirmedClose) return;
         event.preventDefault();
         const operations: Operation[] = await general.getOperations();
-        console.log(operations);
         if (operations.filter((operation: Operation) =>
             operation.state == OpState.STARTED || operation.state == OpState.QUEUED
         ).length > 0) {

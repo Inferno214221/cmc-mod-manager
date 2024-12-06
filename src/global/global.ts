@@ -68,7 +68,7 @@ export abstract class ModList<ModType extends Mod, ModUpdateType extends ModUpda
         this.modsByNum[mod.number] = index;
     }
 
-    getByName(name: string): ModType {
+    getByName(name: string): ModType | undefined {
         return this.mods[this.modsByName[name]];
     }
 
@@ -81,7 +81,8 @@ export abstract class ModList<ModType extends Mod, ModUpdateType extends ModUpda
     }
 
     removeByName(name: string): void {
-        const remove: ModType = this.getByName(name);
+        const remove: ModType | undefined = this.getByName(name);
+        if (!remove) return;
         this.mods.splice(this.modsByName[name], 1);
         for (const mod of this.mods) {
             if (mod.number > remove.number) {
@@ -91,7 +92,7 @@ export abstract class ModList<ModType extends Mod, ModUpdateType extends ModUpda
         this.indexAll();
     }
 
-    getByNum(number: number): ModType {
+    getByNum(number: number): ModType | undefined {
         return this.mods[this.modsByNum[number]];
     }
 
@@ -104,7 +105,8 @@ export abstract class ModList<ModType extends Mod, ModUpdateType extends ModUpda
     }
 
     removeByNum(number: number): void {
-        const remove: ModType = this.getByNum(number);
+        const remove: ModType | undefined = this.getByNum(number);
+        if (!remove) return;
         this.mods.splice(this.modsByNum[number], 1);
         for (const mod of this.mods) {
             if (mod.number > remove.number) {

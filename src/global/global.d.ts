@@ -58,6 +58,8 @@ interface CharacterUpdate extends ModUpdate {
 
 interface CharacterDat {
     name: string, // File name
+    // TODO: this shouldn't be optional, and I should have a proper partial class but it's probably
+    // not worth fixing now
     displayName?: string, // Line 1
     menuName?: string, // Line 2
     battleName?: string, //Line 3
@@ -65,6 +67,13 @@ interface CharacterDat {
     homeStages: string[], // After "---Classic Home Stages Below---"
     randomDatas: string[], // After "---Random Datas---""
     palettes: CharacterPalette[] // After "---From Here is Individual Palettes data---"
+}
+
+interface PartialDatInfo {
+    displayName?: string,
+    menuName?: string,
+    battleName?: string,
+    series?: string
 }
 
 interface CharacterPalette {
@@ -222,6 +231,7 @@ interface ConfirmOptions extends Options {
 
 interface PromptOptions extends Options {
     placeholder?: string,
+    defaultValue?: string,
     invalidCharacters?: RegExp,
     okLabel?: string,
     cancelLabel?: string
