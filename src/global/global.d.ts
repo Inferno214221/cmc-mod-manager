@@ -121,7 +121,7 @@ interface FoundStage {
 interface StageInfo {
     menuName: string,
     source: string,
-    series: string
+    series?: string
 }
 
 interface V7CharacterInfo {
@@ -156,7 +156,6 @@ interface WipStage extends Mod {
 interface Stage extends WipStage {
     menuName: string,
     source: string,
-    series: string,
 }
 
 interface StageUpdate extends ModUpdate {

@@ -75,7 +75,7 @@ export function TabStages({
             const retVal: Stage[][] = [];
             sortTypes.forEach((sortType: SortTypeOptions, index: number) => {
                 retVal[index] = stages.toSorted((a: Stage, b: Stage) =>
-                    (a[sortType] > b[sortType] ? 1 : -1)
+                    ((a[sortType] ?? "zzzzz") > (b[sortType] ?? "zzzzz") ? 1 : -1)
                 );
             });
             return retVal;
@@ -199,7 +199,7 @@ export function TabStages({
                                         return (
                                             <>
                                                 <SeriesDisplay
-                                                    series={stage.series}
+                                                    series={stage.series ?? "undefined"}
                                                     readStages={readStages}
                                                     setOperations={setOperations}
                                                 />

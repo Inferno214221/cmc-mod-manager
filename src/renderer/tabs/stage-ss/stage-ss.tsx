@@ -229,7 +229,7 @@ function ExcludedStages({
             );
         }
         sortedStages = sortedStages.toSorted((a: Stage, b: Stage) =>
-            (a[sortTypes[sortType]] > b[sortTypes[sortType]] ? 1 : -1)
+            ((a[sortTypes[sortType]] ?? "zzzzz") > (b[sortTypes[sortType]] ?? "zzzzz") ? 1 : -1)
         );
         if (reverseSort) {
             sortedStages.reverse();
@@ -316,7 +316,9 @@ function ExcludedStages({
                                         <>
                                             <div className={styles.seriesName}>
                                                 <span>
-                                                    <b>{stage.series.toUpperCase()}</b>
+                                                    <b>
+                                                        {stage.series?.toUpperCase() ?? "undefined"}
+                                                    </b>
                                                 </span>
                                             </div>
                                             {stageDisplay}

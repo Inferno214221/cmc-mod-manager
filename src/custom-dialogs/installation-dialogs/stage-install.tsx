@@ -101,7 +101,10 @@ function Body(): JSX.Element {
                     return ((a.info?.series ?? "") > (b.info?.series ?? "") ? -1 : 1);
                 case SortTypeOptions.MENU_NAME:
                 default:
-                    return ((a.info?.menuName ?? a.name) > (b.info?.menuName ?? a.name) ? -1 : 1);
+                    return (
+                        (a.info?.menuName ?? a.name).toLowerCase() >
+                        (b.info?.menuName ?? b.name).toLowerCase() ? 1 : -1
+                    );
             }
         });
         if (reverseSort) {
@@ -239,7 +242,7 @@ function Body(): JSX.Element {
                                             return (
                                                 <>
                                                     <SeriesDisplay
-                                                        series={stage.info?.series ?? ""}
+                                                        series={stage.info?.series ?? "undefined"}
                                                     />
                                                     {stageDisplay}
                                                 </>

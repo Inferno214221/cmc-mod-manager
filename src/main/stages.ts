@@ -35,16 +35,39 @@ function readStageList(dir: string = global.gameDir): StageList {
         "ascii"
     ).split(/\r?\n/);
     stagesTxt.shift(); // Drop the number
-    for (let stage: number = 0; stage < Math.floor(stagesTxt.length / 4); stage++) {
-        stageList.add({
-            name: stagesTxt[(stage * 4) + 0],
-            menuName: stagesTxt[(stage * 4) + 1],
-            source: stagesTxt[(stage * 4) + 2],
-            series: stagesTxt[(stage * 4) + 3].toLowerCase(),
-            randomSelection: true,
-            number: stage + 1,
-            icon: path.join(dir, "gfx", "stgicons", stagesTxt[(stage * 4) + 0] + ".png")
-        });
+
+    const isV7: boolean = (stagesTxt.map((line: string, index: number) => {
+        const wrappedIndex: number = (index + 1) % 4;
+        if (wrappedIndex <= 1) {
+            return [/^[^ ]+$/.test(line), line];
+        } else {
+            return [true];
+        }
+    }).filter((success: any) => !success[0]).length != 0);
+
+    if (isV7) {
+        for (let stage: number = 0; stage < Math.floor(stagesTxt.length / 3); stage++) {
+            stageList.add({
+                name: stagesTxt[(stage * 3) + 0],
+                menuName: stagesTxt[(stage * 3) + 1],
+                source: stagesTxt[(stage * 3) + 2],
+                randomSelection: true,
+                number: stage + 1,
+                icon: path.join(dir, "gfx", "stgicons", stagesTxt[(stage * 3) + 0] + ".png")
+            });
+        }
+    } else {
+        for (let stage: number = 0; stage < Math.floor(stagesTxt.length / 4); stage++) {
+            stageList.add({
+                name: stagesTxt[(stage * 4) + 0],
+                menuName: stagesTxt[(stage * 4) + 1],
+                source: stagesTxt[(stage * 4) + 2],
+                series: stagesTxt[(stage * 4) + 3].toLowerCase(),
+                randomSelection: true,
+                number: stage + 1,
+                icon: path.join(dir, "gfx", "stgicons", stagesTxt[(stage * 4) + 0] + ".png")
+            });
+        }
     }
     const lockedTxt: string[] = fs.readFileSync(
         path.join(dir, "data", "stage_lock.txt"),
@@ -116,7 +139,8 @@ export function getStageRegExps(
     const files: RegExp[] = [];
     STAGE_FILES.forEach((file: string) => {
         let wipString: string = file.replaceAll("<stage>", stage.name);
-        if (!ignoreSeries) wipString = wipString.replaceAll("<series>", stage.series);
+        if (!ignoreSeries && stage.series)
+            wipString = wipString.replaceAll("<series>", stage.series);
         wipString = general.escapeRegex(wipString);
         wipString += "$";
         wipString = wipString.replaceAll("<any>", "[^\\/\\\\]+");
@@ -290,6 +314,23 @@ export function correctStageDir(targetDir: string): string {
 }
 
 export function findStages(targetDir: string): FoundStage[] {
+    // readStageList should probably handle what to do if the directory is,
+    // invalid better, but there isn't much point fixing it now.
+    let installedStages: FoundStage[] | null = null;
+    try {
+        installedStages = readStages(targetDir).map((stage: Stage) => ({
+            name: stage.name,
+            info: {
+                menuName: stage.menuName,
+                source: stage.source,
+                series: stage.series
+            },
+            icon: stage.icon
+        }));
+    } catch (e: any) {
+        // Do nothing; installedStages is already null
+    }
+
     const stageNames: string[] = Array.from(new Set(
         fs.readdirSync(
             path.join(targetDir, "stage")
@@ -299,7 +340,7 @@ export function findStages(targetDir: string): FoundStage[] {
             (stage: string) => stage.replace(/\.[^/\\]+$/, "")
         )
     ));
-    return stageNames.map((stageName: string) => {
+    const foundStages: FoundStage[] = stageNames.map((stageName: string) => {
         const found: FoundStage = {
             name: stageName,
             icon: path.join(targetDir, "gfx", "stgicons", stageName + ".png")
@@ -313,6 +354,16 @@ export function findStages(targetDir: string): FoundStage[] {
         }
         return found;
     }) as FoundStage[];
+
+    const allStagesByName: { [name: string]: FoundStage } = {};
+    foundStages.forEach((stage: FoundStage) =>
+        allStagesByName[stage.name.toLowerCase()] = stage
+    );
+    if (installedStages) installedStages.forEach((stage: FoundStage) =>
+        allStagesByName[stage.name.toLowerCase()] = stage
+    );
+
+    return Object.values(allStagesByName);
 }
 
 export function queStageInstallation(
