@@ -136,17 +136,17 @@ export function getStageRegExps(
     stage: Stage,
     ignoreSeries: boolean = false
 ): RegExp[] {
-    const files: RegExp[] = [];
-    STAGE_FILES.forEach((file: string) => {
+    return STAGE_FILES.map((file: string) => {
         let wipString: string = file.replaceAll("<stage>", stage.name);
         if (!ignoreSeries && stage.series)
+            // I should filter these out, but this function is never called
+            // without a series anyway
             wipString = wipString.replaceAll("<series>", stage.series);
         wipString = general.escapeRegex(wipString);
         wipString += "$";
-        wipString = wipString.replaceAll("<any>", "[^\\/\\\\]+");
-        files.push(new RegExp(wipString, "gmi"));
+        wipString = wipString.replaceAll("<any>", "[^]+");
+        return new RegExp(wipString, "gi")
     });
-    return files;
 }
 
 export function getStageFiles(
@@ -156,28 +156,31 @@ export function getStageFiles(
     similarNames: string[] = []
 ): string[] {
     const stageFiles: string[] = general.getAllFiles(dir)
-        .map((file: string) => path.relative(dir, file).split(path.sep).join(path.posix.sep));
-    let stageFilesString: string = stageFiles.join("\n");
+        .map((file: string) => path.relative(dir, file).split(path.sep).join(path.posix.sep))
+        .filter((file: string) => !file.startsWith("0extracted"));
     const validFiles: string[] = [];
-    getStageRegExps(stage, ignoreSeries).forEach((exp: RegExp) => {
-        for (const match of stageFilesString.matchAll(exp)) {
-            validFiles.push(match[0]);
-            stageFiles.splice(stageFiles.indexOf(match[0]), 1);
+    const exps: RegExp[] = getStageRegExps(stage, ignoreSeries);
+    for (const exp of exps) {
+        for (let file: number = 0; file < stageFiles.length; file++) {
+            if (exp.test(stageFiles[file])) {
+                validFiles.push(stageFiles[file]);
+                stageFiles.splice(file, 1);
+            }
         }
-        stageFilesString = stageFiles.join("\n");
-    });
+    }
     if (similarNames.length > 0) {
         const stageList: StageList = readStageList(dir);
         similarNames.forEach((name: string) => {
-            const validFilesString: string = validFiles.join("\n");
             const stage: Stage | undefined = stageList.getByName(name);
             if (!stage) throw new Error("Stage not found: \"" + name + "\"");
-            getStageRegExps(stage, ignoreSeries)
-                .forEach((exp: RegExp) => {
-                    for (const match of validFilesString.matchAll(exp)) {
-                        validFiles.splice(validFiles.indexOf(match[0]), 1);
+            const negExps: RegExp[] = getStageRegExps(stage, ignoreSeries);
+            for (const exp of negExps) {
+                for (let file: number = 0; file < validFiles.length; file++) {
+                    if (exp.test(validFiles[file])) {
+                        validFiles.splice(file, 1);
                     }
-                });
+                }
+            }
         });
     }
     return validFiles;

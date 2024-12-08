@@ -41,6 +41,7 @@ const CHARACTER_FILES: string[] = [
     "sticker/ultra/<fighter>.png",
     "sticker/ultra/desc/<fighter>.txt",
 ];
+// TODO: separate directory regexes
 
 const EXTRA_CHARACTER_FILES: string[] = CHARACTER_FILES.concat([
     "data/<fighter>.dat",
@@ -918,20 +919,19 @@ export function getCharacterRegExps(
     includeExtraFiles: boolean,
     ignoreSeries: boolean = false
 ): RegExp[] {
-    const files: RegExp[] = [];
-    (includeExtraFiles ? EXTRA_CHARACTER_FILES : CHARACTER_FILES).forEach((file: string) => {
+    return (includeExtraFiles ? EXTRA_CHARACTER_FILES : CHARACTER_FILES).map((file: string) => {
         let wipString: string = file.replaceAll("<fighter>", characterDat.name);
-        if (!ignoreSeries) wipString = wipString.replaceAll(
-            "<series>", characterDat.series ?? error("Character dat has no series.")
-        );
+        if (!ignoreSeries && characterDat.series)
+            // I should filter these out, but this function is never called
+            // without a series anyway
+            wipString = wipString.replaceAll("<series>", characterDat.series);
         wipString = general.escapeRegex(wipString);
         wipString += "$";
         wipString = wipString.replaceAll("<audio>", "(mp3|wav|ogg)");
-        wipString = wipString.replaceAll("<palette>", "\\d+");
-        wipString = wipString.replaceAll("<any>", "[^\\/\\\\]+");
-        files.push(new RegExp(wipString, "gmi"));
+        wipString = wipString.replaceAll("<palette>", "\\d*");
+        wipString = wipString.replaceAll("<any>", "[^]+");
+        return new RegExp(wipString, "gi");
     });
-    return files;
 }
 
 export function getCharacterFiles(
@@ -942,28 +942,29 @@ export function getCharacterFiles(
     similarNames: string[] = []
 ): string[] {
     const characterFiles: string[] = general.getAllFiles(dir)
-        .map((file: string) => path.relative(dir, file).split(path.sep).join(path.posix.sep));
-    let characterFilesString: string = characterFiles.join("\n");
+        .map((file: string) => path.relative(dir, file).split(path.sep).join(path.posix.sep))
+        .filter((file: string) => !file.startsWith("0extracted"));
     const validFiles: string[] = [];
-    getCharacterRegExps(characterDat, includeExtraFiles, ignoreSeries).forEach((exp: RegExp) => {
-        // console.log(exp);
-        for (const match of characterFilesString.matchAll(exp)) {
-            // console.log(match);
-            validFiles.push(match[0]);
-            characterFiles.splice(characterFiles.indexOf(match[0]), 1);
+    const exps: RegExp[] = getCharacterRegExps(characterDat, includeExtraFiles, ignoreSeries);
+    for (const exp of exps) {
+        for (let file: number = 0; file < characterFiles.length; file++) {
+            if (exp.test(characterFiles[file])) {
+                validFiles.push(characterFiles[file]);
+                characterFiles.splice(file, 1);
+            }
         }
-        characterFilesString = characterFiles.join("\n");
-    });
+    }
     similarNames.forEach((name: string) => {
-        const validFilesString: string = validFiles.join("\n");
         const similarDat: CharacterDat = readCharacterDat(name, dir) ??
             error("Similarly named character: '" + name + "' has no dat.");
-        getCharacterRegExps(similarDat, includeExtraFiles, ignoreSeries)
-            .forEach((exp: RegExp) => {
-                for (const match of validFilesString.matchAll(exp)) {
-                    validFiles.splice(validFiles.indexOf(match[0]), 1);
+        const negExps: RegExp[] = getCharacterRegExps(similarDat, includeExtraFiles, ignoreSeries)
+        for (const exp of negExps) {
+            for (let file: number = 0; file < validFiles.length; file++) {
+                if (exp.test(validFiles[file])) {
+                    validFiles.splice(file, 1);
                 }
-            });
+            }
+        }
     });
     return validFiles;
 }
