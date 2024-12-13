@@ -243,3 +243,17 @@ interface CharacterInstallOptions extends Options {
 interface StageInstallOptions extends Options {
     targetDir: string
 }
+
+interface StringNode {
+    name: string,
+    isDir?: boolean,
+    isExtra?: boolean,
+    nonExhaustive?: boolean,
+    contents?: StringNode[]
+}
+
+interface RegExpNode {
+    pattern: RegExp,
+    nonExhaustive?: boolean,
+    contents?: RegExpNode[]
+}

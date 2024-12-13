@@ -684,3 +684,37 @@ export async function createUniqueFileName(
     }
     return path.join(dir, base + "-" + i + ext);
 }
+
+export async function matchFs(
+    nodes: RegExpNode[],
+    dir: { name: string, full: string }
+): Promise<string[]> {
+    for (let i: number = 0; i < nodes.length; i++) {
+        const node: RegExpNode = nodes[i];
+        const test: boolean = node.pattern.test(dir.name);
+        if (!test) continue;
+        if (!node.contents) {
+            if (!node.nonExhaustive) {
+                // If its exhaustive, remove it from the list
+                nodes.splice(i, 1);
+                i--;
+            }
+            return [dir.full];
+        }
+        try {
+            const contents: string[] = await fs.readdir(dir.full);
+            const retVal: string[] = [];
+            for (const subDir of contents) {
+                retVal.push(...(await matchFs(
+                    node.contents!,
+                    { name: subDir, full: path.join(dir.full, subDir) }
+                )));
+            }
+            return retVal;
+        } catch (e: any) {
+            console.log(e);
+            break;
+        }
+    }
+    return [];
+}

@@ -8,8 +8,8 @@ import * as customDialogs from "./custom-dialogs";
 const STAGE_FILES: string[] = [
     "data/sinfo/<stage>.json",
     "stage/<stage>.bin",
-    "stage/<stage>/<any>",
-    "music/stage/<stage>/<any>",
+    "stage/<stage>/",
+    "music/stage/<stage>/",
     "gfx/stgicons/<stage>.png",
     "gfx/stgprevs/<stage>.png",
     "gfx/seriesicon/<series>.png",
@@ -165,6 +165,7 @@ export function getStageFiles(
             if (exp.test(stageFiles[file])) {
                 validFiles.push(stageFiles[file]);
                 stageFiles.splice(file, 1);
+                file--;
             }
         }
     }
@@ -178,6 +179,7 @@ export function getStageFiles(
                 for (let file: number = 0; file < validFiles.length; file++) {
                     if (exp.test(validFiles[file])) {
                         validFiles.splice(file, 1);
+                        file--;
                     }
                 }
             }

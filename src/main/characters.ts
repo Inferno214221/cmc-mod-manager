@@ -8,46 +8,8 @@ import * as customDialogs from "./custom-dialogs";
 
 import V7_BUILTINS from "../assets/v7.json";
 
-const CHARACTER_FILES: string[] = [
-    "arcade/routes/<fighter>.txt",
-    "arcade/routes/<series>_series.txt",
-    "data/dats/<fighter>.dat",
-    "fighter/<fighter>.bin",
-    "fighter/<fighter>/<any>",
-    "gfx/abust/<fighter>.png",
-    "gfx/bust/<fighter>.png",
-    "gfx/bust/<fighter>_<palette>.png",
-    "gfx/cbust/<fighter>.png",
-    "gfx/mbust/<fighter>.png",
-    "gfx/tbust/<fighter>__<any>.png",
-    "gfx/mugs/<fighter>.png",
-    "gfx/hudicon/<series>.png",
-    "gfx/name/<fighter>.png",
-    "gfx/portrait/<fighter>.png",
-    "gfx/portrait/<fighter>_<palette>.png",
-    "gfx/seriesicon/<series>.png",
-    "gfx/stock/<fighter>.png",
-    "palettes/<fighter>/<any>",
-    "music/versus/<fighter>_<any>.<audio>",
-    "music/victory/<series>.<audio>",
-    "music/victory/individual/<fighter>.<audio>",
-    "sfx/announcer/fighter/<fighter>.<audio>",
-    "sticker/common/<fighter>.png",
-    "sticker/common/desc/<fighter>.txt",
-    "sticker/rare/<fighter>.png",
-    "sticker/rare/desc/<fighter>.txt",
-    "sticker/super/<fighter>.png",
-    "sticker/super/desc/<fighter>.txt",
-    "sticker/ultra/<fighter>.png",
-    "sticker/ultra/desc/<fighter>.txt",
-];
-// TODO: separate directory regexes
-
-const EXTRA_CHARACTER_FILES: string[] = CHARACTER_FILES.concat([
-    "data/<fighter>.dat",
-    "gfx/portrait_new/<fighter>.png",
-    "gfx/portrait_new/<fighter>_<palette>.png",
-]);
+import _ from "../assets/character-files.json";
+const CHARACTER_FILES: StringNode[] = _;
 
 const BLANK_CSS_PAGE_DATA: string = "\
 0000 0000 0000 0000 0000 0000 0000\r\n\
@@ -712,19 +674,19 @@ export async function installCharacter(
 
     const toResolve: Promise<void>[] = [];
     if (filterInstallation) {
-        getCharacterFiles(foundCharacter.dat, false, false, targetDir).forEach((file: string) => {
-            const filePath: string = path.join(targetDir, file);
-            const targetPath: string = path.join(dir, file);
-            fs.ensureDirSync(path.parse(targetPath).dir);
-            if (!updateCharacters && fs.existsSync(targetPath)) return;
-            toResolve.push(
-                fs.copy(
-                    filePath,
-                    targetPath,
-                    { overwrite: !file.startsWith("gfx/seriesicon/") }
-                )
-            );
-        });
+        (await getCharacterFiles(foundCharacter.dat, false, false, targetDir))
+            .forEach((file: string) => {
+                const targetPath: string = path.join(dir, path.relative(targetDir, file));
+                fs.ensureDirSync(path.parse(targetPath).dir);
+                if (!updateCharacters && fs.existsSync(targetPath)) return;
+                toResolve.push(
+                    fs.copy(
+                        file,
+                        targetPath,
+                        { overwrite: !file.startsWith("gfx/seriesicon/") }
+                    )
+                );
+            });
     } else {
         toResolve.push(fs.copy(targetDir, dir, { overwrite: true }));
     }
@@ -865,18 +827,18 @@ export async function extractCharacter(
         }
     });
     
-    getCharacterFiles(characterDat, true, false, dir, similarNames).forEach((file: string) => {
-        const filePath: string = path.join(dir, file);
-        const targetPath: string = path.join(extractDir, file);
-        fs.ensureDirSync(path.parse(targetPath).dir);
-        toResolve.push(
-            fs.copy(
-                filePath,
-                targetPath,
-                { overwrite: true }
-            )
-        );
-    });
+    (await getCharacterFiles(characterDat, true, false, dir, similarNames))
+        .forEach((file: string) => {
+            const targetPath: string = path.join(extractDir, path.relative(dir, file));
+            fs.ensureDirSync(path.parse(targetPath).dir);
+            toResolve.push(
+                fs.copy(
+                    file,
+                    targetPath,
+                    { overwrite: true }
+                )
+            );
+        });
 
     await Promise.allSettled(toResolve);
     writeCharacterDat(characterDat, path.join(extractDir, "data", "dats"));
@@ -899,12 +861,10 @@ export async function removeCharacter(remove: string, dir: string = global.gameD
         }
     });
 
-    getCharacterFiles(characterDat, true, true, dir, similarNames).forEach((file: string) => {
-        const filePath: string = path.join(dir, file);
-        toResolve.push(
-            fs.remove(filePath)
-        );
-    });
+    (await getCharacterFiles(characterDat, true, true, dir, similarNames))
+        .forEach((file: string) => {
+            toResolve.push(fs.remove(file));
+        });
     
     characters.removeByName(remove);
     toResolve.push(writeCharacters(characters.toArray(), dir));
@@ -914,59 +874,78 @@ export async function removeCharacter(remove: string, dir: string = global.gameD
     return;    
 }
 
-export function getCharacterRegExps(
+//     similarNames.forEach((name: string) => {
+//         const similarDat: CharacterDat = readCharacterDat(name, dir) ??
+//             error("Similarly named character: '" + name + "' has no dat.");
+//         const negExps: RegExp[] =
+//             getCharacterRegExps(similarDat, includeExtraFiles, ignoreSeries);
+//         for (const exp of negExps) {
+//             for (let file: number = 0; file < validFiles.length; file++) {
+//                 if (exp.test(validFiles[file])) {
+//                     validFiles.splice(file, 1);
+//                     file--;
+//                 }
+//             }
+//         }
+//     });
+//     return validFiles;
+
+export function createCharacterRegExpNodes(
+    nodes: StringNode[] | undefined,
     characterDat: CharacterDat,
     includeExtraFiles: boolean,
     ignoreSeries: boolean = false
-): RegExp[] {
-    return (includeExtraFiles ? EXTRA_CHARACTER_FILES : CHARACTER_FILES).map((file: string) => {
-        let wipString: string = file.replaceAll("<fighter>", characterDat.name);
+): RegExpNode[] | undefined {
+    if (!nodes) return undefined;
+    return nodes.map((node: StringNode) => {
+        if (!includeExtraFiles && node.isExtra) {
+            return null;
+        }
+        let wipString: string = node.name.replaceAll("<fighter>", characterDat.name);
         if (!ignoreSeries && characterDat.series)
-            // I should filter these out, but this function is never called
-            // without a series anyway
             wipString = wipString.replaceAll("<series>", characterDat.series);
-        wipString = general.escapeRegex(wipString);
+        wipString = "^" + general.escapeRegex(wipString);
         wipString += "$";
-        wipString = wipString.replaceAll("<audio>", "(mp3|wav|ogg)");
-        wipString = wipString.replaceAll("<palette>", "\\d*");
-        wipString = wipString.replaceAll("<any>", "[^]+");
-        return new RegExp(wipString, "gi");
-    });
+        wipString = wipString.replaceAll("<mp3|wav|ogg>", "(mp3|wav|ogg)");
+        wipString = wipString.replaceAll("<number>", "\\d+");
+        wipString = wipString.replaceAll("<anything>", "[^]+");
+        return {
+            pattern: new RegExp(wipString, "i"),
+            nonExhaustive: node.nonExhaustive,
+            contents: createCharacterRegExpNodes(
+                node.contents,
+                characterDat,
+                includeExtraFiles,
+                ignoreSeries
+            )
+        };
+    }).filter((node: RegExpNode | null) => node != null) as RegExpNode[];
 }
 
-export function getCharacterFiles(
+export async function getCharacterFiles(
     characterDat: CharacterDat,
     includeExtraFiles: boolean,
     ignoreSeries: boolean,
     dir: string = global.gameDir,
     similarNames: string[] = []
-): string[] {
-    const characterFiles: string[] = general.getAllFiles(dir)
-        .map((file: string) => path.relative(dir, file).split(path.sep).join(path.posix.sep))
-        .filter((file: string) => !file.startsWith("0extracted"));
-    const validFiles: string[] = [];
-    const exps: RegExp[] = getCharacterRegExps(characterDat, includeExtraFiles, ignoreSeries);
-    for (const exp of exps) {
-        for (let file: number = 0; file < characterFiles.length; file++) {
-            if (exp.test(characterFiles[file])) {
-                validFiles.push(characterFiles[file]);
-                characterFiles.splice(file, 1);
-            }
-        }
-    }
-    similarNames.forEach((name: string) => {
-        const similarDat: CharacterDat = readCharacterDat(name, dir) ??
-            error("Similarly named character: '" + name + "' has no dat.");
-        const negExps: RegExp[] = getCharacterRegExps(similarDat, includeExtraFiles, ignoreSeries)
-        for (const exp of negExps) {
-            for (let file: number = 0; file < validFiles.length; file++) {
-                if (exp.test(validFiles[file])) {
-                    validFiles.splice(file, 1);
-                }
-            }
-        }
-    });
-    return validFiles;
+): Promise<string[]> {
+    const matchNodes: RegExpNode[] | undefined = createCharacterRegExpNodes(
+        CHARACTER_FILES,
+        characterDat,
+        includeExtraFiles,
+        ignoreSeries
+    );
+    if (!matchNodes) return [];
+    const toResolve: Promise<string[]>[] = [];
+    (await fs.readdir(dir)).forEach((subDir: string) =>
+        toResolve.push(general.matchFs(
+            matchNodes,
+            { name: subDir, full: path.join(dir, subDir) }
+        ))
+    );
+    console.log((await Promise.all(toResolve)).flat(), similarNames);
+    return (await Promise.all(toResolve)).flat();
+    // FIXME: needs to deal with similar names - only for nonExhaustive ones tho
 }
 
 export function readCssPages(dir: string = global.gameDir): CssPage[] {
