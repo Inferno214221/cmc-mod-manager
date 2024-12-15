@@ -51,6 +51,23 @@ export default {
         targetDir: string
     ]): Promise<string> => ipcRenderer.invoke("correctStageDir", args)),
 
+    createCharacterRegExpNodes: ((...args: [
+        nodes: StringNode[] | undefined,
+        characterDat: CharacterDat,
+        includeExtraFiles: boolean,
+        ignoreSeries?: boolean
+    ]): Promise<RegExpNode[] | undefined> =>
+        ipcRenderer.invoke("createCharacterRegExpNodes", args)
+    ),
+    
+    createStageRegExpNodes: ((...args: [
+        nodes: StringNode[] | undefined,
+        stage: Stage,
+        ignoreSeries?: boolean
+    ]): Promise<RegExpNode[] | undefined> =>
+        ipcRenderer.invoke("createStageRegExpNodes", args)
+    ),
+
     downloadMod: ((...args: [
         url: string,
         modId: string,
@@ -105,12 +122,6 @@ export default {
         similarNames?: string[]
     ]): Promise<string[]> => ipcRenderer.invoke("getCharacterFiles", args)),
 
-    getCharacterRegExps: ((...args: [
-        characterDat: CharacterDat,
-        includeExtraFiles: boolean,
-        ignoreSeries?: boolean
-    ]): Promise<RegExp[]> => ipcRenderer.invoke("getCharacterRegExps", args)),
-
     getDownloadInfo: ((...args: [
         url: string,
         modIf: number
@@ -132,14 +143,8 @@ export default {
     getStageFiles: ((...args: [
         stage: Stage,
         ignoreSeries: boolean,
-        dir?: string,
-        similarName?: string[]
+        dir?: string
     ]): Promise<string[]> => ipcRenderer.invoke("getStageFiles", args)),
-
-    getStageRegExps: ((...args: [
-        stage: Stage,
-        ignoreSeries?: boolean
-    ]): Promise<RegExp[]> => ipcRenderer.invoke("getStageRegExps", args)),
 
     handleURI: ((... args: [
         uri: string | undefined

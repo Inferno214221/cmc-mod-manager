@@ -6,7 +6,8 @@ import { CharacterList, OpDep, OpState, error } from "../global/global";
 import * as general from "./general";
 import * as customDialogs from "./custom-dialogs";
 
-import V7_BUILTINS from "../assets/v7.json";
+import _V7_BUILTINS from "../assets/v7.json";
+const V7_BUILTINS: { [name: string]: { displayName: string, series: string } } = _V7_BUILTINS;
 
 import _CHARACTER_FILES from "../assets/character-files.json";
 const CHARACTER_FILES: StringNode[] = _CHARACTER_FILES;
@@ -566,7 +567,7 @@ export function findCharacters(targetDir: string): FoundCharacter[] {
         } else return null;
 
         // Check for missing info available from v7
-        const builtinInfo: V7CharacterInfo = v7CharacterLookup(found.dat.name);
+        const builtinInfo: V7CharacterInfo | undefined = v7CharacterLookup(found.dat.name);
         if (builtinInfo != undefined) {
             found.dat.displayName = found.dat.displayName || builtinInfo.displayName;
             found.dat.menuName = found.dat.menuName || builtinInfo.displayName;
@@ -722,7 +723,7 @@ export async function getMissingDatInfo(
     // TODO: prefill needs an explicit test
     if (dat.displayName && dat.menuName && dat.battleName && dat.series) return dat;
 
-    const builtinInfo: V7CharacterInfo = v7CharacterLookup(dat.name);
+    const builtinInfo: V7CharacterInfo | undefined = v7CharacterLookup(dat.name);
     if (builtinInfo != undefined) {
         dat.displayName = dat.displayName || builtinInfo.displayName;
         dat.menuName = dat.menuName || builtinInfo.displayName;
@@ -808,8 +809,7 @@ export async function getMissingDatInfo(
     return dat;
 }
 
-export function v7CharacterLookup(name: string): V7CharacterInfo {
-    // @ts-ignore: an expression of type 'string' can't be used to index typeof import("v7.json")
+export function v7CharacterLookup(name: string): V7CharacterInfo | undefined {
     return V7_BUILTINS[name];
 }
 

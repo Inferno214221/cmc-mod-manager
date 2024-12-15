@@ -5,15 +5,8 @@ import { OpDep, OpState, StageList, error } from "../global/global";
 import * as general from "./general";
 import * as customDialogs from "./custom-dialogs";
 
-const STAGE_FILES: string[] = [
-    "data/sinfo/<stage>.json",
-    "stage/<stage>.bin",
-    "stage/<stage>/",
-    "music/stage/<stage>/",
-    "gfx/stgicons/<stage>.png",
-    "gfx/stgprevs/<stage>.png",
-    "gfx/seriesicon/<series>.png",
-];
+import _STAGE_FILES from "../assets/stage-files.json";
+const STAGE_FILES: StringNode[] = _STAGE_FILES;
 
 const BLANK_SSS_PAGE_DATA: SssData = [
     [ "0000", "0000", "0000", "0000", "0000", "0000", "0000", "0000", "0000", "0000" ],
@@ -132,60 +125,44 @@ export async function writeStageRandom(
     return;
 }
 
-export function getStageRegExps(
+export function createStageRegExpNodes(
+    nodes: StringNode[] | undefined,
     stage: Stage,
     ignoreSeries: boolean = false
-): RegExp[] {
-    return STAGE_FILES.map((file: string) => {
-        let wipString: string = file.replaceAll("<stage>", stage.name);
+): RegExpNode[] | undefined {
+    if (!nodes) return undefined;
+    return nodes.map((node: StringNode) => {
+        let wipString: string = node.name.replaceAll("<stage>", stage.name);
         if (!ignoreSeries && stage.series)
-            // I should filter these out, but this function is never called
-            // without a series anyway
             wipString = wipString.replaceAll("<series>", stage.series);
-        wipString = general.escapeRegex(wipString);
+        wipString = "^" + general.escapeRegex(wipString);
         wipString += "$";
-        wipString = wipString.replaceAll("<any>", "[^]+");
-        return new RegExp(wipString, "gi")
-    });
+        wipString = wipString.replaceAll("<anything>", "[^]+");
+        return {
+            pattern: new RegExp(wipString, "i"),
+            nonExhaustive: node.nonExhaustive,
+            contents: createStageRegExpNodes(
+                node.contents,
+                stage,
+                ignoreSeries
+            )
+        };
+    }).filter((node: RegExpNode | null) => node != null) as RegExpNode[];
 }
 
-export function getStageFiles(
+export async function getStageFiles(
     stage: Stage,
     ignoreSeries: boolean,
-    dir: string = global.gameDir,
-    similarNames: string[] = []
-): string[] {
-    const stageFiles: string[] = general.getAllFiles(dir)
-        .map((file: string) => path.relative(dir, file).split(path.sep).join(path.posix.sep))
-        .filter((file: string) => !file.startsWith("0extracted"));
-    const validFiles: string[] = [];
-    const exps: RegExp[] = getStageRegExps(stage, ignoreSeries);
-    for (const exp of exps) {
-        for (let file: number = 0; file < stageFiles.length; file++) {
-            if (exp.test(stageFiles[file])) {
-                validFiles.push(stageFiles[file]);
-                stageFiles.splice(file, 1);
-                file--;
-            }
-        }
-    }
-    if (similarNames.length > 0) {
-        const stageList: StageList = readStageList(dir);
-        similarNames.forEach((name: string) => {
-            const stage: Stage | undefined = stageList.getByName(name);
-            if (!stage) throw new Error("Stage not found: \"" + name + "\"");
-            const negExps: RegExp[] = getStageRegExps(stage, ignoreSeries);
-            for (const exp of negExps) {
-                for (let file: number = 0; file < validFiles.length; file++) {
-                    if (exp.test(validFiles[file])) {
-                        validFiles.splice(file, 1);
-                        file--;
-                    }
-                }
-            }
-        });
-    }
-    return validFiles;
+    dir: string = global.gameDir
+): Promise<string[]> {
+    const matchNodes: RegExpNode[] | undefined = createStageRegExpNodes(
+        STAGE_FILES,
+        stage,
+        ignoreSeries
+    );
+    if (!matchNodes) return [];
+    return await general.matchContents(matchNodes, dir);
+    // Stages currently contain only exhaustive nodes
 }
 
 export function readStageInfoPath(targetInfo: string): StageInfo | null {
@@ -478,14 +455,13 @@ export async function installStage(
 
     const toResolve: Promise<void>[] = [];
     if (filterInstallation) {
-        getStageFiles(stage, false, targetDir).forEach((file: string) => {
-            const filePath: string = path.join(targetDir, file);
-            const targetPath: string = path.join(dir, file);
+        (await getStageFiles(stage, false, targetDir)).forEach((file: string) => {
+            const targetPath: string = path.join(dir, path.relative(targetDir, file));
             fs.ensureDirSync(path.parse(targetPath).dir);
             if (!updateStages && fs.existsSync(targetPath)) return;
             toResolve.push(
                 fs.copy(
-                    filePath,
+                    file,
                     targetPath,
                     { overwrite: !file.startsWith("gfx/seriesicon/") }
                 )
@@ -593,23 +569,16 @@ export async function getMissingStageInfo(
 export async function extractStage(extract: string, dir: string = global.gameDir): Promise<string> {
     const toResolve: Promise<void>[] = [];
     const stageList: StageList = readStageList(dir);
-    const similarNames: string[] = [];
     const stage: Stage | undefined = stageList.getByName(extract);
     if (!stage) throw new Error("Stage not found: \"" + extract + "\"");
     const extractDir: string = path.join(dir, "0extracted", extract);
-    stageList.toArray().forEach((stage: Stage) => {
-        if (stage.name.includes(extract) && stage.name != extract) {
-            similarNames.push(stage.name);
-        }
-    });
     
-    getStageFiles(stage, false, dir, similarNames).forEach((file: string) => {
-        const filePath: string = path.join(dir, file);
-        const targetPath: string = path.join(extractDir, file);
+    (await getStageFiles(stage, false, dir)).forEach((file: string) => {
+        const targetPath: string = path.join(extractDir, path.relative(dir, file));
         fs.ensureDirSync(path.parse(targetPath).dir);
         toResolve.push(
             fs.copy(
-                filePath,
+                file,
                 targetPath,
                 { overwrite: true }
             )
@@ -625,17 +594,10 @@ export async function removeStage(remove: string, dir: string = global.gameDir):
     const stageList: StageList = readStageList(dir);
     const stage: Stage | undefined = stageList.getByName(remove);
     if (!stage) throw new Error("Stage not found: \"" + remove + "\"");
-    const similarNames: string[] = [];
-    stageList.toArray().forEach((stage: Stage) => {
-        if (stage.name.startsWith(remove) && stage.name != remove) {
-            similarNames.push(stage.name);
-        }
-    });
 
-    getStageFiles(stage, true, dir, similarNames).forEach((file: string) => {
-        const filePath: string = path.join(dir, file);
+    (await getStageFiles(stage, true, dir)).forEach((file: string) => {
         toResolve.push(
-            fs.remove(filePath)
+            fs.remove(file)
         );
     });
     

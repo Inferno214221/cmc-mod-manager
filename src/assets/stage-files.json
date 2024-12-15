@@ -1,0 +1,69 @@
+[
+  {
+    "name": "data",
+    "contents": [
+      {
+        "name": "sinfo",
+        "contents": [
+          {
+            "name": "<stage>.json"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "stage",
+    "contents": [
+      {
+        "name": "<stage>",
+        "isDir": true
+      },
+      {
+        "name": "<stage>.bin"
+      }
+    ]
+  },
+  {
+    "name": "gfx",
+    "contents": [
+      {
+        "name": "stgicons",
+        "contents": [
+          {
+            "name": "<stage>.png"
+          }
+        ]
+      },
+      {
+        "name": "stgprevs",
+        "contents": [
+          {
+            "name": "<stage>.png"
+          }
+        ]
+      },
+      {
+        "name": "seriesicon",
+        "contents": [
+          {
+            "name": "<series>.png"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "music",
+    "contents": [ 
+      {
+        "name": "stage",
+        "contents": [
+          {
+            "name": "<stage>"
+          }
+        ]
+      }
+    ]
+  }
+]
