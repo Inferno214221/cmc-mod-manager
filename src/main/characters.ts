@@ -8,8 +8,10 @@ import * as customDialogs from "./custom-dialogs";
 
 import V7_BUILTINS from "../assets/v7.json";
 
-import _ from "../assets/character-files.json";
-const CHARACTER_FILES: StringNode[] = _;
+import _CHARACTER_FILES from "../assets/character-files.json";
+const CHARACTER_FILES: StringNode[] = _CHARACTER_FILES;
+import _POSSIBLE_CONFLICTS from "../assets/character-files-possible-conflicts.json";
+const CHARACTER_FILES_POSSIBLE_CONFLICTS: StringNode[] = _POSSIBLE_CONFLICTS;
 
 const BLANK_CSS_PAGE_DATA: string = "\
 0000 0000 0000 0000 0000 0000 0000\r\n\
@@ -817,15 +819,13 @@ export async function extractCharacter(
 ): Promise<string> {
     const toResolve: Promise<void>[] = [];
     const characters: Character[] = readCharacters(dir);
-    const similarNames: string[] = [];
     const characterDat: CharacterDat =
         readCharacterDat(extract, dir) ?? error("Character has no dat file.");
     const extractDir: string = path.join(dir, "0extracted", extract);
-    characters.forEach((character: Character) => {
-        if (character.name.includes(extract) && character.name != extract) {
-            similarNames.push(character.name);
-        }
-    });
+
+    const similarNames: string[] = characters.filter(
+        (character: Character) => character.name.startsWith(extract) && character.name != extract
+    ).map((character: Character) => character.name);
     
     (await getCharacterFiles(characterDat, true, false, dir, similarNames))
         .forEach((file: string) => {
@@ -854,12 +854,9 @@ export async function removeCharacter(remove: string, dir: string = global.gameD
     const characterDat: CharacterDat =
         readCharacterDat(remove, dir) ?? error("Character has no dat file.");
 
-    const similarNames: string[] = [];
-    characters.toArray().forEach((character: Character) => {
-        if (character.name.startsWith(remove) && character.name != remove) {
-            similarNames.push(character.name);
-        }
-    });
+    const similarNames: string[] = characters.toArray().filter(
+        (character: Character) => character.name.startsWith(remove) && character.name != remove
+    ).map((character: Character) => character.name);
 
     (await getCharacterFiles(characterDat, true, true, dir, similarNames))
         .forEach((file: string) => {
@@ -873,22 +870,6 @@ export async function removeCharacter(remove: string, dir: string = global.gameD
     await Promise.allSettled(toResolve);
     return;    
 }
-
-//     similarNames.forEach((name: string) => {
-//         const similarDat: CharacterDat = readCharacterDat(name, dir) ??
-//             error("Similarly named character: '" + name + "' has no dat.");
-//         const negExps: RegExp[] =
-//             getCharacterRegExps(similarDat, includeExtraFiles, ignoreSeries);
-//         for (const exp of negExps) {
-//             for (let file: number = 0; file < validFiles.length; file++) {
-//                 if (exp.test(validFiles[file])) {
-//                     validFiles.splice(file, 1);
-//                     file--;
-//                 }
-//             }
-//         }
-//     });
-//     return validFiles;
 
 export function createCharacterRegExpNodes(
     nodes: StringNode[] | undefined,
@@ -906,7 +887,7 @@ export function createCharacterRegExpNodes(
             wipString = wipString.replaceAll("<series>", characterDat.series);
         wipString = "^" + general.escapeRegex(wipString);
         wipString += "$";
-        wipString = wipString.replaceAll("<mp3|wav|ogg>", "(mp3|wav|ogg)");
+        wipString = wipString.replaceAll("<audio>", "(mp3|wav|ogg)");
         wipString = wipString.replaceAll("<number>", "\\d+");
         wipString = wipString.replaceAll("<anything>", "[^]+");
         return {
@@ -936,16 +917,26 @@ export async function getCharacterFiles(
         ignoreSeries
     );
     if (!matchNodes) return [];
-    const toResolve: Promise<string[]>[] = [];
-    (await fs.readdir(dir)).forEach((subDir: string) =>
-        toResolve.push(general.matchFs(
-            matchNodes,
-            { name: subDir, full: path.join(dir, subDir) }
-        ))
-    );
-    console.log((await Promise.all(toResolve)).flat(), similarNames);
-    return (await Promise.all(toResolve)).flat();
-    // FIXME: needs to deal with similar names - only for nonExhaustive ones tho
+    let files: string[] = await general.matchContents(matchNodes, dir);
+
+    for (const name of similarNames) {
+        const similarDat: CharacterDat | null = readCharacterDat(name, dir);
+        if (!similarDat) continue;
+        const negNodes: RegExpNode[] | undefined = createCharacterRegExpNodes(
+            CHARACTER_FILES_POSSIBLE_CONFLICTS,
+            similarDat,
+            true,
+            true
+        );
+        if (!negNodes) continue;
+        const negFiles: string[] = await general.matchContents(negNodes, dir);
+        files = files.filter((file: string) => {
+            if (!negFiles.includes(file)) return true;
+            negFiles.splice(negFiles.indexOf(file));
+            return false;
+        });
+    }
+    return files;
 }
 
 export function readCssPages(dir: string = global.gameDir): CssPage[] {

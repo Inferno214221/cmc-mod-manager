@@ -246,7 +246,6 @@ interface StageInstallOptions extends Options {
 
 interface StringNode {
     name: string,
-    isDir?: boolean,
     isExtra?: boolean,
     nonExhaustive?: boolean,
     contents?: StringNode[]

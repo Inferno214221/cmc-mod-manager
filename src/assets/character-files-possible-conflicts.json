@@ -1,0 +1,64 @@
+[
+  {
+    "name": "gfx",
+    "isDir": true,
+    "contents": [
+      {
+        "name": "bust",
+        "isDir": true,
+        "contents": [
+          {
+            "name": "<fighter>_<number>.png",
+            "nonExhaustive": true
+          }
+        ]
+      },
+      {
+        "name": "tbust",
+        "isDir": true,
+        "contents": [
+          {
+            "name": "<fighter>__<number>.png"
+          }
+        ]
+      },
+      {
+        "name": "portrait",
+        "isDir": true,
+        "contents": [
+          {
+            "name": "<fighter>_<number>.png",
+            "nonExhaustive": true
+          }
+        ]
+      },
+      {
+        "name": "portrait_new",
+        "isDir": true,
+        "isExtra": true,
+        "contents": [
+          {
+            "name": "<fighter>_<number>.png",
+            "nonExhaustive": true
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "music",
+    "isDir": true,
+    "contents": [ 
+      {
+        "name": "versus",
+        "isDir": true,
+        "contents": [
+          {
+            "name": "<fighter>_<anything>.<audio>",
+            "nonExhaustive": true
+          }
+        ]
+      }
+    ]
+  }
+]

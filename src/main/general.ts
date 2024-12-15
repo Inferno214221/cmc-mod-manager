@@ -691,8 +691,7 @@ export async function matchFs(
 ): Promise<string[]> {
     for (let i: number = 0; i < nodes.length; i++) {
         const node: RegExpNode = nodes[i];
-        const test: boolean = node.pattern.test(dir.name);
-        if (!test) continue;
+        if (!node.pattern.test(dir.name)) continue;
         if (!node.contents) {
             if (!node.nonExhaustive) {
                 // If its exhaustive, remove it from the list
@@ -717,4 +716,18 @@ export async function matchFs(
         }
     }
     return [];
+}
+
+export async function matchContents(
+    nodes: RegExpNode[],
+    dir: string
+): Promise<string[]> {
+    const toResolve: Promise<string[]>[] = [];
+    (await fs.readdir(dir)).forEach((subDir: string) =>
+        toResolve.push(matchFs(
+            nodes,
+            { name: subDir, full: path.join(dir, subDir) }
+        ))
+    );
+    return (await Promise.all(toResolve)).flat();
 }

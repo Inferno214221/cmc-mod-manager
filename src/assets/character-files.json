@@ -1,11 +1,9 @@
 [
   {
     "name": "arcade",
-    "isDir": true,
     "contents": [
       {
         "name": "routes",
-        "isDir": true,
         "contents": [
           {
             "name": "<fighter>.txt"
@@ -19,11 +17,9 @@
   },
   {
     "name": "data",
-    "isDir": true,
     "contents": [
       {
         "name": "dat",
-        "isDir": true,
         "contents": [
           {
             "name": "<fighter>.dat"
@@ -38,7 +34,6 @@
   },
   {
     "name": "fighter",
-    "isDir": true,
     "contents": [
       {
         "name": "<fighter>",
@@ -51,11 +46,9 @@
   },
   {
     "name": "gfx",
-    "isDir": true,
     "contents": [
       {
         "name": "abust",
-        "isDir": true,
         "contents": [
           {
             "name": "<fighter>.png"
@@ -64,7 +57,6 @@
       },
       {
         "name": "bust",
-        "isDir": true,
         "contents": [
           {
             "name": "<fighter>.png"
@@ -77,7 +69,6 @@
       },
       {
         "name": "cbust",
-        "isDir": true,
         "contents": [
           {
             "name": "<fighter>.png"
@@ -86,7 +77,6 @@
       },
       {
         "name": "mbust",
-        "isDir": true,
         "contents": [
           {
             "name": "<fighter>.png"
@@ -95,7 +85,6 @@
       },
       {
         "name": "tbust",
-        "isDir": true,
         "contents": [
           {
             "name": "<fighter>__<number>.png"
@@ -104,7 +93,6 @@
       },
       {
         "name": "mugs",
-        "isDir": true,
         "contents": [
           {
             "name": "<fighter>.png"
@@ -113,7 +101,6 @@
       },
       {
         "name": "hudicon",
-        "isDir": true,
         "contents": [
           {
             "name": "<series>.png"
@@ -122,7 +109,6 @@
       },
       {
         "name": "name",
-        "isDir": true,
         "contents": [
           {
             "name": "<fighter>.png"
@@ -131,7 +117,6 @@
       },
       {
         "name": "portrait",
-        "isDir": true,
         "contents": [
           {
             "name": "<fighter>.png"
@@ -144,7 +129,6 @@
       },
       {
         "name": "portrait_new",
-        "isDir": true,
         "isExtra": true,
         "contents": [
           {
@@ -158,7 +142,6 @@
       },
       {
         "name": "seriesicon",
-        "isDir": true,
         "contents": [
           {
             "name": "<series>.png"
@@ -167,7 +150,6 @@
       },
       {
         "name": "stock",
-        "isDir": true,
         "contents": [
           {
             "name": "<fighter>.png"
@@ -178,7 +160,6 @@
   },
   {
     "name": "palettes",
-    "isDir": true,
     "contents": [
       {
         "name": "<fighter>",
@@ -188,34 +169,30 @@
   },
   {
     "name": "music",
-    "isDir": true,
     "contents": [ 
       {
         "name": "versus",
-        "isDir": true,
         "contents": [
           {
-            "name": "<fighter>_<anything>.<ogg|wav|mp3>",
+            "name": "<fighter>_<anything>.<audio>",
             "nonExhaustive": true
           }
         ]
       },
       {
         "name": "victory",
-        "isDir": true,
         "contents": [
           {
             "name": "individual",
-            "isDir": true,
             "contents": [
               {
-                "name": "<fighter>.<ogg|wav|mp3>",
+                "name": "<fighter>.<audio>",
                 "nonExhaustive": true
               }
             ]
           },
           {
-            "name": "<series>.<ogg|wav|mp3>",
+            "name": "<series>.<audio>",
             "nonExhaustive": true
           }
         ]
@@ -224,18 +201,15 @@
   },
   {
     "name": "sfx",
-    "isDir": true,
     "contents": [
       {
         "name": "announcer",
-        "isDir": true,
         "contents": [
           {
             "name": "fighter",
-            "isDir": true,
             "contents": [
               {
-                "name": "<fighter>.<ogg|wav|mp3>",
+                "name": "<fighter>.<audio>",
                 "nonExhaustive": true
               }
             ]
@@ -246,18 +220,15 @@
   },
   {
     "name": "sticker",
-    "isDir": true,
     "contents": [
       {
         "name": "common",
-        "isDir": true,
         "contents": [
           {
             "name": "<fighter>.png"
           },
           {
             "name": "desc",
-            "isDir": true,
             "contents": [
               {
                 "name": "<fighter>.txt"
@@ -268,14 +239,12 @@
       },
       {
         "name": "rare",
-        "isDir": true,
         "contents": [
           {
             "name": "<fighter>.png"
           },
           {
             "name": "desc",
-            "isDir": true,
             "contents": [
               {
                 "name": "<fighter>.txt"
@@ -286,14 +255,12 @@
       },
       {
         "name": "super",
-        "isDir": true,
         "contents": [
           {
             "name": "<fighter>.png"
           },
           {
             "name": "desc",
-            "isDir": true,
             "contents": [
               {
                 "name": "<fighter>.txt"
@@ -304,14 +271,12 @@
       },
       {
         "name": "ultra",
-        "isDir": true,
         "contents": [
           {
             "name": "<fighter>.png"
           },
           {
             "name": "desc",
-            "isDir": true,
             "contents": [
               {
                 "name": "<fighter>.txt"
