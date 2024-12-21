@@ -1088,13 +1088,28 @@ export function readCssData(page: CssPage): CssData {
 }
 
 export async function writeCssData(page: CssPage, data: CssData): Promise<void> {
-    const output: string = data.map((row: string[]) => row.join(" ")).join("\r\n") + " ";
+    const fixedData: CssData = fixCssData(data);
+    const output: string = fixedData.map((row: string[]) => row.join(" ")).join("\r\n") + " ";
     fs.writeFileSync(
         page.path,
         output,
         { encoding: "ascii" }
     );
     return;
+}
+
+export function fixCssData(data: CssData): CssData {
+    // If one row is longer than the others for some reason, extend the other rows to ensure the css
+    // is valid and avoid losing information.
+    const largestLength: number = data.toSorted(
+        (a: string[], b: string[]) => b.length - a.length
+    )[0].length;
+    return data.map((row: string[]) => {
+        while (row.length < largestLength) {
+            row.push("0000");
+        }
+        return row;
+    });
 }
 
 export async function removeCharacterCss(

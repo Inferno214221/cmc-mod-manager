@@ -89,7 +89,6 @@ export function TabStageSelectionScreen({
     }, [stages, sssPages]);
 
     function stageDragAndDrop(from: DndData, to: DndData): void {
-        console.log("stageDragAndDrop");
         console.log(from, to);
         // Can't be called unless sssData has a value
         const newSssData: SssData = [...sssData!];
@@ -111,13 +110,11 @@ export function TabStageSelectionScreen({
     }
 
     useEffect(() => {
-        console.log("sssPages, activePage updated");
         if (sssPages[activePage] == undefined) return;
         setSssData(sssPages[activePage].data);
     }, [sssPages, activePage]);
 
     useEffect(() => {
-        console.log("sssData updated");
         if (sssPages[activePage] == undefined) return;
         if (sssData == sssPages[activePage].data) return;
         const updatedPages: SssPage[] = [...sssPages];

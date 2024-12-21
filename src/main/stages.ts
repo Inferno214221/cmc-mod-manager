@@ -642,7 +642,7 @@ export async function writeSssPages(pages: SssPage[], dir: string = global.gameD
         pages.map((page: SssPage) =>
             [
                 page.name,
-                page.data.map((row: string[]) => row.join(" ")).join("\r\n")
+                fixSssData(page.data).map((row: string[]) => row.join(" ")).join("\r\n")
             ].join("\r\n")
         ).join("\r\n")
     ].join("\r\n");
@@ -652,6 +652,26 @@ export async function writeSssPages(pages: SssPage[], dir: string = global.gameD
         { encoding: "ascii" }
     );
     return;
+}
+
+export function fixSssData(data: SssData): SssData {
+    // SSS Pages are a constant size of 10 by 6
+    const fixedData: SssData = data.map((row: string[]) => {
+        while (row.length < 10) {
+            row.push("0000");
+        }
+        while (row.length > 10) {
+            row.pop();
+        }
+        return row;
+    });
+    while (fixedData.length < 6) {
+        fixedData.push(BLANK_SSS_PAGE_DATA[0]);
+    }
+    while (fixedData.length > 6) {
+        fixedData.pop();
+    }
+    return fixedData;
 }
 
 export async function removeStageSss(
