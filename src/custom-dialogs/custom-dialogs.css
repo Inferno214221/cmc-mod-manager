@@ -34,6 +34,10 @@ body {
     user-select: none;
 }
 
+span {
+    user-select: text;
+}
+
 button {
     border-width: 1px;
     border-style: solid;

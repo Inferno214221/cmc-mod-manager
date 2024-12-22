@@ -51,6 +51,7 @@
     padding: 10px;
     display: inline-flex;
     align-items: center;
+    user-select: text;
 }
 
 .character-display-actions,
@@ -69,6 +70,7 @@
 .series-display-name {
     display: inline-block;
     width: calc(100% - 40px);
+    user-select: text;
 }
 
 .series-display-wrapper :global(.icon-buttons_icon-button-wrapper) {

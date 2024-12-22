@@ -35,10 +35,6 @@ body {
     user-select: none;
 }
 
-span:not(.mat-icon) {
-    user-select: text;
-}
-
 a {
     text-decoration: none;
     color: inherit;
@@ -411,6 +407,11 @@ hr.vr {
     margin: 5px;
     width: 31px;
     height: 31px;
+}
+
+.operation-display-title,
+.operation-display-info span:not(.mat-icon) {
+    user-select: text;
 }
 
 .animation-rotation {

@@ -29,6 +29,12 @@
     height: 100%;
 } */
 
+#about-div {
+    h1, h2, h3 {
+        user-select: text;
+    }
+}
+
 #tabs-div {
     white-space: nowrap;
     overflow-y: hidden;
