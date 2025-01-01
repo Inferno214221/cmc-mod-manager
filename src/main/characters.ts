@@ -240,18 +240,23 @@ export async function ensureAltIsCharacter(alt: Alt, dir: string = global.gameDi
         return;
     }
 
-    const characterDat: CharacterDat | null = readCharacterDat(alt.alt, dir);
     const baseCharacter: Character | undefined = characterList.getByName(alt.base);
     if (!baseCharacter) throw new Error("Character not found: \"" + alt.base + "\"");
+
+    // Adding a partial Character removes the need to read the character's dat, before entirely
+    // ignoring it.
+    // const characterDat: CharacterDat | null = readCharacterDat(alt.alt, dir);
     characterList.add({
         name: alt.alt,
-        menuName: characterDat?.menuName ?? alt.menuName,
-        series: characterDat?.series ?? baseCharacter.series,
-        randomSelection: true,
+        // menuName: characterDat?.menuName ?? alt.menuName,
+        // series: characterDat?.series ?? baseCharacter.series,
+        // randomSelection: true,
         number: characterList.getNextNumber(),
-        alts: [],
-        mug: path.join(dir, "gfx", "mugs", alt.alt + ".png")
-    });
+        // Alts for this character should also be calculated, by taking (alts: Alt[]) as an input
+        // but because the info is immediately discarded, there is no point.
+        // alts: [],
+        // mug: path.join(dir, "gfx", "mugs", alt.alt + ".png")
+    } as Character);
 
     await writeCharacters(characterList.toArray(), dir);
     return;
@@ -265,9 +270,7 @@ export async function ensureAltIsntCharacter(
     const characterList: CharacterList = readCharacterList(dir);
     const character: Character | undefined = characterList.getByName(alt.alt);
     if (!character) throw new Error("Character not found: \"" + alt.alt + "\"");
-    if (character == undefined || isCharacterOnCSS(character, dir)) {
-        return;
-    }
+    if (isCharacterOnCSS(character, dir)) return;
     characterList.removeByName(alt.alt);
     toResolve.push(writeCharacters(characterList.toArray(), dir));
     toResolve.push(removeCharacterCss(character, dir)); // Updates numbers
@@ -286,6 +289,9 @@ export async function ensureAllAltsAreCharacters(
         if (areCharacters) {
             await ensureAltIsCharacter(alt, dir);
         } else {
+            // If another character is an alt to this character, don't remove this from the
+            // character list.
+            if (alts.filter((a: Alt) => a.base == alt.alt).length != 0) continue;
             await ensureAltIsntCharacter(alt, dir);
         }
     }
