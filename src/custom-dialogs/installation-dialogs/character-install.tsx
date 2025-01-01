@@ -79,21 +79,6 @@ function Body(): JSX.Element {
     const [newFoundCharacters, setNewFoundCharacters]:
     [FoundCharacter[], Dispatch<SetStateAction<FoundCharacter[]>>] = useState([]);
 
-    // useEffect(() => {
-    //     setPreSorted(() => {
-    //         const retVal: FoundCharacter[][] = [];
-    //         sortTypes.forEach((sortType: SortTypeOptions, index: number) => {
-    //             retVal[index] = foundCharacters.toSorted(
-    //                 (a: FoundCharacter, b: FoundCharacter) =>
-    //                     // @ts-ignore; Property '[SortTypeOptions.NUMBER]' does not exist on type
-    //                     // 'CharacterDat'.
-    //                     (a.dat[sortType] > b.dat[sortType] ? 1 : -1)
-    //             );
-    //         });
-    //         return retVal;
-    //     });
-    // }, [foundCharacters]);
-
     useEffect(() => {
         setSortedCharacters(sortCharacters());
     }, [

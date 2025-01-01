@@ -1,5 +1,3 @@
-/* @import "../../app/app.css"; */
-
 #about-div,
 #game-select-div,
 #tabs-div {
@@ -16,18 +14,6 @@
 .vertical-inner-div {
     width: 100%;
 }
-
-/* #tabs-scrollable {
-    white-space: nowrap;
-    overflow-y: hidden;
-    overflow-x: auto;
-    height: 100%;
-    padding-bottom: 5px;
-}
-
-#tabs-scrollable div.center {
-    height: 100%;
-} */
 
 #about-div {
     h1, h2, h3 {
@@ -118,7 +104,6 @@
     box-shadow: none;
     margin: 0px;
     padding: 0px;
-    /* height: min-content; */
     width: 100%;
 }
 

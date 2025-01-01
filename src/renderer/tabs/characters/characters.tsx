@@ -310,10 +310,8 @@ export function TabCharacters({
                     />
                     <ToggleIconButton
                         checked={!!altsAsCharacters}
-                        // trueIcon={"group"}
                         trueIcon={"diversity_3"}
                         trueTooltip={"Alts: Included As Characters"}
-                        // falseIcon={"group_off"}
                         falseIcon={"reduce_capacity"}
                         falseTooltip={"Alts: Excluded From Characters"}
                         iconSize={"50px"}
@@ -472,11 +470,6 @@ function CharacterDisplay({
                             falseTooltip={"Random Selection: Disabled"}
                             iconSize={"30px"}
                             setter={setRandomSelection}
-                            //     (state: boolean) => {
-                            //     console.log(character.name, state);
-                            //     api.writeCharacterRandom(character.name, state);
-                            //     setRandomSelection(state);
-                            // }}
                         />
                         <AddAltButton
                             character={character}

@@ -323,14 +323,10 @@ hr.vr {
     height: 100%;
     pointer-events: all;
     overflow-y: auto;
-    /* border-left: 1px solid var(--inf-grey2); */
 }
 
 .operation-display {
     background-color: var(--inf-grey4);
-    /* border-color: var(--inf-grey2);
-    border-width: 1px;
-    border-style: solid; */
     border-radius: 3px;
     padding: 5px;
     margin-bottom: 5px;

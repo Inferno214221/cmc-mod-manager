@@ -5,7 +5,6 @@ import { TabCharacters } from "../tabs/characters/characters";
 import { TabCharacterSelectionScreen } from "../tabs/character-ss/character-ss";
 import { TabStages } from "../tabs/stages/stages";
 import { TabStageSelectionScreen } from "../tabs/stage-ss/stage-ss";
-import { TabSettings } from "../tabs/settings/settings";
 import ToggleIconButton from "../icon-buttons/toggle-icon-button";
 import MISSING from "../../assets/missing.png";
 import { OpDep, OpState } from "../../global/global";
@@ -47,13 +46,6 @@ export const CHARACTER_SELECTION_SCREEN: Tab = {
     element: (setOperations: Dispatch<SetStateAction<Operation[]>>) =>
         <TabCharacterSelectionScreen setOperations={setOperations}/>
 };
-// export const PORT_CHARACTERS: Tab = {
-//     name: "portCharacters",
-//     displayName: "Port Characters",
-//     icon: "reduce_capacity",
-//     element: () => <></>,
-//     allowTabSwitch: null
-// };
 export const STAGES: Tab = {
     name: "stages",
     displayName: "Stages",
@@ -67,12 +59,6 @@ export const STAGE_SELECTION_SCREEN: Tab = {
     icon: "location_pin",
     element: (setOperations: Dispatch<SetStateAction<Operation[]>>) =>
         <TabStageSelectionScreen setOperations={setOperations}/>
-};
-export const SETTINGS: Tab = {
-    name: "settings",
-    displayName: "Settings",
-    icon: "settings",
-    element: () => <TabSettings/>
 };
 
 export interface NavButtonInfo {
@@ -171,12 +157,9 @@ export function Nav(): JSX.Element {
             <hr/>
             <NavTab info={CHARACTERS}/>
             <NavTab info={CHARACTER_SELECTION_SCREEN}/>
-            {/* <NavTab info={PORT_CHARACTERS}/> */}
             <hr/>
             <NavTab info={STAGES}/>
             <NavTab info={STAGE_SELECTION_SCREEN}/>
-            {/* <hr/>
-            <NavTab info={SETTINGS}/> */}
             <div className={styles.flexFill}/>
             <NavButton info={CHANGE_DIR}/>
             <NavButton info={OPEN_DIR}/>

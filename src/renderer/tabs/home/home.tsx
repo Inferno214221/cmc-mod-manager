@@ -7,8 +7,6 @@ import IconButton from "../../icon-buttons/icon-button";
 import {
     CHARACTERS,
     CHARACTER_SELECTION_SCREEN,
-    // PORT_CHARACTERS,
-    // SETTINGS,
     STAGES,
     STAGE_SELECTION_SCREEN,
     Tab,
@@ -105,7 +103,6 @@ export function TabHome(): JSX.Element {
             <hr/>
             <div id={styles.tabsDiv} className={styles.verticalOuterDiv}>
                 <div className={styles.verticalInnerDiv}>
-                    {/* <div id={styles.tabs-scrollable"}> */}
                     <div className={styles.center}>
                         <TabButton
                             tab={CHARACTERS}
@@ -115,10 +112,6 @@ export function TabHome(): JSX.Element {
                             tab={CHARACTER_SELECTION_SCREEN}
                             desc={"Modify CMC+'s character selection screen."}
                         />
-                        {/* <TabButton
-                            tab={PORT_CHARACTERS}
-                            desc={"Install characters from another version of CMC+."}
-                        /> */}
                         <TabButton
                             tab={STAGES}
                             desc={"Install, extract or delete stages from CMC+."}
@@ -127,12 +120,7 @@ export function TabHome(): JSX.Element {
                             tab={STAGE_SELECTION_SCREEN}
                             desc={"Modify CMC+'s stage selection screen."}
                         />
-                        {/* <TabButton
-                            tab={SETTINGS}
-                            desc={"Configure the program and enable optional features."}
-                        /> */}
                     </div>
-                    {/* </div> */}
                 </div>
             </div>
         </section>

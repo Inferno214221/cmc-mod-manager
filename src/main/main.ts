@@ -14,7 +14,6 @@ declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 global.win = null;
 global.dialogs = [];
 global.gameDir = "";
-// global.appData = null;
 global.appDir = app.isPackaged ?
     path.parse(app.getPath("exe")).dir :
     path.join(path.parse(app.getPath("exe")).dir, "..", "..", "..");
@@ -153,7 +152,6 @@ app.on("before-quit", async () => {
 function createHandlers(module: any): void {
     /* eslint-disable import/namespace */
     Object.keys(module).forEach((func: string & keyof typeof module) => {
-        // console.log("Creating Handler For: " + func);
         if (typeof module[func] != "function") return;
         if (module[func].length == 0) {
             ipcMain.handle(

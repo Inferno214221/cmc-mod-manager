@@ -1,10 +1,6 @@
-/* @import "../../app/app.css"; */
-
 #character-div {
     flex-grow: 1;
     min-height: 0px;
-    /* padding: 5px;
-    margin-top: 5px; */
     margin: 5px;
     overflow: auto;
 }

@@ -1,5 +1,3 @@
-/* @import "../../app/app.css"; */
-
 #pages-div,
 #sort-excluded-div,
 #excluded-div {
@@ -46,7 +44,6 @@
 }
 
 #pages-wrapper {
-    /* display: flex; */
     width: fit-content;
     text-wrap: nowrap;
     overflow: hidden;
@@ -131,17 +128,12 @@
 }
 
 .css-tooltip {
-    /* height: 35px; */
     height: 100%;
     left: 35px;
-    /* left: -5px;
-    top: 35px; */
 }
 
 .css-character-display {
     padding: 2px;
-    /* width: 35px;
-    overflow: hidden; */
 }
 
 .css-character-display img {
@@ -168,11 +160,6 @@
     height: 17px;
 }
 
-/* #css-add-column {
-    width: min-content;
-    padding: 0px;
-} */
-
 .css-row-header :global(.icon-buttons_icon-button-wrapper) {
     margin: 0px -5px;
 }
@@ -184,12 +171,6 @@
 .css-table {
     overflow: hidden;
 }
-
-/* .css-column-header,
-.css-row-header {
-    overflow: visible;
-    overflow-anchor: auto;
-} */
 
 .add-css-page input[type="text"],
 .css-page-edit {

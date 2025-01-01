@@ -732,7 +732,6 @@ function SssStageDisplay({
                 <div
                     draggable={true}
                     onDragStart={(event: any) => {
-                        // console.log(event);
                         event.dataTransfer.setData("data", JSON.stringify(dndData));
                     }}
                     onDragOver={(event: any) => {
@@ -745,7 +744,6 @@ function SssStageDisplay({
                         );
                     }}
                     onMouseEnter={(event: any) => {
-                        // console.log(event);
                         if (event.target.tagName == "DIV") {
                             event.target
                                 .nextElementSibling
@@ -772,7 +770,6 @@ function SssStageDisplay({
                     className={styles.tooltip + " " + styles.sssTooltip}
                     hidden={true}
                     onDragEnter={(event: any) => {
-                        // console.log(event);
                         event.target.hidden = true;
                     }}
                 >

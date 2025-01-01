@@ -51,7 +51,6 @@ export function TabCharacterSelectionScreen({
 
     async function getInfo(): Promise<void> {
         const characters: Character[] = await api.readCharacters();
-        // characters[9998] = {
         characters.push({
             name: "random",
             menuName: "Random",
@@ -796,7 +795,6 @@ function CssCharacterDisplay({
                 <div
                     draggable={true}
                     onDragStart={(event: any) => {
-                        // console.log(event);
                         event.dataTransfer.setData("data", JSON.stringify(dndData));
                     }}
                     onDragOver={(event: any) => {
@@ -809,7 +807,6 @@ function CssCharacterDisplay({
                         );
                     }}
                     onMouseEnter={(event: any) => {
-                        // console.log(event);
                         event.target
                             .parentElement
                             .nextElementSibling
@@ -830,7 +827,6 @@ function CssCharacterDisplay({
                     className={styles.tooltip + " " + styles.cssTooltip}
                     hidden={true}
                     onDragEnter={(event: any) => {
-                        // console.log(event);
                         event.target.hidden = true;
                     }}
                 >
@@ -873,7 +869,6 @@ function CssColumnHeader({
                             row.splice(column, 1);
                             return row;
                         });
-                        // prev.splice(row, 1);
                         updateCssData(prev);
                         return prev;
                     })}
