@@ -42,12 +42,10 @@ if (!app.requestSingleInstanceLock()) {
     });
 }
 
-console.log(global.appDir);
 
 function createWindow(): void {
     const updateDir: string = path.join(global.appDir, "update");
     if (fs.existsSync(updateDir)) {
-        console.log(updateDir);
         fs.removeSync(updateDir);
     }
 
@@ -82,12 +80,20 @@ function createWindow(): void {
         ) => shell.openExternal(...args)
     );
 
-    protocol.registerFileProtocol("img", (
+    protocol.registerFileProtocol("img", async (
         request: ProtocolRequest,
         callback: (response: string | ProtocolResponse) => void
     ) => {
         const url: string = request.url.replace("img://", "");
-        return callback(url);
+        if (fs.pathExistsSync(url)) return callback(url);
+        const parsedUrl: path.ParsedPath = path.parse(url);
+        if (!(fs.pathExistsSync(parsedUrl.dir))) return callback("MISSING");
+
+        const dirContents: string[] = fs.readdirSync(parsedUrl.dir);
+        const filePat: RegExp = new RegExp("^" + general.escapeRegex(parsedUrl.base) + "$", "i");
+        const filtered: string[] = dirContents.filter((file: string) => filePat.test(file));
+        if (filtered.length > 0) return callback(path.join(parsedUrl.dir, filtered[0]));
+        return callback("MISSING");
     });
 
     general.checkForUpdates();
