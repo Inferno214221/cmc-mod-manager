@@ -171,13 +171,13 @@ export async function checkForUpdates(): Promise<void> {
         const latestVersion: string = semver.clean(releases[0].tag_name) ??
             error("Invalid semver string: '" + app.getVersion() + "'");
         console.log("Latest Version: " + latestVersion);
-        const id: string = "downloadUpdate_" + Date.now();
         if (semver.lt(currentVersion, latestVersion)) {
             if (semver.prerelease(latestVersion)) {
                 if (!semver.prerelease(currentVersion)) {
                     return;
                 }
             }
+            const id: string = "downloadUpdate_" + Date.now();
 
             try {
                 fs.accessSync(global.appDir, fs.constants.W_OK | fs.constants.X_OK);

@@ -26,17 +26,18 @@ function readStageList(dir: string = global.gameDir): StageList {
     const stagesTxt: string[] = fs.readFileSync(
         path.join(dir, "data", "stages.txt"),
         "ascii"
-    ).split(/\r?\n/);
-    stagesTxt.shift(); // Drop the number
+    ).trim().split(/\r?\n/);
+    const num: number = parseInt(stagesTxt.shift() ?? "");
+    const isV7: boolean = (stagesTxt.length / 3) == num;
 
-    const isV7: boolean = (stagesTxt.map((line: string, index: number) => {
-        const wrappedIndex: number = (index + 1) % 4;
-        if (wrappedIndex <= 1) {
-            return [/^[^ ]+$/.test(line), line];
-        } else {
-            return [true];
-        }
-    }).filter((success: any) => !success[0]).length != 0);
+    // const isV7: boolean = (stagesTxt.map((line: string, index: number) => {
+    //     const wrappedIndex: number = (index + 1) % 4;
+    //     if (wrappedIndex <= 1) {
+    //         return [/^[^ ]+$/.test(line), line];
+    //     } else {
+    //         return [true];
+    //     }
+    // }).filter((success: any) => !success[0]).length != 0);
 
     if (isV7) {
         for (let stage: number = 0; stage < Math.floor(stagesTxt.length / 3); stage++) {

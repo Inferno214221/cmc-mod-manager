@@ -30,7 +30,7 @@ export function readCharacterList(dir: string = global.gameDir): CharacterList {
     const charactersTxt: string[] = fs.readFileSync(
         path.join(dir, "data", "fighters.txt"),
         "ascii"
-    ).split(/\r?\n/);
+    ).trim().split(/\r?\n/);
     charactersTxt.shift(); // Drop the number
     charactersTxt.forEach((character: string, index: number) => {
         if (fs.existsSync(path.join(dir, "data", "dats", character + ".dat"))) {

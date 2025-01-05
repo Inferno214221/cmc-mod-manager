@@ -130,7 +130,7 @@ const config: ForgeConfig = {
                     arch: arch
                 }, null, 2),
                 { encoding: "utf-8" }
-            )
+            );
         },
         postPackage: async (_config: any, packageResult: any) => {
             fs.copySync(
@@ -139,17 +139,20 @@ const config: ForgeConfig = {
                 { overwrite: true }
             );
             let updateScript: string = "update.";
-            if (packageResult.platform == "win32") {
-                updateScript += "bat";
-            } else if (packageResult.platform == "linux") {
-                fs.copySync(
-                    path.join(__dirname, "src", "assets", "cmc-mod-manager.desktop"),
-                    path.join(packageResult.outputPaths[0], "cmc-mod-manager.desktop"),
-                    { overwrite: true }
-                );
-                updateScript += "sh"
-            } else {
-                throw new Error("Invalid platform");
+            switch (packageResult.platform) {
+                case "win32":
+                    updateScript += "bat";
+                    break;
+                case "linux":
+                    fs.copySync(
+                        path.join(__dirname, "src", "assets", "cmc-mod-manager.desktop"),
+                        path.join(packageResult.outputPaths[0], "cmc-mod-manager.desktop"),
+                        { overwrite: true }
+                    );
+                    updateScript += "sh";
+                    break;
+                default:
+                    throw new Error("Invalid platform");
             }
             fs.copySync(
                 path.join(__dirname, "src", "updater", updateScript),
