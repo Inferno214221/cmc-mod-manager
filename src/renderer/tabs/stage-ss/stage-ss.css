@@ -129,7 +129,7 @@
 
 .sss-tooltip {
     height: 100%;
-    left: 35px;
+    left: 65px;
 }
 
 .sss-stage-display {
@@ -138,8 +138,8 @@
 
 .sss-stage-display img {
     display: block;
-    width: 40px;
-    height: 40px;
+    width: 65px;
+    height: 65px;
     object-fit: cover;
 }
 
@@ -147,7 +147,7 @@
     display: block;
     font-size: 8pt;
     text-align: center;
-    width: 35px;
+    width: 60px;
     overflow: hidden;
     text-wrap: nowrap;
 }
