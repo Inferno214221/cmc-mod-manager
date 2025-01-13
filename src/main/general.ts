@@ -380,7 +380,7 @@ export function focusWindow(): void {
 
 // TODO: split this function up
 export async function downloadMod(url: string, modId: string, id: string): Promise<void> {
-    return new Promise((resolve: () => void) => {
+    return new Promise((resolve: () => void, reject: (reason: any) => void) => {
         console.log(url);
         fs.ensureDirSync(global.temp);
 
@@ -391,18 +391,17 @@ export async function downloadMod(url: string, modId: string, id: string): Promi
             .on("error", (err: Error) => {
                 throw err;
             }).on("response", async (res: request.Response) => {
-                switch (res.headers["content-type"]?.split("/")[1]) {
+                const archiveType: string = res.headers["content-type"]?.split("/")[1] ?? "";
+                switch (archiveType) {
                     case "zip":
-                        file += "zip";
+                        file += ".zip";
                         break;
                     case "rar":
                     case "x-rar-compressed":
-                        file += "rar";
+                        file += ".rar";
                         break;
                     default:
-                        throw new Error(
-                            "Invalid archive type: " + res.headers["content-type"]?.split("/")[1]
-                        );
+                        return reject(new Error("Invalid archive type: " + archiveType));
                 }
                 const filePath: string = path.join(global.temp, file);
                 const modInfo: string[] = await Promise.resolve(infoPromise);
@@ -415,7 +414,7 @@ export async function downloadMod(url: string, modId: string, id: string): Promi
                         modType = ModTypes.STAGE;
                         break;
                     default:
-                        throw new Error("Unknown mod type.");
+                        return reject(new Error("Unknown mod type."));
                 }
 
                 const downloadSize: number = parseInt(res.headers["content-length"] ?? "");
@@ -433,7 +432,7 @@ export async function downloadMod(url: string, modId: string, id: string): Promi
                 ).on("error", (err: Error & { code: string }) => {
                     downloadStream.close();
                     if (canceled) return;
-                    throw err;
+                    return reject(err);
                 });
 
                 global.cancelFunctions[operationId] = (() => {
@@ -453,21 +452,29 @@ export async function downloadMod(url: string, modId: string, id: string): Promi
                 req.pipe(downloadStream).on("close", async () => {
                     delete global.cancelFunctions[operationId];
                     if (downloadStream.errored || canceled) return;
-                    const output: string = await extractArchive(filePath, global.temp);
-                    fs.removeSync(filePath);
-                    updateOperation({
-                        id: operationId,
-                        body: "Downloaded mod: '" + modInfo[0] + "' from GameBanana.",
-                        state: OpState.FINISHED,
-                    });
-                    resolve();
-                    switch (modType) {
-                        case ModTypes.CHARACTER:
-                            characters.installDownloadedCharacters(output);
-                            break;
-                        case ModTypes.STAGE:
-                            stages.installDownloadedStages(output);
-                            break;
+                    try {
+                        updateOperation({
+                            id: operationId,
+                            body: "Extracting downloaded mod.",
+                        });
+                        const output: string = await extractArchive(filePath, global.temp);
+                        fs.removeSync(filePath);
+                        updateOperation({
+                            id: operationId,
+                            body: "Downloaded mod: '" + modInfo[0] + "' from GameBanana.",
+                            state: OpState.FINISHED,
+                        });
+                        resolve();
+                        switch (modType) {
+                            case ModTypes.CHARACTER:
+                                characters.installDownloadedCharacters(output);
+                                break;
+                            case ModTypes.STAGE:
+                                stages.installDownloadedStages(output);
+                                break;
+                        }
+                    } catch (err: any) {
+                        return reject(err);
                     }
                 });
 
