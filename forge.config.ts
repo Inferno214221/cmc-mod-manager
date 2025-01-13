@@ -40,7 +40,7 @@ const config: ForgeConfig = {
                 description: "A mod manager for CMC+ v8 made with Electron",
                 license: "GNU General Public License v3.0",
                 categories: ["Utility"],
-                icon: "./gb/icon.png",
+                icon: "./gb/icon.svg",
                 version: "3.0.0-beta.4",
                 mimeType: ["x-scheme-handler/cmcmm"]
             },
@@ -53,7 +53,7 @@ const config: ForgeConfig = {
                 description: "A mod manager for CMC+ v8 made with Electron",
                 license: "GNU General Public License v3.0",
                 categories: ["Utility"],
-                icon: "./gb/icon.png",
+                icon: "./gb/icon.svg",
                 version: "3.0.0-beta.4",
                 mimeType: ["x-scheme-handler/cmcmm"]
             },
@@ -147,6 +147,11 @@ const config: ForgeConfig = {
                     fs.copySync(
                         path.join(__dirname, "src", "assets", "cmc-mod-manager.desktop"),
                         path.join(packageResult.outputPaths[0], "cmc-mod-manager.desktop"),
+                        { overwrite: true }
+                    );
+                    fs.copySync(
+                        path.join(__dirname, "src", "assets", "icon.svg"),
+                        path.join(packageResult.outputPaths[0], "cmc-mod-manager.svg"),
                         { overwrite: true }
                     );
                     updateScript += "sh";

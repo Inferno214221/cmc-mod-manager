@@ -5,7 +5,7 @@ import {
 import path from "path";
 import fs from "fs-extra";
 import { OpState } from "../global/global";
-import CMCMM from "../assets/icon.png";
+import CMCMM from "../assets/icon.svg";
 import * as buildInfo from "../../build.json";
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;

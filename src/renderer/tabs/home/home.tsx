@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import CMCMM from "../../../assets/icon.png";
+import CMCMM from "../../../assets/icon.svg";
 import PFP from "../../../assets/pfp.png";
 import GH from "../../../assets/github.png";
 import GB from "../../../assets/gb.png";

@@ -1,5 +1,5 @@
 import { render } from "./app/app";
-import CMCMM from "../assets/icon.png";
+import CMCMM from "../assets/icon.svg";
 
 render();
 
