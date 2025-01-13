@@ -431,7 +431,7 @@ export async function installStage(
         series: foundStage.info?.series,
         randomSelection: true,
         number: stageList.getNextNumber(),
-        icon: path.join(dir, "gfx", "stgicons", foundStage + ".png")
+        icon: path.join(dir, "gfx", "stgicons", foundStage.name + ".png")
     };
     
     const stage: Stage | null = await getMissingStageInfo(wipStage, targetDir, stageList);
