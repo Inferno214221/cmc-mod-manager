@@ -3,6 +3,7 @@ import CMCMM from "../../../assets/icon.svg";
 import PFP from "../../../assets/pfp.png";
 import GH from "../../../assets/github.png";
 import GB from "../../../assets/gb.png";
+import BMC from "../../../assets/buy-me-a-coffee.png"
 import IconButton from "../../icon-buttons/icon-button";
 import {
     CHARACTERS,
@@ -81,6 +82,12 @@ export function TabHome(): JSX.Element {
                             tooltip={"GameBanana"}
                             location={"https://gamebanana.com/tools/14136"}
                             id={"gb"}
+                        />
+                        <ExternalLinkImage
+                            icon={BMC}
+                            tooltip={"Buy Me A Coffee"}
+                            location={"https://buymeacoffee.com/inferno214221"}
+                            id={"bmc"}
                         />
                     </div>
                     <div className={styles.center}>
