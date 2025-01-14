@@ -138,7 +138,8 @@ function createWindow(): void {
             body: "Thanks for updating CMC Mod Manager! The CMC Mod Manager website has also " +
                 "been updated, so please consider checking it out: " +
                 "https://inferno214221.com/cmc-mod-manager/ (a link is also available in the " +
-                "'Home' tab)"
+                "'Home' tab). I've also setup a 'Buy Me A Coffee' page if you'd like to support " +
+                "the project!"
         });
     }
 
