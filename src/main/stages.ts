@@ -274,7 +274,7 @@ export function installStages(
 export function correctStageDir(targetDir: string): string {
     let correctedDir: string = targetDir;
     const modFiles: string[] = general.getAllFiles(correctedDir)
-        .map((file: string) => file.replace(correctedDir, ""));
+        .map((file: string) => file.replace(correctedDir, "")).reverse(); // Puts 0extracted last
     for (let file of modFiles) {
         file = path.join(file).split(path.sep).join(path.posix.sep);
         const fileDir: string = path.posix.parse(file).dir + "/";
