@@ -45,7 +45,8 @@ if (!app.requestSingleInstanceLock()) {
 
 function createWindow(): void {
     const updateDir: string = path.join(global.appDir, "update");
-    if (fs.existsSync(updateDir)) {
+    const didUpdate: boolean = fs.existsSync(updateDir);
+    if (didUpdate) {
         fs.removeSync(updateDir);
     }
 
@@ -129,6 +130,17 @@ function createWindow(): void {
         global.confirmedClose = true;
         app.quit();
     });
+
+    if (didUpdate) {
+        customDialogs.alert({
+            id: "postUpdate",
+            title: "CMC Mod Manager | Post Update Message",
+            body: "Thanks for updating CMC Mod Manager! The CMC Mod Manager website has also " +
+                "been updated, so please consider checking it out: " +
+                "https://inferno214221.com/cmc-mod-manager/ (a link is also available in the " +
+                "'Home' tab)"
+        });
+    }
 
     app.setAsDefaultProtocolClient("cmcmm");
 }
