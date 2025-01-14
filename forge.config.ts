@@ -41,7 +41,7 @@ const config: ForgeConfig = {
                 license: "GNU General Public License v3.0",
                 categories: ["Utility"],
                 icon: "./gb/icon.svg",
-                version: "3.0.0-beta.4",
+                version: "3.1.0",
                 mimeType: ["x-scheme-handler/cmcmm"]
             },
         },
@@ -54,7 +54,7 @@ const config: ForgeConfig = {
                 license: "GNU General Public License v3.0",
                 categories: ["Utility"],
                 icon: "./gb/icon.svg",
-                version: "3.0.0-beta.4",
+                version: "3.1.0",
                 mimeType: ["x-scheme-handler/cmcmm"]
             },
         },
