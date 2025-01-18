@@ -3,7 +3,9 @@ import IconButton from "../../icon-buttons/icon-button";
 import ToggleIconButton from "../../icon-buttons/toggle-icon-button";
 import CycleIconButton from "../../icon-buttons/cycle-icon-button";
 import MISSING from "../../../assets/missing.png";
-import { DndDataType, OpDep, OpState, SortTypeOptions, StageList } from "../../../global/global";
+import {
+    DndDataType, OpDep, OpState, SortTypeOptions, StageList, finishOp
+} from "../../../global/global";
 import appStyles from "../../app/app.css";
 import stageSsStyles from "./stage-ss.css";
 const styles: typeof import("../../app/app.css") & typeof import("./stage-ss.css") =
@@ -132,13 +134,10 @@ export function TabStageSelectionScreen({
                 dependencies: [OpDep.SSS],
                 call: async () => {
                     await api.writeSssPages(sssPages);
-                    setOperations((prev: Operation[]) => {
-                        const newOperations: Operation[] = [...prev];
-                        newOperations[operationId].state = OpState.FINISHED;
-                        newOperations[operationId].body = "Wrote modified SSS data to page: '" +
-                            sssPages[activePage].name + "'.";
-                        return newOperations;
-                    });
+                    setOperations(finishOp(
+                        operationId,
+                        "Wrote modified SSS data to page: '" + sssPages[activePage].name + "'."
+                    ));
                 }
             }) - 1;
             return newOperations;
@@ -419,13 +418,11 @@ function SssPages({
                 dependencies: [OpDep.SSS],
                 call: async () => {
                     await api.reorderSssPage(from, to);
-                    setOperations((prev: Operation[]) => {
-                        const newOperations: Operation[] = [...prev];
-                        newOperations[operationId].state = OpState.FINISHED;
-                        newOperations[operationId].body = "Moved SSS page: '" +
-                            sssPages[from].name + "' to index: " + (to > from ? to - 1 : to) + ".";
-                        return newOperations;
-                    });
+                    setOperations(finishOp(
+                        operationId,
+                        "Moved SSS page: '" + sssPages[from].name + "' to index: " +
+                        (to > from ? to - 1 : to) + "."
+                    ));
                     getPages();
                 }
             }) - 1;
@@ -447,13 +444,10 @@ function SssPages({
                 dependencies: [OpDep.SSS],
                 call: async () => {
                     const newPage: SssPage = await api.addSssPage(newPageName);
-                    setOperations((prev: Operation[]) => {
-                        const newOperations: Operation[] = [...prev];
-                        newOperations[operationId].state = OpState.FINISHED;
-                        newOperations[operationId].body = "Added new SSS " +
-                            "page: '" + newPageName + "'.";
-                        return newOperations;
-                    });
+                    setOperations(finishOp(
+                        operationId,
+                        "Added new SSS page: '" + newPageName + "'."
+                    ));
                     getPages(newPage.pageNumber);
                 }
             }) - 1;
@@ -552,13 +546,10 @@ function SssPageDisplay({
                 dependencies: [OpDep.SSS],
                 call: async () => {
                     const editedPage: SssPage = await api.renameSssPage(pageIndex, editingName);
-                    setOperations((prev: Operation[]) => {
-                        const newOperations: Operation[] = [...prev];
-                        newOperations[operationId].state = OpState.FINISHED;
-                        newOperations[operationId].body = "Renamed SSS page: '" + page.name +
-                            "' to '" + editingName + "'.";
-                        return newOperations;
-                    });
+                    setOperations(finishOp(
+                        operationId,
+                        "Renamed SSS page: '" + page.name + "' to '" + editingName + "'."
+                    ));
                     getPages(editedPage.pageNumber);
                 }
             }) - 1;
@@ -637,13 +628,10 @@ function SssPageDisplay({
                             dependencies: [OpDep.SSS],
                             call: async () => {
                                 await api.removeSssPage(page);
-                                setOperations((prev: Operation[]) => {
-                                    const newOperations: Operation[] = [...prev];
-                                    newOperations[operationId].state = OpState.FINISHED;
-                                    newOperations[operationId].body = "Deleted SSS page: '" +
-                                        page.name + "'.";
-                                    return newOperations;
-                                });
+                                setOperations(finishOp(
+                                    operationId,
+                                    "Deleted SSS page: '" + page.name + "'."
+                                ));
                                 getPages();
                             }
                         }) - 1;

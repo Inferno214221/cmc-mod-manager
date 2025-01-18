@@ -3,7 +3,7 @@ import IconButton from "../../icon-buttons/icon-button";
 import ToggleIconButton from "../../icon-buttons/toggle-icon-button";
 import CycleIconButton from "../../icon-buttons/cycle-icon-button";
 import MISSING from "../../../assets/missing.png";
-import { OpDep, OpState, SortTypeOptions } from "../../../global/global";
+import { OpDep, OpState, SortTypeOptions, finishOp } from "../../../global/global";
 import appStyles from "../../app/app.css";
 import stagesStyles from "./stages.css";
 const styles: typeof import("../../app/app.css") & typeof import("./stages.css") =
@@ -327,13 +327,11 @@ function StageDisplay({
                 call: async () => {
                     api.writeStageRandom(stage.name, randomSelection);
                     stage.randomSelection = randomSelection;
-                    setOperations((prev: Operation[]) => {
-                        const newOperations: Operation[] = [...prev];
-                        newOperations[operationId].state = OpState.FINISHED;
-                        newOperations[operationId].body = "Toggled the ability for stage: '" +
-                            stage.name + "' to be selected at random."
-                        return newOperations;
-                    });
+                    setOperations(finishOp(
+                        operationId,
+                        "Toggled the ability for stage: '" + stage.name + "' to be selected at " +
+                        "random."
+                    ));
                 }
             }) - 1;
             return newOperations;
@@ -375,13 +373,10 @@ function StageDisplay({
                                         dependencies: [OpDep.STAGES, OpDep.STAGE_LOCK, OpDep.SSS],
                                         call: async () => {
                                             await api.removeStage(stage.name);
-                                            setOperations((prev: Operation[]) => {
-                                                const newOperations: Operation[] = [...prev];
-                                                newOperations[operationId].state = OpState.FINISHED;
-                                                newOperations[operationId].body = "Deleted " +
-                                                    "stage: '" + stage.name + "'.";
-                                                return newOperations;
-                                            });
+                                            setOperations(finishOp(
+                                                operationId,
+                                                "Deleted stage: '" + stage.name + "'."
+                                            ));
                                             readStages();
                                         }
                                     }) - 1;
@@ -408,21 +403,18 @@ function StageDisplay({
                                         call: async () => {
                                             const extractDir: string =
                                                 await api.extractStage(stage.name);
-                                            setOperations((prev: Operation[]) => {
-                                                const newOperations: Operation[] = [...prev];
-                                                newOperations[operationId].state = OpState.FINISHED;
-                                                newOperations[operationId].body = "Extracted " +
-                                                    "stage: '" + stage.name + "'.";
-                                                newOperations[operationId].postCompletion = {
+                                            setOperations(finishOp(
+                                                operationId,
+                                                "Extracted stage: '" + stage.name + "'.",
+                                                {
                                                     icon: "source",
                                                     tooltip: "Open Extracted Files",
                                                     call: {
                                                         name: "openDir",
                                                         args: [extractDir]
                                                     }
-                                                };
-                                                return newOperations;
-                                            });
+                                                }
+                                            ));
                                         }
                                     }) - 1;
                                     return newOperations;
@@ -477,13 +469,10 @@ function SeriesDisplay({
                                 dependencies: [OpDep.STAGES, OpDep.STAGE_LOCK, OpDep.SSS],
                                 call: async () => {
                                     await api.removeSeriesStages(series);
-                                    setOperations((prev: Operation[]) => {
-                                        const newOperations: Operation[] = [...prev];
-                                        newOperations[operationId].state = OpState.FINISHED;
-                                        newOperations[operationId].body = "Deleted all stages " +
-                                            "in series: '" + series + "'.";
-                                        return newOperations;
-                                    });
+                                    setOperations(finishOp(
+                                        operationId,
+                                        "Deleted all stages in series: '" + series + "'."
+                                    ));
                                     readStages();
                                 }
                             }) - 1;

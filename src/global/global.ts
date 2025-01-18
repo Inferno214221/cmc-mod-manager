@@ -133,8 +133,8 @@ export function finishOp(
     return (prev: Operation[]) => {
         const newOperations: Operation[] = [...prev];
         newOperations[id].state = OpState.FINISHED;
-        newOperations[id].body = body
-        newOperations[id].postCompletion = postCompletion
+        newOperations[id].body = body;
+        newOperations[id].postCompletion = postCompletion;
         return newOperations;
     }
 }

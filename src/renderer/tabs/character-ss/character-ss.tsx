@@ -4,7 +4,7 @@ import ToggleIconButton from "../../icon-buttons/toggle-icon-button";
 import CycleIconButton from "../../icon-buttons/cycle-icon-button";
 import MISSING from "../../../assets/missing.png";
 import {
-    CharacterList, DndDataType, OpDep, OpState, SortTypeOptions
+    CharacterList, DndDataType, OpDep, OpState, SortTypeOptions, finishOp
 } from "../../../global/global";
 import appStyles from "../../app/app.css";
 import characterSsStyles from "./character-ss.css";
@@ -123,13 +123,10 @@ export function TabCharacterSelectionScreen({
                 call: async () => {
                     await api.writeCssData(activePage!, data);
                     getCssData();
-                    setOperations((prev: Operation[]) => {
-                        const newOperations: Operation[] = [...prev];
-                        newOperations[operationId].state = OpState.FINISHED;
-                        newOperations[operationId].body = "Wrote modified CSS data to page: '" +
-                            activePage!.name + "'.";
-                        return newOperations;
-                    });
+                    setOperations(finishOp(
+                        operationId,
+                        "Wrote modified CSS data to page: '" + activePage!.name + "'."
+                    ));
                 }
             }) - 1;
             return newOperations;
@@ -431,13 +428,11 @@ function CssPages({
                 dependencies: [OpDep.GAME_SETTINGS],
                 call: async () => {
                     await api.reorderCssPage(from, to);
-                    setOperations((prev: Operation[]) => {
-                        const newOperations: Operation[] = [...prev];
-                        newOperations[operationId].state = OpState.FINISHED;
-                        newOperations[operationId].body = "Moved CSS page: '" +
-                            cssPages[from].name + "' to index: " + (to > from ? to - 1 : to) + ".";
-                        return newOperations;
-                    });
+                    setOperations(finishOp(
+                        operationId,
+                        "Moved CSS page: '" + cssPages[from].name + "' to index: " +
+                        (to > from ? to - 1 : to) + "."
+                    ));
                     getPages();
                 }
             }) - 1;
@@ -459,13 +454,10 @@ function CssPages({
                 dependencies: [OpDep.CSS, OpDep.GAME_SETTINGS],
                 call: async () => {
                     const newPage: CssPage = await api.addCssPage(newPageName);
-                    setOperations((prev: Operation[]) => {
-                        const newOperations: Operation[] = [...prev];
-                        newOperations[operationId].state = OpState.FINISHED;
-                        newOperations[operationId].body = "Added new CSS " +
-                            "page: '" + newPageName + "'.";
-                        return newOperations;
-                    });
+                    setOperations(finishOp(
+                        operationId,
+                        "Added new CSS page: '" + newPageName + "'."
+                    ));
                     getPages(newPage);
                 }
             }) - 1;
@@ -565,13 +557,10 @@ function CssPageDisplay({
                 dependencies: [OpDep.CSS, OpDep.GAME_SETTINGS],
                 call: async () => {
                     const editedPage: CssPage = await api.renameCssPage(pageIndex, editingName);
-                    setOperations((prev: Operation[]) => {
-                        const newOperations: Operation[] = [...prev];
-                        newOperations[operationId].state = OpState.FINISHED;
-                        newOperations[operationId].body = "Renamed CSS page: '" + page.name +
-                            "' to '" + editingName + "'.";
-                        return newOperations;
-                    });
+                    setOperations(finishOp(
+                        operationId,
+                        "Renamed CSS page: '" + page.name + "' to '" + editingName + "'."
+                    ));
                     getPages(editedPage);
                 }
             }) - 1;
@@ -654,13 +643,10 @@ function CssPageDisplay({
                             dependencies: [OpDep.CSS, OpDep.GAME_SETTINGS],
                             call: async () => {
                                 await api.removeCssPage(page);
-                                setOperations((prev: Operation[]) => {
-                                    const newOperations: Operation[] = [...prev];
-                                    newOperations[operationId].state = OpState.FINISHED;
-                                    newOperations[operationId].body = "Deleted CSS page: '" +
-                                        page.name + "'.";
-                                    return newOperations;
-                                });
+                                setOperations(finishOp(
+                                    operationId,
+                                    "Deleted CSS page: '" + page.name + "'."
+                                ));
                                 getPages();
                             }
                         }) - 1;
