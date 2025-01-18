@@ -34,14 +34,14 @@ const DEFAULT_CONFIG: AppConfig = {
 
 const DATA_FILE: string = path.join(app.getPath("userData"), "data.json");
 
-export function loadAppData(): void {
-    if (!fs.existsSync(DATA_FILE)) {
+export async function loadAppData(): Promise<void> {
+    if (!(await fs.exists(DATA_FILE))) {
         writeAppData({
             dir: "",
             config: DEFAULT_CONFIG
         });
     } else {
-        global.appData = readJSON(DATA_FILE);
+        global.appData = await readJSON(DATA_FILE);
         if (global.appData.config == undefined) {
             global.appData.config = DEFAULT_CONFIG;
         } else {
@@ -53,15 +53,15 @@ export function loadAppData(): void {
         }
         writeAppData(global.appData);
     }
-    global.appData = readJSON(DATA_FILE);
+    global.appData = await readJSON(DATA_FILE);
 }
 
-export function readJSON(file: string): any {
-    return JSON.parse(fs.readFileSync(file, "utf-8"));
+export async function readJSON(file: string): Promise<any> {
+    return JSON.parse(await fs.readFile(file, "utf-8"));
 }
 
 export async function writeJSON(file: string, data: object): Promise<void> {
-    fs.writeFileSync(file, JSON.stringify(data, null, 4), "utf-8");
+    await fs.writeFile(file, JSON.stringify(data, null, 2), "utf-8");
     return;
 }
 
@@ -79,24 +79,24 @@ export function isNumber(num: string): boolean {
     return /^\d+$/.test(num);
 }
 
-export function getAllFiles(dirPath: string, arrayOfFiles: string[] = []): string[] {
-    const contents: string[] = fs.readdirSync(dirPath);
+export async function getAllFiles(dirPath: string, arrayOfFiles: string[] = []): Promise<string[]> {
+    const contents: string[] = await fs.readdir(dirPath);
 
-    contents.forEach((file: string) => {
-        if (fs.statSync(dirPath + "/" + file).isDirectory()) {
-            arrayOfFiles = getAllFiles(dirPath + "/" + file, arrayOfFiles);
+    for (const file of contents) {
+        if ((await fs.stat(dirPath + "/" + file)).isDirectory()) {
+            arrayOfFiles = await getAllFiles(dirPath + "/" + file, arrayOfFiles);
         } else {
             arrayOfFiles.push(path.join(dirPath, "/", file));
         }
-    });
+    }
 
     return arrayOfFiles;
 }
 
 export async function extractArchive(archive: string, destination: string): Promise<string> {
     const output: string = path.join(destination, path.parse(archive).name);
-    fs.ensureDirSync(destination);
-    fs.removeSync(output);
+    await fs.ensureDir(destination);
+    await fs.remove(output);
     switch (path.parse(archive).ext.toLowerCase()) {
         case ".zip":
             await extract(archive, {
@@ -180,7 +180,7 @@ export async function checkForUpdates(): Promise<void> {
             const id: string = "downloadUpdate_" + Date.now();
 
             try {
-                fs.accessSync(global.appDir, fs.constants.W_OK | fs.constants.X_OK);
+                await fs.access(global.appDir, fs.constants.W_OK | fs.constants.X_OK);
             } catch (error: any) {
                 addOperation({
                     id: id,
@@ -233,7 +233,7 @@ export async function downloadUpdate(tagName: string, id: string): Promise<void>
         return;
     }
     const targetPath: string = path.join(global.temp, "update.zip");
-    fs.createFileSync(targetPath);
+    await fs.createFile(targetPath);
     const targetStream: fs.WriteStream = fs.createWriteStream(targetPath);
     const url: string = "https://github.com/Inferno214221/cmc-mod-manager/releases/download/" +
         tagName + "/cmc-mod-manager-" + global.platform + "-" + global.arch + ".zip";
@@ -263,11 +263,11 @@ export async function downloadUpdate(tagName: string, id: string): Promise<void>
                 let updateTemp: string = path.join(global.temp, "update");
                 await extractArchive(targetPath, updateTemp);
                 while (
-                    fs.readdirSync(updateTemp).length == 1
+                    (await fs.readdir(updateTemp)).length == 1
                 ) {
-                    updateTemp = path.join(updateTemp, fs.readdirSync(updateTemp)[0]);
+                    updateTemp = path.join(updateTemp, (await fs.readdir(updateTemp))[0]);
                 }
-                fs.moveSync(updateTemp, updateDir, { overwrite: true });
+                await fs.move(updateTemp, updateDir, { overwrite: true });
             }
 
             const installId: string = "installUpdate_" + Date.now();
@@ -288,17 +288,17 @@ export async function downloadUpdate(tagName: string, id: string): Promise<void>
         });
 }
 
-export function installUpdate(id: string): void {
+export async function installUpdate(id: string): Promise<void> {
     if (!app.isPackaged) throw new Error("Cannot update in dev mode.");
     const updateDir: string = path.join(global.appDir, "update");
     const updaterDir: string = path.join(global.appDir, "updater");
-    if (!fs.existsSync(path.join(updateDir))) throw new Error("Update files not found.");
+    if (!(await fs.exists(path.join(updateDir)))) throw new Error("Update files not found.");
     if (
-        fs.existsSync(path.join(updateDir, "updater", "update.sh")) ||
-        fs.existsSync(path.join(updateDir, "updater", "update.bat"))
+        await fs.exists(path.join(updateDir, "updater", "update.sh")) ||
+        await fs.exists(path.join(updateDir, "updater", "update.bat"))
     ) {
-        fs.removeSync(updaterDir);
-        fs.copySync(path.join(updateDir, "updater"), updaterDir, { overwrite: true });
+        await fs.remove(updaterDir);
+        await fs.copy(path.join(updateDir, "updater"), updaterDir, { overwrite: true });
     }
     global.updateOnExit = true;
     updateOperation({
@@ -380,10 +380,10 @@ export function focusWindow(): void {
 
 // TODO: split this function up
 export async function downloadMod(url: string, modId: string, id: string): Promise<void> {
-    return new Promise((resolve: () => void, reject: (reason: any) => void) => {
-        console.log(url);
-        fs.ensureDirSync(global.temp);
+    console.log(url);
+    await fs.ensureDir(global.temp);
 
+    return new Promise((resolve: () => void, reject: (reason: any) => void) => {
         const infoPromise: Promise<string[]> = getDownloadInfo(modId);
         const operationId: string = "download_" + id;
         let file: string = operationId;
@@ -458,7 +458,7 @@ export async function downloadMod(url: string, modId: string, id: string): Promi
                             body: "Extracting downloaded mod.",
                         });
                         const output: string = await extractArchive(filePath, global.temp);
-                        fs.removeSync(filePath);
+                        await fs.remove(filePath);
                         updateOperation({
                             id: operationId,
                             body: "Downloaded mod: '" + modInfo[0] + "' from GameBanana.",
@@ -559,15 +559,15 @@ export function getExtractedDir(): string {
     return path.join(global.gameDir, "0extracted");
 }
 
-export function getGameVersion(
+export async function getGameVersion(
     dir: string = global.gameDir,
     list: string[] = SUPPORTED_VERSIONS
-): string | null {
+): Promise<string | null> {
     if (dir == null) {
         return null;
     }
     for (const game of list) {
-        if (fs.existsSync(path.join(dir, game + ".exe"))) {
+        if (await fs.exists(path.join(dir, game + ".exe"))) {
             return game;
         }
     }
@@ -592,7 +592,7 @@ async function alertSelfContainedDir(): Promise<void> {
 }
 
 export async function isValidGameDir(dir: string = global.gameDir): Promise<boolean> {
-    return ((dir == null || getGameVersion(dir) != null) && !isSelfContainedDir(dir));
+    return ((dir == null || await getGameVersion(dir) != null) && !isSelfContainedDir(dir));
 }
 
 export async function selectGameDir(): Promise<string | null> {
@@ -618,11 +618,11 @@ export async function selectGameDir(): Promise<string | null> {
         return null;
     }
 
-    getAllFiles(dir.filePaths[0]).forEach((file: string) => {
+    (await getAllFiles(dir.filePaths[0])).forEach((file: string) => {
         fs.chmod(file, 0o777);
     });
     global.gameDir = dir.filePaths[0];
-    global.appData = readJSON(DATA_FILE);
+    global.appData = await readJSON(DATA_FILE);
     global.appData.dir = global.gameDir;
     writeAppData(global.appData);
     return global.gameDir;
@@ -634,7 +634,7 @@ export async function openDir(dir: string): Promise<void> {
 }
 
 export async function runGame(dir: string = global.gameDir): Promise<void> {
-    spawn(path.join(dir, getGameVersion(global.gameDir) + ".exe"), {
+    spawn(path.join(dir, await getGameVersion(global.gameDir) + ".exe"), {
         cwd: dir,
         windowsHide: true,
         detached: true

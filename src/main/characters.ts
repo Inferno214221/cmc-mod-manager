@@ -20,36 +20,37 @@ const BLANK_CSS_PAGE_DATA: string = "\
 0000 0000 0000 0000 0000 0000 0000\r\n\
 0000 0000 0000 9999 0000 0000 0000 ";
 
-export function readCharacters(dir: string = global.gameDir): Character[] {
-    return readCharacterList(dir).toArray();
+export async function readCharacters(dir: string = global.gameDir): Promise<Character[]> {
+    return (await readCharacterList(dir)).toArray();
 }
 
-export function readCharacterList(dir: string = global.gameDir): CharacterList {
-    const alts: Alt[] = readAlts(dir);
+export async function readCharacterList(dir: string = global.gameDir): Promise<CharacterList> {
+    const alts: Alt[] = await readAlts(dir);
     const characterList: CharacterList = new CharacterList();
-    const charactersTxt: string[] = fs.readFileSync(
+    const charactersTxt: string[] = (await fs.readFile(
         path.join(dir, "data", "fighters.txt"),
         "ascii"
-    ).trim().split(/\r?\n/);
+    )).trim().split(/\r?\n/);
     charactersTxt.shift(); // Drop the number
-    charactersTxt.forEach((character: string, index: number) => {
-        if (fs.existsSync(path.join(dir, "data", "dats", character + ".dat"))) {
-            const characterDat: CharacterDat | null = readCharacterDat(character, dir);
+    for (const index in charactersTxt) {
+        const character: string = charactersTxt[index];
+        if (await fs.exists(path.join(dir, "data", "dats", character + ".dat"))) {
+            const characterDat: CharacterDat | null = await readCharacterDat(character, dir);
             characterList.add({
                 name: character,
                 menuName: characterDat?.menuName ?? character,
                 series: characterDat?.series ?? "",
                 randomSelection: true, // Assume true and then iterate through false list
-                number: index + 1,
+                number: parseInt(index) + 1,
                 alts: alts.filter((alt: Alt) => alt.base == character),
                 mug: path.join(dir, "gfx", "mugs", character + ".png")
             });
         }
-    });
-    const lockedTxt: string[] = fs.readFileSync(
+    }
+    const lockedTxt: string[] = (await fs.readFile(
         path.join(dir, "data", "fighter_lock.txt"),
         "ascii"
-    ).split(/\r?\n/);
+    )).split(/\r?\n/);
     lockedTxt.shift();
     lockedTxt.forEach((locked: string) => {
         if (characterList.getByName(locked) == undefined) return;
@@ -69,7 +70,7 @@ export async function writeCharacters(
         characters.length,
         characters.map((character: Character) => character.name).join("\r\n")
     ].join("\r\n");
-    fs.writeFileSync(
+    await fs.writeFile(
         path.join(dir, "data", "fighters.txt"),
         output,
         { encoding: "ascii" }
@@ -82,10 +83,10 @@ export async function writeCharacterRandom(
     randomSelection: boolean,
     dir: string = global.gameDir
 ): Promise<void> {
-    let lockedTxt: string[] = fs.readFileSync(
+    let lockedTxt: string[] = (await fs.readFile(
         path.join(dir, "data", "fighter_lock.txt"),
         "ascii"
-    ).split(/\r?\n/);
+    )).split(/\r?\n/);
     lockedTxt.shift();
     if (randomSelection) {
         lockedTxt = lockedTxt.filter((locked: string) => locked != character);
@@ -94,7 +95,7 @@ export async function writeCharacterRandom(
     }
     let output: string = lockedTxt.length + "\r\n";
     output += lockedTxt.join("\r\n");
-    fs.writeFileSync(
+    await fs.writeFile(
         path.join(dir, "data", "fighter_lock.txt"),
         output,
         { encoding: "ascii" }
@@ -102,11 +103,11 @@ export async function writeCharacterRandom(
     return;
 }
 
-export function readAlts(dir: string = global.gameDir): Alt[] {
-    const altsTxt: string[] = fs.readFileSync(
+export async function readAlts(dir: string = global.gameDir): Promise<Alt[]> {
+    const altsTxt: string[] = (await fs.readFile(
         path.join(dir, "data", "alts.txt"),
         "ascii"
-    ).split(/\r?\n/);
+    )).split(/\r?\n/);
     altsTxt.shift(); // Drop the number
     const alts: Alt[] = [];
     for (let alt: number = 0; alt < Math.floor(altsTxt.length / 5); alt++) {
@@ -152,7 +153,7 @@ export async function writeAlts(alts: Alt[], dir: string = global.gameDir): Prom
             ].join("\r\n")
         ).join("\r\n")
     ].join("\r\n");
-    fs.writeFileSync(
+    await fs.writeFile(
         path.join(dir, "data", "alts.txt"),
         output,
         { encoding: "ascii" }
@@ -169,7 +170,7 @@ export async function addAlt(
         throw new Error("A character with alts can't be assigned as an alt.");
 
     const toResolve: Promise<void>[] = [];
-    const alts: Alt[] = readAlts(dir);
+    const alts: Alt[] = await readAlts(dir);
     let altNumber: number = 1;
     const sameBase: Alt[] = alts.filter((alt: Alt) => alt.base == base.name);
     if (sameBase.length > 6)
@@ -178,7 +179,7 @@ export async function addAlt(
     sameBase.forEach((alt: Alt) => {
         if (alt.number > altNumber) altNumber = alt.number;
     });
-    const newAltDat: CharacterDat | null = readCharacterDat(newAlt.name, dir);
+    const newAltDat: CharacterDat | null = await readCharacterDat(newAlt.name, dir);
     alts.push({
         base: base.name,
         alt: newAlt.name,
@@ -189,7 +190,7 @@ export async function addAlt(
     });
     await writeAlts(alts, dir);
     if (!global.appData.config.altsAsCharacters && !isCharacterOnCSS(newAlt, dir)) {
-        const characterList: CharacterList = readCharacterList(dir);
+        const characterList: CharacterList = await readCharacterList(dir);
         characterList.removeByName(newAlt.name);
         toResolve.push(writeCharacters(characterList.toArray(), dir));
         toResolve.push(removeCharacterCss(newAlt, dir));
@@ -204,7 +205,7 @@ export async function removeAlt(
     ensureAccessible: boolean = true,
     dir: string = global.gameDir
 ): Promise<void> {
-    const alts: Alt[] = readAlts(dir).filter((i: Alt) => !(
+    const alts: Alt[] = (await readAlts(dir)).filter((i: Alt) => !(
         i.base == alt.base &&
         i.alt == alt.alt &&
         i.number == alt.number
@@ -221,10 +222,13 @@ export async function removeAlt(
     return;
 }
 
-export function isCharacterOnCSS(character: Character, dir: string = global.gameDir): boolean {
-    const cssPages: CssPage[] = readCssPages(dir);
+export async function isCharacterOnCSS(
+    character: Character,
+    dir: string = global.gameDir
+): Promise<boolean> {
+    const cssPages: CssPage[] = await readCssPages(dir);
     for (const page of cssPages) {
-        const cssData: CssData = readCssData(page);
+        const cssData: CssData = await readCssData(page);
         for (const row of cssData) {
             if (row.includes(("0000" + character.number).slice(-4))) {
                 return true;
@@ -235,7 +239,7 @@ export function isCharacterOnCSS(character: Character, dir: string = global.game
 }
 
 export async function ensureAltIsCharacter(alt: Alt, dir: string = global.gameDir): Promise<void> {
-    const characterList: CharacterList = readCharacterList(dir);
+    const characterList: CharacterList = await readCharacterList(dir);
     if (characterList.getByName(alt.alt) != undefined) {
         return;
     }
@@ -267,10 +271,10 @@ export async function ensureAltIsntCharacter(
     dir: string = global.gameDir
 ): Promise<void> {
     const toResolve: Promise<void>[] = [];
-    const characterList: CharacterList = readCharacterList(dir);
+    const characterList: CharacterList = await readCharacterList(dir);
     const character: Character | undefined = characterList.getByName(alt.alt);
     if (!character) throw new Error("Character not found: \"" + alt.alt + "\"");
-    if (isCharacterOnCSS(character, dir)) return;
+    if (await isCharacterOnCSS(character, dir)) return;
     characterList.removeByName(alt.alt);
     toResolve.push(writeCharacters(characterList.toArray(), dir));
     toResolve.push(removeCharacterCss(character, dir)); // Updates numbers
@@ -283,7 +287,7 @@ export async function ensureAllAltsAreCharacters(
     areCharacters: boolean,
     dir: string = global.gameDir
 ): Promise<void> {
-    const alts: Alt[] = readAlts(dir);
+    const alts: Alt[] = await readAlts(dir);
     for (const alt of alts) {
         console.log(alt);
         if (areCharacters) {
@@ -314,7 +318,7 @@ export async function removeAllAlts(
         });
     }
     // remove character from other's alts
-    for (const alt of readAlts(dir).filter(
+    for (const alt of (await readAlts(dir)).filter(
         (alt: Alt) => alt.alt == character.name
     )) {
         await removeAlt(alt, false, dir);
@@ -322,22 +326,22 @@ export async function removeAllAlts(
     return;
 }
 
-export function readCharacterDat(
+export async function readCharacterDat(
     character: string,
     dir: string = global.gameDir
-): CharacterDat | null {
+): Promise<CharacterDat | null> {
     return readCharacterDatPath(path.join(dir, "data", "dats", character + ".dat"), character);
 }
 
-export function readCharacterDatPath(
+export async function readCharacterDatPath(
     datPath: string,
     character: string = path.parse(datPath).name
-): CharacterDat | null {
-    if (!fs.existsSync(datPath)) return null;
-    const characterDatTxt: string[] = fs.readFileSync(
+): Promise<CharacterDat | null> {
+    if (!(await fs.exists(datPath))) return null;
+    const characterDatTxt: string[] = (await fs.readFile(
         datPath,
         "ascii"
-    ).split(/\r?\n/);
+    )).split(/\r?\n/);
     const isVanilla: boolean = general.isNumber(characterDatTxt[3]);
     const isV7: boolean = isVanilla || general.isNumber(characterDatTxt[4]);
 
@@ -410,7 +414,7 @@ export function readCharacterDatPath(
     return characterDat;
 }
 
-export function writeCharacterDat(dat: CharacterDat, destination: string): void {
+export async function writeCharacterDat(dat: CharacterDat, destination: string): Promise<void> {
     let output: string = [
         dat.displayName,
         dat.menuName,
@@ -437,8 +441,8 @@ export function writeCharacterDat(dat: CharacterDat, destination: string): void 
             palette[4]
         ].join("\r\n");
     });
-    fs.ensureFileSync(path.join(destination, dat.name + ".dat"));
-    fs.writeFileSync(path.join(destination, dat.name + ".dat"), output, { encoding: "ascii" });
+    await fs.ensureFile(path.join(destination, dat.name + ".dat"));
+    await fs.writeFile(path.join(destination, dat.name + ".dat"), output, { encoding: "ascii" });
     return;
 }
 
@@ -462,19 +466,19 @@ export async function installDownloadedCharacters(targetDir: string): Promise<vo
     installCharacters(targetDir, true, global.appData.config.updateCharacters, "GameBanana");
 }
 
-export function installCharacters(
+export async function installCharacters(
     targetDir: string,
     filterInstallation: boolean,
     updateCharacters: boolean,
     location: string,
     dir: string = global.gameDir
-): void {
+): Promise<void> {
     try {
-        const correctedTarget: string = correctCharacterDir(targetDir);
+        const correctedTarget: string = await correctCharacterDir(targetDir);
         if (path.relative(correctedTarget, dir) == "") throw new Error(
             "Cannot install characters from the directory that they are being installed to."
         );
-        const foundCharacters: FoundCharacter[] = findCharacters(correctedTarget);
+        const foundCharacters: FoundCharacter[] = await findCharacters(correctedTarget);
         if (foundCharacters.length == 0)
             throw new Error("No valid characters found in directory: '" + targetDir + "'.");
         if (foundCharacters.length == 1) {
@@ -515,9 +519,9 @@ export function installCharacters(
     return;
 }
 
-export function correctCharacterDir(targetDir: string): string {
+export async function correctCharacterDir(targetDir: string): Promise<string> {
     let correctedDir: string = targetDir;
-    const modFiles: string[] = general.getAllFiles(correctedDir)
+    const modFiles: string[] = (await general.getAllFiles(correctedDir))
         .map((file: string) => file.replace(correctedDir, "")).reverse(); // Puts 0extracted last
     for (let file of modFiles) {
         file = path.join(file).split(path.sep).join(path.posix.sep);
@@ -534,40 +538,40 @@ export function correctCharacterDir(targetDir: string): string {
             break;
         }
     }
-    if (!fs.readdirSync(correctedDir).includes("fighter")) {
+    if (!(await fs.readdir(correctedDir)).includes("fighter")) {
         throw new Error("No 'fighter' subdirectory found in directory: '" + targetDir + "'.");
     }
     return correctedDir;
 }
 
-export function findCharacters(targetDir: string): FoundCharacter[] {
+export async function findCharacters(targetDir: string): Promise<FoundCharacter[]> {
     const characterNames: string[] = Array.from(new Set(
-        fs.readdirSync(
+        (await fs.readdir(
             path.join(targetDir, "fighter")
-        ).filter(
+        )).filter(
             (file: string) => file.endsWith(".bin") || !file.includes(".")
         ).map(
             (character: string) => character.replace(/\.[^/\\]+$/, "")
         )
     ));
-    return characterNames.map((characterName: string) => {
+    return (await Promise.all(characterNames.map(async (characterName: string) => {
         let found: FoundCharacter;
-        if (fs.existsSync(path.join(targetDir, "data", "dats", characterName + ".dat"))) {
+        if (await fs.exists(path.join(targetDir, "data", "dats", characterName + ".dat"))) {
             found = {
                 name: characterName,
-                dat: readCharacterDatPath(
+                dat: (await readCharacterDatPath(
                     path.join(targetDir, "data", "dats", characterName + ".dat"),
                     characterName
-                )!,
+                ))!,
                 mug: path.join(targetDir, "gfx", "mugs", characterName + ".png")
             };
-        } else if (fs.existsSync(path.join(targetDir, "data", characterName + ".dat"))) {
+        } else if (await fs.exists(path.join(targetDir, "data", characterName + ".dat"))) {
             found = {
                 name: characterName,
-                dat: readCharacterDatPath(
+                dat: (await readCharacterDatPath(
                     path.join(targetDir, "data", characterName + ".dat"),
                     characterName
-                )!,
+                ))!,
                 mug: path.join(targetDir, "gfx", "mugs", characterName + ".png")
             };
         } else return null;
@@ -581,7 +585,7 @@ export function findCharacters(targetDir: string): FoundCharacter[] {
             found.dat.series = found.dat.series || builtinInfo.series;
         }
         return found;
-    }).filter((found: FoundCharacter) => found != null) as FoundCharacter[];
+    }))).filter((found: FoundCharacter) => found != null) as FoundCharacter[];
 }
 
 export function queCharacterInstallation(
@@ -654,7 +658,7 @@ export async function installCharacter(
     updateCharacters: boolean,
     dir: string = global.gameDir
 ): Promise<Character | null> {
-    const characters: CharacterList = readCharacterList(dir);
+    const characters: CharacterList = await readCharacterList(dir);
     if (!updateCharacters && characters.getByName(foundCharacter.name) != undefined) {
         throw new Error("Character already installed, updates disabled.");
     }
@@ -667,35 +671,34 @@ export async function installCharacter(
     if (updateCharacters) {
         if (
             (
-                fs.existsSync(path.join(targetDir, "fighter", foundCharacter.name + ".bin")) ||
-                fs.existsSync(path.join(targetDir, "fighter", foundCharacter.name))
+                await fs.exists(path.join(targetDir, "fighter", foundCharacter.name + ".bin")) ||
+                await fs.exists(path.join(targetDir, "fighter", foundCharacter.name))
             ) &&
             (
-                fs.existsSync(path.join(dir, "fighter", foundCharacter.name + ".bin")) ||
-                fs.existsSync(path.join(dir, "fighter", foundCharacter.name))
+                await fs.exists(path.join(dir, "fighter", foundCharacter.name + ".bin")) ||
+                await fs.exists(path.join(dir, "fighter", foundCharacter.name))
             )
         ) {
             console.log("Removing bin & folder for replacement.");
-            fs.removeSync(path.join(dir, "fighter", foundCharacter.name + ".bin"));
-            fs.removeSync(path.join(dir, "fighter", foundCharacter.name));
+            await fs.remove(path.join(dir, "fighter", foundCharacter.name + ".bin"));
+            await fs.remove(path.join(dir, "fighter", foundCharacter.name));
         }
     }
 
     const toResolve: Promise<void>[] = [];
     if (filterInstallation) {
-        (await getCharacterFiles(foundCharacter.dat, false, false, targetDir))
-            .forEach((file: string) => {
+        toResolve.push(...(await getCharacterFiles(foundCharacter.dat, false, false, targetDir))
+            .map(async (file: string) => {
                 const targetPath: string = path.join(dir, path.relative(targetDir, file));
-                fs.ensureDirSync(path.parse(targetPath).dir);
-                if (!updateCharacters && fs.existsSync(targetPath)) return;
-                toResolve.push(
-                    fs.copy(
-                        file,
-                        targetPath,
-                        { overwrite: !file.startsWith("gfx/seriesicon/") }
-                    )
+                if (!updateCharacters && await fs.exists(targetPath)) return;
+                await fs.ensureDir(path.parse(targetPath).dir);
+                await fs.copy(
+                    file,
+                    targetPath,
+                    { overwrite: !file.startsWith("gfx/seriesicon/") }
                 );
-            });
+            })
+        );
     } else {
         toResolve.push(fs.copy(targetDir, dir, { overwrite: true }));
     }
@@ -739,7 +742,7 @@ export async function getMissingDatInfo(
 
     let prefillInfo: PartialDatInfo | undefined;
     if (installedCharacters) {
-        const toUpdate: CharacterDat | null = readCharacterDat(dat.name);
+        const toUpdate: CharacterDat | null = await readCharacterDat(dat.name);
         if (toUpdate) {
             prefillInfo = {
                 displayName: toUpdate.displayName,
@@ -822,42 +825,38 @@ export async function extractCharacter(
     extract: string,
     dir: string = global.gameDir
 ): Promise<string> {
-    const toResolve: Promise<void>[] = [];
-    const characters: Character[] = readCharacters(dir);
+    const characters: Character[] = await readCharacters(dir);
     const characterDat: CharacterDat =
-        readCharacterDat(extract, dir) ?? error("Character has no dat file.");
+        await readCharacterDat(extract, dir) ?? error("Character has no dat file.");
     const extractDir: string = path.join(dir, "0extracted", extract);
 
     const similarNames: string[] = characters.filter(
         (character: Character) => character.name.startsWith(extract) && character.name != extract
     ).map((character: Character) => character.name);
-    
-    (await getCharacterFiles(characterDat, true, false, dir, similarNames))
-        .forEach((file: string) => {
-            const targetPath: string = path.join(extractDir, path.relative(dir, file));
-            fs.ensureDirSync(path.parse(targetPath).dir);
-            toResolve.push(
-                fs.copy(
-                    file,
-                    targetPath,
-                    { overwrite: true }
-                )
-            );
-        });
 
-    await Promise.allSettled(toResolve);
+    await Promise.allSettled((await getCharacterFiles(characterDat, true, false, dir, similarNames))
+        .map(async (file: string) => {
+            const targetPath: string = path.join(extractDir, path.relative(dir, file));
+            await fs.ensureDir(path.parse(targetPath).dir);
+            await fs.copy(
+                file,
+                targetPath,
+                { overwrite: true }
+            );
+        })
+    );
     writeCharacterDat(characterDat, path.join(extractDir, "data", "dats"));
     return extractDir;
 }
 
 export async function removeCharacter(remove: string, dir: string = global.gameDir): Promise<void> {
     const toResolve: Promise<void>[] = [];
-    const character: Character | undefined = readCharacterList(dir).getByName(remove);
+    const character: Character | undefined = (await readCharacterList(dir)).getByName(remove);
     if (!character) throw new Error("Character not found: \"" + remove + "\"");
     await removeAllAlts(character, dir);
-    const characters: CharacterList = readCharacterList(dir);
+    const characters: CharacterList = await readCharacterList(dir);
     const characterDat: CharacterDat =
-        readCharacterDat(remove, dir) ?? error("Character has no dat file.");
+        await readCharacterDat(remove, dir) ?? error("Character has no dat file.");
 
     const similarNames: string[] = characters.toArray().filter(
         (character: Character) => character.name.startsWith(remove) && character.name != remove
@@ -925,7 +924,7 @@ export async function getCharacterFiles(
     let files: string[] = await general.matchContents(matchNodes, dir);
 
     for (const name of similarNames) {
-        const similarDat: CharacterDat | null = readCharacterDat(name, dir);
+        const similarDat: CharacterDat | null = await readCharacterDat(name, dir);
         if (!similarDat) continue;
         const negNodes: RegExpNode[] | undefined = createCharacterRegExpNodes(
             CHARACTER_FILES_POSSIBLE_CONFLICTS,
@@ -944,9 +943,9 @@ export async function getCharacterFiles(
     return files;
 }
 
-export function readCssPages(dir: string = global.gameDir): CssPage[] {
+export async function readCssPages(dir: string = global.gameDir): Promise<CssPage[]> {
     const pages: CssPage[] = [];
-    const gameSettings: any = ini.parse(fs.readFileSync(
+    const gameSettings: any = ini.parse(await fs.readFile(
         path.join(dir, "data", "GAME_SETTINGS.txt"),
         "ascii"
     ));
@@ -975,10 +974,10 @@ export function readCssPages(dir: string = global.gameDir): CssPage[] {
 }
 
 export async function writeCssPages(pages: CssPage[], dir: string = global.gameDir): Promise<void> {
-    let gameSettings: string[] = fs.readFileSync(
+    let gameSettings: string[] = (await fs.readFile(
         path.join(dir, "data", "GAME_SETTINGS.txt"),
         "ascii"
-    ).split(/\r?\n/);
+    )).split(/\r?\n/);
     if (ini.parse(gameSettings.join("\r\n"))["global.css_customs"] == 0) {
         throw new Error("Custom CSS pages disabled in game_settings.");
     }
@@ -1002,7 +1001,7 @@ export async function writeCssPages(pages: CssPage[], dir: string = global.gameD
         );
         gameSettings.push("global.css_custom_name[" + (index + 1) + "] = \"" + page.name + "\";");
     });
-    fs.writeFileSync(
+    await fs.writeFile(
         path.join(dir, "data", "GAME_SETTINGS.txt"),
         gameSettings.join("\r\n"),
         { encoding: "ascii" }
@@ -1011,7 +1010,7 @@ export async function writeCssPages(pages: CssPage[], dir: string = global.gameD
 }
 
 export async function removeCssPage(page: CssPage, dir: string = global.gameDir): Promise<void> {
-    const pages: CssPage[] = readCssPages(dir).filter((i: CssPage) => i.path != page.path);
+    const pages: CssPage[] = (await readCssPages(dir)).filter((i: CssPage) => i.path != page.path);
     fs.remove(page.path);
     await writeCssPages(pages, dir);
     return;
@@ -1022,20 +1021,20 @@ export async function addCssPage(pageName: string, dir: string = global.gameDir)
     const newFile: string = pageName.replace(/[\\/:*?|. ]/g, "-");
     let newPath: string = path.join(dir, "data", "css", newFile + ".txt");
 
-    if (fs.existsSync(newPath)) {
+    if (await fs.exists(newPath)) {
         newPath = await general.createUniqueFileName(
             path.join(dir, "data", "css"),
             newFile, ".txt"
         );
     }
 
-    const pages: CssPage[] = readCssPages(dir);
+    const pages: CssPage[] = await readCssPages(dir);
     const newPage: CssPage = { name: pageName, path: newPath };
     pages.push(newPage);
     await writeCssPages(pages, dir);
 
-    fs.ensureFileSync(newPath);
-    fs.writeFileSync(
+    await fs.ensureFile(newPath);
+    await fs.writeFile(
         newPath,
         BLANK_CSS_PAGE_DATA,
         { encoding: "ascii" }
@@ -1049,7 +1048,7 @@ export async function reorderCssPage(
     dir: string = global.gameDir
 ): Promise<void> {
     if (to == from) return;
-    const pages: CssPage[] = readCssPages(dir);
+    const pages: CssPage[] = await readCssPages(dir);
     const target: CssPage = pages[from];
     pages.splice(from, 1);
     if (to > from) to--;
@@ -1064,12 +1063,12 @@ export async function renameCssPage(
     dir: string = global.gameDir
 ): Promise<CssPage> {
     const toResolve: Promise<void>[] = [];
-    const pages: CssPage[] = readCssPages(dir);
+    const pages: CssPage[] = await readCssPages(dir);
     const newFile: string = pageName.replace(/[\\/:*?|. ]/g, "-");
     let newPath: string = path.join(dir, "data", "css", newFile + ".txt");
     
     if (newPath != pages[index].path) {
-        if (fs.existsSync(newPath)) {
+        if (await fs.exists(newPath)) {
             newPath = await general.createUniqueFileName(
                 path.join(dir, "data", "css"),
                 newFile, ".txt"
@@ -1085,8 +1084,8 @@ export async function renameCssPage(
     return newPage;
 }
 
-export function readCssData(page: CssPage): CssData {
-    const cssFile: string[] = fs.readFileSync(page.path, "ascii").split(/\r?\n/);
+export async function readCssData(page: CssPage): Promise<CssData> {
+    const cssFile: string[] = (await fs.readFile(page.path, "ascii")).split(/\r?\n/);
     const css: CssData = cssFile.map((line: string) => line.split(" "));
     css[css.length - 1].pop();
     return css;
@@ -1095,7 +1094,7 @@ export function readCssData(page: CssPage): CssData {
 export async function writeCssData(page: CssPage, data: CssData): Promise<void> {
     const fixedData: CssData = fixCssData(data);
     const output: string = fixedData.map((row: string[]) => row.join(" ")).join("\r\n") + " ";
-    fs.writeFileSync(
+    await fs.writeFile(
         page.path,
         output,
         { encoding: "ascii" }
@@ -1122,9 +1121,9 @@ export async function removeCharacterCss(
     dir: string = global.gameDir
 ): Promise<void> {
     const toResolve: Promise<void>[] = [];
-    const cssPages: CssPage[] = readCssPages(dir);
-    cssPages.forEach((page: CssPage) => {
-        const cssData: CssData = readCssData(page);
+    const cssPages: CssPage[] = await readCssPages(dir);
+    for (const page of cssPages) {
+        const cssData: CssData = await readCssData(page);
         toResolve.push(writeCssData(page, cssData.map((row: string[]) => {
             return row.map((cell: string) => {
                 if (parseInt(cell) == character.number) {
@@ -1136,7 +1135,7 @@ export async function removeCharacterCss(
                 }
             });
         })));
-    });
+    }
     await Promise.allSettled(toResolve);
     return;
 }
@@ -1145,7 +1144,7 @@ export async function removeSeriesCharacters(
     series: string,
     dir: string = global.gameDir
 ): Promise<void> {
-    const charactersToRemove: Character[] = readCharacters(dir)
+    const charactersToRemove: Character[] = (await readCharacters(dir))
         .filter((character: Character) => character.series == series);
     const altsToRemove: Alt[] = [];
     charactersToRemove.forEach((character: Character) => {

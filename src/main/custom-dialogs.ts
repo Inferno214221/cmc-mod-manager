@@ -5,7 +5,7 @@ const DEV_TOOLS_ENABLED: boolean = true;
 abstract class Dialog<OptionsType extends Options, ReturnType> {
     options: OptionsType;
     window: BrowserWindow;
-    callback: ((result?: ReturnType) => void);
+    resolve: ((result?: ReturnType) => void);
 
     abstract readonly PRELOAD_ENTRY: string;
     abstract readonly REACT_ENTRY: string;
@@ -18,55 +18,51 @@ abstract class Dialog<OptionsType extends Options, ReturnType> {
 
     async show(): Promise<ReturnType | undefined> {
         return new Promise((resolve: (result?: ReturnType) => void) => {
-            this.showSync(resolve);
+            this.options.id = this.options.id + "_" + Date.now();
+            this.resolve = resolve;
+
+            this.window = new BrowserWindow({
+                resizable: true,
+                modal: true,
+                autoHideMenuBar: true,
+                minimizable: false,
+                maximizable: false,
+                alwaysOnTop: true,
+                fullscreenable: false,
+                darkTheme: true,
+                width: 360,
+                height: 100,
+                parent: global.win,
+                webPreferences: {
+                    devTools: DEV_TOOLS_ENABLED,
+                    preload: this.PRELOAD_ENTRY,
+                    additionalArguments: [JSON.stringify(this.options)]
+                }
+            });
+
+            this.window.on("close", () => {
+                this.clearHandlers();
+                resolve();
+            });
+
+            // Calls even when destroyed
+            this.window.on("closed", () => {
+                global.dialogs.splice(global.dialogs.indexOf(this.window), 1);
+            });
+
+            ipcMain.handle(this.options.id + "_dialogResize",
+                (_event: IpcMainInvokeEvent, height: number) => this.resize(height)
+            );
+            ipcMain.handle(this.options.id + "_dialogOk",
+                (_event: IpcMainInvokeEvent, value: ReturnType) => this.ok(value)
+            );
+            ipcMain.handle(this.options.id + "_dialogCancel",
+                () => this.cancel()
+            );
+
+            this.window.loadURL(this.REACT_ENTRY);
+            global.dialogs.push(this.window);
         });
-    }
-
-    showSync(callback: ((result?: ReturnType) => void)): void {
-        this.options.id = this.options.id + "_" + Date.now();
-        this.callback = callback;
-
-        this.window = new BrowserWindow({
-            resizable: true,
-            modal: true,
-            autoHideMenuBar: true,
-            minimizable: false,
-            maximizable: false,
-            alwaysOnTop: true,
-            fullscreenable: false,
-            darkTheme: true,
-            width: 360,
-            height: 100,
-            parent: global.win,
-            webPreferences: {
-                devTools: DEV_TOOLS_ENABLED,
-                preload: this.PRELOAD_ENTRY,
-                additionalArguments: [JSON.stringify(this.options)]
-            }
-        });
-
-        this.window.on("close", () => {
-            this.clearHandlers();
-            if (callback != undefined) callback();
-        });
-
-        // Calls even when destroyed
-        this.window.on("closed", () => {
-            global.dialogs.splice(global.dialogs.indexOf(this.window), 1);
-        });
-
-        ipcMain.handle(this.options.id + "_dialogResize",
-            (_event: IpcMainInvokeEvent, height: number) => this.resize(height)
-        );
-        ipcMain.handle(this.options.id + "_dialogOk",
-            (_event: IpcMainInvokeEvent, value: ReturnType) => this.ok(value)
-        );
-        ipcMain.handle(this.options.id + "_dialogCancel",
-            () => this.cancel()
-        );
-
-        this.window.loadURL(this.REACT_ENTRY);
-        global.dialogs.push(this.window);
     }
 
     resize(height: number): void {
@@ -99,11 +95,11 @@ export class AlertDialog extends Dialog<AlertOptions, null> {
 
     ok(value: null): void {
         super.ok(value);
-        this.callback();
+        this.resolve();
     }
     cancel(): void {
         super.cancel();
-        this.callback();
+        this.resolve();
     }
 }
 
@@ -120,11 +116,11 @@ export class ConfirmDialog extends Dialog<ConfirmOptions, boolean> {
 
     ok(value: boolean): void {
         super.ok(value);
-        this.callback(true);
+        this.resolve(true);
     }
     cancel(): void {
         super.cancel();
-        this.callback(false);
+        this.resolve(false);
     }
 }
 
@@ -141,11 +137,11 @@ export class PromptDialog extends Dialog<PromptOptions, string> {
 
     ok(value: string): void {
         super.ok(value);
-        this.callback(value);
+        this.resolve(value);
     }
     cancel(): void {
         super.cancel();
-        this.callback(undefined);
+        this.resolve(undefined);
     }
 }
 
@@ -164,11 +160,11 @@ export class CharacterInstallDialog extends Dialog<CharacterInstallOptions, null
 
     ok(value: null): void {
         super.ok(value);
-        this.callback();
+        this.resolve();
     }
     cancel(): void {
         super.cancel();
-        this.callback();
+        this.resolve();
     }
 }
 
@@ -193,11 +189,11 @@ export class StageInstallDialog extends Dialog<StageInstallOptions, null> {
 
     ok(value: null): void {
         super.ok(value);
-        this.callback();
+        this.resolve();
     }
     cancel(): void {
         super.cancel();
-        this.callback();
+        this.resolve();
     }
 }
 

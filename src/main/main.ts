@@ -29,9 +29,7 @@ import * as characters from "./characters";
 import * as stages from "./stages";
 import * as customDialogs from "./custom-dialogs";
 
-general.loadAppData();
-
-global.gameDir = global.appData.dir;
+general.loadAppData().then(() => global.gameDir = global.appData.dir);
 
 if (!app.requestSingleInstanceLock()) {
     console.log("No App Single Instance Lock");
@@ -42,12 +40,11 @@ if (!app.requestSingleInstanceLock()) {
     });
 }
 
-
-function createWindow(): void {
+async function createWindow(): Promise<void> {
     const updateDir: string = path.join(global.appDir, "update");
-    const didUpdate: boolean = fs.existsSync(updateDir);
+    const didUpdate: boolean = await fs.exists(updateDir);
     if (didUpdate) {
-        fs.removeSync(updateDir);
+        fs.remove(updateDir);
     }
 
     global.win = new BrowserWindow({
@@ -86,11 +83,11 @@ function createWindow(): void {
         callback: (response: string | ProtocolResponse) => void
     ) => {
         const url: string = request.url.replace("img://", "");
-        if (fs.pathExistsSync(url)) return callback(url);
+        if (await fs.pathExists(url)) return callback(url);
         const parsedUrl: path.ParsedPath = path.parse(url);
-        if (!(fs.pathExistsSync(parsedUrl.dir))) return callback("MISSING");
+        if (!(await fs.pathExists(parsedUrl.dir))) return callback("MISSING");
 
-        const dirContents: string[] = fs.readdirSync(parsedUrl.dir);
+        const dirContents: string[] = await fs.readdir(parsedUrl.dir);
         const filePat: RegExp = new RegExp("^" + general.escapeRegex(parsedUrl.base) + "$", "i");
         const filtered: string[] = dirContents.filter((file: string) => filePat.test(file));
         if (filtered.length > 0) return callback(path.join(parsedUrl.dir, filtered[0]));

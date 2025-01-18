@@ -17,16 +17,16 @@ const BLANK_SSS_PAGE_DATA: SssData = [
     [ "0000", "0000", "0000", "0000", "0000", "0000", "0000", "0000", "0000", "9999" ],
 ];
 
-export function readStages(dir: string = global.gameDir): Stage[] {
-    return readStageList(dir).toArray();
+export async function readStages(dir: string = global.gameDir): Promise<Stage[]> {
+    return (await readStageList(dir)).toArray();
 }
 
-function readStageList(dir: string = global.gameDir): StageList {
+export async function readStageList(dir: string = global.gameDir): Promise<StageList> {
     const stageList: StageList = new StageList();
-    const stagesTxt: string[] = fs.readFileSync(
+    const stagesTxt: string[] = (await fs.readFile(
         path.join(dir, "data", "stages.txt"),
         "ascii"
-    ).trim().split(/\r?\n/);
+    )).trim().split(/\r?\n/);
     const num: number = parseInt(stagesTxt.shift() ?? "");
     const isV7: boolean = (stagesTxt.length / 3) == num;
 
@@ -63,10 +63,10 @@ function readStageList(dir: string = global.gameDir): StageList {
             });
         }
     }
-    const lockedTxt: string[] = fs.readFileSync(
+    const lockedTxt: string[] = (await fs.readFile(
         path.join(dir, "data", "stage_lock.txt"),
         "ascii"
-    ).split(/\r?\n/);
+    )).split(/\r?\n/);
     lockedTxt.shift();
     lockedTxt.forEach((locked: string) => {
         if (stageList.getByName(locked) == undefined) return;
@@ -93,7 +93,7 @@ export async function writeStages(
             ].join("\r\n")
         ).join("\r\n")
     ].join("\r\n");
-    fs.writeFileSync(
+    await fs.writeFile(
         path.join(dir, "data", "stages.txt"),
         output,
         { encoding: "ascii" }
@@ -106,10 +106,10 @@ export async function writeStageRandom(
     randomSelection: boolean,
     dir: string = global.gameDir
 ): Promise<void> {
-    let lockedTxt: string[] = fs.readFileSync(
+    let lockedTxt: string[] = (await fs.readFile(
         path.join(dir, "data", "stage_lock.txt"),
         "ascii"
-    ).split(/\r?\n/);
+    )).split(/\r?\n/);
     lockedTxt.shift();
     if (randomSelection) {
         lockedTxt = lockedTxt.filter((locked: string) => locked != stage);
@@ -118,7 +118,7 @@ export async function writeStageRandom(
     }
     let output: string = lockedTxt.length + "\r\n";
     output += lockedTxt.join("\r\n");
-    fs.writeFileSync(
+    await fs.writeFile(
         path.join(dir, "data", "stage_lock.txt"),
         output,
         { encoding: "ascii" }
@@ -166,8 +166,8 @@ export async function getStageFiles(
     // Stages currently contain only exhaustive nodes
 }
 
-export function readStageInfoPath(targetInfo: string): StageInfo | null {
-    const infoTxt: string[] | StageInfo = general.readJSON(targetInfo);
+export async function readStageInfoPath(targetInfo: string): Promise<StageInfo | null> {
+    const infoTxt: string[] | StageInfo = await general.readJSON(targetInfo);
     if (Array.isArray(infoTxt)) {
         return {
             menuName: infoTxt[0],
@@ -185,15 +185,15 @@ export function readStageInfoPath(targetInfo: string): StageInfo | null {
     return infoTxt as StageInfo;
 }
 
-export function writeStageInfo(stage: Stage, destination: string): void {
-    fs.ensureFileSync(path.join(destination, stage.name + ".json"));
-    fs.writeFileSync(
+export async function writeStageInfo(stage: Stage, destination: string): Promise<void> {
+    await fs.ensureFile(path.join(destination, stage.name + ".json"));
+    await general.writeJSON(
         path.join(destination, stage.name + ".json"),
-        JSON.stringify({
+        {
             menuName: stage.menuName,
             source: stage.source,
             series: stage.series
-        }, null, 2)
+        }
     );
     return;
 }
@@ -218,19 +218,19 @@ export async function installDownloadedStages(targetDir: string): Promise<void> 
     installStages(targetDir, true, global.appData.config.updateStages, "GameBanana");
 }
 
-export function installStages(
+export async function installStages(
     targetDir: string,
     filterInstallation: boolean,
     updateStages: boolean,
     location: string,
     dir: string = global.gameDir
-): void {
+): Promise<void> {
     try {
-        const correctedTarget: string = correctStageDir(targetDir);
+        const correctedTarget: string = await correctStageDir(targetDir);
         if (path.relative(correctedTarget, dir) == "") throw new Error(
             "Cannot install stage from the directory that they are being installed to."
         );
-        const foundStages: FoundStage[] = findStages(correctedTarget);
+        const foundStages: FoundStage[] = await findStages(correctedTarget);
         if (foundStages.length == 0)
             throw new Error("No valid stages found in directory: '" + targetDir + "'.");
         if (foundStages.length == 1) {
@@ -271,9 +271,9 @@ export function installStages(
     return;
 }
 
-export function correctStageDir(targetDir: string): string {
+export async function correctStageDir(targetDir: string): Promise<string> {
     let correctedDir: string = targetDir;
-    const modFiles: string[] = general.getAllFiles(correctedDir)
+    const modFiles: string[] = (await general.getAllFiles(correctedDir))
         .map((file: string) => file.replace(correctedDir, "")).reverse(); // Puts 0extracted last
     for (let file of modFiles) {
         file = path.join(file).split(path.sep).join(path.posix.sep);
@@ -290,18 +290,18 @@ export function correctStageDir(targetDir: string): string {
             break;
         }
     }
-    if (!fs.readdirSync(correctedDir).includes("stage")) {
+    if (!(await fs.readdir(correctedDir)).includes("stage")) {
         throw new Error("No 'stage' subdirectory found in directory: '" + targetDir + "'.");
     }
     return correctedDir;
 }
 
-export function findStages(targetDir: string): FoundStage[] {
+export async function findStages(targetDir: string): Promise<FoundStage[]> {
     // readStageList should probably handle what to do if the directory is,
     // invalid better, but there isn't much point fixing it now.
     let installedStages: FoundStage[] | null = null;
     try {
-        installedStages = readStages(targetDir).map((stage: Stage) => ({
+        installedStages = (await readStages(targetDir)).map((stage: Stage) => ({
             name: stage.name,
             info: {
                 menuName: stage.menuName,
@@ -315,28 +315,33 @@ export function findStages(targetDir: string): FoundStage[] {
     }
 
     const stageNames: string[] = Array.from(new Set(
-        fs.readdirSync(
+        (await fs.readdir(
             path.join(targetDir, "stage")
-        ).filter(
+        )).filter(
             (file: string) => file.endsWith(".bin") || !file.includes(".")
         ).map(
             (stage: string) => stage.replace(/\.[^/\\]+$/, "")
         )
     ));
-    const foundStages: FoundStage[] = stageNames.map((stageName: string) => {
-        const found: FoundStage = {
-            name: stageName,
-            icon: path.join(targetDir, "gfx", "stgicons", stageName + ".png")
-        };
-        if (fs.existsSync(path.join(targetDir, "info.json"))) {
-            found.info = readStageInfoPath(path.join(targetDir, "info.json")) ?? undefined;
-        } else if (fs.existsSync(path.join(targetDir, "data", "sinfo", stageName + ".json"))) {
-            found.info =
-                readStageInfoPath(path.join(targetDir, "data", "sinfo", stageName + ".json")) ??
-                undefined;
-        }
-        return found;
-    }) as FoundStage[];
+    const foundStages: FoundStage[] =
+        (await Promise.all(stageNames.map(async (stageName: string) => {
+            const found: FoundStage = {
+                name: stageName,
+                icon: path.join(targetDir, "gfx", "stgicons", stageName + ".png")
+            };
+            if (await fs.exists(path.join(targetDir, "info.json"))) {
+                found.info = await readStageInfoPath(
+                    path.join(targetDir, "info.json")
+                ) ?? undefined;
+            } else if (await fs.exists(
+                path.join(targetDir, "data", "sinfo", stageName + ".json")
+            )) {
+                found.info = await readStageInfoPath(
+                    path.join(targetDir, "data", "sinfo", stageName + ".json")
+                ) ?? undefined;
+            }
+            return found;
+        }))) as FoundStage[];
 
     const allStagesByName: { [name: string]: FoundStage } = {};
     foundStages.forEach((stage: FoundStage) =>
@@ -419,7 +424,7 @@ export async function installStage(
     updateStages: boolean = false,
     dir: string = global.gameDir
 ): Promise<Stage | null> {
-    const stageList: StageList = readStageList(dir);
+    const stageList: StageList = await readStageList(dir);
     if (!updateStages && stageList.getByName(foundStage.name) != undefined) {
         throw new Error("Stage already installed, updates disabled.");
     }
@@ -440,34 +445,34 @@ export async function installStage(
     if (updateStages) {
         if (
             (
-                fs.existsSync(path.join(targetDir, "stage", foundStage.name + ".bin")) ||
-                fs.existsSync(path.join(targetDir, "stage", foundStage.name))
+                await fs.exists(path.join(targetDir, "stage", foundStage.name + ".bin")) ||
+                await fs.exists(path.join(targetDir, "stage", foundStage.name))
             ) &&
             (
-                fs.existsSync(path.join(dir, "stage", foundStage.name + ".bin")) ||
-                fs.existsSync(path.join(dir, "stage", foundStage.name))
+                await fs.exists(path.join(dir, "stage", foundStage.name + ".bin")) ||
+                await fs.exists(path.join(dir, "stage", foundStage.name))
             )
         ) {
             console.log("Removing bin & folder for replacement.");
-            fs.removeSync(path.join(dir, "stage", foundStage.name + ".bin"));
-            fs.removeSync(path.join(dir, "stage", foundStage.name));
+            await fs.remove(path.join(dir, "stage", foundStage.name + ".bin"));
+            await fs.remove(path.join(dir, "stage", foundStage.name));
         }
     }
 
     const toResolve: Promise<void>[] = [];
     if (filterInstallation) {
-        (await getStageFiles(stage, false, targetDir)).forEach((file: string) => {
-            const targetPath: string = path.join(dir, path.relative(targetDir, file));
-            fs.ensureDirSync(path.parse(targetPath).dir);
-            if (!updateStages && fs.existsSync(targetPath)) return;
-            toResolve.push(
-                fs.copy(
+        toResolve.push(...(await getStageFiles(stage, false, targetDir))
+            .map(async (file: string) => {
+                const targetPath: string = path.join(dir, path.relative(targetDir, file));
+                if (!updateStages && await fs.exists(targetPath)) return;
+                await fs.ensureDir(path.parse(targetPath).dir);
+                await fs.copy(
                     file,
                     targetPath,
                     { overwrite: !file.startsWith("gfx/seriesicon/") }
-                )
-            );
-        });
+                );
+            })
+        );
     } else {
         toResolve.push(fs.copy(targetDir, dir, { overwrite: true }));
     }
@@ -482,7 +487,7 @@ export async function installStage(
     toResolve.push(writeStages(stageList.toArray(), dir));
     await Promise.allSettled(toResolve);
     
-    fs.removeSync(path.join(dir, "info.json"));
+    await fs.remove(path.join(dir, "info.json"));
     writeStageInfo(stage, path.join(dir, "data", "sinfo"));
     return stage;
 }
@@ -568,31 +573,29 @@ export async function getMissingStageInfo(
 }
 
 export async function extractStage(extract: string, dir: string = global.gameDir): Promise<string> {
-    const toResolve: Promise<void>[] = [];
-    const stageList: StageList = readStageList(dir);
+    const stageList: StageList = await readStageList(dir);
     const stage: Stage | undefined = stageList.getByName(extract);
     if (!stage) throw new Error("Stage not found: \"" + extract + "\"");
     const extractDir: string = path.join(dir, "0extracted", extract);
     
-    (await getStageFiles(stage, false, dir)).forEach((file: string) => {
-        const targetPath: string = path.join(extractDir, path.relative(dir, file));
-        fs.ensureDirSync(path.parse(targetPath).dir);
-        toResolve.push(
-            fs.copy(
+    await Promise.allSettled((await getStageFiles(stage, false, dir))
+        .map(async (file: string) => {
+            const targetPath: string = path.join(extractDir, path.relative(dir, file));
+            await fs.ensureDir(path.parse(targetPath).dir);
+            await fs.copy(
                 file,
                 targetPath,
                 { overwrite: true }
-            )
-        );
-    });
-    await Promise.allSettled(toResolve);
+            );
+        })
+    );
     writeStageInfo(stage, path.join(extractDir, "data", "sinfo"));
     return extractDir;
 }
 
 export async function removeStage(remove: string, dir: string = global.gameDir): Promise<void> {
     const toResolve: Promise<void>[] = [];
-    const stageList: StageList = readStageList(dir);
+    const stageList: StageList = await readStageList(dir);
     const stage: Stage | undefined = stageList.getByName(remove);
     if (!stage) throw new Error("Stage not found: \"" + remove + "\"");
 
@@ -610,15 +613,15 @@ export async function removeStage(remove: string, dir: string = global.gameDir):
     return;
 }
 
-export function readSssPages(dir: string = global.gameDir): SssPage[] {
+export async function readSssPages(dir: string = global.gameDir): Promise<SssPage[]> {
     const pages: SssPage[] = [];
     // Currently SSS Pages are a fixed size - 10x6. Although it is possible that his may change in
     // the future, if any changes would be made to the stage format, it would likely become more
     // consistent with the current character format and therefore need major adjustments anyway
-    const sssTxt: string[] = fs.readFileSync(
+    const sssTxt: string[] = (await fs.readFile(
         path.join(dir, "data", "sss.txt"),
         "ascii"
-    ).split(/\r?\n/);
+    )).split(/\r?\n/);
     sssTxt.shift();
     for (let page: number = 0; page < Math.floor(sssTxt.length / 7); page++) {
         const data: SssData = [];
@@ -647,7 +650,7 @@ export async function writeSssPages(pages: SssPage[], dir: string = global.gameD
             ].join("\r\n")
         ).join("\r\n")
     ].join("\r\n");
-    fs.writeFileSync(
+    await fs.writeFile(
         path.join(dir, "data", "sss.txt"),
         output,
         { encoding: "ascii" }
@@ -679,7 +682,7 @@ export async function removeStageSss(
     stage: Stage,
     dir: string = global.gameDir
 ): Promise<void> {
-    const sssPages: SssPage[] = readSssPages(dir);
+    const sssPages: SssPage[] = await readSssPages(dir);
     for (const page of sssPages) {
         page.data = page.data.map((row: string[]) =>
             row.map((cell: string) => {
@@ -701,7 +704,7 @@ export async function removeSeriesStages(
     series: string,
     dir: string = global.gameDir
 ): Promise<void> {
-    const stagesToRemove: Stage[] = readStages(dir)
+    const stagesToRemove: Stage[] = (await readStages(dir))
         .filter((stage: Stage) => stage.series == series);
     console.log(Date.now());
     for (const stage of stagesToRemove) {
@@ -714,7 +717,7 @@ export async function removeSeriesStages(
 
 export async function addSssPage(pageName: string, dir: string = global.gameDir): Promise<SssPage> {
     pageName = pageName.replace(/'|"/g, "");
-    const pages: SssPage[] = readSssPages(dir);
+    const pages: SssPage[] = await readSssPages(dir);
     const newPage: SssPage = {
         name: pageName,
         pageNumber: pages.length,
@@ -726,7 +729,7 @@ export async function addSssPage(pageName: string, dir: string = global.gameDir)
 }
 
 export async function removeSssPage(page: SssPage, dir: string = global.gameDir): Promise<void> {
-    const pages: SssPage[] = readSssPages(dir).filter((i: SssPage) =>
+    const pages: SssPage[] = (await readSssPages(dir)).filter((i: SssPage) =>
         !(i.name == page.name && i.pageNumber == page.pageNumber)
     );
     await writeSssPages(pages, dir);
@@ -739,7 +742,7 @@ export async function reorderSssPage(
     dir: string = global.gameDir
 ): Promise<void> {
     if (to == from) return;
-    const pages: SssPage[] = readSssPages(dir);
+    const pages: SssPage[] = await readSssPages(dir);
     pages.sort((a: SssPage, b: SssPage) =>
         (a.pageNumber > b.pageNumber ? 1 : -1)
     );
@@ -764,7 +767,7 @@ export async function renameSssPage(
     pageName: string,
     dir: string = global.gameDir
 ): Promise<SssPage> {
-    const pages: SssPage[] = readSssPages(dir);
+    const pages: SssPage[] = await readSssPages(dir);
     pages[index].name = pageName;
     await writeSssPages(pages, dir);
     return pages[index];
