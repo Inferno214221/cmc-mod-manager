@@ -278,7 +278,7 @@ export function correctStageDir(targetDir: string): string {
     for (let file of modFiles) {
         file = path.join(file).split(path.sep).join(path.posix.sep);
         const fileDir: string = path.posix.parse(file).dir + "/";
-        if (fileDir.includes("/stage/") && !file.includes("/music/")) {
+        if (fileDir.includes("/stage/") && !file.includes("/music")) {
             let topDir: string = file.split("/").shift() ??
                 error("Top dir not found for file: '" + file + "'");
             while (topDir != "stage") {

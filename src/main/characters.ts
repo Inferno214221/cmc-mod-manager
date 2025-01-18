@@ -522,7 +522,7 @@ export function correctCharacterDir(targetDir: string): string {
     for (let file of modFiles) {
         file = path.join(file).split(path.sep).join(path.posix.sep);
         const fileDir: string = path.posix.parse(file).dir + "/";
-        if (fileDir.includes("/fighter/") && !file.includes("/announcer/")) {
+        if (fileDir.includes("/fighter/") && !file.includes("/announcer")) {
             let topDir: string | undefined = file.split("/").shift() ??
                 error("Top dir not found for file: '" + file + "'");
             while (topDir != "fighter") {
