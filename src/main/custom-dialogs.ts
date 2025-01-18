@@ -11,6 +11,7 @@ abstract class Dialog<OptionsType extends Options, ReturnType> {
     abstract readonly REACT_ENTRY: string;
 
     readonly DEFAULT_WIDTH: number = 360;
+    readonly IS_MODAL: boolean = true;
 
     constructor(options: OptionsType) {
         this.options = options;
@@ -23,7 +24,7 @@ abstract class Dialog<OptionsType extends Options, ReturnType> {
 
             this.window = new BrowserWindow({
                 resizable: true,
-                modal: true,
+                modal: this.IS_MODAL,
                 autoHideMenuBar: true,
                 minimizable: false,
                 maximizable: false,
@@ -157,6 +158,7 @@ export class CharacterInstallDialog extends Dialog<CharacterInstallOptions, null
     readonly REACT_ENTRY: string = DIALOG_CHARACTER_INSTALL_WEBPACK_ENTRY;
 
     readonly DEFAULT_WIDTH: number = 600;
+    readonly IS_MODAL: boolean = false;
 
     ok(value: null): void {
         super.ok(value);
@@ -186,6 +188,7 @@ export class StageInstallDialog extends Dialog<StageInstallOptions, null> {
     readonly REACT_ENTRY: string = DIALOG_STAGE_INSTALL_WEBPACK_ENTRY;
 
     readonly DEFAULT_WIDTH: number = 600;
+    readonly IS_MODAL: boolean = false;
 
     ok(value: null): void {
         super.ok(value);
