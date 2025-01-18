@@ -726,7 +726,6 @@ export async function getMissingDatInfo(
     targetDir: string,
     installedCharacters?: CharacterList
 ): Promise<CharacterDat | null> {
-    // TODO: prefill needs an explicit test
     if (dat.displayName && dat.menuName && dat.battleName && dat.series) return dat;
 
     const builtinInfo: V7CharacterInfo | undefined = v7CharacterLookup(dat.name);

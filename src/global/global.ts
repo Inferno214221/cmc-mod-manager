@@ -124,3 +124,17 @@ export class StageList extends ModList<Stage, StageUpdate> {}
 export function error(message: string): never {
     throw new Error(message);
 }
+
+export function finishOp(
+    id: number,
+    body: string,
+    postCompletion?: PostCompletion
+): ((prev: Operation[]) => Operation[]) {
+    return (prev: Operation[]) => {
+        const newOperations: Operation[] = [...prev];
+        newOperations[id].state = OpState.FINISHED;
+        newOperations[id].body = body
+        newOperations[id].postCompletion = postCompletion
+        return newOperations;
+    }
+}

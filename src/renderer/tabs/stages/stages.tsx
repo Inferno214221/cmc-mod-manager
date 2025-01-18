@@ -413,7 +413,7 @@ function StageDisplay({
                                                 newOperations[operationId].state = OpState.FINISHED;
                                                 newOperations[operationId].body = "Extracted " +
                                                     "stage: '" + stage.name + "'.";
-                                                newOperations[operationId].postCompletition = {
+                                                newOperations[operationId].postCompletion = {
                                                     icon: "source",
                                                     tooltip: "Open Extracted Files",
                                                     call: {

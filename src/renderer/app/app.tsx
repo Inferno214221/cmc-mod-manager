@@ -279,13 +279,13 @@ export function OperationDisplay({ display }: { display: Operation }): JSX.Eleme
             break;
         case (OpState.FINISHED):
             icon = "done";
-            if (display.postCompletition) {
+            if (display.postCompletion) {
                 closeButton = (
                     <IconButton
-                        icon={display.postCompletition.icon}
+                        icon={display.postCompletion.icon}
                         iconSize={"16px"}
-                        tooltip={display.postCompletition.tooltip}
-                        onClick={() => runOperation(display.postCompletition!.call)}
+                        tooltip={display.postCompletion.tooltip}
+                        onClick={() => runOperation(display.postCompletion!.call)}
                     />
                 );
             }

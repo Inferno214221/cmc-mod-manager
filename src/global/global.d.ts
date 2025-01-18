@@ -187,11 +187,7 @@ interface Operation {
     dependencies: OpDep[],
     call?: (() => Promise<void>) | MainCall,
     cancelable?: boolean,
-    postCompletition?: {
-        icon: string,
-        tooltip: string,
-        call: (() => Promise<void>) | MainCall
-    }
+    postCompletion?: PostCompletion
 }
 
 interface OperationUpdate {
@@ -201,11 +197,13 @@ interface OperationUpdate {
     image?: string,
     state?: OpState,
     cancelable?: boolean,
-    postCompletition?: {
-        icon: string,
-        tooltip: string,
-        call: (() => Promise<void>) | MainCall
-    }
+    postCompletion?: PostCompletion
+}
+
+interface PostCompletion {
+    icon: string,
+    tooltip: string,
+    call: (() => Promise<void>) | MainCall
 }
 
 interface MainCall {

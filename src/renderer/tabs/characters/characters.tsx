@@ -3,7 +3,7 @@ import IconButton from "../../icon-buttons/icon-button";
 import ToggleIconButton from "../../icon-buttons/toggle-icon-button";
 import CycleIconButton from "../../icon-buttons/cycle-icon-button";
 import MISSING from "../../../assets/missing.png";
-import { OpDep, OpState, SortTypeOptions } from "../../../global/global";
+import { OpDep, OpState, SortTypeOptions, finishOp } from "../../../global/global";
 import appStyles from "../../app/app.css";
 import charactersStyles from "./characters.css";
 const styles: typeof import("../../app/app.css") & typeof import("./characters.css") =
@@ -133,13 +133,37 @@ export function TabCharacters({
 
     async function writeAltsAsCharacters(value: boolean | null): Promise<void> {
         const appData: AppData = await api.readAppData();
-        if (value != null && appData.config["altsAsCharacters"] != value) {
-            appData.config["altsAsCharacters"] = value;
-            await api.writeAppData(appData);
-            console.log("Calling");
-            await api.ensureAllAltsAreCharacters(altsAsCharacters);
-            readCharacters();
-        }
+        if (value == null || appData.config["altsAsCharacters"] == value) return;
+
+        let operationId: number;
+        setOperations((prev: Operation[]) => {
+            const newOperations: Operation[] = [...prev];
+            operationId = newOperations.push({
+                title: "Alt Inclusion",
+                body: value ? "Ensuring that alts are included in the character list." :
+                    "Ensuring that alts are excluded from the character list.",
+                state: OpState.QUEUED,
+                icon: value ? "diversity_3" : "reduce_capacity",
+                animation: Math.floor(Math.random() * 3),
+                dependencies: [OpDep.FIGHTERS, OpDep.ALTS, OpDep.FIGHTER_LOCK, OpDep.CSS],
+                call: async () => {
+                    appData.config["altsAsCharacters"] = value;
+                    const toResolve: Promise<void>[] = [];
+                    toResolve.push(api.writeAppData(appData));
+                    toResolve.push(api.ensureAllAltsAreCharacters(value));
+                    await Promise.allSettled(toResolve);
+
+                    setOperations(finishOp(
+                        operationId,
+                        value ? "Ensured that alts are included in the character list." :
+                            "Ensured that alts are excluded from the character list."
+                    ));
+
+                    readCharacters();
+                }
+            }) - 1;
+            return newOperations;
+        });
     }
 
     return (
@@ -357,13 +381,11 @@ function CharacterDisplay({
                 call: async () => {
                     api.writeCharacterRandom(character.name, randomSelection);
                     character.randomSelection = randomSelection;
-                    setOperations((prev: Operation[]) => {
-                        const newOperations: Operation[] = [...prev];
-                        newOperations[operationId].state = OpState.FINISHED;
-                        newOperations[operationId].body = "Toggled the ability for character: '" +
-                            character.name + "' to be selected at random."
-                        return newOperations;
-                    });
+                    setOperations(finishOp(
+                        operationId,
+                        "Toggled the ability for character: '" + character.name + "' to be " +
+                        "selected at random."
+                    ));
                 }
             }) - 1;
             return newOperations;
@@ -408,13 +430,10 @@ function CharacterDisplay({
                                         ],
                                         call: async () => {
                                             await api.removeCharacter(character.name);
-                                            setOperations((prev: Operation[]) => {
-                                                const newOperations: Operation[] = [...prev];
-                                                newOperations[operationId].state = OpState.FINISHED;
-                                                newOperations[operationId].body = "Deleted " +
-                                                    "character: '" + character.name + "'.";
-                                                return newOperations;
-                                            });
+                                            setOperations(finishOp(
+                                                operationId,
+                                                "Deleted character: '" + character.name + "'."
+                                            ));
                                             readCharacters();
                                         }
                                     }) - 1;
@@ -441,21 +460,18 @@ function CharacterDisplay({
                                         call: async () => {
                                             const extractDir: string =
                                                 await api.extractCharacter(character.name);
-                                            setOperations((prev: Operation[]) => {
-                                                const newOperations: Operation[] = [...prev];
-                                                newOperations[operationId].state = OpState.FINISHED;
-                                                newOperations[operationId].body = "Extracted " +
-                                                    "character: '" + character.name + "'.";
-                                                newOperations[operationId].postCompletition = {
+                                            setOperations(finishOp(
+                                                operationId,
+                                                "Extracted  character: '" + character.name + "'.",
+                                                {
                                                     icon: "source",
                                                     tooltip: "Open Extracted Files",
                                                     call: {
                                                         name: "openDir",
                                                         args: [extractDir]
                                                     }
-                                                };
-                                                return newOperations;
-                                            });
+                                                }
+                                            ));
                                         }
                                     }) - 1;
                                     return newOperations;
@@ -542,13 +558,11 @@ function CharacterAltDisplay({
                                 dependencies: [OpDep.FIGHTERS, OpDep.ALTS],
                                 call: async () => {
                                     await api.removeAlt(alt);
-                                    setOperations((prev: Operation[]) => {
-                                        const newOperations: Operation[] = [...prev];
-                                        newOperations[operationId].state = OpState.FINISHED;
-                                        newOperations[operationId].body = "Removed alt: '" +
-                                            alt.alt + "' from character: '" + alt.base + "'.";
-                                        return newOperations;
-                                    });
+                                    setOperations(finishOp(
+                                        operationId,
+                                        "Removed alt: '" + alt.alt + "' from character: '" +
+                                        alt.base + "'."
+                                    ));
                                     readCharacters();
                                 }
                             }) - 1;
@@ -619,13 +633,11 @@ function AddAltButton({
                         call: async () => {
                             await api.addAlt(altTarget, character);
                             setAltTarget(null);
-                            setOperations((prev: Operation[]) => {
-                                const newOperations: Operation[] = [...prev];
-                                newOperations[operationId].state = OpState.FINISHED;
-                                newOperations[operationId].body = "Added alt: '" + character.name +
-                                    "' to character: '" + altTarget.name + "'.";
-                                return newOperations;
-                            });
+                            setOperations(finishOp(
+                                operationId,
+                                "Added alt: '" + character.name + "' to character: '" +
+                                altTarget.name + "'."
+                            ));
                             readCharacters();
                         }
                     }) - 1;
@@ -670,13 +682,10 @@ function SeriesDisplay({
                                 ],
                                 call: async () => {
                                     await api.removeSeriesCharacters(series);
-                                    setOperations((prev: Operation[]) => {
-                                        const newOperations: Operation[] = [...prev];
-                                        newOperations[operationId].state = OpState.FINISHED;
-                                        newOperations[operationId].body = "Deleted all " +
-                                            "characters in series: '" + series + "'.";
-                                        return newOperations;
-                                    });
+                                    setOperations(finishOp(
+                                        operationId,
+                                        "Deleted all characters in series: '" + series + "'."
+                                    ));
                                     readCharacters();
                                 }
                             }) - 1;
