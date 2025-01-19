@@ -78,11 +78,11 @@ interface PartialDatInfo {
 
 interface CharacterPalette {
     name: string,
-    0: number,
-    1: number,
-    2: number,
-    3: number,
-    4: number
+    0: string,
+    1: string,
+    2: string,
+    3: string,
+    4: string
 }
 
 interface CssPage {

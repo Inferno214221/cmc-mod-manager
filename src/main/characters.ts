@@ -369,11 +369,11 @@ export async function readCharacterDatPath(
             const paletteLocation: number = isVanilla ? 1 : 5 + palette;
             palettes.push({
                 name: characterDatTxt[paletteLocation + 0],
-                0: parseInt(characterDatTxt[paletteLocation + 1]),
-                1: parseInt(characterDatTxt[paletteLocation + 2]),
-                2: parseInt(characterDatTxt[paletteLocation + 3]),
-                3: parseInt(characterDatTxt[paletteLocation + 4]),
-                4: parseInt(characterDatTxt[paletteLocation + 5])
+                0: characterDatTxt[paletteLocation + 1],
+                1: characterDatTxt[paletteLocation + 2],
+                2: characterDatTxt[paletteLocation + 3],
+                3: characterDatTxt[paletteLocation + 4],
+                4: characterDatTxt[paletteLocation + 5]
             });
         }
     } else {
@@ -393,11 +393,11 @@ export async function readCharacterDatPath(
             const paletteLocation: number = 10 + homeStageCount + randomDataCount + palette;
             palettes.push({
                 name: characterDatTxt[paletteLocation + 0],
-                0: parseInt(characterDatTxt[paletteLocation + 1]),
-                1: parseInt(characterDatTxt[paletteLocation + 2]),
-                2: parseInt(characterDatTxt[paletteLocation + 3]),
-                3: parseInt(characterDatTxt[paletteLocation + 4]),
-                4: parseInt(characterDatTxt[paletteLocation + 5])
+                0: characterDatTxt[paletteLocation + 1],
+                1: characterDatTxt[paletteLocation + 2],
+                2: characterDatTxt[paletteLocation + 3],
+                3: characterDatTxt[paletteLocation + 4],
+                4: characterDatTxt[paletteLocation + 5]
             });
         }
     }
