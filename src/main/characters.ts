@@ -643,11 +643,27 @@ export async function installCharacterOp(
 }
 
 export async function characterInstallationOp(targetDir: string, id: string): Promise<void> {
-    await customDialogs.characterInstallation(targetDir);
+    const dialog: customDialogs.CharacterInstallDialog =
+        new customDialogs.CharacterInstallDialog(targetDir);
+    const show: Promise<null | undefined> = dialog.show();
+    // This isn't cancel because it finishes successfully
+    general.updateOperation({
+        id: id,
+        action: {
+            icon: "close",
+            tooltip: "Close Window",
+            call: {
+                name: "closeDialog",
+                args: [dialog.window.id]
+            }
+        }
+    });
+    await show;
     general.updateOperation({
         id: id,
         body: "Selected characters to install from '" + targetDir + "'.",
         state: OpState.FINISHED,
+        action: undefined
     });
 }
 

@@ -263,6 +263,15 @@ export function OperationDisplay({ display }: { display: Operation }): JSX.Eleme
                         onClick={() => api.cancelOperation(display.id)}
                     />
                 );
+            } else if (display.action) {
+                closeButton = (
+                    <IconButton
+                        icon={display.action.icon}
+                        iconSize={"16px"}
+                        tooltip={display.action.tooltip}
+                        onClick={() => runOperation(display.action!.call)}
+                    />
+                );
             }
             break
         case (OpState.QUEUED):
@@ -279,13 +288,13 @@ export function OperationDisplay({ display }: { display: Operation }): JSX.Eleme
             break;
         case (OpState.FINISHED):
             icon = "done";
-            if (display.postCompletion) {
+            if (display.action) {
                 closeButton = (
                     <IconButton
-                        icon={display.postCompletion.icon}
+                        icon={display.action.icon}
                         iconSize={"16px"}
-                        tooltip={display.postCompletion.tooltip}
-                        onClick={() => runOperation(display.postCompletion!.call)}
+                        tooltip={display.action.tooltip}
+                        onClick={() => runOperation(display.action!.call)}
                     />
                 );
             }

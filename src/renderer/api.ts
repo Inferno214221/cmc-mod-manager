@@ -112,6 +112,10 @@ export default {
         targetDir: string
     ]): Promise<string[]> => ipcRenderer.invoke("findStages", args)),
 
+    closeDialog: ((...args: [
+        id: number
+    ]): Promise<void> => ipcRenderer.invoke("closeDialog", args)),
+
     focusWindow: ((): Promise<void> => ipcRenderer.invoke("focusWindow")),
 
     getCharacterFiles: ((...args: [

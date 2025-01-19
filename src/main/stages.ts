@@ -409,11 +409,26 @@ export async function installStageOp(
 }
 
 export async function stageInstallationOp(targetDir: string, id: string): Promise<void> {
-    await customDialogs.stageInstallation(targetDir);
+    const dialog: customDialogs.StageInstallDialog =
+        new customDialogs.StageInstallDialog(targetDir);
+    const show: Promise<null | undefined> = dialog.show();
+    general.updateOperation({
+        id: id,
+        action: {
+            icon: "close",
+            tooltip: "Close Window",
+            call: {
+                name: "closeDialog",
+                args: [dialog.window.id]
+            }
+        }
+    });
+    await show;
     general.updateOperation({
         id: id,
         body: "Selected stages to install from '" + targetDir + "'.",
         state: OpState.FINISHED,
+        action: undefined
     });
 }
 

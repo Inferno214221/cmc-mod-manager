@@ -26,9 +26,9 @@ abstract class Dialog<OptionsType extends Options, ReturnType> {
                 resizable: true,
                 modal: this.IS_MODAL,
                 autoHideMenuBar: true,
-                minimizable: false,
-                maximizable: false,
-                alwaysOnTop: true,
+                minimizable: !this.IS_MODAL,
+                maximizable: !this.IS_MODAL,
+                alwaysOnTop: !this.IS_MODAL,
                 fullscreenable: false,
                 darkTheme: true,
                 width: 360,
@@ -160,6 +160,15 @@ export class CharacterInstallDialog extends Dialog<CharacterInstallOptions, null
     readonly DEFAULT_WIDTH: number = 600;
     readonly IS_MODAL: boolean = false;
 
+    constructor(targetDir: string) {
+        super({
+            id: "characterInstallation",
+            body: "",
+            title: "Select Characters To Install",
+            targetDir: targetDir
+        });
+    }
+
     ok(value: null): void {
         super.ok(value);
         this.resolve();
@@ -168,16 +177,6 @@ export class CharacterInstallDialog extends Dialog<CharacterInstallOptions, null
         super.cancel();
         this.resolve();
     }
-}
-
-export async function characterInstallation(targetDir: string): Promise<void> {
-    await new CharacterInstallDialog({
-        id: "characterInstallation",
-        body: "",
-        title: "Select Characters To Install",
-        targetDir: targetDir
-    }).show();
-    return;
 }
 
 declare const DIALOG_STAGE_INSTALL_PRELOAD_WEBPACK_ENTRY: string;
@@ -190,6 +189,15 @@ export class StageInstallDialog extends Dialog<StageInstallOptions, null> {
     readonly DEFAULT_WIDTH: number = 600;
     readonly IS_MODAL: boolean = false;
 
+    constructor(targetDir: string) {
+        super({
+            id: "stageInstallation",
+            body: "",
+            title: "Select Stages To Install",
+            targetDir: targetDir
+        });
+    }
+
     ok(value: null): void {
         super.ok(value);
         this.resolve();
@@ -200,12 +208,6 @@ export class StageInstallDialog extends Dialog<StageInstallOptions, null> {
     }
 }
 
-export async function stageInstallation(targetDir: string): Promise<void> {
-    await new StageInstallDialog({
-        id: "stageInstallation",
-        body: "",
-        title: "Select Stages To Install",
-        targetDir: targetDir
-    }).show();
-    return;
+export function closeDialog(winId: number): void {
+    global.dialogs.filter((win: BrowserWindow) => win.id == winId)[0].close();
 }

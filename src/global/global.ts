@@ -128,13 +128,13 @@ export function error(message: string): never {
 export function finishOp(
     id: number,
     body: string,
-    postCompletion?: PostCompletion
+    action?: OpAction
 ): ((prev: Operation[]) => Operation[]) {
     return (prev: Operation[]) => {
         const newOperations: Operation[] = [...prev];
         newOperations[id].state = OpState.FINISHED;
         newOperations[id].body = body;
-        newOperations[id].postCompletion = postCompletion;
+        newOperations[id].action = action;
         return newOperations;
     }
 }
