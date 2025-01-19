@@ -102,6 +102,13 @@ While mods formatted for earlier versions of the CMC / SSBC will likely function
 </details>
 
 ## Changelog
+### v3.1.1
+- Fixes mod detection for SSBC v0.9.5
+- Reduces freezing on Windows
+- Tweaks interactions available while installation dialogs are open
+- Reduces unnecessary parsing of character palettes
+- Converts alt inclusion toggle to operation
+
 ### v3.1.0
 - Finally fixed dialog height
 - Allows the selection of multiple dirs / archives at once
