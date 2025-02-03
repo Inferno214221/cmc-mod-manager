@@ -1,4 +1,4 @@
-# [CMC Mod Manager Official Website](https://inferno214221.com/cmc-mod-managet)
+# [CMC Mod Manager Official Website](https://inferno214221.com/cmc-mod-manager)
 
 <a href="https://github.com/Inferno214221/cmc-mod-manager/">
 	<img src="./src/assets/github.png" alt="GitHub Repo" style="height: 40px;"/>
