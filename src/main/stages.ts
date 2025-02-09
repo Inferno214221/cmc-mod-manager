@@ -590,7 +590,7 @@ export async function getMissingStageInfo(
 export async function extractStage(extract: string, dir: string = global.gameDir): Promise<string> {
     const stageList: StageList = await readStageList(dir);
     const stage: Stage | undefined = stageList.getByName(extract);
-    if (!stage) throw new Error("Stage not found: \"" + extract + "\"");
+    if (!stage) throw new Error("Stage not found: '" + extract + "'");
     const extractDir: string = path.join(dir, "0extracted", extract);
     
     await Promise.allSettled((await getStageFiles(stage, false, dir))
@@ -612,7 +612,7 @@ export async function removeStage(remove: string, dir: string = global.gameDir):
     const toResolve: Promise<void>[] = [];
     const stageList: StageList = await readStageList(dir);
     const stage: Stage | undefined = stageList.getByName(remove);
-    if (!stage) throw new Error("Stage not found: \"" + remove + "\"");
+    if (!stage) throw new Error("Stage not found: '" + remove + "'");
 
     (await getStageFiles(stage, true, dir)).forEach((file: string) => {
         toResolve.push(

@@ -245,7 +245,7 @@ export async function ensureAltIsCharacter(alt: Alt, dir: string = global.gameDi
     }
 
     const baseCharacter: Character | undefined = characterList.getByName(alt.base);
-    if (!baseCharacter) throw new Error("Character not found: \"" + alt.base + "\"");
+    if (!baseCharacter) throw new Error("Character not found: '" + alt.base + "'");
 
     // Adding a partial Character removes the need to read the character's dat, before entirely
     // ignoring it.
@@ -273,7 +273,7 @@ export async function ensureAltIsntCharacter(
     const toResolve: Promise<void>[] = [];
     const characterList: CharacterList = await readCharacterList(dir);
     const character: Character | undefined = characterList.getByName(alt.alt);
-    if (!character) throw new Error("Character not found: \"" + alt.alt + "\"");
+    if (!character) throw new Error("Character not found: '" + alt.alt + "'");
     if (await isCharacterOnCSS(character, dir)) return;
     characterList.removeByName(alt.alt);
     toResolve.push(writeCharacters(characterList.toArray(), dir));
@@ -354,7 +354,9 @@ export async function readCharacterDatPath(
         displayName = characterDatTxt[0];
         menuName = characterDatTxt[1];
         battleName = characterDatTxt[2];
-        series = characterDatTxt[3].toLowerCase();
+        series = (characterDatTxt[3] ??
+            error("Character dat is incomplete: '" + character + "'.")
+        ).toLowerCase();
     }
 
     const homeStages: string[] = [];
@@ -854,7 +856,7 @@ export async function extractCharacter(
 export async function removeCharacter(remove: string, dir: string = global.gameDir): Promise<void> {
     const toResolve: Promise<void>[] = [];
     const character: Character | undefined = (await readCharacterList(dir)).getByName(remove);
-    if (!character) throw new Error("Character not found: \"" + remove + "\"");
+    if (!character) throw new Error("Character not found: '" + remove + "'");
     await removeAllAlts(character, dir);
     const characters: CharacterList = await readCharacterList(dir);
     const characterDat: CharacterDat =

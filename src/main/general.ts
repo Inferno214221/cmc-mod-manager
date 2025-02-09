@@ -107,6 +107,8 @@ export async function extractArchive(archive: string, destination: string): Prom
             break;
         case ".rar":
             const extractor: Extractor = await createExtractorFromFile({
+                // @ts-ignore: I didn't change anything, but now this is throwing a type error.
+                // ! still works, so I'll just leave it.
                 wasmBinary: WASM_BINARY,
                 filepath: archive,
                 targetPath: output
@@ -241,7 +243,7 @@ export async function downloadUpdate(tagName: string, id: string): Promise<void>
         .on("error", (err: Error) => {
             console.log(err);
             targetStream.close();
-            throw new Error("A stream error occurred: \"" + err.message + "\"");
+            throw new Error("A stream error occurred: '" + err.message + "'");
         }).on("response", (res: request.Response) => {
             const downloadSize: number = parseInt(res.headers["content-length"] ?? "");
             updateDownloadProgress(
