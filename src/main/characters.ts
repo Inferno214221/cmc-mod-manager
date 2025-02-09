@@ -369,11 +369,7 @@ export async function readCharacterDatPath(
             const paletteLocation: number = isVanilla ? 1 : 5 + palette;
             palettes.push({
                 name: characterDatTxt[paletteLocation + 0],
-                0: characterDatTxt[paletteLocation + 1],
-                1: characterDatTxt[paletteLocation + 2],
-                2: characterDatTxt[paletteLocation + 3],
-                3: characterDatTxt[paletteLocation + 4],
-                4: characterDatTxt[paletteLocation + 5]
+                values: characterDatTxt.slice(paletteLocation + 1, paletteLocation + 6)
             });
         }
     } else {
@@ -393,11 +389,7 @@ export async function readCharacterDatPath(
             const paletteLocation: number = 10 + homeStageCount + randomDataCount + palette;
             palettes.push({
                 name: characterDatTxt[paletteLocation + 0],
-                0: characterDatTxt[paletteLocation + 1],
-                1: characterDatTxt[paletteLocation + 2],
-                2: characterDatTxt[paletteLocation + 3],
-                3: characterDatTxt[paletteLocation + 4],
-                4: characterDatTxt[paletteLocation + 5]
+                values: characterDatTxt.slice(paletteLocation + 1, paletteLocation + 6)
             });
         }
     }
@@ -415,32 +407,26 @@ export async function readCharacterDatPath(
 }
 
 export async function writeCharacterDat(dat: CharacterDat, destination: string): Promise<void> {
-    let output: string = [
+    const output: string = [
         dat.displayName,
         dat.menuName,
         dat.battleName,
         dat.series,
         "---Classic Home Stages Below---",
         dat.homeStages.length,
-        dat.homeStages.join("\r\n"),
+        ...dat.homeStages,
         "---Random Datas---",
         dat.randomDatas.length,
-        dat.randomDatas.join("\r\n"),
+        ...dat.randomDatas,
         "---Palettes Number---",
         dat.palettes.length,
-        "---From Here is Individual Palettes data---"
-    ].join("\r\n");
-    dat.palettes.forEach((palette: CharacterPalette) => {
-        output += [
-            "",
+        "---From Here is Individual Palettes data---",
+        ...(dat.palettes.map((palette: CharacterPalette) => [
             palette.name,
-            palette[0],
-            palette[1],
-            palette[2],
-            palette[3],
-            palette[4]
-        ].join("\r\n");
-    });
+            ...palette.values
+        ].join("\r\n")))
+    ].join("\r\n");
+    console.log(output);
     await fs.ensureFile(path.join(destination, dat.name + ".dat"));
     await fs.writeFile(path.join(destination, dat.name + ".dat"), output, { encoding: "ascii" });
     return;
