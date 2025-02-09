@@ -553,8 +553,8 @@ export function cancelOperation(id: string): void {
     return global.cancelFunctions[id]();
 }
 
-export function getGameDir(): string {
-    return global.gameDir;
+export function getGameDir(): string | null {
+    return global.gameDir || null;
 }
 
 export function getExtractedDir(): string {

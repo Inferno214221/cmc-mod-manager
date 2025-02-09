@@ -18,9 +18,11 @@ const sortTypes: SortTypeOptions[] = [
 ];
 
 export function TabCharacterSelectionScreen({
-    setOperations
+    setOperations,
+    handle
 }: {
-    setOperations: Dispatch<SetStateAction<Operation[]>>
+    setOperations: Dispatch<SetStateAction<Operation[]>>,
+    handle: <T>(promise: Promise<T>) => Promise<T>
 }): JSX.Element {
     const [characters, setCharacters]:
     [Character[], Dispatch<SetStateAction<Character[]>>]
@@ -50,7 +52,7 @@ export function TabCharacterSelectionScreen({
     api.on("updateStagePages", () => null);
 
     async function getInfo(): Promise<void> {
-        const characters: Character[] = await api.readCharacters();
+        const characters: Character[] = await handle(api.readCharacters());
         characters.push({
             name: "random",
             menuName: "Random",
@@ -58,7 +60,9 @@ export function TabCharacterSelectionScreen({
             randomSelection: false,
             number: 9999,
             alts: [],
-            mug: await api.pathJoin(await api.getGameDir(), "gfx", "mugs", "random.png")
+            mug: await handle(api.pathJoin(
+                await handle(api.getGameDir()), "gfx", "mugs", "random.png"
+            ))
         });
         setCharacters(characters)
         getPages();
@@ -66,7 +70,7 @@ export function TabCharacterSelectionScreen({
 
     async function getPages(newActivePage?: CssPage): Promise<void> {
         if (newActivePage == null) newActivePage = activePage ?? undefined;
-        const pages: CssPage[] = await api.readCssPages();
+        const pages: CssPage[] = await handle(api.readCssPages());
         setCssPages(pages);
         const pageMatch: CssPage[] = pages.filter(
             (page: CssPage) => page.path == newActivePage?.path
@@ -84,8 +88,7 @@ export function TabCharacterSelectionScreen({
 
     async function getCssData(): Promise<void> {
         if (activePage == null) return;
-        setCssData(await api.readCssData(activePage));
-        console.log(await api.readCssData(activePage));
+        setCssData(await handle(api.readCssData(activePage)));
     }
 
     useEffect(() => {

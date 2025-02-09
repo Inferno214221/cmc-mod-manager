@@ -22,7 +22,10 @@ export interface Tab {
     name: string,
     displayName: string,
     icon: string,
-    element: (setOperations: Dispatch<SetStateAction<Operation[]>>) => JSX.Element,
+    element: (
+        setOperations: Dispatch<SetStateAction<Operation[]>>,
+        handle: <T>(promise: Promise<T>) => Promise<T>
+    ) => JSX.Element,
     allowTabSwitch?: () => Promise<boolean>
 }
 export const HOME: Tab = {
@@ -36,29 +39,41 @@ export const CHARACTERS: Tab = {
     name: "characters",
     displayName: "Characters",
     icon: "groups",
-    element: (setOperations: Dispatch<SetStateAction<Operation[]>>) =>
-        <TabCharacters setOperations={setOperations}/>
+    element: (
+        setOperations: Dispatch<SetStateAction<Operation[]>>,
+        handle: <T>(promise: Promise<T>) => Promise<T>
+    ) =>
+        <TabCharacters setOperations={setOperations} handle={handle}/>
 };
 export const CHARACTER_SELECTION_SCREEN: Tab = {
     name: "characterSelectionScreen",
     displayName: "Character Selection Screen",
     icon: "pan_tool_alt",
-    element: (setOperations: Dispatch<SetStateAction<Operation[]>>) =>
-        <TabCharacterSelectionScreen setOperations={setOperations}/>
+    element: (
+        setOperations: Dispatch<SetStateAction<Operation[]>>,
+        handle: <T>(promise: Promise<T>) => Promise<T>
+    ) =>
+        <TabCharacterSelectionScreen setOperations={setOperations} handle={handle}/>
 };
 export const STAGES: Tab = {
     name: "stages",
     displayName: "Stages",
     icon: "terrain",
-    element: (setOperations: Dispatch<SetStateAction<Operation[]>>) =>
-        <TabStages setOperations={setOperations}/>
+    element: (
+        setOperations: Dispatch<SetStateAction<Operation[]>>,
+        handle: <T>(promise: Promise<T>) => Promise<T>
+    ) =>
+        <TabStages setOperations={setOperations} handle={handle}/>
 };
 export const STAGE_SELECTION_SCREEN: Tab = {
     name: "stageSelectionScreen",
     displayName: "Stage Selection Screen",
     icon: "location_pin",
-    element: (setOperations: Dispatch<SetStateAction<Operation[]>>) =>
-        <TabStageSelectionScreen setOperations={setOperations}/>
+    element: (
+        setOperations: Dispatch<SetStateAction<Operation[]>>,
+        handle: <T>(promise: Promise<T>) => Promise<T>
+    ) =>
+        <TabStageSelectionScreen setOperations={setOperations} handle={handle}/>
 };
 
 export interface NavButtonInfo {
@@ -109,6 +124,10 @@ export function App({ tab }: { tab: Tab }): JSX.Element {
     [Operation[], Dispatch<SetStateAction<Operation[]>>]
     = useState([]);
 
+    const [appError, setAppError]:
+    [Error | null, Dispatch<SetStateAction<Error | null>>]
+    = useState(null);
+
     api.on("addOperation", (operation: Operation) => {
         setOperations((prev: Operation[]) => {
             const newOperations: Operation[] = [...prev];
@@ -137,10 +156,31 @@ export function App({ tab }: { tab: Tab }): JSX.Element {
         callQueuedOperations(operations, setOperations);
     }, [operations]);
 
+    async function handle<T>(promise: Promise<T>): Promise<T> {
+        return new Promise((resolve: (value: T) => void) => {
+            promise.then(
+                (value: T) => resolve(value),
+                (err: Error) => {
+                    setAppError(err);
+                    // I think it still needs to throw, but we switch to the error page halfway
+                    // between.
+                    throw err;
+                }
+            )
+        });
+    }
+
+    useEffect(() => {
+        setAppError(null);
+    }, [tab])
+
     return (
         <>
             <Nav/>
-            {tab.element(setOperations)}
+            {appError == null ?
+                tab.element(setOperations, handle) :
+                <ErrorDisplay error={appError}/>
+            }
             <OperationPanel
                 operations={operations}
                 showPanel={showPanel}
@@ -193,6 +233,25 @@ export function NavButton({ info }: { info: NavButtonInfo }): JSX.Element {
                 <span>{info.displayName}</span>
             </div>
         </div>
+    );
+}
+
+export function ErrorDisplay({ error }: { error: Error }): JSX.Element {
+    return (
+        <section>
+            <div className={styles.errorWrapper}>
+                <div className={styles.errorBox}>
+                    <h2>An Error Occurred!</h2>
+                    <p>
+                        {error.message.replace(/(Error invoking remote method)[\w:' ]*Error: /, "")}
+                    </p>
+                    <p>
+                        An error being displayed here means that it isn't associated with an
+                        Operation and is preventing the Tab from rendering.
+                    </p>
+                </div>
+            </div>
+        </section>
     );
 }
 

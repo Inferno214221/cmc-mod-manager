@@ -16,9 +16,11 @@ const sortTypes: SortTypeOptions[] = [
 ];
 
 export function TabStages({
-    setOperations
+    setOperations,
+    handle
 }: {
-    setOperations: Dispatch<SetStateAction<Operation[]>>
+    setOperations: Dispatch<SetStateAction<Operation[]>>,
+    handle: <T>(promise: Promise<T>) => Promise<T>
 }): JSX.Element {
     const [filterInstallation, setFilterInstallation]:
     [boolean | null, Dispatch<SetStateAction<boolean | null>>]
@@ -61,11 +63,11 @@ export function TabStages({
     }, []);
 
     async function readStages(): Promise<void> {
-        setStages(await api.readStages());
+        setStages(await handle(api.readStages()));
     }
 
     async function readDefaultConfig(): Promise<void> {
-        const data: AppData = await api.readAppData();
+        const data: AppData = await handle(api.readAppData());
         setFilterInstallation(data.config.filterStageInstallation);
         setUpdateStages(data.config.updateStages);
     }

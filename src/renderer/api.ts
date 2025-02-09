@@ -133,7 +133,7 @@ export default {
 
     getExtractedDir: ((): Promise<string> => ipcRenderer.invoke("getExtractedDir")),
 
-    getGameDir: ((): Promise<string> => ipcRenderer.invoke("getGameDir")),
+    getGameDir: ((): Promise<string | null> => ipcRenderer.invoke("getGameDir")),
 
     getGameVersion: ((...args: [
         dir?: string,

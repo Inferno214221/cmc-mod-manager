@@ -166,12 +166,11 @@ function ExternalLinkImage({
 
 function GameDirectoryActions(): JSX.Element {
     const [cmcDir, setCmcDir]:
-    [string, Dispatch<SetStateAction<string>>]
-    = useState("None Selected");
+    [string | null, Dispatch<SetStateAction<string | null>>]
+    = useState(null);
 
     async function updateGameDir(): Promise<void> {
-        const newCmcDir: string = await api.getGameDir();
-        setCmcDir(newCmcDir == null ? "None Selected" : newCmcDir);
+        setCmcDir(await api.getGameDir());
     }
 
     useEffect(() => {
@@ -186,7 +185,7 @@ function GameDirectoryActions(): JSX.Element {
                     type={"text"}
                     readOnly={true}
                     id={styles.dirOutput}
-                    value={cmcDir}
+                    value={cmcDir ?? "(None Selected)"}
                 />
             </div>
             <div className={styles.center + " " + styles.marginVertical}>

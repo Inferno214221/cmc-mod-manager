@@ -18,9 +18,11 @@ const sortTypes: SortTypeOptions[] = [
 ];
 
 export function TabStageSelectionScreen({
-    setOperations
+    setOperations,
+    handle
 }: {
-    setOperations: Dispatch<SetStateAction<Operation[]>>
+    setOperations: Dispatch<SetStateAction<Operation[]>>,
+    handle: <T>(promise: Promise<T>) => Promise<T>
 }): JSX.Element {
     const [stages, setStages]:
     [Stage[], Dispatch<SetStateAction<Stage[]>>]
@@ -50,7 +52,7 @@ export function TabStageSelectionScreen({
     api.on("updateStagePages", getInfo);
 
     async function getInfo(): Promise<void> {
-        const stages: Stage[] = await api.readStages();
+        const stages: Stage[] = await handle(api.readStages());
         stages.push({
             name: "random",
             menuName: "Random",
@@ -58,14 +60,16 @@ export function TabStageSelectionScreen({
             series: "random",
             randomSelection: false,
             number: 9999,
-            icon: await api.pathJoin(await api.getGameDir(), "gfx", "stgicons", "random.png")
+            icon: await handle(api.pathJoin(
+                await handle(api.getGameDir()), "gfx", "stgicons", "random.png"
+            ))
         });
         setStages(stages)
         getPages();
     }
 
     async function getPages(newActivePage?: number): Promise<void> {
-        const pages: SssPage[] = await api.readSssPages();
+        const pages: SssPage[] = await handle(api.readSssPages());
         setSssPages(pages);
         setActivePage(newActivePage ?? 0);
     }

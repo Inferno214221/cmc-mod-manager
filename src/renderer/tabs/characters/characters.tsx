@@ -16,9 +16,11 @@ const sortTypes: SortTypeOptions[] = [
 ];
 
 export function TabCharacters({
-    setOperations
+    setOperations,
+    handle
 }: {
-    setOperations: Dispatch<SetStateAction<Operation[]>>
+    setOperations: Dispatch<SetStateAction<Operation[]>>,
+    handle: <T>(promise: Promise<T>) => Promise<T>
 }): JSX.Element {
     const [filterInstallation, setFilterInstallation]:
     [boolean | null, Dispatch<SetStateAction<boolean | null>>]
@@ -69,11 +71,11 @@ export function TabCharacters({
     }, []);
 
     async function readCharacters(): Promise<void> {
-        setCharacters(await api.readCharacters());
+        setCharacters(await handle(api.readCharacters()));
     }
 
     async function readDefaultConfig(): Promise<void> {
-        const data: AppData = await api.readAppData();
+        const data: AppData = await handle(api.readAppData());
         setFilterInstallation(data.config.filterCharacterInstallation);
         setUpdateCharacters(data.config.updateCharacters);
         setAltsAsCharacters(data.config.altsAsCharacters);

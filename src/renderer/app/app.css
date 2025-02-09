@@ -469,3 +469,22 @@ hr.vr {
         transform: perspective(200px) rotateX(0deg) rotateY(-180deg);
     }
 }
+
+.error-wrapper {
+    height: 100%;
+    width: 100%;
+    position: relative;
+}
+
+.error-box {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateY(-50%) translateX(-50%);
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.error-box h2 {
+    color: #f66151;
+}
