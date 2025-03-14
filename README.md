@@ -10,4 +10,4 @@
 	<img src="./src/assets/buy-me-a-coffee.png" alt="Buy Me A Coffee" style="height: 40px;">
 </a>
 
-I believe the content in this description has been interfering with my website's Google search ranking, because it contained all the same text. As such, this description has been emptied, please view the website above instead.
+The content in this description was interfering with my website's Google search ranking, because it contained all the same text. As such, this description has been emptied, please view the website above instead.
