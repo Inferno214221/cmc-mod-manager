@@ -3,11 +3,15 @@ run-name: Build With Electron Forge
 on: [push, workflow_dispatch]
 
 jobs:
-  setup-auto-release:
+  auto-release:
     runs-on: ubuntu-latest
 
     permissions:
       contents: write
+
+    strategy:
+      matrix:
+        node-version: [18.x]
 
     steps:
       - name: Delete Tag & Release
@@ -22,22 +26,13 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           custom_tag: auto
           tag_prefix: ""
-
-  windows-build:
-    runs-on: windows-latest
-
-    permissions:
-      contents: write
-
-    if: ${{ always() }}
-    needs: [setup-auto-release]
-
-    strategy:
-      matrix:
-        node-version: [18.x]
-
-    steps:
+          
       - uses: actions/checkout@v4.1.7
+      
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4.0.3
+        with:
+          node-version: ${{ matrix.node-version }}
       
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4.0.3
@@ -46,58 +41,8 @@ jobs:
       
       - name: Install Yarn Dependencies
         run: yarn
-      - name: Electron Forge Build
-        run: yarn run make-win
-      - name: Move Output Zip
-        run: move .\out\make\zip\win32\x64\cmc-mod-manager-win32-x64-3.1.2.zip .\cmc-mod-manager-win32-x64.zip
 
-      - name: Update Release
-        uses: ncipollo/release-action@v1.14.0
-        with:
-          artifacts: "./cmc-mod-manager-win32-x64.zip"
-          tag: auto
-          allowUpdates: true
-          prerelease: true
-          makeLatest: false
-
-      - name: Electron Forge Build 32 Bit
-        run: yarn run make-win32
-      - name: Move Output Zip
-        run: move .\out\make\zip\win32\ia32\cmc-mod-manager-win32-ia32-3.1.2.zip .\cmc-mod-manager-win32-ia32.zip
-
-      - name: Update Release
-        uses: ncipollo/release-action@v1.14.0
-        with:
-          artifacts: "./cmc-mod-manager-win32-ia32.zip"
-          tag: auto
-          allowUpdates: true
-          prerelease: true
-          makeLatest: false
-
-  ubuntu-build:
-    runs-on: ubuntu-latest
-
-    permissions:
-      contents: write
-
-    if: ${{ always() }}
-    needs: [setup-auto-release]
-
-    strategy:
-      matrix:
-        node-version: [18.x]
-
-    steps:
-      - uses: actions/checkout@v4.1.7
-      
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4.0.3
-        with:
-          node-version: ${{ matrix.node-version }}
-      
-      - name: Install Yarn Dependencies
-        run: yarn
-      - name: Electron Forge Build
+      - name: Electron Forge Build (Linux)
         run: yarn run make-linux-all
       - name: Move Output Zip
         run: mv ./out/make/zip/linux/x64/cmc-mod-manager-linux-x64-3.1.2.zip ./cmc-mod-manager-linux-x64.zip
@@ -110,6 +55,34 @@ jobs:
         uses: ncipollo/release-action@v1.14.0
         with:
           artifacts: "./cmc-mod-manager-linux-x64.zip,./cmc-mod-manager-linux.deb,./cmc-mod-manager-linux.rpm"
+          tag: auto
+          allowUpdates: true
+          prerelease: true
+          makeLatest: false
+
+      - name: Electron Forge Build (Windows)
+        run: yarn run make-win
+      - name: Move Output Zip
+        run: mv ./out/make/zip/win32/x64/cmc-mod-manager-win32-x64-3.1.2.zip ./cmc-mod-manager-win32-x64.zip
+
+      - name: Update Release
+        uses: ncipollo/release-action@v1.14.0
+        with:
+          artifacts: "./cmc-mod-manager-win32-x64.zip"
+          tag: auto
+          allowUpdates: true
+          prerelease: true
+          makeLatest: false
+
+      - name: Electron Forge Build (Windows 32 Bit)
+        run: yarn run make-win32
+      - name: Move Output Zip
+        run: mv ./out/make/zip/win32/ia32/cmc-mod-manager-win32-ia32-3.1.2.zip ./cmc-mod-manager-win32-ia32.zip
+
+      - name: Update Release
+        uses: ncipollo/release-action@v1.14.0
+        with:
+          artifacts: "./cmc-mod-manager-win32-ia32.zip"
           tag: auto
           allowUpdates: true
           prerelease: true
