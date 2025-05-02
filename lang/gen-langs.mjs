@@ -1,5 +1,5 @@
 /* eslint-disable */
-import fs from "fs";
+import fs from "fs-extra";
 import path from "path";
 
 const IN_DIR = path.parse(
@@ -30,6 +30,7 @@ export function squashRecursive(obj, path) {
 }
 
 export function squashLangToFile(lang, file) {
+    fs.ensureFileSync(file);
     fs.writeFileSync(file, JSON.stringify(
         Object.assign(squash(lang), squash(CONSTANTS.default)),
         null,

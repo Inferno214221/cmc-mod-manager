@@ -561,7 +561,7 @@ export default {
         searchPlaceholder: "Search",
         pagePlaceholder: "Page Name",
         showLicense: "Show License (GNU GPLv3)",
-        errorDisplay: "An error being displayed here means that it isn't associated with an Operation and is preventing the Tab from rendering.",
+        errorDisplay: "An error being displayed here means that it isn't associated with an operation and is preventing the tab from rendering.",
         operations: "Operations"
     },
     enumDisplayName: {
