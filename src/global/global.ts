@@ -4,8 +4,8 @@ export enum DndDataType {
 }
 
 export enum ModTypes {
-    CHARACTER = "Character",
-    STAGE = "Stage"
+    CHARACTER = "character",
+    STAGE = "stage"
 }
 
 export enum OpDep {
@@ -22,11 +22,11 @@ export enum OpDep {
 }
 
 export enum OpState {
-    QUEUED = "Queued",
-    STARTED = "Started",
-    FINISHED = "Finished",
-    CANCELED = "Canceled",
-    ERROR = "Error"
+    QUEUED = "queued",
+    STARTED = "started",
+    FINISHED = "finished",
+    CANCELED = "canceled",
+    ERROR = "error"
 }
 
 export enum SortTypeOptions {
@@ -120,10 +120,6 @@ export abstract class ModList<ModType extends Mod, ModUpdateType extends ModUpda
 export class CharacterList extends ModList<Character, CharacterUpdate> {}
 
 export class StageList extends ModList<Stage, StageUpdate> {}
-
-export function error(message: string): never {
-    throw new Error(message);
-}
 
 export function finishOp(
     id: number,

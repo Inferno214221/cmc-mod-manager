@@ -1,7 +1,8 @@
 import fs from "fs-extra";
 import path from "path";
 import ini from "ini";
-import { CharacterList, OpDep, OpState, error } from "../global/global";
+import { CharacterList, OpDep, OpState } from "../global/global";
+import { error, message } from "../global/translations";
 
 import * as general from "./general";
 import * as customDialogs from "./custom-dialogs";
@@ -166,15 +167,13 @@ export async function addAlt(
     newAlt: Character,
     dir: string = global.gameDir
 ): Promise<void> {
-    if (newAlt.alts.length != 0)
-        throw new Error("A character with alts can't be assigned as an alt.");
+    if (newAlt.alts.length != 0) error("noRecursiveAlts");
 
     const toResolve: Promise<void>[] = [];
     const alts: Alt[] = await readAlts(dir);
     let altNumber: number = 1;
     const sameBase: Alt[] = alts.filter((alt: Alt) => alt.base == base.name);
-    if (sameBase.length > 6)
-        throw new Error("Character already has the maximum number of alts.");
+    if (sameBase.length > 6) error("maxAltsReached");
 
     sameBase.forEach((alt: Alt) => {
         if (alt.number > altNumber) altNumber = alt.number;
@@ -245,7 +244,7 @@ export async function ensureAltIsCharacter(alt: Alt, dir: string = global.gameDi
     }
 
     const baseCharacter: Character | undefined = characterList.getByName(alt.base);
-    if (!baseCharacter) throw new Error("Character not found: '" + alt.base + "'");
+    if (!baseCharacter) error("characterNotFound", alt.base);
 
     // Adding a partial Character removes the need to read the character's dat, before entirely
     // ignoring it.
@@ -273,7 +272,7 @@ export async function ensureAltIsntCharacter(
     const toResolve: Promise<void>[] = [];
     const characterList: CharacterList = await readCharacterList(dir);
     const character: Character | undefined = characterList.getByName(alt.alt);
-    if (!character) throw new Error("Character not found: '" + alt.alt + "'");
+    if (!character) error("characterNotFound", alt.alt);
     if (await isCharacterOnCSS(character, dir)) return;
     characterList.removeByName(alt.alt);
     toResolve.push(writeCharacters(characterList.toArray(), dir));
@@ -354,9 +353,7 @@ export async function readCharacterDatPath(
         displayName = characterDatTxt[0];
         menuName = characterDatTxt[1];
         battleName = characterDatTxt[2];
-        series = (characterDatTxt[3] ??
-            error("Character dat is incomplete: '" + character + "'.")
-        ).toLowerCase();
+        series = (characterDatTxt[3] ?? error("incompleteDat", character)).toLowerCase();
     }
 
     const homeStages: string[] = [];
@@ -364,7 +361,7 @@ export async function readCharacterDatPath(
     const palettes: CharacterPalette[] = [];
     if (isV7) {
         homeStages.push("battlefield");
-        randomDatas.push("Updated to v8 dat format by CMC Mod Manager");
+        randomDatas.push(message("other.datFormatUpdated"));
         const paletteCount: number =
             parseInt(characterDatTxt[isVanilla ? 1 : 5]);
         for (let palette: number = 1; palette <= paletteCount * 6; palette += 6) {
@@ -463,12 +460,9 @@ export async function installCharacters(
 ): Promise<void> {
     try {
         const correctedTarget: string = await correctCharacterDir(targetDir);
-        if (path.relative(correctedTarget, dir) == "") throw new Error(
-            "Cannot install characters from the directory that they are being installed to."
-        );
+        if (path.relative(correctedTarget, dir) == "") error("characterInstallTargetSelf");
         const foundCharacters: FoundCharacter[] = await findCharacters(correctedTarget);
-        if (foundCharacters.length == 0)
-            throw new Error("No valid characters found in directory: '" + targetDir + "'.");
+        if (foundCharacters.length == 0) error("noValidCharactersFound", targetDir);
         if (foundCharacters.length == 1) {
             queCharacterInstallation(
                 correctedTarget,
@@ -482,8 +476,8 @@ export async function installCharacters(
             const id: string = "characterInstallation_" + Date.now();
             general.addOperation({
                 id: id,
-                title: "Character Installation",
-                body: "Selecting characters to install from '" + correctedTarget + "'.",
+                title: message("operation.character.bulkInstallation.started.title"),
+                body: message("operation.character.bulkInstallation.started.body", correctedTarget),
                 state: OpState.QUEUED,
                 icon: "playlist_add",
                 animation: Math.floor(Math.random() * 3),
@@ -496,7 +490,7 @@ export async function installCharacters(
         }
     } catch (err: any) {
         general.addOperation({
-            title: "Character Installation",
+            title: message("operation.character.bulkInstallation.started.title"),
             body: (err as Error).message,
             state: OpState.ERROR,
             icon: "folder_shared",
@@ -515,20 +509,16 @@ export async function correctCharacterDir(targetDir: string): Promise<string> {
         file = path.join(file).split(path.sep).join(path.posix.sep);
         const fileDir: string = path.posix.parse(file).dir + "/";
         if (fileDir.includes("/fighter/") && !file.includes("/announcer")) {
-            let topDir: string | undefined = file.split("/").shift() ??
-                error("Top dir not found for file: '" + file + "'");
+            let topDir: string = file.split("/").shift() ?? error("noTopDir", file);
             while (topDir != "fighter") {
                 correctedDir = path.join(correctedDir, topDir);
                 file = file.replace(topDir + "/", "");
-                topDir = file.split("/").shift() ??
-                    error("Top dir not found for file: '" + file + "'");
+                topDir = file.split("/").shift() ?? error("noTopDir", file);
             }
             break;
         }
     }
-    if (!(await fs.readdir(correctedDir)).includes("fighter")) {
-        throw new Error("No 'fighter' subdirectory found in directory: '" + targetDir + "'.");
-    }
+    if (!(await fs.readdir(correctedDir)).includes("fighter")) error("noFighterSubdir", targetDir);
     return correctedDir;
 }
 
@@ -587,8 +577,8 @@ export function queCharacterInstallation(
     const id: string = foundCharacter.name + "_" + Date.now();
     general.addOperation({
         id: id,
-        title: "Character Installation",
-        body: "Installing a character from " + location + ".",
+        title: message("operation.character.installation.started.title", location),
+        body: message("operation.character.installation.started.body", location),
         state: OpState.QUEUED,
         icon: "folder_shared",
         animation: Math.floor(Math.random() * 3),
@@ -622,7 +612,10 @@ export async function installCharacterOp(
     } else {
         general.updateOperation({
             id: id,
-            body: "Installed character: '" + character.name + "' from " + location + ".",
+            body: message(
+                "operation.character.installation.finished.body",
+                character.name, location
+            ),
             image: "img://" + character.mug,
             state: OpState.FINISHED,
         });
@@ -639,7 +632,7 @@ export async function characterInstallationOp(targetDir: string, id: string): Pr
         id: id,
         action: {
             icon: "close",
-            tooltip: "Close Window",
+            tooltip: message("tooltip.closeWindow"),
             call: {
                 name: "closeDialog",
                 args: [dialog.window.id]
@@ -649,7 +642,7 @@ export async function characterInstallationOp(targetDir: string, id: string): Pr
     await show;
     general.updateOperation({
         id: id,
-        body: "Selected characters to install from '" + targetDir + "'.",
+        body: message("operation.character.bulkInstallation.finished.body", targetDir),
         state: OpState.FINISHED,
         action: undefined
     });
@@ -663,9 +656,8 @@ export async function installCharacter(
     dir: string = global.gameDir
 ): Promise<Character | null> {
     const characters: CharacterList = await readCharacterList(dir);
-    if (!updateCharacters && characters.getByName(foundCharacter.name) != undefined) {
-        throw new Error("Character already installed, updates disabled.");
-    }
+    if (!updateCharacters && characters.getByName(foundCharacter.name) != undefined)
+        error("noUpdateCharacter");
     
     const temp: CharacterDat | null =
         await getMissingDatInfo(foundCharacter.dat, targetDir, characters);
@@ -683,7 +675,6 @@ export async function installCharacter(
                 await fs.exists(path.join(dir, "fighter", foundCharacter.name))
             )
         ) {
-            console.log("Removing bin & folder for replacement.");
             await fs.remove(path.join(dir, "fighter", foundCharacter.name + ".bin"));
             await fs.remove(path.join(dir, "fighter", foundCharacter.name));
         }
@@ -757,34 +748,16 @@ export async function getMissingDatInfo(
         }
     }
 
-    if (!(await customDialogs.confirm({
-        id: "confirmCharacterInput",
-        title: "CMC Mod Manager | Character Installation",
-        body: "The character that is being installed's dat file uses the vanilla format and " +
-            "you will be required to enter some information for the installation. This " +
-            "information can usually be found in a txt file in the mod's top level directory.",
-        okLabel: "Continue"
-    }))) {
+    if (!(await customDialogs.confirm("beginCharacterInput"))) {
         return null;
     }
 
-    if (await customDialogs.confirm({
-        id: "openCharacterDir",
-        title: "CMC Mod Manager | Character Installation",
-        body: "Would you like to open the mod's directory to find any txt files manually?",
-        okLabel: "Yes",
-        cancelLabel: "No"
-    })) {
+    if (await customDialogs.confirm("openCharacterDir")) {
         general.openDir(targetDir);
     }
 
     while (!dat.menuName) {
-        dat.menuName = await customDialogs.prompt({
-            id: "inputCharacterMenuName",
-            title: "CMC Mod Manager | Character Installation",
-            body: "Please enter the character's 'menu name'. (This is the name displayed " +
-                "on the when the character is selected on the character selection screen.)",
-            placeholder: "Character's Menu Name",
+        dat.menuName = await customDialogs.prompt("characterMenuName", {
             defaultValue: prefillInfo?.menuName ?? prefillInfo?.displayName
         });
         if (dat.menuName == undefined) return null;
@@ -795,25 +768,14 @@ export async function getMissingDatInfo(
     }
 
     while (!dat.battleName) {
-        dat.battleName = await customDialogs.prompt({
-            id: "inputCharacterBattleName",
-            title: "CMC Mod Manager | Character Installation",
-            body: "Please enter the character's 'battle name'. (This is the name displayed " +
-                "as a part of the HUD during a match.)",
-            placeholder: "Character's Battle Name",
+        dat.battleName = await customDialogs.prompt("characterBattleName", {
             defaultValue: prefillInfo?.battleName
         });
         if (dat.battleName == undefined) return null;
     }
 
     while (!dat.series) {
-        dat.series = await customDialogs.prompt({
-            id: "inputCharacterSeries",
-            title: "CMC Mod Manager | Character Installation",
-            body: "Please enter the character's 'series'. (This name will be used to select " +
-            "the icon to use on the character selection screen. This value is usually short " +
-            "and in all lowercase letters.)",
-            placeholder: "Character's Series",
+        dat.series = await customDialogs.prompt("characterSeries", {
             defaultValue: prefillInfo?.series
         });
         if (dat.series == undefined) return null;
@@ -831,7 +793,7 @@ export async function extractCharacter(
 ): Promise<string> {
     const characters: Character[] = await readCharacters(dir);
     const characterDat: CharacterDat =
-        await readCharacterDat(extract, dir) ?? error("Character has no dat file.");
+        await readCharacterDat(extract, dir) ?? error("noDatFile");
     const extractDir: string = path.join(dir, "0extracted", extract);
 
     const similarNames: string[] = characters.filter(
@@ -856,11 +818,11 @@ export async function extractCharacter(
 export async function removeCharacter(remove: string, dir: string = global.gameDir): Promise<void> {
     const toResolve: Promise<void>[] = [];
     const character: Character | undefined = (await readCharacterList(dir)).getByName(remove);
-    if (!character) throw new Error("Character not found: '" + remove + "'");
+    if (!character) error("characterNotFound", remove);
     await removeAllAlts(character, dir);
     const characters: CharacterList = await readCharacterList(dir);
     const characterDat: CharacterDat =
-        await readCharacterDat(remove, dir) ?? error("Character has no dat file.");
+        await readCharacterDat(remove, dir) ?? error("noDatFile");
 
     const similarNames: string[] = characters.toArray().filter(
         (character: Character) => character.name.startsWith(remove) && character.name != remove
@@ -955,7 +917,7 @@ export async function readCssPages(dir: string = global.gameDir): Promise<CssPag
     ));
     if (gameSettings["global.css_customs"] == 0) {
         pages.push({
-            name: "Default",
+            name: message("other.defaultPageName"),
             path: path.join(global.gameDir, "data", "css.txt")
         });
         return pages;
@@ -982,9 +944,7 @@ export async function writeCssPages(pages: CssPage[], dir: string = global.gameD
         path.join(dir, "data", "GAME_SETTINGS.txt"),
         "ascii"
     )).split(/\r?\n/);
-    if (ini.parse(gameSettings.join("\r\n"))["global.css_customs"] == 0) {
-        throw new Error("Custom CSS pages disabled in game_settings.");
-    }
+    if (ini.parse(gameSettings.join("\r\n"))["global.css_customs"] == 0) error("customCssDisabled");
     gameSettings = gameSettings.map((line: string) => {
         if (line.startsWith("global.css_custom_number")) {
             return ("global.css_custom_number = " + pages.length + ";");

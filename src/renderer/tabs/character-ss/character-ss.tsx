@@ -8,6 +8,7 @@ import {
 } from "../../../global/global";
 import appStyles from "../../app/app.css";
 import characterSsStyles from "./character-ss.css";
+import { message } from "../../../global/translations";
 const styles: typeof import("../../app/app.css") & typeof import("./character-ss.css") =
     Object.assign({}, appStyles, characterSsStyles);
 
@@ -117,8 +118,8 @@ export function TabCharacterSelectionScreen({
         setOperations((prev: Operation[]) => {
             const newOperations: Operation[] = [...prev];
             operationId = newOperations.push({
-                title: "Write CSS Data",
-                body: "Writing modified CSS data to page: '" + activePage!.name + "'.",
+                title: message("operation.css.writeData.started.title"),
+                body: message("operation.css.writeData.started.body", activePage!.name),
                 state: OpState.QUEUED,
                 icon: "pan_tool_alt",
                 animation: Math.floor(Math.random() * 3),
@@ -128,7 +129,7 @@ export function TabCharacterSelectionScreen({
                     getCssData();
                     setOperations(finishOp(
                         operationId,
-                        "Wrote modified CSS data to page: '" + activePage!.name + "'."
+                        message("operation.css.writeData.finished.body", activePage!.name)
                     ));
                 }
             }) - 1;
@@ -255,7 +256,7 @@ function ExcludedCharacters({
                     <div className={styles.tooltipWrapper + " " + styles.inlineSortOptions}>
                         <input
                             type={"text"}
-                            placeholder={"Search"}
+                            placeholder={message("ui.searchPlaceholder")}
                             id={styles.excludedSearch}
                             onInput={(event: any) => {
                                 setSearchValue(event.target.value);
@@ -263,7 +264,7 @@ function ExcludedCharacters({
                             }}
                         />
                         <div className={styles.tooltip}>
-                            <span>Search For Characters</span>
+                            <span>{message("tooltip.character.search")}</span>
                         </div>
                     </div>
                     <div className={styles.inlineSortOptions}>
@@ -275,9 +276,9 @@ function ExcludedCharacters({
                                 "sort_by_alpha"
                             ]}
                             tooltips={[
-                                "Sort By: Internal Number",
-                                "Sort By: Franchise",
-                                "Sort By: Alphabetical"
+                                message("tooltip.sortBy.number"),
+                                message("tooltip.sortBy.series"),
+                                message("tooltip.sortBy.alphabetical")
                             ]}
                             iconSize={"30px"}
                             setter={setSortType}
@@ -285,18 +286,18 @@ function ExcludedCharacters({
                         <ToggleIconButton
                             checked={reverseSort}
                             trueIcon={"west"}
-                            trueTooltip={"Sort Direction: Backwards"}
+                            trueTooltip={message("tooltip.sortDirection.backwards")}
                             falseIcon={"east"}
-                            falseTooltip={"Sort Direction: Forwards"}
+                            falseTooltip={message("tooltip.sortDirection.forwards")}
                             iconSize={"30px"}
                             setter={setReverseSort}
                         />
                         <ToggleIconButton
                             checked={showAllCharacters}
                             trueIcon={"groups"}
-                            trueTooltip={"Showing: All Characters"}
+                            trueTooltip={message("tooltip.character.showing.all")}
                             falseIcon={"person_outline"}
-                            falseTooltip={"Showing: Excluded Characters"}
+                            falseTooltip={message("tooltip.character.showing.excluded")}
                             iconSize={"30px"}
                             setter={setShowAllCharacters}
                         />
@@ -422,9 +423,12 @@ function CssPages({
         setOperations((prev: Operation[]) => {
             const newOperations: Operation[] = [...prev];
             operationId = newOperations.push({
-                title: "Reorder CSS Pages",
-                body: "Moving CSS page: '" + cssPages[from].name + "' to index: " +
-                    (to > from ? to - 1 : to) + ".",
+                title: message("operation.css.reorderPages.started.title"),
+                body: message(
+                    "operation.css.reorderPages.started.body",
+                    cssPages[from].name,
+                    (to > from ? to - 1 : to)
+                ),
                 state: OpState.QUEUED,
                 icon: "swap_horiz",
                 animation: Math.floor(Math.random() * 3),
@@ -433,8 +437,11 @@ function CssPages({
                     await api.reorderCssPage(from, to);
                     setOperations(finishOp(
                         operationId,
-                        "Moved CSS page: '" + cssPages[from].name + "' to index: " +
-                        (to > from ? to - 1 : to) + "."
+                        message(
+                            "operation.css.reorderPages.finished.body",
+                            cssPages[from].name,
+                            (to > from ? to - 1 : to)
+                        )
                     ));
                     getPages();
                 }
@@ -449,8 +456,8 @@ function CssPages({
         setOperations((prev: Operation[]) => {
             const newOperations: Operation[] = [...prev];
             operationId = newOperations.push({
-                title: "CSS Page Addition",
-                body: "Adding new CSS page: '" + newPageName + "'.",
+                title: message("operation.css.pageAddition.started.title"),
+                body: message("operation.css.pageAddition.started.body", newPageName),
                 state: OpState.QUEUED,
                 icon: "add",
                 animation: Math.floor(Math.random() * 3),
@@ -459,7 +466,7 @@ function CssPages({
                     const newPage: CssPage = await api.addCssPage(newPageName);
                     setOperations(finishOp(
                         operationId,
-                        "Added new CSS page: '" + newPageName + "'."
+                        message("operation.css.pageAddition.finished.body", newPageName)
                     ));
                     getPages(newPage);
                 }
@@ -485,7 +492,7 @@ function CssPages({
             <div className={styles.cssPage + " " + styles.addCssPage}>
                 <input
                     type={"text"}
-                    placeholder={"Page Name"}
+                    placeholder={message("ui.pagePlaceholder")}
                     onInput={(event: any) => {
                         event.target.value = event.target.value.replace(/'|"/g, "");
                         setNewPageName(event.target.value);
@@ -510,10 +517,9 @@ function CssPages({
                 <IconButton
                     icon={"add"}
                     iconSize={"18px"}
-                    tooltip={"Add Page"}
+                    tooltip={message("tooltip.ss.addPage")}
                     onClick={async () => {
                         createNewPage();
-                        // TODO: clear the input
                     }}
                 />
             </div>
@@ -552,8 +558,8 @@ function CssPageDisplay({
         setOperations((prev: Operation[]) => {
             const newOperations: Operation[] = [...prev];
             operationId = newOperations.push({
-                title: "Rename CSS Page",
-                body: "Renaming CSS page: '" + page.name + "' to '" + editingName + "'.",
+                title: message("operation.css.renamePage.started.title"),
+                body: message("operation.css.renamePage.started.body", page.name, editingName),
                 state: OpState.QUEUED,
                 icon: "edit",
                 animation: Math.floor(Math.random() * 3),
@@ -562,7 +568,7 @@ function CssPageDisplay({
                     const editedPage: CssPage = await api.renameCssPage(pageIndex, editingName);
                     setOperations(finishOp(
                         operationId,
-                        "Renamed CSS page: '" + page.name + "' to '" + editingName + "'."
+                        message("operation.css.renamePage.finished.body", page.name, editingName),
                     ));
                     getPages(editedPage);
                 }
@@ -631,15 +637,15 @@ function CssPageDisplay({
             <IconButton
                 icon={"delete"}
                 iconSize={"18px"}
-                tooltip={"Delete Page"}
+                tooltip={message("tooltip.ss.deletePage")}
                 onClick={async () => {
                     if (!await api.confirmDestructiveAction()) return;
                     let operationId: number;
                     setOperations((prev: Operation[]) => {
                         const newOperations: Operation[] = [...prev];
                         operationId = newOperations.push({
-                            title: "CSS Page Deletion",
-                            body: "Deleting CSS page: '" + page.name + "'.",
+                            title: message("operation.css.pageDeletion.started.title"),
+                            body: message("operation.css.pageDeletion.started.body", page.name),
                             state: OpState.QUEUED,
                             icon: "delete",
                             animation: Math.floor(Math.random() * 3),
@@ -648,7 +654,7 @@ function CssPageDisplay({
                                 await api.removeCssPage(page);
                                 setOperations(finishOp(
                                     operationId,
-                                    "Deleted CSS page: '" + page.name + "'."
+                                    message("operation.css.pageDeletion.finished.body", page.name)
                                 ));
                                 getPages();
                             }
@@ -690,7 +696,7 @@ function CssTableContents({
                     <IconButton
                         icon={"add"}
                         iconSize={"11pt"}
-                        tooltip={"Add Column"}
+                        tooltip={message("tooltip.ss.column.add")}
                         onClick={() => setCssData((prev: CssData) => {
                             prev = prev.map((row: string[]) => {
                                 row.push("0000");
@@ -727,7 +733,7 @@ function CssTableContents({
                     <IconButton
                         icon={"add"}
                         iconSize={"11pt"}
-                        tooltip={"Add Row"}
+                        tooltip={message("tooltip.ss.row.add")}
                         onClick={() => setCssData((prev: CssData) => {
                             prev.push([]);
                             prev[0].forEach(() => {
@@ -852,7 +858,7 @@ function CssColumnHeader({
                 <IconButton
                     icon={"remove"}
                     iconSize={"11pt"}
-                    tooltip={"Remove Column"}
+                    tooltip={message("tooltip.ss.column.remove")}
                     onClick={() => setCssData((prev: CssData) => {
                         prev.map((row: string[]) => {
                             row.splice(column, 1);
@@ -894,7 +900,7 @@ function CssRowHeader({
                 <IconButton
                     icon={"remove"}
                     iconSize={"11pt"}
-                    tooltip={"Remove Row"}
+                    tooltip={message("tooltip.ss.row.remove")}
                     onClick={() => setCssData((prev: CssData) => {
                         prev.splice(row, 1);
                         updateCssData(prev);

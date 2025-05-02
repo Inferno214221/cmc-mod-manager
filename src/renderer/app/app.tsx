@@ -10,6 +10,7 @@ import MISSING from "../../assets/missing.png";
 import { OpDep, OpState } from "../../global/global";
 import styles from "./app.css";
 import IconButton from "../icon-buttons/icon-button";
+import { error, message, tryMessage } from "../../global/translations";
 
 let root: Root;
 let activeTab: Tab | null = null;
@@ -20,7 +21,6 @@ export function render(): void {
 }
 export interface Tab {
     name: string,
-    displayName: string,
     icon: string,
     element: (
         setOperations: Dispatch<SetStateAction<Operation[]>>,
@@ -30,14 +30,12 @@ export interface Tab {
 }
 export const HOME: Tab = {
     name: "home",
-    displayName: "Home",
     icon: "home",
     element: () => <TabHome/>,
     allowTabSwitch: AllowTabSwitchHome
 };
 export const CHARACTERS: Tab = {
     name: "characters",
-    displayName: "Characters",
     icon: "groups",
     element: (
         setOperations: Dispatch<SetStateAction<Operation[]>>,
@@ -47,7 +45,6 @@ export const CHARACTERS: Tab = {
 };
 export const CHARACTER_SELECTION_SCREEN: Tab = {
     name: "characterSelectionScreen",
-    displayName: "Character Selection Screen",
     icon: "pan_tool_alt",
     element: (
         setOperations: Dispatch<SetStateAction<Operation[]>>,
@@ -57,7 +54,6 @@ export const CHARACTER_SELECTION_SCREEN: Tab = {
 };
 export const STAGES: Tab = {
     name: "stages",
-    displayName: "Stages",
     icon: "terrain",
     element: (
         setOperations: Dispatch<SetStateAction<Operation[]>>,
@@ -67,7 +63,6 @@ export const STAGES: Tab = {
 };
 export const STAGE_SELECTION_SCREEN: Tab = {
     name: "stageSelectionScreen",
-    displayName: "Stage Selection Screen",
     icon: "location_pin",
     element: (
         setOperations: Dispatch<SetStateAction<Operation[]>>,
@@ -82,7 +77,7 @@ export interface NavButtonInfo {
     function: () => void
 }
 export const CHANGE_DIR: NavButtonInfo = {
-    displayName: "Change CMC+ Directory",
+    displayName: message("tooltip.gameDir.change"),
     icon: "policy",
     function: async () => {
         await api.selectGameDir();
@@ -90,14 +85,14 @@ export const CHANGE_DIR: NavButtonInfo = {
     }
 };
 export const OPEN_DIR: NavButtonInfo = {
-    displayName: "Open CMC+ Directory",
+    displayName: message("tooltip.gameDir.open"),
     icon: "folder",
     function: async () => {
         api.openDir(await api.getGameDir());
     }
 };
 export const RUN_GAME: NavButtonInfo = {
-    displayName: "Run CMC+",
+    displayName: message("tooltip.gameDir.run"),
     icon: "smart_display",
     function: () => {
         api.runGame();
@@ -112,7 +107,7 @@ export async function switchTabs(tab: Tab): Promise<void> {
     ) return;
     activeTab = tab;
     root.render(<App tab={tab}/>);
-    document.title = "CMC Mod Manager | " + tab.displayName;
+    document.title = message("ui.windowTitle", tryMessage("ui.tabs." + tab.name + ".title"));
 }
 
 export function App({ tab }: { tab: Tab }): JSX.Element {
@@ -217,7 +212,7 @@ export function NavTab({ info }: { info: Tab }): JSX.Element {
                 <span className={styles.matIcon + " " + styles.navIcon}>{info.icon}</span>
             </button>
             <div className={styles.tooltip}>
-                <span>{info.displayName}</span>
+                <span>{tryMessage("ui.tabs." + info.name + ".title")}</span>
             </div>
         </div>
     );
@@ -246,8 +241,7 @@ export function ErrorDisplay({ error }: { error: Error }): JSX.Element {
                         {error.message.replace(/(Error invoking remote method)[\w:' ]*Error: /, "")}
                     </p>
                     <p>
-                        An error being displayed here means that it isn't associated with an
-                        Operation and is preventing the Tab from rendering.
+                        {message("ui.errorDisplay")}
                     </p>
                 </div>
             </div>
@@ -282,9 +276,9 @@ export function OperationPanel({
                 <ToggleIconButton
                     checked={!!showPanel}
                     trueIcon={"keyboard_arrow_right"}
-                    trueTooltip={"Hide Operations"}
+                    trueTooltip={message("tooltip.operationPanel.hide")}
                     falseIcon={"keyboard_arrow_left"}
-                    falseTooltip={"Show Operations"}
+                    falseTooltip={message("tooltip.operationPanel.show")}
                     iconSize={"30px"}
                     setter={setShowPanel}
                 />
@@ -292,7 +286,9 @@ export function OperationPanel({
             {showPanel ?
                 <div className={styles.operationDisplayBox}>
                     <div className={styles.center}>
-                        <h2 className={styles.operationPanelTitle}>Operations</h2>
+                        <h2 className={styles.operationPanelTitle}>
+                            {message("ui.operations")}
+                        </h2>
                     </div>
                     {operations.toReversed().map((display: Operation, index: number) =>
                         <OperationDisplay
@@ -318,7 +314,7 @@ export function OperationDisplay({ display }: { display: Operation }): JSX.Eleme
                     <IconButton
                         icon={"close"}
                         iconSize={"16px"}
-                        tooltip={"Cancel Operation"}
+                        tooltip={message("tooltip.operation.cancel")}
                         onClick={() => api.cancelOperation(display.id)}
                     />
                 );
@@ -339,7 +335,7 @@ export function OperationDisplay({ display }: { display: Operation }): JSX.Eleme
                 <IconButton
                     icon={"close"}
                     iconSize={"16px"}
-                    tooltip={"Cancel Operation"}
+                    tooltip={message("tooltip.operation.cancel")}
                     onClick={() => display.state = OpState.CANCELED}
                     // Pass by reference moment
                 />
@@ -471,7 +467,7 @@ async function runOperation(call: (() => Promise<void>) | MainCall): Promise<voi
         if (api[call.name] != undefined) {
             await api[call.name](...call.args);
         } else {
-            throw new Error("Function not found: " + call.name + ".");
+            error("operationCallNotFound", call.name);
         }
     }
 }

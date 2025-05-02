@@ -6,6 +6,7 @@ import MISSING from "../../../assets/missing.png";
 import { OpDep, OpState, SortTypeOptions, finishOp } from "../../../global/global";
 import appStyles from "../../app/app.css";
 import charactersStyles from "./characters.css";
+import { message } from "../../../global/translations";
 const styles: typeof import("../../app/app.css") & typeof import("./characters.css") =
     Object.assign({}, appStyles, charactersStyles);
 
@@ -141,9 +142,10 @@ export function TabCharacters({
         setOperations((prev: Operation[]) => {
             const newOperations: Operation[] = [...prev];
             operationId = newOperations.push({
-                title: "Alt Inclusion",
-                body: value ? "Ensuring that alts are included in the character list." :
-                    "Ensuring that alts are excluded from the character list.",
+                title: value ? message("operation.alt.include.started.title") :
+                    message("operation.alt.exclude.started.title"),
+                body: value ? message("operation.alt.include.started.body") :
+                    message("operation.alt.exclude.started.body"),
                 state: OpState.QUEUED,
                 icon: value ? "diversity_3" : "reduce_capacity",
                 animation: Math.floor(Math.random() * 3),
@@ -157,8 +159,8 @@ export function TabCharacters({
 
                     setOperations(finishOp(
                         operationId,
-                        value ? "Ensured that alts are included in the character list." :
-                            "Ensured that alts are excluded from the character list."
+                        value ? message("operation.alt.include.finished.body") :
+                            message("operation.alt.exclude.finished.body")
                     ));
 
                     readCharacters();
@@ -175,7 +177,7 @@ export function TabCharacters({
                     <div className={styles.tooltipWrapper + " " + styles.inlineSortOptions}>
                         <input
                             type={"text"}
-                            placeholder={"Search"}
+                            placeholder={message("ui.searchPlaceholder")}
                             id={styles.characterSearch}
                             onInput={(event: any) => {
                                 setSearchValue(event.target.value);
@@ -183,7 +185,7 @@ export function TabCharacters({
                             }}
                         />
                         <div className={styles.tooltip}>
-                            <span>Search For Characters</span>
+                            <span>{message("tooltip.character.search")}</span>
                         </div>
                     </div>
                     <div className={styles.inlineSortOptions}>
@@ -195,9 +197,9 @@ export function TabCharacters({
                                 "sort_by_alpha"
                             ]}
                             tooltips={[
-                                "Sort By: Internal Number",
-                                "Sort By: Series",
-                                "Sort By: Alphabetical"
+                                message("tooltip.sortBy.number"),
+                                message("tooltip.sortBy.series"),
+                                message("tooltip.sortBy.alphabetical")
                             ]}
                             iconSize={"30px"}
                             setter={setSortType}
@@ -205,9 +207,9 @@ export function TabCharacters({
                         <ToggleIconButton
                             checked={reverseSort}
                             trueIcon={"north"}
-                            trueTooltip={"Sort Direction: Backwards"}
+                            trueTooltip={message("tooltip.sortDirection.backwards")}
                             falseIcon={"south"}
-                            falseTooltip={"Sort Direction: Forwards"}
+                            falseTooltip={message("tooltip.sortDirection.forwards")}
                             iconSize={"30px"}
                             setter={setReverseSort}
                         />
@@ -273,7 +275,7 @@ export function TabCharacters({
                     <IconButton
                         icon={"folder_shared"}
                         iconSize={"50px"}
-                        tooltip={"Install Character From Directory"}
+                        tooltip={message("tooltip.character.installDir")}
                         onClick={async () => {
                             api.selectAndInstallCharacters(
                                 filterInstallation,
@@ -285,7 +287,7 @@ export function TabCharacters({
                     <IconButton
                         icon={"contact_page"}
                         iconSize={"50px"}
-                        tooltip={"Install Character From Archive"}
+                        tooltip={message("tooltip.character.installArch")}
                         onClick={async () => {
                             api.selectAndInstallCharacters(
                                 filterInstallation,
@@ -297,7 +299,7 @@ export function TabCharacters({
                     <IconButton
                         icon={"source"}
                         iconSize={"50px"}
-                        tooltip={"Open Extraction Directory"}
+                        tooltip={message("tooltip.openExtractionDir")}
                         onClick={async () => {
                             api.openDir(await api.getExtractedDir());
                         }}
@@ -319,27 +321,27 @@ export function TabCharacters({
                     <ToggleIconButton
                         checked={!!filterInstallation}
                         trueIcon={"filter_alt"}
-                        trueTooltip={"Installation: Only Necessary Files"}
+                        trueTooltip={message("tooltip.installation.filter")}
                         falseIcon={"filter_alt_off"}
-                        falseTooltip={"Installation: All Files"}
+                        falseTooltip={message("tooltip.installation.all")}
                         iconSize={"50px"}
                         setter={setFilterInstallation}
                     />
                     <ToggleIconButton
                         checked={!!updateCharacters}
                         trueIcon={"sync"}
-                        trueTooltip={"Existing Characters: Update"}
+                        trueTooltip={message("tooltip.character.existing.update")}
                         falseIcon={"sync_disabled"}
-                        falseTooltip={"Existing Characters: Abort"}
+                        falseTooltip={message("tooltip.character.existing.abort")}
                         iconSize={"50px"}
                         setter={setUpdateCharacters}
                     />
                     <ToggleIconButton
                         checked={!!altsAsCharacters}
                         trueIcon={"diversity_3"}
-                        trueTooltip={"Alts: Included As Characters"}
+                        trueTooltip={message("tooltip.alt.asCharacters.included")}
                         falseIcon={"reduce_capacity"}
-                        falseTooltip={"Alts: Excluded From Characters"}
+                        falseTooltip={message("tooltip.alt.asCharacters.excluded")}
                         iconSize={"50px"}
                         setter={setAltsAsCharacters}
                     />
@@ -372,9 +374,8 @@ function CharacterDisplay({
         setOperations((prev: Operation[]) => {
             const newOperations: Operation[] = [...prev];
             operationId = newOperations.push({
-                title: "Character Selection",
-                body: "Toggling the ability for character: '" + character.name + "' to be " +
-                    "selected at random.",
+                title: message("operation.character.randomSelection.started.title"),
+                body: message("operation.character.randomSelection.started.body", character.name),
                 image: "img://" + character.mug,
                 state: OpState.QUEUED,
                 icon: randomSelection ? "help" : "help_outline",
@@ -385,8 +386,7 @@ function CharacterDisplay({
                     character.randomSelection = randomSelection;
                     setOperations(finishOp(
                         operationId,
-                        "Toggled the ability for character: '" + character.name + "' to be " +
-                        "selected at random."
+                        message("operation.character.randomSelection.finished.body", character.name)
                     ));
                 }
             }) - 1;
@@ -414,14 +414,19 @@ function CharacterDisplay({
                         <IconButton
                             icon={"delete"}
                             iconSize={"30px"}
-                            tooltip={"Delete Character"}
+                            tooltip={message("tooltip.character.delete")}
                             onClick={async () => {
                                 let operationId: number;
                                 setOperations((prev: Operation[]) => {
                                     const newOperations: Operation[] = [...prev];
                                     operationId = newOperations.push({
-                                        title: "Character Deletion",
-                                        body: "Deleting character: '" + character.name + "'.",
+                                        title: message(
+                                            "operation.character.deletion.started.title"
+                                        ),
+                                        body: message(
+                                            "operation.character.deletion.started.body",
+                                            character.name
+                                        ),
                                         image: "img://" + character.mug,
                                         state: OpState.QUEUED,
                                         icon: "delete",
@@ -434,7 +439,10 @@ function CharacterDisplay({
                                             await api.removeCharacter(character.name);
                                             setOperations(finishOp(
                                                 operationId,
-                                                "Deleted character: '" + character.name + "'."
+                                                message(
+                                                    "operation.character.deletion.finished.body",
+                                                    character.name
+                                                )
                                             ));
                                             readCharacters();
                                         }
@@ -446,14 +454,19 @@ function CharacterDisplay({
                         <IconButton
                             icon={"drive_file_move"}
                             iconSize={"30px"}
-                            tooltip={"Extract Character"}
+                            tooltip={message("tooltip.character.extract")}
                             onClick={async () => {
                                 let operationId: number;
                                 setOperations((prev: Operation[]) => {
                                     const newOperations: Operation[] = [...prev];
                                     operationId = newOperations.push({
-                                        title: "Character Extraction",
-                                        body: "Extracting character: '" + character.name + "'.",
+                                        title: message(
+                                            "operation.character.extraction.started.title"
+                                        ),
+                                        body: message(
+                                            "operation.character.extraction.started.body",
+                                            character.name
+                                        ),
                                         image: "img://" + character.mug,
                                         state: OpState.QUEUED,
                                         icon: "drive_file_move",
@@ -464,10 +477,13 @@ function CharacterDisplay({
                                                 await api.extractCharacter(character.name);
                                             setOperations(finishOp(
                                                 operationId,
-                                                "Extracted  character: '" + character.name + "'.",
+                                                message(
+                                                    "operation.character.extraction.finished.body",
+                                                    character.name
+                                                ),
                                                 {
                                                     icon: "source",
-                                                    tooltip: "Open Extracted Files",
+                                                    tooltip: message("tooltip.openExtractedFiles"),
                                                     call: {
                                                         name: "openDir",
                                                         args: [extractDir]
@@ -483,9 +499,9 @@ function CharacterDisplay({
                         <ToggleIconButton
                             checked={randomSelection}
                             trueIcon={"help"}
-                            trueTooltip={"Random Selection: Enabled"}
+                            trueTooltip={message("tooltip.randomSelection.enabled")}
                             falseIcon={"help_outline"}
-                            falseTooltip={"Random Selection: Disabled"}
+                            falseTooltip={message("tooltip.randomSelection.disabled")}
                             iconSize={"30px"}
                             setter={setRandomSelection}
                         />
@@ -544,15 +560,18 @@ function CharacterAltDisplay({
                 <IconButton
                     icon={"group_remove"}
                     iconSize={"30px"}
-                    tooltip={"Remove Alt"}
+                    tooltip={message("tooltip.alt.remove")}
                     onClick={async () => {
                         let operationId: number;
                         setOperations((prev: Operation[]) => {
                             const newOperations: Operation[] = [...prev];
                             operationId = newOperations.push({
-                                title: "Alt Removal",
-                                body: "Removing alt: '" + alt.alt + "' from character: '" +
-                                    alt.base + "'.",
+                                title: message("operation.alt.removal.started.title"),
+                                body: message(
+                                    "operation.alt.removal.started.body",
+                                    alt.alt,
+                                    alt.base
+                                ),
                                 image: "img://" + alt.mug,
                                 state: OpState.QUEUED,
                                 icon: "group_remove",
@@ -562,8 +581,11 @@ function CharacterAltDisplay({
                                     await api.removeAlt(alt);
                                     setOperations(finishOp(
                                         operationId,
-                                        "Removed alt: '" + alt.alt + "' from character: '" +
-                                        alt.base + "'."
+                                        message(
+                                            "operation.alt.removal.finished.body",
+                                            alt.alt,
+                                            alt.base
+                                        )
                                     ));
                                     readCharacters();
                                 }
@@ -595,7 +617,7 @@ function AddAltButton({
             <IconButton
                 icon={"group_add"}
                 iconSize={"30px"}
-                tooltip={"Add Alt To This Character"}
+                tooltip={message("tooltip.alt.addition.toThis")}
                 onClick={() => {
                     setAltTarget(character);
                 }}
@@ -607,7 +629,7 @@ function AddAltButton({
             <IconButton
                 icon={"cancel"}
                 iconSize={"30px"}
-                tooltip={"Cancel Alt Addition"}
+                tooltip={message("tooltip.alt.addition.cancel")}
                 onClick={() => {
                     setAltTarget(null);
                 }}
@@ -618,15 +640,18 @@ function AddAltButton({
         <IconButton
             icon={"person_add"}
             iconSize={"30px"}
-            tooltip={"Add As Alt To Selected Character"}
+            tooltip={message("tooltip.alt.addition.thisFor")}
             onClick={async () => {
                 let operationId: number;
                 setOperations((prev: Operation[]) => {
                     const newOperations: Operation[] = [...prev];
                     operationId = newOperations.push({
-                        title: "Alt Addition",
-                        body: "Adding alt: '" + character.name + "' to character: '" +
-                            altTarget.name + "'.",
+                        title: message("operation.alt.addition.started.title"),
+                        body: message(
+                            "operation.alt.addition.started.body",
+                            character.name,
+                            altTarget.name
+                        ),
                         image: "img://" + character.mug,
                         state: OpState.QUEUED,
                         icon: "person_add",
@@ -637,8 +662,11 @@ function AddAltButton({
                             setAltTarget(null);
                             setOperations(finishOp(
                                 operationId,
-                                "Added alt: '" + character.name + "' to character: '" +
-                                altTarget.name + "'."
+                                message(
+                                    "operation.alt.addition.finished.body",
+                                    character.name,
+                                    altTarget.name
+                                )
                             ));
                             readCharacters();
                         }
@@ -668,14 +696,17 @@ function SeriesDisplay({
                 <IconButton
                     icon={"delete_sweep"}
                     iconSize={"30px"}
-                    tooltip={"Delete All Characters In Series"}
+                    tooltip={message("tooltip.character.deleteSeries")}
                     onClick={async () => {
                         let operationId: number;
                         setOperations((prev: Operation[]) => {
                             const newOperations: Operation[] = [...prev];
                             operationId = newOperations.push({
-                                title: "Series Deletion",
-                                body: "Deleting all characters in series: '" + series + "'.",
+                                title: message("operation.character.seriesDeletion.started.title"),
+                                body: message(
+                                    "operation.character.seriesDeletion.started.body",
+                                    series
+                                ),
                                 state: OpState.QUEUED,
                                 icon: "delete_sweep",
                                 animation: Math.floor(Math.random() * 3),
@@ -686,7 +717,10 @@ function SeriesDisplay({
                                     await api.removeSeriesCharacters(series);
                                     setOperations(finishOp(
                                         operationId,
-                                        "Deleted all characters in series: '" + series + "'."
+                                        message(
+                                            "operation.character.seriesDeletion.finished.body",
+                                            series
+                                        )
                                     ));
                                     readCharacters();
                                 }

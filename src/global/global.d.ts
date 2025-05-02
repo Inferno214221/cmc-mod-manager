@@ -207,34 +207,35 @@ interface MainCall {
     args: any[]
 }
 
-interface Options {
-    id: string,
-    body: string,
-    title?: string,
-}
+// interface Options {
+//     id: string,
+//     body: string,
+//     title?: string,
+// }
 
-interface AlertOptions extends Options {
-    okLabel?: string
-}
+// interface AlertOptions extends Options {
+//     okLabel?: string
+// }
 
-interface ConfirmOptions extends Options {
-    okLabel?: string,
-    cancelLabel?: string
-}
+// interface ConfirmOptions extends Options {
+//     okLabel?: string,
+//     cancelLabel?: string
+// }
 
-interface PromptOptions extends Options {
-    placeholder?: string,
+// interface PromptOptions extends Options {
+//     placeholder?: string,
+//     defaultValue?: string,
+//     invalidCharacters?: RegExp,
+//     okLabel?: string,
+//     cancelLabel?: string
+// }
+
+interface PromptOptions {
     defaultValue?: string,
     invalidCharacters?: RegExp,
-    okLabel?: string,
-    cancelLabel?: string
 }
 
-interface CharacterInstallOptions extends Options {
-    targetDir: string
-}
-
-interface StageInstallOptions extends Options {
+interface InstallOptions {
     targetDir: string
 }
 

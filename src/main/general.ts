@@ -9,7 +9,8 @@ import { execSync, spawn } from "child_process";
 import request from "request";
 import http from "http";
 import semver from "semver";
-import { ModTypes, OpDep, OpState, error } from "../global/global";
+import { ModTypes, OpDep, OpState } from "../global/global";
+import { displayEnum, error, message } from "../global/translations";
 
 require.resolve("./unrar.wasm");
 const WASM_BINARY: Buffer = fs.readFileSync(path.join(__dirname, "unrar.wasm"));
@@ -120,7 +121,7 @@ export async function extractArchive(archive: string, destination: string): Prom
             // This log statement included because of how the generator works
             break;
         default:
-            throw new Error("Unsupported archive type: " + path.parse(archive).ext.toLowerCase());
+            error("unsupportedArchiveType", path.parse(archive).ext.toLowerCase());
     }
     return output;
 }
@@ -128,8 +129,8 @@ export async function extractArchive(archive: string, destination: string): Prom
 export async function selectPathsArch(): Promise<string[]> {
     const selected: OpenDialogReturnValue = await dialog.showOpenDialog(global.win, {
         filters: [
-            { name: "Archives", extensions: ["zip", "rar"] },
-            { name: "All Files", extensions: ["*"] }
+            { name: message("other.selector.archives"), extensions: ["zip", "rar"] },
+            { name: message("other.selector.all"), extensions: ["*"] }
         ],
         properties: ["openFile", "multiSelections"]
     });
@@ -154,7 +155,7 @@ export async function selectPathsDir(): Promise<string[]> {
 
 export async function checkForUpdates(): Promise<void> {
     const currentVersion: string = semver.clean(app.getVersion()) ??
-        error("Invalid semver string: '" + app.getVersion() + "'");
+        error("invalidSemverString", app.getVersion());
     request.get("https://api.github.com/repos/Inferno214221/cmc-mod-manager/releases", {
         headers: {
             "Accept": "application/vnd.github.v3+json",
@@ -171,8 +172,7 @@ export async function checkForUpdates(): Promise<void> {
             return (semver.gte(a.tag_name, b.tag_name) ? -1 : 1);
         });
         const latestVersion: string = semver.clean(releases[0].tag_name) ??
-            error("Invalid semver string: '" + app.getVersion() + "'");
-        console.log("Latest Version: " + latestVersion);
+            error("invalidSemverString", releases[0].tag_name);
         if (semver.lt(currentVersion, latestVersion)) {
             if (semver.prerelease(latestVersion)) {
                 if (!semver.prerelease(currentVersion)) {
@@ -186,10 +186,8 @@ export async function checkForUpdates(): Promise<void> {
             } catch (error: any) {
                 addOperation({
                     id: id,
-                    title: "Download Update",
-                    body: `Due to the way CMC Mod Manager has been installed, it can't be updated
-                        automatically. Please download the latest version from GitHub or GameBanana.
-                        (Check the Home tab for links.)`,
+                    title: message("operation.update.download.started.title"),
+                    body: message("other.autoUpdateFailed"),
                     state: OpState.ERROR,
                     icon: "download",
                     animation: Math.floor(Math.random() * 3),
@@ -201,8 +199,8 @@ export async function checkForUpdates(): Promise<void> {
 
             addOperation({
                 id: id,
-                title: "Download Update",
-                body: "Downloading the latest version of CMC Mod Manager.",
+                title: message("operation.update.download.started.title"),
+                body: message("operation.update.download.started.body"),
                 state: OpState.QUEUED,
                 icon: "download",
                 animation: Math.floor(Math.random() * 3),
@@ -218,15 +216,7 @@ export async function checkForUpdates(): Promise<void> {
 }
 
 export async function downloadUpdate(tagName: string, id: string): Promise<void> {
-    if (!(await customDialogs.confirm({
-        id: "confirmUpdate",
-        title: "CMC Mod Manager | Program Update",
-        body: "CMC Mod Manager requires an update. This update will now be installed " +
-            "automatically. This update will remove all files within CMC Mod Manager's " +
-            "directory, if this is problematic, please cancel this update and remove any " +
-            "affected files.",
-        okLabel: "Continue"
-    })) || isSelfContainedDir()) {
+    if (!(await customDialogs.confirm("programUpdate")) || isSelfContainedDir()) {
         if (isSelfContainedDir()) alertSelfContainedDir();
         updateOperation({
             id: id,
@@ -243,12 +233,12 @@ export async function downloadUpdate(tagName: string, id: string): Promise<void>
         .on("error", (err: Error) => {
             console.log(err);
             targetStream.close();
-            throw new Error("A stream error occurred: '" + err.message + "'");
+            error("streamError", err.message);
         }).on("response", (res: request.Response) => {
             const downloadSize: number = parseInt(res.headers["content-length"] ?? "");
             updateDownloadProgress(
                 id,
-                "Downloading the latest version of CMC Mod Manager.",
+                message("operation.update.download.started.body"),
                 targetStream,
                 downloadSize
             );
@@ -256,8 +246,8 @@ export async function downloadUpdate(tagName: string, id: string): Promise<void>
             if (targetStream.errored) return;
             updateOperation({
                 id: id,
-                title: "Update Downloaded",
-                body: "Downloaded the latest version of CMC Mod Manager.",
+                title: message("operation.update.download.finished.title"),
+                body: message("operation.update.download.finished.body"),
                 state: OpState.FINISHED
             });
             if (app.isPackaged) {
@@ -275,8 +265,8 @@ export async function downloadUpdate(tagName: string, id: string): Promise<void>
             const installId: string = "installUpdate_" + Date.now();
             addOperation({
                 id: installId,
-                title: "Install Update",
-                body: "Installing the latest version of CMC Mod Manager.",
+                title: message("operation.update.install.started.title"),
+                body: message("operation.update.install.started.body"),
                 state: OpState.QUEUED,
                 icon: "install_desktop",
                 animation: Math.floor(Math.random() * 3),
@@ -291,10 +281,10 @@ export async function downloadUpdate(tagName: string, id: string): Promise<void>
 }
 
 export async function installUpdate(id: string): Promise<void> {
-    if (!app.isPackaged) throw new Error("Cannot update in dev mode.");
+    if (!app.isPackaged) error("cantUpdateDevMode");
     const updateDir: string = path.join(global.appDir, "update");
     const updaterDir: string = path.join(global.appDir, "updater");
-    if (!(await fs.exists(path.join(updateDir)))) throw new Error("Update files not found.");
+    if (!(await fs.exists(path.join(updateDir)))) error("missingUpdateFiles");
     if (
         await fs.exists(path.join(updateDir, "updater", "update.sh")) ||
         await fs.exists(path.join(updateDir, "updater", "update.bat"))
@@ -305,14 +295,14 @@ export async function installUpdate(id: string): Promise<void> {
     global.updateOnExit = true;
     updateOperation({
         id: id,
-        body: "Please close CMC Mod Manager to finish the update.",
+        body: message("operation.update.install.finished.body"),
         state: OpState.FINISHED
     });
     return;
 }
 
 export function runUpdater(): void {
-    if (!app.isPackaged) throw new Error("Cannot update in dev mode.");
+    if (!app.isPackaged) error("cantUpdateDevMode");
     const updaterDir: string = path.join(global.appDir, "updater");
 
     if (global.platform == "win32") {
@@ -343,8 +333,8 @@ export async function handleURI(uri: string | undefined): Promise<void> {
     const modId: string = splitUri[2];
     const id: string = modId + "_" + Date.now();
 
-    showNotification("1-Click Download Initialised", {
-        body: "Downloading mod with id: '" + modId + "' from GameBanana."
+    showNotification(message("dialog.notification.oneClickDownload.title"), {
+        body: message("dialog.notification.oneClickDownload.body", modId)
     }, {
         name: "focusWindow",
         args: []
@@ -352,8 +342,8 @@ export async function handleURI(uri: string | undefined): Promise<void> {
 
     addOperation({
         id: "download_" + id,
-        title: "Mod Download",
-        body: "Downloading a mod from GameBanana.",
+        title: message("operation.mod.download.started.title"),
+        body: message("operation.mod.download.started.body"),
         image: "https://gamebanana.com/mods/embeddables/" + modId + "?type=medium_square",
         state: OpState.QUEUED,
         icon: "download",
@@ -391,7 +381,7 @@ export async function downloadMod(url: string, modId: string, id: string): Promi
         let file: string = operationId;
         request.get(url)
             .on("error", (err: Error) => {
-                throw err;
+                return reject(err);
             }).on("response", async (res: request.Response) => {
                 const archiveType: string = res.headers["content-type"]?.split("/")[1] ?? "";
                 switch (archiveType) {
@@ -403,7 +393,9 @@ export async function downloadMod(url: string, modId: string, id: string): Promi
                         file += ".rar";
                         break;
                     default:
-                        return reject(new Error("Invalid archive type: " + archiveType));
+                        return reject(
+                            new Error(message("error.unsupportedArchiveType", archiveType))
+                        );
                 }
                 const filePath: string = path.join(global.temp, file);
                 const modInfo: string[] = await Promise.resolve(infoPromise);
@@ -416,15 +408,17 @@ export async function downloadMod(url: string, modId: string, id: string): Promi
                         modType = ModTypes.STAGE;
                         break;
                     default:
-                        return reject(new Error("Unknown mod type."));
+                        return reject(
+                            new Error(message("error.unsupportedArchiveType", modInfo[1]))
+                        );
                 }
 
                 const downloadSize: number = parseInt(res.headers["content-length"] ?? "");
                 updateOperation({
                     id: operationId,
-                    title: modType + " Download",
-                    body: "Downloading mod: '" + modInfo[0] + "' from GameBanana. (0 / " +
-                        toMb(downloadSize) + " mb)",
+                    title: message("operation.mod.download.progress.0.title", displayEnum(modType)),
+                    body: message("operation.mod.download.progress.0.body", modInfo[0]) +
+                        " (0 / " + toMb(downloadSize) + " mb)",
                 });
 
                 const downloadStream: fs.WriteStream = fs.createWriteStream(filePath);
@@ -457,13 +451,13 @@ export async function downloadMod(url: string, modId: string, id: string): Promi
                     try {
                         updateOperation({
                             id: operationId,
-                            body: "Extracting downloaded mod.",
+                            body: message("operation.mod.download.progress.1.body"),
                         });
                         const output: string = await extractArchive(filePath, global.temp);
                         await fs.remove(filePath);
                         updateOperation({
                             id: operationId,
-                            body: "Downloaded mod: '" + modInfo[0] + "' from GameBanana.",
+                            body: message("operation.mod.download.finished.body", modInfo[0]),
                             state: OpState.FINISHED,
                         });
                         resolve();
@@ -482,7 +476,7 @@ export async function downloadMod(url: string, modId: string, id: string): Promi
 
                 updateDownloadProgress(
                     operationId,
-                    "Downloading mod: '" + modInfo[0] + "' from GameBanana.",
+                    message("operation.mod.download.progress.0.body", modInfo[0]),
                     downloadStream,
                     downloadSize
                 );
@@ -578,18 +572,16 @@ export async function getGameVersion(
 
 export function isSelfContainedDir(dir: string = global.gameDir): boolean {
     const relativePath: string = path.relative(global.appDir, path.resolve(dir));
-    return (!relativePath || (!relativePath.startsWith("..") && !path.isAbsolute(relativePath)));
+    return !(
+        relativePath && (
+            relativePath.startsWith("..") ||
+            path.isAbsolute(relativePath)
+        )
+    );
 }
 
 async function alertSelfContainedDir(): Promise<void> {
-    customDialogs.alert({
-        id: "modManagerContainedDirWarning",
-        body: "The selected game directory is contained within CMC Mod Manager's own " +
-            "directory. CMC Mod Manager deletes all files within this directory when " +
-            "updating, so it cannot be used to store your game files, please move them to " +
-            "a different location.",
-        title: "Invalid Game Location Warning",
-    });
+    customDialogs.alert("selfContainedDir");
     return;
 }
 
@@ -608,14 +600,7 @@ export async function selectGameDir(): Promise<string | null> {
         if (isSelfContainedDir(dir.filePaths[0])) {
             alertSelfContainedDir();
         } else {
-            customDialogs.alert({
-                id: "invalidGameDir",
-                body: "The selected directory is invalid as it does not contain one of the " +
-                "following identifying executables: " +
-                SUPPORTED_VERSIONS.map((val: string) => val + ".exe").join(", ") +
-                ".",
-                title: "Invalid Directory Selected",
-            });
+            customDialogs.alert("invalidGameDir");
         }
         return null;
     }
@@ -649,13 +634,7 @@ export function escapeRegex(str: string): string {
 }
 
 export async function confirmDestructiveAction(): Promise<boolean> {
-    return await customDialogs.confirm({
-        id: "confirmDestructiveAction",
-        body: "This action is destructive and cannot be undone. Are you sure that you want to " +
-            "continue?",
-        title: "Destructive Action Confirmation",
-        okLabel: "Continue",
-    });
+    return await customDialogs.confirm("destructiveAction");
 }
 
 export function updateCharacterPages(): void {

@@ -7,6 +7,7 @@ import fs from "fs-extra";
 import { OpState } from "../global/global";
 import CMCMM from "../assets/icon.svg";
 import * as buildInfo from "../../build.json";
+import { message } from "../global/translations";
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
@@ -32,7 +33,7 @@ import * as customDialogs from "./custom-dialogs";
 general.loadAppData().then(() => global.gameDir = global.appData.dir);
 
 if (!app.requestSingleInstanceLock()) {
-    console.log("No App Single Instance Lock");
+    console.log(message("error.noSingleInstanceLock"));
     app.exit();
 } else {
     app.on("second-instance", (_event: Event, argv: string[]) => {
@@ -113,14 +114,7 @@ async function createWindow(): Promise<void> {
         if (operations.filter((operation: Operation) =>
             operation.state == OpState.STARTED || operation.state == OpState.QUEUED
         ).length > 0) {
-            if (!(await customDialogs.confirm({
-                id: "closeUnfinishedOperations",
-                title: "CMC Mod Manager | Unfinished Operations",
-                body: "Are you sure you want to close CMC Mod Manager? Some operations are " +
-                    "unfinished and will be canceled if you close (or reload) the program.",
-                okLabel: "Close Anyway",
-                cancelLabel: "Cancel"
-            }))) {
+            if (!(await customDialogs.confirm("closeUnfinishedOperations"))) {
                 return;
             }
         }
@@ -129,15 +123,7 @@ async function createWindow(): Promise<void> {
     });
 
     if (didUpdate) {
-        customDialogs.alert({
-            id: "postUpdate",
-            title: "CMC Mod Manager | Post Update Message",
-            body: "Thanks for updating CMC Mod Manager! The CMC Mod Manager website has also " +
-                "been updated, so please consider checking it out: " +
-                "https://inferno214221.com/cmc-mod-manager/ (a link is also available in the " +
-                "'Home' tab). I've also setup a 'Buy Me A Coffee' page if you'd like to support " +
-                "the project!"
-        });
+        customDialogs.alert("postUpdate");
     }
 
     app.setAsDefaultProtocolClient("cmcmm");

@@ -1,16 +1,19 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Root, createRoot } from "react-dom/client";
 import styles from "./custom-dialogs.css";
+import { error, message, tryMessage } from "../global/translations";
 
 declare const dialog: typeof import("./api").default;
-declare const options: ConfirmOptions;
+declare const options: {
+    id: string,
+    name: string,
+    extra: null
+};
 
 const root: Root = createRoot(document.body);
 console.log(options);
-if (!options) throw new Error("Options not found.");
-if (options.title != undefined) {
-    document.title = options.title;
-}
+if (!options) error("missingDialogOptions");
+document.title = tryMessage("dialog.confirm." + options.name + ".title")!;
 root.render(<Body/>);
 
 async function requestNextFrame(height: number, depth: number = 0): Promise<number> {
@@ -60,23 +63,21 @@ function Body(): JSX.Element {
         }}>
             <div className={styles.center}>
                 <span>
-                    {options.body}
+                    {tryMessage("dialog.confirm." + options.name + ".body")!}
                 </span>
             </div>
             <br/>
             <div className={styles.right}>
                 <button onClick={() => cancel(options.id)}>
                     {
-                        (options.cancelLabel == undefined) ?
-                            "Cancel" :
-                            options.cancelLabel
+                        tryMessage("dialog.confirm." + options.name + ".cancelLabel") ??
+                        message("dialog.defaults.cancelLabel")
                     }
                 </button>
                 <button onClick={() => ok(options.id)}>
                     {
-                        (options.okLabel == undefined) ?
-                            "OK" :
-                            options.okLabel
+                        tryMessage("dialog.confirm." + options.name + ".okLabel") ??
+                        message("dialog.defaults.okLabel")
                     }
                 </button>
             </div>

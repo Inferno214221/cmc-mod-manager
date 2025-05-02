@@ -8,6 +8,7 @@ import {
 } from "../../../global/global";
 import appStyles from "../../app/app.css";
 import stageSsStyles from "./stage-ss.css";
+import { message } from "../../../global/translations";
 const styles: typeof import("../../app/app.css") & typeof import("./stage-ss.css") =
     Object.assign({}, appStyles, stageSsStyles);
 
@@ -130,8 +131,8 @@ export function TabStageSelectionScreen({
         setOperations((prev: Operation[]) => {
             const newOperations: Operation[] = [...prev];
             operationId = newOperations.push({
-                title: "Write SSS Data",
-                body: "Writing modified SSS data to page: '" + sssPages[activePage].name + "'.",
+                title: message("operation.sss.writeData.started.title"),
+                body: message("operation.sss.writeData.started.body", sssPages[activePage].name),
                 state: OpState.QUEUED,
                 icon: "location_pin",
                 animation: Math.floor(Math.random() * 3),
@@ -140,7 +141,7 @@ export function TabStageSelectionScreen({
                     await api.writeSssPages(sssPages);
                     setOperations(finishOp(
                         operationId,
-                        "Wrote modified SSS data to page: '" + sssPages[activePage].name + "'."
+                        message("operation.sss.writeData.finished.body", sssPages[activePage].name)
                     ));
                 }
             }) - 1;
@@ -244,7 +245,7 @@ function ExcludedStages({
                     <div className={styles.tooltipWrapper + " " + styles.inlineSortOptions}>
                         <input
                             type={"text"}
-                            placeholder={"Search"}
+                            placeholder={message("ui.searchPlaceholder")}
                             id={styles.excludedSearch}
                             onInput={(event: any) => {
                                 setSearchValue(event.target.value);
@@ -252,7 +253,7 @@ function ExcludedStages({
                             }}
                         />
                         <div className={styles.tooltip}>
-                            <span>Search For Stages</span>
+                            <span>{message("tooltip.stage.search")}</span>
                         </div>
                     </div>
                     <div className={styles.inlineSortOptions}>
@@ -264,9 +265,9 @@ function ExcludedStages({
                                 "sort_by_alpha"
                             ]}
                             tooltips={[
-                                "Sort By: Internal Number",
-                                "Sort By: Franchise",
-                                "Sort By: Alphabetical"
+                                message("tooltip.sortBy.number"),
+                                message("tooltip.sortBy.series"),
+                                message("tooltip.sortBy.alphabetical")
                             ]}
                             iconSize={"30px"}
                             setter={setSortType}
@@ -274,18 +275,18 @@ function ExcludedStages({
                         <ToggleIconButton
                             checked={reverseSort}
                             trueIcon={"west"}
-                            trueTooltip={"Sort Direction: Backwards"}
+                            trueTooltip={message("tooltip.sortDirection.backwards")}
                             falseIcon={"east"}
-                            falseTooltip={"Sort Direction: Forwards"}
+                            falseTooltip={message("tooltip.sortDirection.forwards")}
                             iconSize={"30px"}
                             setter={setReverseSort}
                         />
                         <ToggleIconButton
                             checked={showAllStages}
                             trueIcon={"groups"}
-                            trueTooltip={"Showing: All Stages"}
+                            trueTooltip={message("tooltip.stage.showing.all")}
                             falseIcon={"person_outline"}
-                            falseTooltip={"Showing: Excluded Stages"}
+                            falseTooltip={message("tooltip.stage.showing.excluded")}
                             iconSize={"30px"}
                             setter={setShowAllStages}
                         />
@@ -413,9 +414,12 @@ function SssPages({
         setOperations((prev: Operation[]) => {
             const newOperations: Operation[] = [...prev];
             operationId = newOperations.push({
-                title: "Reorder SSS Pages",
-                body: "Moving SSS page: '" + sssPages[from].name + "' to index: " +
-                    (to > from ? to - 1 : to) + ".",
+                title: message("operation.sss.reorderPages.started.title"),
+                body: message(
+                    "operation.sss.reorderPages.started.body",
+                    sssPages[from].name,
+                    (to > from ? to - 1 : to)
+                ),
                 state: OpState.QUEUED,
                 icon: "swap_horiz",
                 animation: Math.floor(Math.random() * 3),
@@ -424,8 +428,11 @@ function SssPages({
                     await api.reorderSssPage(from, to);
                     setOperations(finishOp(
                         operationId,
-                        "Moved SSS page: '" + sssPages[from].name + "' to index: " +
-                        (to > from ? to - 1 : to) + "."
+                        message(
+                            "operation.sss.reorderPages.finished.body",
+                            sssPages[from].name,
+                            (to > from ? to - 1 : to)
+                        )
                     ));
                     getPages();
                 }
@@ -440,8 +447,8 @@ function SssPages({
         setOperations((prev: Operation[]) => {
             const newOperations: Operation[] = [...prev];
             operationId = newOperations.push({
-                title: "SSS Page Addition",
-                body: "Adding new SSS page: '" + newPageName + "'.",
+                title: message("operation.sss.pageAddition.started.title"),
+                body: message("operation.sss.pageAddition.started.body", newPageName),
                 state: OpState.QUEUED,
                 icon: "add",
                 animation: Math.floor(Math.random() * 3),
@@ -450,7 +457,7 @@ function SssPages({
                     const newPage: SssPage = await api.addSssPage(newPageName);
                     setOperations(finishOp(
                         operationId,
-                        "Added new SSS page: '" + newPageName + "'."
+                        message("operation.sss.pageAddition.finished.body", newPageName)
                     ));
                     getPages(newPage.pageNumber);
                 }
@@ -476,7 +483,7 @@ function SssPages({
             <div className={styles.sssPage + " " + styles.addSssPage}>
                 <input
                     type={"text"}
-                    placeholder={"Page Name"}
+                    placeholder={message("ui.pagePlaceholder")}
                     onInput={(event: any) => {
                         event.target.value = event.target.value.replace(/'|"/g, "");
                         setNewPageName(event.target.value);
@@ -501,7 +508,7 @@ function SssPages({
                 <IconButton
                     icon={"add"}
                     iconSize={"18px"}
-                    tooltip={"Add Page"}
+                    tooltip={message("tooltip.ss.addPage")}
                     onClick={async () => {
                         createNewPage();
                     }}
@@ -542,8 +549,8 @@ function SssPageDisplay({
         setOperations((prev: Operation[]) => {
             const newOperations: Operation[] = [...prev];
             operationId = newOperations.push({
-                title: "Rename SSS Page",
-                body: "Renaming SSS page: '" + page.name + "' to '" + editingName + "'.",
+                title: message("operation.sss.renamePage.started.title"),
+                body: message("operation.sss.renamePage.started.body", page.name, editingName),
                 state: OpState.QUEUED,
                 icon: "edit",
                 animation: Math.floor(Math.random() * 3),
@@ -552,7 +559,7 @@ function SssPageDisplay({
                     const editedPage: SssPage = await api.renameSssPage(pageIndex, editingName);
                     setOperations(finishOp(
                         operationId,
-                        "Renamed SSS page: '" + page.name + "' to '" + editingName + "'."
+                        message("operation.sss.renamePage.finished.body", page.name, editingName)
                     ));
                     getPages(editedPage.pageNumber);
                 }
@@ -617,15 +624,15 @@ function SssPageDisplay({
             <IconButton
                 icon={"delete"}
                 iconSize={"18px"}
-                tooltip={"Delete Page"}
+                tooltip={message("tooltip.ss.deletePage")}
                 onClick={async () => {
                     if (!await api.confirmDestructiveAction()) return;
                     let operationId: number;
                     setOperations((prev: Operation[]) => {
                         const newOperations: Operation[] = [...prev];
                         operationId = newOperations.push({
-                            title: "SSS Page Deletion",
-                            body: "Deleting SSS page: '" + page.name + "'.",
+                            title: message("operation.sss.pageDeletion.started.title"),
+                            body: message("operation.sss.pageDeletion.started.body", page.name),
                             state: OpState.QUEUED,
                             icon: "delete",
                             animation: Math.floor(Math.random() * 3),
@@ -634,7 +641,7 @@ function SssPageDisplay({
                                 await api.removeSssPage(page);
                                 setOperations(finishOp(
                                     operationId,
-                                    "Deleted SSS page: '" + page.name + "'."
+                                    message("operation.sss.pageDeletion.finished.body", page.name)
                                 ));
                                 getPages();
                             }

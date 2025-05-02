@@ -11,17 +11,20 @@ import IconButton from "../../renderer/icon-buttons/icon-button";
 import ToggleIconButton from "../../renderer/icon-buttons/toggle-icon-button";
 import CycleIconButton from "../../renderer/icon-buttons/cycle-icon-button";
 import MISSING from "../../assets/missing.png";
+import { error, message } from "../../global/translations";
 
 declare const dialog: typeof import("../api").default;
-declare const options: StageInstallOptions;
+declare const options: {
+    id: string,
+    name: string,
+    extra: InstallOptions
+};
 declare const api: typeof import("./api").default;
 
 const root: Root = createRoot(document.body);
 console.log(options);
-if (!options) throw new Error("Options not found.");
-if (options.title != undefined) {
-    document.title = options.title;
-}
+if (!options) error("missingDialogOptions");
+document.title = message("dialog.installation.stage.title");
 root.render(<Body/>);
 
 const sortTypes: SortTypeOptions[] = [
@@ -136,7 +139,7 @@ function Body(): JSX.Element {
     }
 
     async function findStages(): Promise<void> {
-        setFoundStages(await api.findStages(options.targetDir));
+        setFoundStages(await api.findStages(options.extra.targetDir));
     }
 
     async function readAlts(): Promise<void> {
@@ -160,7 +163,7 @@ function Body(): JSX.Element {
                         type={"text"}
                         readOnly={true}
                         id={styles.dirOutput}
-                        value={options.targetDir}
+                        value={options.extra.targetDir}
                     />
                 </div>
             </div>
@@ -170,7 +173,7 @@ function Body(): JSX.Element {
                     <div className={styles.tooltipWrapper + " " + styles.inlineSortOptions}>
                         <input
                             type={"text"}
-                            placeholder={"Search"}
+                            placeholder={message("ui.searchPlaceholder")}
                             id={styles.stageSearch}
                             onInput={(event: any) => {
                                 setSearchValue(event.target.value);
@@ -189,8 +192,8 @@ function Body(): JSX.Element {
                                 "group"
                             ]}
                             tooltips={[
-                                "Sort By: Alphabetical",
-                                "Sort By: Series"
+                                message("tooltip.sortBy.alphabetical"),
+                                message("tooltip.sortBy.series")
                             ]}
                             iconSize={"30px"}
                             setter={setSortType}
@@ -198,18 +201,18 @@ function Body(): JSX.Element {
                         <ToggleIconButton
                             checked={reverseSort}
                             trueIcon={"north"}
-                            trueTooltip={"Sort Direction: Backwards"}
+                            trueTooltip={message("tooltip.sortDirection.backwards")}
                             falseIcon={"south"}
-                            falseTooltip={"Sort Direction: Forwards"}
+                            falseTooltip={message("tooltip.sortDirection.forwards")}
                             iconSize={"30px"}
                             setter={setReverseSort}
                         />
                         <ToggleIconButton
                             checked={showAllStages}
                             trueIcon={"groups"}
-                            trueTooltip={"Showing: All Stages"}
+                            trueTooltip={message("tooltip.stage.showing.all")}
                             falseIcon={"person_outline"}
-                            falseTooltip={"Showing: New Stages"}
+                            falseTooltip={message("tooltip.stage.showing.all")}
                             iconSize={"30px"}
                             setter={setShowAllStages}
                         />
@@ -228,7 +231,7 @@ function Body(): JSX.Element {
                                     ) => {
                                         const stageDisplay: JSX.Element = (
                                             <StageDisplay
-                                                targetDir={options.targetDir}
+                                                targetDir={options.extra.targetDir}
                                                 stage={stage}
                                                 gameStages={gameStages}
                                                 alts={alts}
@@ -252,7 +255,7 @@ function Body(): JSX.Element {
                                     }) :
                                     sortedStages.map((stage: FoundStage) => (
                                         <StageDisplay
-                                            targetDir={options.targetDir}
+                                            targetDir={options.extra.targetDir}
                                             stage={stage}
                                             gameStages={gameStages}
                                             alts={alts}
@@ -315,12 +318,12 @@ function StageDisplay({
                             <IconButton
                                 icon={"sync"}
                                 iconSize={"30px"}
-                                tooltip={"Update Stage"}
+                                tooltip={message("tooltip.stage.update")}
                                 onClick={onClick}
                             /> : <IconButton
                                 icon={"add"}
                                 iconSize={"30px"}
-                                tooltip={"Install Stage"}
+                                tooltip={message("tooltip.stage.install")}
                                 onClick={onClick}
                             />
                         }

@@ -2,8 +2,10 @@ import { BrowserWindow, IpcMainInvokeEvent, ipcMain } from "electron";
 
 const DEV_TOOLS_ENABLED: boolean = true;
 
-abstract class Dialog<OptionsType extends Options, ReturnType> {
-    options: OptionsType;
+abstract class Dialog<ExtraOptions, ReturnType> {
+    id: string;
+    name: string;
+    options: ExtraOptions;
     window: BrowserWindow;
     resolve: ((result?: ReturnType) => void);
 
@@ -13,13 +15,14 @@ abstract class Dialog<OptionsType extends Options, ReturnType> {
     readonly DEFAULT_WIDTH: number = 360;
     readonly IS_MODAL: boolean = true;
 
-    constructor(options: OptionsType) {
+    constructor(name: string, options: ExtraOptions) {
+        this.id = name + "_" + Date.now();
+        this.name = name;
         this.options = options;
     }
 
     async show(): Promise<ReturnType | undefined> {
         return new Promise((resolve: (result?: ReturnType) => void) => {
-            this.options.id = this.options.id + "_" + Date.now();
             this.resolve = resolve;
 
             this.window = new BrowserWindow({
@@ -37,7 +40,11 @@ abstract class Dialog<OptionsType extends Options, ReturnType> {
                 webPreferences: {
                     devTools: DEV_TOOLS_ENABLED,
                     preload: this.PRELOAD_ENTRY,
-                    additionalArguments: [JSON.stringify(this.options)]
+                    additionalArguments: [JSON.stringify({
+                        id: this.id,
+                        name: this.name,
+                        extra: this.options
+                    })]
                 }
             });
 
@@ -51,13 +58,13 @@ abstract class Dialog<OptionsType extends Options, ReturnType> {
                 global.dialogs.splice(global.dialogs.indexOf(this.window), 1);
             });
 
-            ipcMain.handle(this.options.id + "_dialogResize",
+            ipcMain.handle(this.id + "_dialogResize",
                 (_event: IpcMainInvokeEvent, height: number) => this.resize(height)
             );
-            ipcMain.handle(this.options.id + "_dialogOk",
+            ipcMain.handle(this.id + "_dialogOk",
                 (_event: IpcMainInvokeEvent, value: ReturnType) => this.ok(value)
             );
-            ipcMain.handle(this.options.id + "_dialogCancel",
+            ipcMain.handle(this.id + "_dialogCancel",
                 () => this.cancel()
             );
 
@@ -81,16 +88,16 @@ abstract class Dialog<OptionsType extends Options, ReturnType> {
     }
 
     clearHandlers(): void {
-        ipcMain.removeHandler(this.options.id + "_dialogResize");
-        ipcMain.removeHandler(this.options.id + "_dialogOk");
-        ipcMain.removeHandler(this.options.id + "_dialogCancel");
+        ipcMain.removeHandler(this.id + "_dialogResize");
+        ipcMain.removeHandler(this.id + "_dialogOk");
+        ipcMain.removeHandler(this.id + "_dialogCancel");
     }
 }
 
 declare const DIALOG_ALERT_PRELOAD_WEBPACK_ENTRY: string;
 declare const DIALOG_ALERT_WEBPACK_ENTRY: string;
 
-export class AlertDialog extends Dialog<AlertOptions, null> {
+export class AlertDialog extends Dialog<null, null> {
     readonly PRELOAD_ENTRY: string = DIALOG_ALERT_PRELOAD_WEBPACK_ENTRY;
     readonly REACT_ENTRY: string = DIALOG_ALERT_WEBPACK_ENTRY;
 
@@ -104,14 +111,14 @@ export class AlertDialog extends Dialog<AlertOptions, null> {
     }
 }
 
-export async function alert(options: AlertOptions): Promise<void> {
-    await new AlertDialog(options).show(); return;
+export async function alert(id: string): Promise<void> {
+    await new AlertDialog(id, null).show(); return;
 }
 
 declare const DIALOG_CONFIRM_PRELOAD_WEBPACK_ENTRY: string;
 declare const DIALOG_CONFIRM_WEBPACK_ENTRY: string;
 
-export class ConfirmDialog extends Dialog<ConfirmOptions, boolean> {
+export class ConfirmDialog extends Dialog<null, boolean> {
     readonly PRELOAD_ENTRY: string = DIALOG_CONFIRM_PRELOAD_WEBPACK_ENTRY;
     readonly REACT_ENTRY: string = DIALOG_CONFIRM_WEBPACK_ENTRY;
 
@@ -125,8 +132,8 @@ export class ConfirmDialog extends Dialog<ConfirmOptions, boolean> {
     }
 }
 
-export async function confirm(options: ConfirmOptions): Promise<boolean> {
-    return !!(await new ConfirmDialog(options).show());
+export async function confirm(id: string): Promise<boolean> {
+    return !!(await new ConfirmDialog(id, null).show());
 }
 
 declare const DIALOG_PROMPT_PRELOAD_WEBPACK_ENTRY: string;
@@ -146,14 +153,14 @@ export class PromptDialog extends Dialog<PromptOptions, string> {
     }
 }
 
-export async function prompt(options: PromptOptions): Promise<string | undefined> {
-    return new PromptDialog(options).show();
+export async function prompt(id: string, extraOptions: PromptOptions): Promise<string | undefined> {
+    return new PromptDialog(id, extraOptions).show();
 }
 
 declare const DIALOG_CHARACTER_INSTALL_PRELOAD_WEBPACK_ENTRY: string;
 declare const DIALOG_CHARACTER_INSTALL_WEBPACK_ENTRY: string;
 
-export class CharacterInstallDialog extends Dialog<CharacterInstallOptions, null> {
+export class CharacterInstallDialog extends Dialog<InstallOptions, null> {
     readonly PRELOAD_ENTRY: string = DIALOG_CHARACTER_INSTALL_PRELOAD_WEBPACK_ENTRY;
     readonly REACT_ENTRY: string = DIALOG_CHARACTER_INSTALL_WEBPACK_ENTRY;
 
@@ -161,12 +168,7 @@ export class CharacterInstallDialog extends Dialog<CharacterInstallOptions, null
     readonly IS_MODAL: boolean = false;
 
     constructor(targetDir: string) {
-        super({
-            id: "characterInstallation",
-            body: "",
-            title: "Select Characters To Install",
-            targetDir: targetDir
-        });
+        super("characterInstallation", { targetDir: targetDir });
     }
 
     ok(value: null): void {
@@ -182,7 +184,7 @@ export class CharacterInstallDialog extends Dialog<CharacterInstallOptions, null
 declare const DIALOG_STAGE_INSTALL_PRELOAD_WEBPACK_ENTRY: string;
 declare const DIALOG_STAGE_INSTALL_WEBPACK_ENTRY: string;
 
-export class StageInstallDialog extends Dialog<StageInstallOptions, null> {
+export class StageInstallDialog extends Dialog<InstallOptions, null> {
     readonly PRELOAD_ENTRY: string = DIALOG_STAGE_INSTALL_PRELOAD_WEBPACK_ENTRY;
     readonly REACT_ENTRY: string = DIALOG_STAGE_INSTALL_WEBPACK_ENTRY;
 
@@ -190,12 +192,7 @@ export class StageInstallDialog extends Dialog<StageInstallOptions, null> {
     readonly IS_MODAL: boolean = false;
 
     constructor(targetDir: string) {
-        super({
-            id: "stageInstallation",
-            body: "",
-            title: "Select Stages To Install",
-            targetDir: targetDir
-        });
+        super("stageInstallation", { targetDir: targetDir });
     }
 
     ok(value: null): void {

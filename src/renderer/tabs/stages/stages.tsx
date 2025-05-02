@@ -6,6 +6,7 @@ import MISSING from "../../../assets/missing.png";
 import { OpDep, OpState, SortTypeOptions, finishOp } from "../../../global/global";
 import appStyles from "../../app/app.css";
 import stagesStyles from "./stages.css";
+import { message } from "../../../global/translations";
 const styles: typeof import("../../app/app.css") & typeof import("./stages.css") =
     Object.assign({}, appStyles, stagesStyles);
 
@@ -138,7 +139,7 @@ export function TabStages({
                     <div className={styles.tooltipWrapper + " " + styles.inlineSortOptions}>
                         <input
                             type={"text"}
-                            placeholder={"Search"}
+                            placeholder={message("ui.searchPlaceholder")}
                             id={styles.stageSearch}
                             onInput={(event: any) => {
                                 setSearchValue(event.target.value);
@@ -146,7 +147,7 @@ export function TabStages({
                             }}
                         />
                         <div className={styles.tooltip}>
-                            <span>Search For Stages</span>
+                            <span>{message("tooltip.stage.search")}</span>
                         </div>
                     </div>
                     <div className={styles.inlineSortOptions}>
@@ -158,9 +159,9 @@ export function TabStages({
                                 "sort_by_alpha"
                             ]}
                             tooltips={[
-                                "Sort By: Internal Number",
-                                "Sort By: Series",
-                                "Sort By: Alphabetical"
+                                message("tooltip.sortBy.number"),
+                                message("tooltip.sortBy.series"),
+                                message("tooltip.sortBy.alphabetical")
                             ]}
                             iconSize={"30px"}
                             setter={setSortType}
@@ -168,9 +169,9 @@ export function TabStages({
                         <ToggleIconButton
                             checked={reverseSort}
                             trueIcon={"north"}
-                            trueTooltip={"Sort Direction: Backwards"}
+                            trueTooltip={message("tooltip.sortDirection.backwards")}
                             falseIcon={"south"}
-                            falseTooltip={"Sort Direction: Forwards"}
+                            falseTooltip={message("tooltip.sortDirection.forwards")}
                             iconSize={"30px"}
                             setter={setReverseSort}
                         />
@@ -232,7 +233,7 @@ export function TabStages({
                     <IconButton
                         icon={"create_new_folder"}
                         iconSize={"50px"}
-                        tooltip={"Install Stage From Directory"}
+                        tooltip={message("tooltip.stage.installDir")}
                         onClick={async () => {
                             api.selectAndInstallStages(
                                 filterInstallation,
@@ -244,7 +245,7 @@ export function TabStages({
                     <IconButton
                         icon={"note_add"}
                         iconSize={"50px"}
-                        tooltip={"Install Stage From Archive"}
+                        tooltip={message("tooltip.stage.installArch")}
                         onClick={async () => {
                             api.selectAndInstallStages(
                                 filterInstallation,
@@ -256,7 +257,7 @@ export function TabStages({
                     <IconButton
                         icon={"source"}
                         iconSize={"50px"}
-                        tooltip={"Open Extraction Directory"}
+                        tooltip={message("tooltip.openExtractionDir")}
                         onClick={async () => {
                             api.openDir(await api.getExtractedDir());
                         }}
@@ -278,18 +279,18 @@ export function TabStages({
                     <ToggleIconButton
                         checked={!!filterInstallation}
                         trueIcon={"filter_alt"}
-                        trueTooltip={"Installation: Only Necessary Files"}
+                        trueTooltip={message("tooltip.installation.filter")}
                         falseIcon={"filter_alt_off"}
-                        falseTooltip={"Installation: All Files"}
+                        falseTooltip={message("tooltip.installation.all")}
                         iconSize={"50px"}
                         setter={setFilterInstallation}
                     />
                     <ToggleIconButton
                         checked={!!updateStages}
                         trueIcon={"sync"}
-                        trueTooltip={"Existing Stages: Update"}
+                        trueTooltip={message("tooltip.stage.existing.update")}
                         falseIcon={"sync_disabled"}
-                        falseTooltip={"Existing Stages: Abort"}
+                        falseTooltip={message("tooltip.stage.existing.abort")}
                         iconSize={"50px"}
                         setter={setUpdateStages}
                     />
@@ -318,9 +319,8 @@ function StageDisplay({
         setOperations((prev: Operation[]) => {
             const newOperations: Operation[] = [...prev];
             operationId = newOperations.push({
-                title: "Stage Selection",
-                body: "Toggling the ability for stage: '" + stage.name + "' to be " +
-                    "selected at random.",
+                title: message("operation.stage.randomSelection.started.title"),
+                body: message("operation.stage.randomSelection.started.body", stage.name),
                 image: "img://" + stage.icon,
                 state: OpState.QUEUED,
                 icon: randomSelection ? "help" : "help_outline",
@@ -331,8 +331,7 @@ function StageDisplay({
                     stage.randomSelection = randomSelection;
                     setOperations(finishOp(
                         operationId,
-                        "Toggled the ability for stage: '" + stage.name + "' to be selected at " +
-                        "random."
+                        message("operation.stage.randomSelection.finished.body", stage.name)
                     ));
                 }
             }) - 1;
@@ -360,14 +359,17 @@ function StageDisplay({
                         <IconButton
                             icon={"delete"}
                             iconSize={"30px"}
-                            tooltip={"Delete Stage"}
+                            tooltip={message("tooltip.stage.delete")}
                             onClick={async () => {
                                 let operationId: number;
                                 setOperations((prev: Operation[]) => {
                                     const newOperations: Operation[] = [...prev];
                                     operationId = newOperations.push({
-                                        title: "Stage Deletion",
-                                        body: "Deleting stage: '" + stage.name + "'.",
+                                        title: message("operation.stage.deletion.started.title"),
+                                        body: message(
+                                            "operation.stage.deletion.started.body",
+                                            stage.name
+                                        ),
                                         image: "img://" + stage.icon,
                                         state: OpState.QUEUED,
                                         icon: "delete",
@@ -377,7 +379,10 @@ function StageDisplay({
                                             await api.removeStage(stage.name);
                                             setOperations(finishOp(
                                                 operationId,
-                                                "Deleted stage: '" + stage.name + "'."
+                                                message(
+                                                    "operation.stage.deletion.finished.body",
+                                                    stage.name
+                                                )
                                             ));
                                             readStages();
                                         }
@@ -389,14 +394,17 @@ function StageDisplay({
                         <IconButton
                             icon={"drive_file_move"}
                             iconSize={"30px"}
-                            tooltip={"Extract Stage"}
+                            tooltip={message("tooltip.stage.extract")}
                             onClick={async () => {
                                 let operationId: number;
                                 setOperations((prev: Operation[]) => {
                                     const newOperations: Operation[] = [...prev];
                                     operationId = newOperations.push({
-                                        title: "Stage Extraction",
-                                        body: "Extracting stage: '" + stage.name + "'.",
+                                        title: message("operation.stage.extraction.started.title"),
+                                        body: message(
+                                            "operation.stage.extraction.started.body",
+                                            stage.name
+                                        ),
                                         image: "img://" + stage.icon,
                                         state: OpState.QUEUED,
                                         icon: "drive_file_move",
@@ -407,10 +415,13 @@ function StageDisplay({
                                                 await api.extractStage(stage.name);
                                             setOperations(finishOp(
                                                 operationId,
-                                                "Extracted stage: '" + stage.name + "'.",
+                                                message(
+                                                    "operation.stage.extraction.finished.body",
+                                                    stage.name
+                                                ),
                                                 {
                                                     icon: "source",
-                                                    tooltip: "Open Extracted Files",
+                                                    tooltip: message("tooltip.openExtractedFiles"),
                                                     call: {
                                                         name: "openDir",
                                                         args: [extractDir]
@@ -426,9 +437,9 @@ function StageDisplay({
                         <ToggleIconButton
                             checked={randomSelection}
                             trueIcon={"help"}
-                            trueTooltip={"Random Selection: Enabled"}
+                            trueTooltip={message("tooltip.randomSelection.enabled")}
                             falseIcon={"help_outline"}
-                            falseTooltip={"Random Selection: Disabled"}
+                            falseTooltip={message("tooltip.randomSelection.disabled")}
                             iconSize={"30px"}
                             setter={setRandomSelection}
                         />
@@ -457,14 +468,17 @@ function SeriesDisplay({
                 <IconButton
                     icon={"delete_sweep"}
                     iconSize={"30px"}
-                    tooltip={"Delete All Stages In Series"}
+                    tooltip={message("tooltip.stage.deleteSeries")}
                     onClick={async () => {
                         let operationId: number;
                         setOperations((prev: Operation[]) => {
                             const newOperations: Operation[] = [...prev];
                             operationId = newOperations.push({
-                                title: "Series Deletion",
-                                body: "Deleting all stages in series: '" + series + "'.",
+                                title: message("operation.stage.seriesDeletion.started.title"),
+                                body: message(
+                                    "operation.stage.seriesDeletion.started.body",
+                                    series
+                                ),
                                 state: OpState.QUEUED,
                                 icon: "delete_sweep",
                                 animation: Math.floor(Math.random() * 3),
@@ -473,7 +487,10 @@ function SeriesDisplay({
                                     await api.removeSeriesStages(series);
                                     setOperations(finishOp(
                                         operationId,
-                                        "Deleted all stages in series: '" + series + "'."
+                                        message(
+                                            "operation.stage.seriesDeletion.finished.body",
+                                            series
+                                        )
                                     ));
                                     readStages();
                                 }

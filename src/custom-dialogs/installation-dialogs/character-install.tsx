@@ -11,17 +11,20 @@ import IconButton from "../../renderer/icon-buttons/icon-button";
 import ToggleIconButton from "../../renderer/icon-buttons/toggle-icon-button";
 import CycleIconButton from "../../renderer/icon-buttons/cycle-icon-button";
 import MISSING from "../../assets/missing.png";
+import { error, message } from "../../global/translations";
 
 declare const dialog: typeof import("../api").default;
-declare const options: CharacterInstallOptions;
+declare const options: {
+    id: string,
+    name: string,
+    extra: InstallOptions
+};
 declare const api: typeof import("./api").default;
 
 const root: Root = createRoot(document.body);
 console.log(options);
-if (!options) throw new Error("Options not found.");
-if (options.title != undefined) {
-    document.title = options.title;
-}
+if (!options) error("missingDialogOptions");
+document.title = message("dialog.installation.character.title");
 root.render(<Body/>);
 
 const sortTypes: SortTypeOptions[] = [
@@ -126,7 +129,7 @@ function Body(): JSX.Element {
     }
 
     async function findCharacters(): Promise<void> {
-        setFoundCharacters(await api.findCharacters(options.targetDir));
+        setFoundCharacters(await api.findCharacters(options.extra.targetDir));
     }
 
     async function readAlts(): Promise<void> {
@@ -150,7 +153,7 @@ function Body(): JSX.Element {
                         type={"text"}
                         readOnly={true}
                         id={styles.dirOutput}
-                        value={options.targetDir}
+                        value={options.extra.targetDir}
                     />
                 </div>
             </div>
@@ -160,7 +163,7 @@ function Body(): JSX.Element {
                     <div className={styles.tooltipWrapper + " " + styles.inlineSortOptions}>
                         <input
                             type={"text"}
-                            placeholder={"Search"}
+                            placeholder={message("ui.searchPlaceholder")}
                             id={styles.characterSearch}
                             onInput={(event: any) => {
                                 setSearchValue(event.target.value);
@@ -179,8 +182,8 @@ function Body(): JSX.Element {
                                 "group"
                             ]}
                             tooltips={[
-                                "Sort By: Alphabetical",
-                                "Sort By: Series"
+                                message("tooltip.sortBy.alphabetical"),
+                                message("tooltip.sortBy.series")
                             ]}
                             iconSize={"30px"}
                             setter={setSortType}
@@ -188,18 +191,18 @@ function Body(): JSX.Element {
                         <ToggleIconButton
                             checked={reverseSort}
                             trueIcon={"north"}
-                            trueTooltip={"Sort Direction: Backwards"}
+                            trueTooltip={message("tooltip.sortDirection.backwards")}
                             falseIcon={"south"}
-                            falseTooltip={"Sort Direction: Forwards"}
+                            falseTooltip={message("tooltip.sortDirection.forwards")}
                             iconSize={"30px"}
                             setter={setReverseSort}
                         />
                         <ToggleIconButton
                             checked={showAllCharacters}
                             trueIcon={"groups"}
-                            trueTooltip={"Showing: All Characters"}
+                            trueTooltip={message("tooltip.character.showing.all")}
                             falseIcon={"person_outline"}
-                            falseTooltip={"Showing: New Characters"}
+                            falseTooltip={message("tooltip.character.showing.new")}
                             iconSize={"30px"}
                             setter={setShowAllCharacters}
                         />
@@ -218,7 +221,7 @@ function Body(): JSX.Element {
                                     ) => {
                                         const characterDisplay: JSX.Element = (
                                             <CharacterDisplay
-                                                targetDir={options.targetDir}
+                                                targetDir={options.extra.targetDir}
                                                 character={character}
                                                 gameCharacters={gameCharacters}
                                                 alts={alts}
@@ -242,7 +245,7 @@ function Body(): JSX.Element {
                                     }) :
                                     sortedCharacters.map((character: FoundCharacter) => (
                                         <CharacterDisplay
-                                            targetDir={options.targetDir}
+                                            targetDir={options.extra.targetDir}
                                             character={character}
                                             gameCharacters={gameCharacters}
                                             alts={alts}
@@ -305,12 +308,12 @@ function CharacterDisplay({
                             <IconButton
                                 icon={"sync"}
                                 iconSize={"30px"}
-                                tooltip={"Update Character"}
+                                tooltip={message("tooltip.character.update")}
                                 onClick={onClick}
                             /> : <IconButton
                                 icon={"add"}
                                 iconSize={"30px"}
-                                tooltip={"Install Character"}
+                                tooltip={message("tooltip.character.install")}
                                 onClick={onClick}
                             />
                         }

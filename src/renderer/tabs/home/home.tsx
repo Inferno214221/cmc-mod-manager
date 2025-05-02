@@ -15,32 +15,15 @@ import {
 } from "../../app/app";
 import appStyles from "../../app/app.css";
 import homeStyles from "./home.css";
+import { message, tryMessage } from "../../../global/translations";
 const styles: typeof import("../../app/app.css") & typeof import("./home.css") =
     Object.assign({}, appStyles, homeStyles);
-
-const LICENSE: string = (
-    "Copyright © 2023 Inferno214221\n\n" +
-    "This program is free software: you can redistribute it and/or modify " +
-    "it under the terms of the GNU General Public License as published by " +
-    "the Free Software Foundation, either version 3 of the License, or " +
-    "(at your option) any later version.\n\n" +
-    "This program is distributed in the hope that it will be useful, " + 
-    "but WITHOUT ANY WARRANTY; without even the implied warranty of " +
-    "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the " +
-    "GNU General Public License for more details.\n\n" +
-    "You should have received a copy of the GNU General Public License " + 
-    "along with this program. If not, see <https://www.gnu.org/licenses/>."
-);
 
 export async function AllowTabSwitchHome(): Promise<boolean> {
     if (await api.isValidGameDir()) {
         return true;
     }
-    api.alert({
-        id: "allowTabSwitch",
-        title: "CMC Mod Manager | No Directory Selected",
-        body: "Please select your CMC+ directory before continuing."
-    });
+    api.alert("noDirSelected");
     return false;
 }
 
@@ -67,37 +50,33 @@ export function TabHome(): JSX.Element {
                     <div className={styles.center + " " + styles.marginVertical}>
                         <ExternalLinkImage
                             icon={CMCMM}
-                            tooltip={"Home Page"}
+                            tooltip={message("tooltip.site.homepage")}
                             location={"https://inferno214221.com/cmc-mod-manager"}
                             id={"homepage"}
                         />
                         <ExternalLinkImage
                             icon={GH}
-                            tooltip={"GitHub"}
+                            tooltip={message("tooltip.site.github")}
                             location={"https://github.com/Inferno214221/cmc-mod-manager"}
                             id={"gh"}
                         />
                         <ExternalLinkImage
                             icon={GB}
-                            tooltip={"GameBanana"}
+                            tooltip={message("tooltip.site.gamebanana")}
                             location={"https://gamebanana.com/tools/14136"}
                             id={"gb"}
                         />
                         <ExternalLinkImage
                             icon={BMC}
-                            tooltip={"Buy Me A Coffee"}
+                            tooltip={message("tooltip.site.buyMeACoffee")}
                             location={"https://buymeacoffee.com/inferno214221"}
                             id={"bmc"}
                         />
                     </div>
                     <div className={styles.center}>
-                        <button onClick={() => {
-                            api.alert({
-                                id: "licenseNotice",
-                                title: "CMC Mod Manager | License Notice",
-                                body: LICENSE
-                            });
-                        }}>Show License (GNU GPLv3)</button>
+                        <button onClick={() => api.alert("licenseNotice")}>
+                            {message("ui.showLicense")}
+                        </button>
                     </div>
                 </div>
             </div>
@@ -111,22 +90,10 @@ export function TabHome(): JSX.Element {
             <div id={styles.tabsDiv} className={styles.verticalOuterDiv}>
                 <div className={styles.verticalInnerDiv}>
                     <div className={styles.center}>
-                        <TabButton
-                            tab={CHARACTERS}
-                            desc={"Install, extract or delete characters from CMC+."}
-                        />
-                        <TabButton
-                            tab={CHARACTER_SELECTION_SCREEN}
-                            desc={"Modify CMC+'s character selection screen."}
-                        />
-                        <TabButton
-                            tab={STAGES}
-                            desc={"Install, extract or delete stages from CMC+."}
-                        />
-                        <TabButton
-                            tab={STAGE_SELECTION_SCREEN}
-                            desc={"Modify CMC+'s stage selection screen."}
-                        />
+                        <TabButton tab={CHARACTERS}/>
+                        <TabButton tab={CHARACTER_SELECTION_SCREEN}/>
+                        <TabButton tab={STAGES}/>
+                        <TabButton tab={STAGE_SELECTION_SCREEN}/>
                     </div>
                 </div>
             </div>
@@ -185,14 +152,14 @@ function GameDirectoryActions(): JSX.Element {
                     type={"text"}
                     readOnly={true}
                     id={styles.dirOutput}
-                    value={cmcDir ?? "(None Selected)"}
+                    value={cmcDir ?? message("tooltip.gameDir.noneSelected")}
                 />
             </div>
             <div className={styles.center + " " + styles.marginVertical}>
                 <IconButton
                     icon={"policy"}
                     iconSize={"50px"}
-                    tooltip={"Change CMC+ Directory"}
+                    tooltip={message("tooltip.gameDir.change")}
                     onClick={async () => {
                         await api.selectGameDir();
                         updateGameDir();
@@ -201,7 +168,7 @@ function GameDirectoryActions(): JSX.Element {
                 <IconButton
                     icon={"folder"}
                     iconSize={"50px"}
-                    tooltip={"Open CMC+ Directory"}
+                    tooltip={message("tooltip.gameDir.open")}
                     onClick={async () => {
                         api.openDir(await api.getGameDir());
                     }}
@@ -209,7 +176,7 @@ function GameDirectoryActions(): JSX.Element {
                 <IconButton
                     icon={"play_circle"}
                     iconSize={"50px"}
-                    tooltip={"Run CMC+"}
+                    tooltip={message("tooltip.gameDir.run")}
                     onClick={() => {
                         api.runGame();
                     }}
@@ -219,13 +186,7 @@ function GameDirectoryActions(): JSX.Element {
     );
 }
 
-function TabButton({
-    tab,
-    desc
-}: {
-    tab: Tab,
-    desc: string
-}): JSX.Element {
+function TabButton({ tab }: { tab: Tab }): JSX.Element {
     return (
         <div className={styles.tabButtonWrapper}>
             <button className={styles.tabButton} onClick={() => {switchTabs(tab)}}>
@@ -233,10 +194,10 @@ function TabButton({
                     {tab.icon}
                 </span>
                 <p className={styles.tabButtonTitle}>
-                    {tab.displayName}
+                    {tryMessage("ui.tabs." + tab.name + ".title")}
                 </p>
                 <p className={styles.tabButtonDesc}>
-                    {desc}
+                    {tryMessage("ui.tabs." + tab.name + ".desc")}
                 </p>
             </button>
         </div>

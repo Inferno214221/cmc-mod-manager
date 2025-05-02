@@ -18,7 +18,7 @@ export default {
     ]): Promise<CssPage> => ipcRenderer.invoke("addSssPage", args)),
 
     alert: ((...args: [
-        options: AlertOptions
+        name: string
     ]): Promise<void> => ipcRenderer.invoke("alert", args)),
 
     cancelOperation: ((...args: [
@@ -37,7 +37,7 @@ export default {
     checkForUpdates: ((): Promise<void> => ipcRenderer.invoke("checkForUpdates")),
 
     confirm: ((...args: [
-        options: ConfirmOptions
+        name: string
     ]): Promise<boolean> => ipcRenderer.invoke("confirm", args)),
 
     confirmDestructiveAction: ((): Promise<boolean> =>
@@ -236,6 +236,7 @@ export default {
     ]): Promise<string> => ipcRenderer.invoke("pathJoin", args)),
 
     prompt: ((...args: [
+        name: string,
         options: PromptOptions
     ]): Promise<string | undefined> => ipcRenderer.invoke("prompt", args)),
 

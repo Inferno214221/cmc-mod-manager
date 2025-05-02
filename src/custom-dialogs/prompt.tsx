@@ -1,16 +1,19 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Root, createRoot } from "react-dom/client";
 import styles from "./custom-dialogs.css";
+import { error, message, tryMessage } from "../global/translations";
 
 declare const dialog: typeof import("./api").default;
-declare const options: PromptOptions;
+declare const options: {
+    id: string,
+    name: string,
+    extra: PromptOptions
+};
 
 const root: Root = createRoot(document.body);
 console.log(options);
-if (!options) throw new Error("Options not found.");
-if (options.title != undefined) {
-    document.title = options.title;
-}
+if (!options) error("missingDialogOptions");
+document.title = tryMessage("dialog.prompt." + options.name + ".title")!;
 root.render(<Body/>);
 
 async function requestNextFrame(height: number, depth: number = 0): Promise<number> {
@@ -41,7 +44,7 @@ function Body(): JSX.Element {
 
     const [inputValue, setInputValue]:
     [string, Dispatch<SetStateAction<string>>]
-    = useState(options.defaultValue ?? "");
+    = useState(options.extra.defaultValue ?? "");
 
     dialog.on("updateCharacterPages", () => null);
     dialog.on("updateStagePages", () => null);
@@ -63,20 +66,20 @@ function Body(): JSX.Element {
         }}>
             <div className={styles.center}>
                 <span>
-                    {options.body}
+                    {tryMessage("dialog.prompt." + options.name + ".body")}
                 </span>
             </div>
             <input
                 autoFocus
                 type={"text"}
-                placeholder={options.placeholder ?? ""}
+                placeholder={tryMessage("dialog.prompt." + options.name + ".placeholder") ?? ""}
                 value={inputValue}
                 onInput={
-                    (options.invalidCharacters == undefined) ?
+                    (options.extra.invalidCharacters == undefined) ?
                         ((event: any) => setInputValue(event.target.value)) :
                         ((event: any) => {
                             event.target.value =
-                                event.target.value.replace(options.invalidCharacters, "");
+                                event.target.value.replace(options.extra.invalidCharacters, "");
                             setInputValue(event.target.value);
                         })
                 }
@@ -85,16 +88,14 @@ function Body(): JSX.Element {
             <div className={styles.right}>
                 <button onClick={() => cancel(options.id)}>
                     {
-                        (options.cancelLabel == undefined) ?
-                            "Cancel" :
-                            options.cancelLabel
+                        tryMessage("dialog.prompt." + options.name + ".cancelLabel") ??
+                        message("dialog.defaults.cancelLabel")
                     }
                 </button>
                 <button onClick={() => ok(options.id, inputValue)}>
                     {
-                        (options.okLabel == undefined) ?
-                            "OK" :
-                            options.okLabel
+                        tryMessage("dialog.prompt." + options.name + ".okLabel") ??
+                        message("dialog.defaults.okLabel")
                     }
                 </button>
             </div>
