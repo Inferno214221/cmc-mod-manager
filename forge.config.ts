@@ -11,6 +11,7 @@ import path from "path";
 
 import { mainConfig } from "./webpack.main.config";
 import { rendererConfig } from "./webpack.renderer.config";
+import { ChildProcess, fork } from "child_process";
 
 const config: ForgeConfig = {
     packagerConfig: {
@@ -131,6 +132,10 @@ const config: ForgeConfig = {
                     arch: arch
                 }, null, 2),
                 { encoding: "utf-8" }
+            );
+            const ps: ChildProcess = fork("./lang/gen-langs.mjs");
+            await new Promise(
+                (resolve: (value: void) => void) => ps.on("exit", () => resolve())
             );
         },
         postPackage: async (_config: any, packageResult: any) => {
