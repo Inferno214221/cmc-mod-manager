@@ -65,7 +65,7 @@ interface CharacterDat {
     battleName?: string, //Line 3
     series?: string, // Line 4
     homeStages: string[], // After "---Classic Home Stages Below---"
-    randomDatas: string[], // After "---Random Datas---""
+    randomData: string[], // After "---Random Datas---""
     palettes: CharacterPalette[] // After "---From Here is Individual Palettes data---"
 }
 

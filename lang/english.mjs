@@ -569,12 +569,18 @@ export default {
         stage: "Stage"
     },
     other: {
-        autoUpdateFailed: "Due to the way CMC Mod Manager has been installed, it can't be updated automatically. Please download the latest version from GitHub or GameBanana. (Check the Home tab for links.)",
-        datFormatUpdated: "Updated to v8 dat format by CMC Mod Manager.",
-        defaultPageName: "Default",
+        dat: {
+            homeStages: "---Home Stages (Classic Mode)---",
+            randomData: "---Other Information---",
+            paletteNumber: "---Palette Number---",
+            paletteData: "---Palette Data---",
+            formatUpdated: "Updated to the CMC+ v8 dat format by CMC Mod Manager.",
+        },
         selector: {
             archives: "Archives",
             all: "All Files"
-        }
+        },
+        autoUpdateFailed: "Due to the way CMC Mod Manager has been installed, it can't be updated automatically. Please download the latest version from GitHub or GameBanana. (Check the Home tab for links.)",
+        defaultPageName: "Default"
     }
 };

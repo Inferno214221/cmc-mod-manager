@@ -357,11 +357,11 @@ export async function readCharacterDatPath(
     }
 
     const homeStages: string[] = [];
-    const randomDatas: string[] = [];
+    const randomData: string[] = [];
     const palettes: CharacterPalette[] = [];
     if (isV7) {
         homeStages.push("battlefield");
-        randomDatas.push(message("other.datFormatUpdated"));
+        randomData.push(message("other.dat.formatUpdated"));
         const paletteCount: number =
             parseInt(characterDatTxt[isVanilla ? 1 : 5]);
         for (let palette: number = 1; palette <= paletteCount * 6; palette += 6) {
@@ -379,7 +379,7 @@ export async function readCharacterDatPath(
 
         const randomDataCount: number = parseInt(characterDatTxt[7 + homeStageCount]);
         for (let data: number = 1; data <= randomDataCount; data++) {
-            randomDatas.push(characterDatTxt[7 + homeStageCount + data]);
+            randomData.push(characterDatTxt[7 + homeStageCount + data]);
         }
 
         const paletteCount: number =
@@ -399,7 +399,7 @@ export async function readCharacterDatPath(
         battleName: battleName,
         series: series,
         homeStages: homeStages,
-        randomDatas: randomDatas,
+        randomData: randomData,
         palettes: palettes
     };
     return characterDat;
@@ -411,15 +411,15 @@ export async function writeCharacterDat(dat: CharacterDat, destination: string):
         dat.menuName,
         dat.battleName,
         dat.series,
-        "---Classic Home Stages Below---",
+        message("other.dat.homeStages"),
         dat.homeStages.length,
         ...dat.homeStages,
-        "---Random Datas---",
-        dat.randomDatas.length,
-        ...dat.randomDatas,
-        "---Palettes Number---",
+        message("other.dat.randomData"),
+        dat.randomData.length,
+        ...dat.randomData,
+        message("other.dat.paletteNumber"),
         dat.palettes.length,
-        "---From Here is Individual Palettes data---",
+        message("other.dat.paletteData"),
         ...(dat.palettes.map((palette: CharacterPalette) => [
             palette.name,
             ...palette.values
