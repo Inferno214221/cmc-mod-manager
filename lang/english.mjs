@@ -1,10 +1,4 @@
 /* eslint-disable @stylistic/js/max-len */
-
-/* eslint-disable @typescript-eslint/typedef */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-// Helps with intellisense
-let started, finished, title, body;
-
 export default {
     operation: {
         update: {
@@ -420,8 +414,8 @@ export default {
         noSingleInstanceLock: "Single instance lock failed.",
         noRecursiveAlts: "A character with alts can't be assigned as an alt.",
         maxAltsReached: "Character already has the maximum number of alts.",
-        characterNotFound: "Character not found: '{0}'",
-        stageNotFound: "Stage not found: '{0}'",
+        characterNotFound: "Character not found: '{0}'.",
+        stageNotFound: "Stage not found: '{0}'.",
         incompleteDat: "Character dat is incomplete: '{0}'.",
         characterInstallTargetSelf: "Cannot install characters from the directory that they are being installed to.",
         stageInstallTargetSelf: "Cannot install stage from the directory that they are being installed to.",
@@ -558,6 +552,7 @@ export default {
                 desc: "Modify CMC+'s stage selection screen."
             }
         },
+        currentGameDir: "Current CMC+ Directory: ",
         searchPlaceholder: "Search",
         pagePlaceholder: "Page Name",
         showLicense: "Show License (GNU GPLv3)",
@@ -581,6 +576,7 @@ export default {
             all: "All Files"
         },
         autoUpdateFailed: "Due to the way CMC Mod Manager has been installed, it can't be updated automatically. Please download the latest version from GitHub or GameBanana. (Check the Home tab for links.)",
-        defaultPageName: "Default"
+        defaultPageName: "Default",
+        languageName: "English"
     }
 };

@@ -147,7 +147,7 @@ function GameDirectoryActions(): JSX.Element {
     return (
         <>
             <div className={styles.center}>
-                <span>Current CMC+ Directory: </span>
+                <span>{message("ui.currentGameDir")}</span>
                 <input
                     type={"text"}
                     readOnly={true}

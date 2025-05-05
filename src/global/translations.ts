@@ -1,12 +1,3 @@
-// /"[^"+><=\]]+ [^"+><=]+"/g
-// Have to remain relatively formal and grammatically correct (as much as my existing strings are)
-// Keep "CMC Mod Manager" and other proper nouns
-// I'll leave out some strings that shouldn't be translated e.g. "GPLv3"
-// Licensed under GPLv3
-// System errors are out of scope
-// Needs to be consistent with keywords e.g. "Character" is always translated the same
-// Casing consistency would also be nice, if applicable
-
 import english from "../assets/lang/english.json";
 import { ModTypes } from "./global";
 
