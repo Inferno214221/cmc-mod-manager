@@ -14,7 +14,8 @@ declare const global: {
     updateOnExit: boolean
     cancelFunctions: { [id: string]: () => void },
     platform: string,
-    arch: string
+    arch: string,
+    language: Language
 };
 
 interface Mod {
@@ -131,7 +132,8 @@ interface AppConfig {
     filterCharacterInstallation: boolean,
     updateCharacters: boolean,
     filterStageInstallation: boolean,
-    updateStages: boolean
+    updateStages: boolean,
+    language: Language
 }
 
 interface AppData {

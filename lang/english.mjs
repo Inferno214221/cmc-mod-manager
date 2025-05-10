@@ -306,6 +306,10 @@ export default {
                 title: "No Directory Selected",
                 body: "Please select your CMC+ directory before continuing."
             },
+            languageUpdated: {
+                title: "Language Updated",
+                body: "Please close and relaunch CMC Mod Manager to apply changes."
+            },
             licenseNotice: {
                 title: "License Notice",
             }
@@ -404,7 +408,6 @@ export default {
         noStringFound: "Unable to get string for key: '{0}'.",
         invalidStringArgs: "Invalid number of arguments when substituting into string.",
         missingDialogOptions: "Dialog options not found.",
-        noProcessArgs: "No process args found.",
         unsupportedArchiveType: "Unsupported archive type: '{0}'.",
         unknownModType: "Unknown mod type: '{0}'.",
         invalidSemverString: "Invalid semver string: '{0}'.",

@@ -141,3 +141,14 @@
 #dir-output {
     field-sizing: content;
 }
+
+#language-select {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    margin: 5px
+}
+
+#language-select > select {
+    field-sizing: content;
+}

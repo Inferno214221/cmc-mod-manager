@@ -134,3 +134,7 @@ export function finishOp(
         return newOperations;
     }
 }
+
+export enum Language {
+    ENGLISH = "en-AU",
+}

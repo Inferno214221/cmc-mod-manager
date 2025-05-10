@@ -1,7 +1,8 @@
 import fs from "fs-extra";
 import path from "path";
 import { OpDep, OpState, StageList } from "../global/global";
-import { error, message } from "../global/translations";
+import { translations } from "../global/translations";
+const { error, message }: ReturnType<typeof translations> = translations(global.language);
 
 import * as general from "./general";
 import * as customDialogs from "./custom-dialogs";
@@ -555,7 +556,7 @@ export async function extractStage(extract: string, dir: string = global.gameDir
     if (!stage) error("stageNotFound", extract);
     const extractDir: string = path.join(dir, "0extracted", extract);
     
-    await Promise.allSettled((await getStageFiles(stage, false, dir))
+    await Promise.allSettled((await getStageFiles(stage!, false, dir))
         .map(async (file: string) => {
             const targetPath: string = path.join(extractDir, path.relative(dir, file));
             await fs.ensureDir(path.parse(targetPath).dir);
@@ -566,7 +567,7 @@ export async function extractStage(extract: string, dir: string = global.gameDir
             );
         })
     );
-    writeStageInfo(stage, path.join(extractDir, "data", "sinfo"));
+    writeStageInfo(stage!, path.join(extractDir, "data", "sinfo"));
     return extractDir;
 }
 
@@ -576,7 +577,7 @@ export async function removeStage(remove: string, dir: string = global.gameDir):
     const stage: Stage | undefined = stageList.getByName(remove);
     if (!stage) error("stageNotFound", remove);
 
-    (await getStageFiles(stage, true, dir)).forEach((file: string) => {
+    (await getStageFiles(stage!, true, dir)).forEach((file: string) => {
         toResolve.push(
             fs.remove(file)
         );
@@ -584,8 +585,8 @@ export async function removeStage(remove: string, dir: string = global.gameDir):
     
     stageList.removeByName(remove);
     toResolve.push(writeStages(stageList.toArray(), dir));
-    toResolve.push(removeStageSss(stage, dir));
-    toResolve.push(writeStageRandom(stage.name, true, dir));
+    toResolve.push(removeStageSss(stage!, dir));
+    toResolve.push(writeStageRandom(stage!.name, true, dir));
     await Promise.allSettled(toResolve);
     return;
 }

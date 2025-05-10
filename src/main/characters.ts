@@ -2,7 +2,8 @@ import fs from "fs-extra";
 import path from "path";
 import ini from "ini";
 import { CharacterList, OpDep, OpState } from "../global/global";
-import { error, message } from "../global/translations";
+import { translations } from "../global/translations";
+const { error, message }: ReturnType<typeof translations> = translations(global.language);
 
 import * as general from "./general";
 import * as customDialogs from "./custom-dialogs";
@@ -273,10 +274,10 @@ export async function ensureAltIsntCharacter(
     const characterList: CharacterList = await readCharacterList(dir);
     const character: Character | undefined = characterList.getByName(alt.alt);
     if (!character) error("characterNotFound", alt.alt);
-    if (await isCharacterOnCSS(character, dir)) return;
+    if (await isCharacterOnCSS(character!, dir)) return;
     characterList.removeByName(alt.alt);
     toResolve.push(writeCharacters(characterList.toArray(), dir));
-    toResolve.push(removeCharacterCss(character, dir)); // Updates numbers
+    toResolve.push(removeCharacterCss(character!, dir)); // Updates numbers
     toResolve.push(writeCharacterRandom(alt.alt, true, dir));
     await Promise.allSettled(toResolve);
     return;
@@ -819,7 +820,7 @@ export async function removeCharacter(remove: string, dir: string = global.gameD
     const toResolve: Promise<void>[] = [];
     const character: Character | undefined = (await readCharacterList(dir)).getByName(remove);
     if (!character) error("characterNotFound", remove);
-    await removeAllAlts(character, dir);
+    await removeAllAlts(character!, dir);
     const characters: CharacterList = await readCharacterList(dir);
     const characterDat: CharacterDat =
         await readCharacterDat(remove, dir) ?? error("noDatFile");
@@ -835,8 +836,8 @@ export async function removeCharacter(remove: string, dir: string = global.gameD
     
     characters.removeByName(remove);
     toResolve.push(writeCharacters(characters.toArray(), dir));
-    toResolve.push(removeCharacterCss(character, dir));
-    toResolve.push(writeCharacterRandom(character.name, true, dir));
+    toResolve.push(removeCharacterCss(character!, dir));
+    toResolve.push(writeCharacterRandom(character!.name, true, dir));
     await Promise.allSettled(toResolve);
     return;    
 }

@@ -15,9 +15,12 @@ import {
 } from "../../app/app";
 import appStyles from "../../app/app.css";
 import homeStyles from "./home.css";
-import { message, tryMessage } from "../../../global/translations";
 const styles: typeof import("../../app/app.css") & typeof import("./home.css") =
     Object.assign({}, appStyles, homeStyles);
+
+import { translations } from "../../../global/translations";
+import { Language } from "../../../global/global";
+const { message, tryMessage }: ReturnType<typeof translations> = translations(global.language);
 
 export async function AllowTabSwitchHome(): Promise<boolean> {
     if (await api.isValidGameDir()) {
@@ -97,6 +100,7 @@ export function TabHome(): JSX.Element {
                     </div>
                 </div>
             </div>
+            <LanguageSelect/>
         </section>
     );
 }
@@ -200,6 +204,27 @@ function TabButton({ tab }: { tab: Tab }): JSX.Element {
                     {tryMessage("ui.tabs." + tab.name + ".desc")}
                 </p>
             </button>
+        </div>
+    );
+}
+
+function LanguageSelect(): JSX.Element {
+    return (
+        <div id={styles.languageSelect}>
+            <select onInput={async (event: any) => {
+                const appData: AppData = await api.readAppData();
+                if (appData.config.language != event.target.value) {
+                    appData.config.language = event.target.value;
+                    await api.writeAppData(appData);
+                }
+                await api.alert("languageUpdated");
+            }}>
+                {Object.values(Language).map((lang: Language) =>
+                    <option value={lang} key={lang} selected={global.language == lang}>
+                        {translations(lang).message("other.languageName")}
+                    </option>
+                )}
+            </select>
         </div>
     );
 }

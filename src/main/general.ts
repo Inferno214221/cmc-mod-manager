@@ -10,11 +10,15 @@ import request from "request";
 import http from "http";
 import semver from "semver";
 import { ModTypes, OpDep, OpState } from "../global/global";
-import { displayEnum, error, message } from "../global/translations";
+import { translations } from "../global/translations";
+const {
+    displayEnum, error, message
+}: ReturnType<typeof translations> = translations(global.language);
 
 require.resolve("./unrar.wasm");
 const WASM_BINARY: Buffer = fs.readFileSync(path.join(__dirname, "unrar.wasm"));
 
+import * as basic from "./basic-fs";
 import * as characters from "./characters";
 import * as stages from "./stages";
 import * as customDialogs from "./custom-dialogs";
@@ -24,57 +28,7 @@ const SUPPORTED_VERSIONS: string[] = [
     "CMC+ v8",
 ];
 
-const DEFAULT_CONFIG: AppConfig = {
-    enableLogs: false,
-    altsAsCharacters: true,
-    filterCharacterInstallation: true,
-    updateCharacters: false,
-    filterStageInstallation: true,
-    updateStages: false
-};
-
-const DATA_FILE: string = path.join(app.getPath("userData"), "data.json");
-
-export async function loadAppData(): Promise<void> {
-    if (!(await fs.exists(DATA_FILE))) {
-        writeAppData({
-            dir: "",
-            config: DEFAULT_CONFIG
-        });
-    } else {
-        global.appData = await readJSON(DATA_FILE);
-        if (global.appData.config == undefined) {
-            global.appData.config = DEFAULT_CONFIG;
-        } else {
-            Object.keys(DEFAULT_CONFIG).forEach((key: keyof AppConfig) => {
-                if (global.appData.config[key] == undefined) {
-                    global.appData.config[key] = DEFAULT_CONFIG[key];
-                }
-            });
-        }
-        writeAppData(global.appData);
-    }
-    global.appData = await readJSON(DATA_FILE);
-}
-
-export async function readJSON(file: string): Promise<any> {
-    return JSON.parse(await fs.readFile(file, "utf-8"));
-}
-
-export async function writeJSON(file: string, data: object): Promise<void> {
-    await fs.writeFile(file, JSON.stringify(data, null, 2), "utf-8");
-    return;
-}
-
-export function readAppData(): AppData {
-    return global.appData;
-}
-
-export async function writeAppData(data: AppData): Promise<void> {
-    global.appData = data;
-    await writeJSON(DATA_FILE, data);
-    return;
-}
+export * from "./basic-fs";
 
 export function isNumber(num: string): boolean {
     return /^\d+$/.test(num);
@@ -609,9 +563,9 @@ export async function selectGameDir(): Promise<string | null> {
         fs.chmod(file, 0o777);
     });
     global.gameDir = dir.filePaths[0];
-    global.appData = await readJSON(DATA_FILE);
+    global.appData = await basic.readJSON(basic.DATA_FILE);
     global.appData.dir = global.gameDir;
-    writeAppData(global.appData);
+    basic.writeAppData(global.appData);
     return global.gameDir;
 }
 

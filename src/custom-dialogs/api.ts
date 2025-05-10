@@ -23,4 +23,6 @@ export default {
             ...args: any
         ) => call(...args));
     }),
+
+    readAppData: ((): Promise<AppData> => ipcRenderer.invoke("readAppData")),
 }

@@ -10,7 +10,10 @@ import MISSING from "../../assets/missing.png";
 import { OpDep, OpState } from "../../global/global";
 import styles from "./app.css";
 import IconButton from "../icon-buttons/icon-button";
-import { error, message, tryMessage } from "../../global/translations";
+import { translations } from "../../global/translations";
+const {
+    error, message, tryMessage
+}: ReturnType<typeof translations> = translations(global.language);
 
 let root: Root;
 let activeTab: Tab | null = null;
@@ -76,28 +79,6 @@ export interface NavButtonInfo {
     icon: string,
     function: () => void
 }
-export const CHANGE_DIR: NavButtonInfo = {
-    displayName: message("tooltip.gameDir.change"),
-    icon: "policy",
-    function: async () => {
-        await api.selectGameDir();
-        switchTabs(HOME);
-    }
-};
-export const OPEN_DIR: NavButtonInfo = {
-    displayName: message("tooltip.gameDir.open"),
-    icon: "folder",
-    function: async () => {
-        api.openDir(await api.getGameDir());
-    }
-};
-export const RUN_GAME: NavButtonInfo = {
-    displayName: message("tooltip.gameDir.run"),
-    icon: "smart_display",
-    function: () => {
-        api.runGame();
-    }
-};
 
 export async function switchTabs(tab: Tab): Promise<void> {
     if (
@@ -186,6 +167,28 @@ export function App({ tab }: { tab: Tab }): JSX.Element {
 }
 
 export function Nav(): JSX.Element {
+    const CHANGE_DIR: NavButtonInfo = {
+        displayName: message("tooltip.gameDir.change"),
+        icon: "policy",
+        function: async () => {
+            await api.selectGameDir();
+            switchTabs(HOME);
+        }
+    };
+    const OPEN_DIR: NavButtonInfo = {
+        displayName: message("tooltip.gameDir.open"),
+        icon: "folder",
+        function: async () => {
+            api.openDir(await api.getGameDir());
+        }
+    };
+    const RUN_GAME: NavButtonInfo = {
+        displayName: message("tooltip.gameDir.run"),
+        icon: "smart_display",
+        function: () => {
+            api.runGame();
+        }
+    };
     return (
         <nav>
             <NavTab info={HOME}/>

@@ -1,7 +1,10 @@
-import { render } from "./app/app";
+// import { render } from "./app/app";
 import CMCMM from "../assets/icon.svg";
 
-render();
+api.readAppData().then(async (appData: AppData) => {
+    global.language = appData.config.language;
+    (await import("./app/app")).render();
+});
 
 api.on("showNotification", (
     title: string,

@@ -6,9 +6,11 @@ import MISSING from "../../../assets/missing.png";
 import { OpDep, OpState, SortTypeOptions, finishOp } from "../../../global/global";
 import appStyles from "../../app/app.css";
 import charactersStyles from "./characters.css";
-import { message } from "../../../global/translations";
 const styles: typeof import("../../app/app.css") & typeof import("./characters.css") =
     Object.assign({}, appStyles, charactersStyles);
+
+import { translations } from "../../../global/translations";
+const { message }: ReturnType<typeof translations> = translations(global.language);
 
 const sortTypes: SortTypeOptions[] = [
     SortTypeOptions.NUMBER,

@@ -7,7 +7,7 @@ import fs from "fs-extra";
 import { OpState } from "../global/global";
 import CMCMM from "../assets/icon.svg";
 import * as buildInfo from "../../build.json";
-import { message } from "../global/translations";
+import { translations } from "../global/translations";
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
@@ -25,21 +25,39 @@ global.cancelFunctions = {};
 global.platform = buildInfo.platform;
 global.arch = buildInfo.arch;
 
-import * as general from "./general";
-import * as characters from "./characters";
-import * as stages from "./stages";
-import * as customDialogs from "./custom-dialogs";
+import * as appData from "./basic-fs";
 
-general.loadAppData().then(() => global.gameDir = global.appData.dir);
+let general: typeof import("./general");
+let characters: typeof import("./characters");
+let stages: typeof import("./stages");
+let customDialogs: typeof import("./custom-dialogs");
 
-if (!app.requestSingleInstanceLock()) {
-    console.log(message("error.noSingleInstanceLock"));
-    app.exit();
-} else {
-    app.on("second-instance", (_event: Event, argv: string[]) => {
-        general.handleURI(argv.find((arg: string) => arg.startsWith("cmcmm:")));
-    });
-}
+appData.loadAppData().then(async () => {
+    global.gameDir = global.appData.dir;
+    global.language = global.appData.config.language;
+
+    general = await import("./general");
+    characters = await import("./characters");
+    stages = await import("./stages");
+    customDialogs = await import("./custom-dialogs");
+    
+    const { message }: ReturnType<typeof translations> = translations(global.language);
+
+    if (!app.requestSingleInstanceLock()) {
+        console.log(message("error.noSingleInstanceLock"));
+        app.exit();
+    } else {
+        app.on("second-instance", (_event: Event, argv: string[]) => {
+            general.handleURI(argv.find((arg: string) => arg.startsWith("cmcmm:")));
+        });
+    }
+
+    if (app.isReady()) {
+        createWindow()
+    } else {
+        app.on("ready", createWindow);
+    }
+});
 
 async function createWindow(): Promise<void> {
     const updateDir: string = path.join(global.appDir, "update");
@@ -132,8 +150,6 @@ async function createWindow(): Promise<void> {
 if (require("electron-squirrel-startup")) {
     app.quit();
 }
-
-app.on("ready", createWindow);
 
 app.on("window-all-closed", () => {
     if (process.platform !== "darwin") {

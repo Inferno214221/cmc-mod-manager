@@ -8,9 +8,11 @@ import {
 } from "../../../global/global";
 import appStyles from "../../app/app.css";
 import characterSsStyles from "./character-ss.css";
-import { message } from "../../../global/translations";
 const styles: typeof import("../../app/app.css") & typeof import("./character-ss.css") =
     Object.assign({}, appStyles, characterSsStyles);
+
+import { translations } from "../../../global/translations";
+const { message }: ReturnType<typeof translations> = translations(global.language);
 
 const sortTypes: SortTypeOptions[] = [
     SortTypeOptions.NUMBER,

@@ -11,7 +11,16 @@ import IconButton from "../../renderer/icon-buttons/icon-button";
 import ToggleIconButton from "../../renderer/icon-buttons/toggle-icon-button";
 import CycleIconButton from "../../renderer/icon-buttons/cycle-icon-button";
 import MISSING from "../../assets/missing.png";
-import { error, message } from "../../global/translations";
+import { MessageMap, translations } from "../../global/translations";
+
+let error: (key: string, ...args: any) => never;
+let message: (key: keyof MessageMap, ...args: any) => string;
+
+function setupTranslations(): void {
+    const funcs: ReturnType<typeof translations> = translations(global.language);
+    error = funcs.error;
+    message = funcs.message;
+}
 
 declare const dialog: typeof import("../api").default;
 declare const options: {
@@ -21,11 +30,16 @@ declare const options: {
 };
 declare const api: typeof import("./api").default;
 
-const root: Root = createRoot(document.body);
-console.log(options);
-if (!options) error("missingDialogOptions");
-document.title = message("dialog.installation.character.title");
-root.render(<Body/>);
+dialog.readAppData().then(async (appData: AppData) => {
+    global.language = appData.config.language;
+    setupTranslations();
+
+    const root: Root = createRoot(document.body);
+    console.log(options);
+    if (!options) error("missingDialogOptions");
+    document.title = message("dialog.installation.character.title")!;
+    root.render(<Body/>);
+});
 
 const sortTypes: SortTypeOptions[] = [
     SortTypeOptions.MENU_NAME,

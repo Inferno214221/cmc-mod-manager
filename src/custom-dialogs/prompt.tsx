@@ -1,7 +1,18 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Root, createRoot } from "react-dom/client";
 import styles from "./custom-dialogs.css";
-import { error, message, tryMessage } from "../global/translations";
+import { MessageMap, translations } from "../global/translations";
+
+let error: (key: string, ...args: any) => never;
+let message: (key: keyof MessageMap, ...args: any) => string;
+let tryMessage: (key: string, ...args: any) => string | undefined;
+
+function setupTranslations(): void {
+    const funcs: ReturnType<typeof translations> = translations(global.language);
+    error = funcs.error;
+    message = funcs.message;
+    tryMessage = funcs.tryMessage;
+}
 
 declare const dialog: typeof import("./api").default;
 declare const options: {
@@ -10,11 +21,16 @@ declare const options: {
     extra: PromptOptions
 };
 
-const root: Root = createRoot(document.body);
-console.log(options);
-if (!options) error("missingDialogOptions");
-document.title = tryMessage("dialog.prompt." + options.name + ".title")!;
-root.render(<Body/>);
+dialog.readAppData().then(async (appData: AppData) => {
+    global.language = appData.config.language;
+    setupTranslations();
+
+    const root: Root = createRoot(document.body);
+    console.log(options);
+    if (!options) error("missingDialogOptions");
+    document.title = tryMessage("dialog.prompt." + options.name + ".title")!;
+    root.render(<Body/>);
+});
 
 async function requestNextFrame(height: number, depth: number = 0): Promise<number> {
     return new Promise((resolve: (result: number) => void) => {
