@@ -65,9 +65,11 @@ function Body(): JSX.Element {
             }
         }}>
             <div className={styles.center}>
-                <span>
-                    {tryMessage("dialog.prompt." + options.name + ".body")}
-                </span>
+                <span
+                    dangerouslySetInnerHTML={{
+                        __html: tryMessage("dialog.prompt." + options.name + ".body")!
+                    }}
+                />
             </div>
             <input
                 autoFocus

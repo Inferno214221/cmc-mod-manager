@@ -60,9 +60,11 @@ function Body(): JSX.Element {
             }
         }}>
             <div className={styles.center}>
-                <span>
-                    {tryMessage("dialog.alert." + options.name + ".body")}
-                </span>
+                <span
+                    dangerouslySetInnerHTML={{
+                        __html: tryMessage("dialog.alert." + options.name + ".body")!
+                    }}
+                />
             </div>
             <br/>
             <div className={styles.right}>
