@@ -45,11 +45,11 @@ jobs:
       - name: Electron Forge Build (Linux)
         run: yarn run make-linux-all
       - name: Move Output Zip
-        run: mv ./out/make/zip/linux/x64/cmc-mod-manager-linux-x64-3.1.2.zip ./cmc-mod-manager-linux-x64.zip
+        run: mv ./out/make/zip/linux/x64/cmc-mod-manager-linux-x64-3.2.0.zip ./cmc-mod-manager-linux-x64.zip
       - name: Move Output Deb
-        run: mv ./out/make/deb/x64/cmc-mod-manager_3.1.2_amd64.deb ./cmc-mod-manager-linux.deb
+        run: mv ./out/make/deb/x64/cmc-mod-manager_3.2.0_amd64.deb ./cmc-mod-manager-linux.deb
       - name: Move Output Rpm
-        run: mv ./out/make/rpm/x64/cmc-mod-manager-3.1.2-1.x86_64.rpm ./cmc-mod-manager-linux.rpm
+        run: mv ./out/make/rpm/x64/cmc-mod-manager-3.2.0-1.x86_64.rpm ./cmc-mod-manager-linux.rpm
       
       - name: Update Release
         uses: ncipollo/release-action@v1.14.0
@@ -63,7 +63,7 @@ jobs:
       - name: Electron Forge Build (Windows)
         run: yarn run make-win
       - name: Move Output Zip
-        run: mv ./out/make/zip/win32/x64/cmc-mod-manager-win32-x64-3.1.2.zip ./cmc-mod-manager-win32-x64.zip
+        run: mv ./out/make/zip/win32/x64/cmc-mod-manager-win32-x64-3.2.0.zip ./cmc-mod-manager-win32-x64.zip
 
       - name: Update Release
         uses: ncipollo/release-action@v1.14.0
@@ -77,7 +77,7 @@ jobs:
       - name: Electron Forge Build (Windows 32 Bit)
         run: yarn run make-win32
       - name: Move Output Zip
-        run: mv ./out/make/zip/win32/ia32/cmc-mod-manager-win32-ia32-3.1.2.zip ./cmc-mod-manager-win32-ia32.zip
+        run: mv ./out/make/zip/win32/ia32/cmc-mod-manager-win32-ia32-3.2.0.zip ./cmc-mod-manager-win32-ia32.zip
 
       - name: Update Release
         uses: ncipollo/release-action@v1.14.0
