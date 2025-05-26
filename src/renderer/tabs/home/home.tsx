@@ -44,7 +44,7 @@ export function TabHome(): JSX.Element {
                         <h3>(v3.1.2)</h3>
                     </div>
                     <div className={styles.center} id={styles.byDiv}>
-                        <h2>By</h2>
+                        <h2>{message("other.by")}</h2>
                     </div>
                     <div className={styles.center + " " + styles.marginVertical}>
                         <img src={PFP} id={styles.pfp} draggable={false}/>

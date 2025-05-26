@@ -307,7 +307,7 @@ export default {
             },
             languageUpdated: {
                 title: "Idioma Actualizado",
-                body: "Cierre y reinicie CMC Mod Manager para aplicar los cambios."
+                body: "Cierre y reinicie CMC Mod Manager para aplicar los cambios. ¡Gracias a SpringTrap Crusader por la traducción!"
             },
             licenseNotice: {
                 title: "Aviso de licencia",
@@ -579,6 +579,7 @@ export default {
         },
         autoUpdateFailed: "Debido a cómo se instaló CMC Mod Manager, no se puede actualizar automáticamente. Por favor, descargue la versión más reciente manualmente desde GitHub o GameBanana. (Consulte la pestaña 'Inicio' para los enlaces.)",
         defaultPageName: "Predeterminado",
-        languageName: "Español (Spanish)"
+        languageName: "Español (Spanish)",
+        by: "de"
     }
 };

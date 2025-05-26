@@ -580,6 +580,7 @@ export default {
         },
         autoUpdateFailed: "Due to the way CMC Mod Manager has been installed, it can't be updated automatically. Please download the latest version from GitHub or GameBanana. (Check the Home tab for links.)",
         defaultPageName: "Default",
-        languageName: "English"
+        languageName: "English",
+        by: "by"
     }
 };
