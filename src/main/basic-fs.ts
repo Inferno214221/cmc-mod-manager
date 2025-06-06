@@ -17,10 +17,10 @@ export const DATA_FILE: string = path.join(app.getPath("userData"), "data.json")
 
 export async function loadAppData(): Promise<void> {
     if (!(await fs.exists(DATA_FILE))) {
-        writeAppData({
+        global.appData = {
             dir: "",
             config: DEFAULT_CONFIG
-        });
+        };
     } else {
         global.appData = await readJSON(DATA_FILE);
         if (global.appData.config == undefined) {
@@ -32,9 +32,8 @@ export async function loadAppData(): Promise<void> {
                 }
             });
         }
-        writeAppData(global.appData);
     }
-    global.appData = await readJSON(DATA_FILE);
+    return await writeAppData(global.appData);
 }
 
 export async function readJSON(file: string): Promise<any> {
