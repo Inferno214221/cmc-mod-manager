@@ -1,9 +1,15 @@
 import english from "../assets/lang/english.json";
 import portuguese from "../assets/lang/portuguese.json";
 import spanish from "../assets/lang/spanish.json";
+import japanese from "../assets/lang/japanese.json";
+import chinese from "../assets/lang/chinese.json";
 import { Language, ModTypes } from "./global";
 
-export type MessageMap = typeof english & typeof portuguese & typeof spanish;
+export type MessageMap = typeof english &
+    typeof portuguese &
+    typeof spanish &
+    typeof japanese &
+    typeof chinese;
     
 // This is currently the only enum that is displayed.
 export type DisplayEnums = ModTypes;
@@ -20,6 +26,12 @@ export function translations(language: Language) {
             break;
         case Language.SPANISH:
             lang = spanish;
+            break;
+        case Language.JAPANESE:
+            lang = japanese;
+            break;
+        case Language.CHINESE:
+            lang = chinese;
             break;
     }
     

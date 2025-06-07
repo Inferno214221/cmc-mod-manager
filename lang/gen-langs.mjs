@@ -38,7 +38,7 @@ export function squashLangToFile(lang, file) {
     ));
 }
 
-const LANGS = ["english", "portuguese", "spanish"];
+const LANGS = ["english", "portuguese", "spanish", "japanese", "chinese"];
 const CONSTANTS = await import(path.join(IN_DIR, "constants.mjs"));
 
 for (const lang of LANGS) {

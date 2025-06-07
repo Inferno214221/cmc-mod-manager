@@ -138,5 +138,7 @@ export function finishOp(
 export enum Language {
     ENGLISH = "en-AU",
     PORTUGUESE = "pt-BR",
-    SPANISH = "es"
+    SPANISH = "es",
+    JAPANESE = "ja",
+    CHINESE = "zh-CN",
 }
