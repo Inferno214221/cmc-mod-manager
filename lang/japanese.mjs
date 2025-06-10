@@ -260,29 +260,29 @@ export default {
             },
             pageAddition: {
                 started: {
-                    title: "新規CSSページの追加",
-                    body: "新しいCSSページ'{0}'を追加中です。"
+                    title: "新規SSSページの追加",
+                    body: "新しいSSSページ'{0}'を追加中です。"
                 },
                 finished: {
-                    body: "新しいCSSページ'{0}'を追加しました。"
+                    body: "新しいSSSページ'{0}'を追加しました。"
                 }
             },
             renamePage: {
                 started: {
-                    title: "CSSページの名前変更",
-                    body: "CSSページ'{0}'の名前を'{1}'に変更中です。"
+                    title: "SSSページの名前変更",
+                    body: "SSSページ'{0}'の名前を'{1}'に変更中です。"
                 },
                 finished: {
-                    body: "CSSページ'{0}'の名前を'{1}'に変更しました。"
+                    body: "SSSページ'{0}'の名前を'{1}'に変更しました。"
                 }
             },
             pageDeletion: {
                 started: {
-                    title: "CSSページの削除",
-                    body: "CSSページ'{0}'を削除中です。"
+                    title: "SSSページの削除",
+                    body: "SSSページ'{0}'を削除中です。"
                 },
                 finished: {
-                    body: "CSSページ'{0}'を削除しました。"
+                    body: "SSSページ'{0}'を削除しました。"
                 }
             }
         }
@@ -410,8 +410,8 @@ export default {
         unsupportedArchiveType: "サポートされていないArchiveタイプ：'{0}'。",
         unknownModType: "サポートされていないmodタイプ：'{0}'。",
         invalidSemverString: "無効なSemver文字列：'{0}'。",
-        cantUpdateDevMode: "なぜ開発モードで更新したのか自分で反省する",
-        missingUpdateFiles: "ファイルを更新したは森で行方不明になったのか？",
+        cantUpdateDevMode: "開発モードでは更新できません。",
+        missingUpdateFiles: "更新ファイルが見つかりません。",
         streamError: "転送エラー：'{0}'。",
         noSingleInstanceLock: "サンプルのロックに失敗しました。",
         noRecursiveAlts: "代替バージョンのあるキャラクターは別のキャラクターの代替バージョンになることはできない",
@@ -421,14 +421,14 @@ export default {
         incompleteDat: "キャラクターのdatは完全ではない：'{0}'。",
         characterInstallTargetSelf: "同じキャラクターをインストールした場所にキャラクターをインストールすることはできません。理解してくれてありがとう~",
         stageInstallTargetSelf: "同じステージをインストールした場所にステージをインストールすることはできません。理解してくれてありがとう~",
-        noValidCharactersFound: "無効なキャラクターばかりだ：'{0}'。",
-        noValidStagesFound: "無効なステージばかりだ：'{0}'。",
-        noTopDir: "このファイルパスにはディレクトリさえありません：'{0}'。",
+        noValidCharactersFound: "有効なキャラクターが見つかりません：'{0}'。",
+        noValidStagesFound: "有効なステージが見つかりません：'{0}'。",
+        noTopDir: "ファイルパスにディレクトリが含まれていません：'{0}'。",
         noFighterSubdir: "あなたのこのディレクトリから「fighter」というサブディレクトリが見つかりません：'{0}'。",
         noStageSubdir: "あなたのこのディレクトリから「stage」というサブディレクトリが見つかりません：'{0}'。",
         noUpdateCharacter: "キャラクターはインストールされており、更新は無効です。",
         noUpdateStage: "ステージはインストールされており、更新は無効です。",
-        noDatFile: "こ の キ ャ ラ ク タ ー に は dat フ ァ イ ル が あ り ま せ ん 。 ",
+        noDatFile: "このキャラクターにはdatファイルがありません。",
         customCssDisabled: "カスタムCSSページはすでにgame_settingsで閉じられています。",
         operationCallNotFound: "操作関数が見つかりません：'{0}'。"
     },
@@ -443,9 +443,9 @@ export default {
             extract: "抽出キャラクター",
             deleteSeries: "このシリーズのすべてのキャラクターを削除します",
             showing: {
-                all: "展示のみ：すべてのキャラクター",
-                new: "展示のみ：新しいキャラクター",
-                excluded: "展示のみ：除外されたキャラクター"
+                all: "表示：すべてのキャラクター",
+                new: "表示：新しいキャラクター",
+                excluded: "表示：除外されたキャラクター"
             },
             existing: {
                 update: "既存キャラクター：更新",
@@ -462,13 +462,13 @@ export default {
             extract: "抽出ステージ",
             deleteSeries: "このシリーズのすべてのステージを削除します",
             showing: {
-                all: "展示のみ：すべてのシリーズ",
-                new: "展示のみ：新しいシリーズ",
-                excluded: "展示のみ：除外されたシリーズ"
+                all: "表示：すべてのステージ",
+                new: "表示：新しいステージ",
+                excluded: "表示：除外されたステージ"
             },
             existing: {
-                update: "既存シリーズ：更新",
-                abort: "既存シリーズ：中止する"
+                update: "既存ステージ：更新",
+                abort: "既存ステージ：中止する"
             }
         },
         alt: {
@@ -520,7 +520,7 @@ export default {
             cancel: "操作を取り消す"
         },
         gameDir: {
-            noneSelected: "（選択された空気）",
+            noneSelected: "（未選択）",
             change: "CMC+ディレクトリの変更",
             open: "CMC+ディレクトリを開く",
             run: "CMC+を起動する"
@@ -546,12 +546,12 @@ export default {
                 desc: "CMC+のキャラクター選択インタフェースを編集します。"
             },
             stages: {
-                title: "シリーズ",
-                desc: "CMC+をシリーズ、抽出、または削除したキャラクター。"
+                title: "ステージ",
+                desc: "CMC+のステージをインストール、抽出、または削除します。"
             },
             stageSelectionScreen: {
-                title: "シリーズ選択インタフェースする",
-                desc: "CMC+のシリーズ選択インタフェースを編集します。"
+                title: "ステージ選択画面",
+                desc: "CMC+のステージ選択画面を編集します。"
             }
         },
         currentGameDir: "現在のCMC+ディレクトリ: ",
@@ -563,11 +563,11 @@ export default {
     },
     enumDisplayName: {
         character: "キャラクター",
-        stage: "シリーズ"
+        stage: "ステージ"
     },
     other: {
         dat: {
-            homeStages: "---ホームシリーズ「シンプル」---",
+            homeStages: "---ホームステージ（クラシックモード）---",
             randomData: "---その他の情報---",
             paletteNumber: "---Palette数---",
             paletteData: "---Paletteデータ---",

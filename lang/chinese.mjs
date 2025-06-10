@@ -260,29 +260,29 @@ export default {
             },
             pageAddition: {
                 started: {
-                    title: "新增CSS页面",
-                    body: "正在增加新的CSS页面：'{0}'。"
+                    title: "新增SSS页面",
+                    body: "正在增加新的SSS页面：'{0}'。"
                 },
                 finished: {
-                    body: "已增加新的CSS页面：'{0}'。"
+                    body: "已增加新的SSS页面：'{0}'。"
                 }
             },
             renamePage: {
                 started: {
-                    title: "重命名CSS页面",
-                    body: "正在将该CSS页面的名字：'{0}'重命名为'{1}'。"
+                    title: "重命名SSS页面",
+                    body: "正在将该SSS页面的名字：'{0}'重命名为'{1}'。"
                 },
                 finished: {
-                    body: "已将该CSS页面的名字：'{0}'重命名为'{1}'。"
+                    body: "已将该SSS页面的名字：'{0}'重命名为'{1}'。"
                 }
             },
             pageDeletion: {
                 started: {
-                    title: "CSS页面删除",
-                    body: "正在删除CSS页面：'{0}'。"
+                    title: "SSS页面删除",
+                    body: "正在删除SSS页面：'{0}'。"
                 },
                 finished: {
-                    body: "已删除CSS页面：'{0}'。"
+                    body: "已删除SSS页面：'{0}'。"
                 }
             }
         }
@@ -410,8 +410,8 @@ export default {
         unsupportedArchiveType: "不支持的Archive类型：'{0}'。",
         unknownModType: "不支持的mod类型：'{0}'。",
         invalidSemverString: "无效的Semver字符串：'{0}'。",
-        cantUpdateDevMode: "谁教你在开发模式里试图更新东西的",
-        missingUpdateFiles: "更新文件丢哪了你知道吗",
+        cantUpdateDevMode: "无法在开发模式下进行更新。",
+        missingUpdateFiles: "未找到更新文件。",
         streamError: "传输错误：'{0}'。",
         noSingleInstanceLock: "单示例锁定失败。",
         noRecursiveAlts: "有替换版本的人物是无法当上别的人物替换版本的。",
@@ -421,14 +421,14 @@ export default {
         incompleteDat: "人物的dat并非完整：'{0}'。",
         characterInstallTargetSelf: "没法在同一个已经安装人物的地方安装人物谢谢。",
         stageInstallTargetSelf: "没法在同一个已经安装场地的地方安装场地谢谢。",
-        noValidCharactersFound: "你这目录怎么没一个真人（全是无效人物）：'{0}'。",
-        noValidStagesFound: "你这目录怎么没一个非纸做的场地（全是无效场地）：'{0}'。",
-        noTopDir: "你这文件路径甚至不带目录是吧：'{0}'。",
+        noValidCharactersFound: "目录中未找到有效人物：'{0}'。",
+        noValidStagesFound: "目录中未找到有效场地：'{0}'。",
+        noTopDir: "文件路径不包含目录：'{0}'。",
         noFighterSubdir: "从你这目录里找不到任何一个名叫'fighter'的子目录：'{0}'。",
         noStageSubdir: "从你这目录里找不到任何一个名叫'stage'的子目录：'{0}'。",
         noUpdateCharacter: "人物已被安装，更新无效。",
         noUpdateStage: "场地已被安装，更新无效。",
-        noDatFile: "这 角 色 没 dat 文 件 。",
+        noDatFile: "该人物缺少 dat 文件。",
         customCssDisabled: "自定义CSS页面已经在game_settings里被关了。",
         operationCallNotFound: "找不到操作函数：'{0}'。"
     },
