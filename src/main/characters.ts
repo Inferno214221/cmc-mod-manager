@@ -1109,12 +1109,15 @@ export async function removeSeriesCharacters(
     series: string,
     dir: string = global.gameDir
 ): Promise<void> {
-    const charactersToRemove: Character[] = (await readCharacters(dir))
-        .filter((character: Character) => character.series == series);
+    const characters: CharacterList = await readCharacterList(dir);
+    const charactersToRemove: Character[] = characters.toArray().filter(
+        (character: Character) => character.series == series
+    );
     const altsToRemove: Alt[] = [];
     charactersToRemove.forEach((character: Character) => {
         character.alts.forEach((alt: Alt) => {
-            if (alt.alt != alt.base) altsToRemove.push(alt);
+            // If the alt is in the character list, it will be removed before alts.
+            if (characters.getByName(alt.alt) == undefined) altsToRemove.push(alt);
         });
     });
     console.log(Date.now());
