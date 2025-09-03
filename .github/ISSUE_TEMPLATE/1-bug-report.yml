@@ -1,0 +1,68 @@
+name: Bug report
+description: Report a potential bug within CMC Mod Manager
+labels: ["bug"]
+assignees:
+  - Inferno214221
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please describe the bug and include as much information as possible.
+
+  - type: input
+    id: version
+    attributes:
+      label: CMC Mod Manager Version
+      description: What version of CMC Mod Manager are you using? Have you tried the latest version?
+      placeholder: "e.g. v3.2.1"
+    validations:
+      required: true
+
+  - type: textarea
+    id: issue
+    attributes:
+      label: Description of the Issue
+      description: Provide a clear and concise description of the bug.
+      placeholder: "Describe what went wrong..."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: location
+    attributes:
+      label: Where does this issue occur?
+      description: Is the issue within CMC Mod Manager itself, or within CMC+ as a result of CMC Mod Manager?
+      options:
+        - CMC Mod Manager
+        - CMC+
+        - Both
+        - Unsure
+    validations:
+      required: true
+
+  - type: input
+    id: frequency
+    attributes:
+      label: Frequency
+      description: How frequently does the issue occur? (e.g. always, sometimes, rarely)
+      placeholder: "Always / Sometimes / Rarely"
+
+  - type: input
+    id: mod
+    attributes:
+      label: Specific Mod Trigger
+      description: If the issue is related to a specific mod, please provide its name.
+      placeholder: "Name of the mod"
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots
+      description: If applicable, add screenshots to help explain your problem.
+
+  - type: textarea
+    id: console
+    attributes:
+      label: Console Errors
+      description: Copy any notable errors from the developer console (Ctrl+Shift+I).
+      placeholder: "Paste error logs here"
