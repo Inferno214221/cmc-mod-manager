@@ -67,7 +67,7 @@ export function TabStageSelectionScreen({
                 await handle(api.getGameDir()), "gfx", "stgicons", "random.png"
             ))
         });
-        setStages(stages)
+        setStages(stages);
         getPages();
     }
 

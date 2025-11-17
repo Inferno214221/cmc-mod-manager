@@ -67,7 +67,7 @@ export function TabCharacterSelectionScreen({
                 await handle(api.getGameDir()), "gfx", "mugs", "random.png"
             ))
         });
-        setCharacters(characters)
+        setCharacters(characters);
         getPages();
     }
 
