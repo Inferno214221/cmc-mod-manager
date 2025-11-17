@@ -61,6 +61,7 @@
     height: 62px;
     object-fit: cover;
     width: 100%;
+    cursor: grab;
 }
 
 .excluded-display-name {
@@ -141,6 +142,7 @@
     width: 65px;
     height: 65px;
     object-fit: cover;
+    cursor: grab;
 }
 
 .sss-stage-display span:not(.sss-stage-display .sss-tooltip span) {
@@ -150,6 +152,7 @@
     width: 60px;
     overflow: hidden;
     text-wrap: nowrap;
+    cursor: grab;
 }
 
 .sss-column-header :global(.icon-buttons_icon-button-wrapper) {

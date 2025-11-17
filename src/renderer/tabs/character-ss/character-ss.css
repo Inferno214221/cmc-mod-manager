@@ -61,6 +61,7 @@
     height: 62px;
     object-fit: cover;
     width: 100%;
+    cursor: grab;
 }
 
 .excluded-display-name {
@@ -141,6 +142,7 @@
     width: 35px;
     height: 35px;
     object-fit: cover;
+    cursor: grab;
 }
 
 .css-character-display span:not(.css-character-display .css-tooltip span) {
@@ -150,6 +152,7 @@
     width: 35px;
     overflow: hidden;
     text-wrap: nowrap;
+    cursor: grab;
 }
 
 .css-column-header :global(.icon-buttons_icon-button-wrapper) {
