@@ -22,18 +22,15 @@ export default function ToggleIconButton({
 }): JSX.Element {
     return (
         <div className={styles.iconButtonWrapper}>
-            <button  className={styles.iconButton} onClick={() => {
-                setter((prev: boolean) => !prev);
-            }}>
+            <button className={styles.iconButton} title={checked ? trueTooltip : falseTooltip}
+                onClick={() => setter((prev: boolean) => !prev)}
+            >
                 <span className={styles.matIcon + " " + styles.buttonIcon}
                     style={{ fontSize: iconSize }}
                 >
                     {checked ? trueIcon : falseIcon}
                 </span>
             </button>
-            <div className={styles.iconButtonTooltip}>
-                <span>{checked ? trueTooltip : falseTooltip}</span>
-            </div>
         </div>
     );
 }

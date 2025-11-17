@@ -253,10 +253,8 @@ function ExcludedStages({
                                 setSearchValue(event.target.value);
                                 console.log(searchValue, sortType, reverseSort);
                             }}
+                            title={message("tooltip.stage.search")}
                         />
-                        <div className={styles.tooltip}>
-                            <span>{message("tooltip.stage.search")}</span>
-                        </div>
                     </div>
                     <div className={styles.inlineSortOptions}>
                         <CycleIconButton
@@ -375,6 +373,7 @@ function StageDisplay({
                         dndData
                     );
                 }}
+                title={stage.menuName}
             >
                 <img
                     src={"img://" + stage.icon}
@@ -386,9 +385,6 @@ function StageDisplay({
                 <div className={styles.excludedDisplayName}>
                     <span>{stage.menuName}</span>
                 </div>
-            </div>
-            <div className={styles.tooltip + " " + styles.excludedTooltip}>
-                <span>{stage.menuName}</span>
             </div>
         </div>
     );
@@ -744,19 +740,7 @@ function SssStageDisplay({
                             dndData
                         );
                     }}
-                    onMouseEnter={(event: any) => {
-                        if (event.target.tagName == "DIV") {
-                            event.target
-                                .nextElementSibling
-                                .hidden = false;
-                        } else {
-                            event.target
-                                .parentElement
-                                .nextElementSibling
-                                .firstElementChild
-                                .hidden = false;
-                        }
-                    }}
+                    title={stage.menuName}
                 >
                     <img
                         src={"img://" + stage.icon}
@@ -765,15 +749,6 @@ function SssStageDisplay({
                             event.target.src = MISSING;
                         }}
                     />
-                    <span>{stage.menuName}</span>
-                </div>
-                <div
-                    className={styles.tooltip + " " + styles.sssTooltip}
-                    hidden={true}
-                    onDragEnter={(event: any) => {
-                        event.target.hidden = true;
-                    }}
-                >
                     <span>{stage.menuName}</span>
                 </div>
             </div>

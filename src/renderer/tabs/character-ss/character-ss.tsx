@@ -264,10 +264,8 @@ function ExcludedCharacters({
                                 setSearchValue(event.target.value);
                                 console.log(searchValue, sortType, reverseSort);
                             }}
+                            title={message("tooltip.character.search")}
                         />
-                        <div className={styles.tooltip}>
-                            <span>{message("tooltip.character.search")}</span>
-                        </div>
                     </div>
                     <div className={styles.inlineSortOptions}>
                         <CycleIconButton
@@ -384,6 +382,7 @@ function CharacterDisplay({
                         dndData
                     );
                 }}
+                title={character.menuName}
             >
                 <img
                     src={"img://" + character.mug}
@@ -395,9 +394,6 @@ function CharacterDisplay({
                 <div className={styles.excludedDisplayName}>
                     <span>{character.menuName}</span>
                 </div>
-            </div>
-            <div className={styles.tooltip + " " + styles.excludedTooltip}>
-                <span>{character.menuName}</span>
             </div>
         </div>
     );
@@ -803,13 +799,7 @@ function CssCharacterDisplay({
                             dndData
                         );
                     }}
-                    onMouseEnter={(event: any) => {
-                        event.target
-                            .parentElement
-                            .nextElementSibling
-                            .firstElementChild
-                            .hidden = false;
-                    }}
+                    title={character.menuName}
                 >
                     <img
                         src={"img://" + character.mug}
@@ -818,15 +808,6 @@ function CssCharacterDisplay({
                             event.target.src = MISSING;
                         }}
                     />
-                    <span>{character.menuName}</span>
-                </div>
-                <div
-                    className={styles.tooltip + " " + styles.cssTooltip}
-                    hidden={true}
-                    onDragEnter={(event: any) => {
-                        event.target.hidden = true;
-                    }}
-                >
                     <span>{character.menuName}</span>
                 </div>
             </div>

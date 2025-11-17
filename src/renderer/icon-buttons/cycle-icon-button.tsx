@@ -16,7 +16,7 @@ export default function CycleIconButton({
 }): JSX.Element {
     return (
         <div className={styles.iconButtonWrapper}>
-            <button  className={styles.iconButton} onClick={() => {
+            <button className={styles.iconButton} title={tooltips[index]} onClick={() => {
                 setter((prev: number) => {
                     prev++;
                     if (prev == icons.length) {
@@ -31,9 +31,6 @@ export default function CycleIconButton({
                     {icons[index]}
                 </span>
             </button>
-            <div className={styles.iconButtonTooltip}>
-                <span>{tooltips[index]}</span>
-            </div>
         </div>
     );
 }

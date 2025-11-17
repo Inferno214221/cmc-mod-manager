@@ -211,26 +211,27 @@ export function NavTab({ info }: { info: Tab }): JSX.Element {
         <div className={
             (activeTab == info ? styles.activeTab + " " : "") + styles.tooltipWrapper
         }>
-            <button className={styles.navClick} onClick={() => {switchTabs(info);}}>
+            <button className={styles.navClick} onClick={() => {switchTabs(info);}}
+                title={tryMessage("ui.tabs." + info.name + ".title")}
+            >
                 <span className={styles.matIcon + " " + styles.navIcon}>{info.icon}</span>
             </button>
-            <div className={styles.tooltip}>
+            {/* <div className={styles.tooltip}>
                 <span>{tryMessage("ui.tabs." + info.name + ".title")}</span>
-            </div>
+            </div> */}
         </div>
     );
 }
 
 export function NavButton({ info }: { info: NavButtonInfo }): JSX.Element {
     return (
-        <div className={styles.tooltipWrapper}>
-            <button className={styles.navClick} onClick={() => {info.function()}}>
-                <span className={styles.matIcon + " " + styles.navIcon}>{info.icon}</span>
-            </button>
-            <div className={styles.tooltip}>
-                <span>{info.displayName}</span>
-            </div>
-        </div>
+        <button
+            className={styles.navClick}
+            title={info.displayName}
+            onClick={() => {info.function()}}
+        >
+            <span className={styles.matIcon + " " + styles.navIcon}>{info.icon}</span>
+        </button>
     );
 }
 

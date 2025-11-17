@@ -185,10 +185,8 @@ export function TabCharacters({
                                 setSearchValue(event.target.value);
                                 console.log(searchValue, sortType, reverseSort);
                             }}
+                            title={message("tooltip.character.search")}
                         />
-                        <div className={styles.tooltip}>
-                            <span>{message("tooltip.character.search")}</span>
-                        </div>
                     </div>
                     <div className={styles.inlineSortOptions}>
                         <CycleIconButton
