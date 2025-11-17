@@ -184,10 +184,16 @@
 .series-name {
     display: flex;
     align-items: center;
+    height: calc(72px + 26pt);
 }
 
 .series-name span {
-    padding: 5px;
+    padding: 5px 10px;
+    height: 100%;
+    text-align: left;
+    white-space: normal;
+    writing-mode: vertical-lr;
+    transform: rotate(180deg);
 }
 
 #excluded-search,
