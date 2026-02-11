@@ -1,212 +1,257 @@
 #pages-div,
 #sort-excluded-div,
 #excluded-div {
-    height: min-content;
-    min-height: min-content;
-    background-color: var(--inf-grey4);
-    z-index: 1;
-    flex-shrink: 0;
+  height: min-content;
+  min-height: min-content;
+  background-color: var(--inf-grey4);
+  z-index: 1;
+  flex-shrink: 0;
 }
 
 #sort-excluded-div,
 #excluded-div {
-    padding: 5px;
+  padding: 5px;
 }
 
 #pages-div,
 #excluded-div {
-    overflow-x: auto;
-    margin: 5px;
+  overflow-x: auto;
+  margin: 5px;
 }
 
 #pages-div {
-    padding: 0px 0px 5px 0px;
+  padding: 0px 0px 5px 0px;
 }
 
 #sort-excluded-div {
-    padding: 0px 5px;
+  padding: 0px 5px;
 }
 
 #css-div {
-    flex-grow: 1;
-    flex-shrink: 1;
-    min-height: 0px;
-    padding: 5px;
-    overflow: auto;
-    margin: 5px;
+  flex-grow: 1;
+  flex-shrink: 1;
+  min-height: 0px;
+  padding: 5px;
+  overflow: auto;
+  margin: 5px;
 }
 
 #excluded-wrapper {
-    display: flex;
-    width: 100%;
-    flex-wrap: nowrap;
-    overflow: hidden;
+  display: flex;
+  width: 100%;
+  flex-wrap: nowrap;
+  overflow: hidden;
 }
 
 #pages-wrapper {
-    width: fit-content;
-    text-wrap: nowrap;
-    overflow: hidden;
-    height: 35px;
+  width: fit-content;
+  text-wrap: nowrap;
+  overflow: hidden;
+  height: 35px;
 }
 
 .excluded-display-wrapper {
-    width: 62px;
-    margin: 5px;
-    height: calc(62px + 2.2em);
+  width: 62px;
+  margin: 5px;
+  height: calc(62px + 2.2em);
 }
 
 .excluded-display-mug,
 .excluded-display-mug img {
-    height: 62px;
-    object-fit: cover;
-    width: 100%;
-    cursor: grab;
+  height: 62px;
+  object-fit: cover;
+  width: 100%;
+  cursor: grab;
 }
 
 .excluded-display-name {
-    overflow: hidden;
-    word-wrap: break-word;
-    -webkit-line-clamp: 2;
-    line-clamp: 2;
-    line-height: 1.1em;
+  overflow: hidden;
+  word-wrap: break-word;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  line-height: 1.1em;
 }
 
 .css-page,
 .css-page-button {
-    box-sizing: border-box;
-    height: 100%;
-    display: inline-block;
-    border: none;
-    box-shadow: none;
-    background-color: var(--inf-grey4);
-    width: fit-content;
-    min-width: fit-content;
+  box-sizing: border-box;
+  height: 100%;
+  display: inline-block;
+  border: none;
+  box-shadow: none;
+  background-color: var(--inf-grey4);
+  width: fit-content;
+  min-width: fit-content;
 }
 
 .css-page:hover:not(:has(:global(.icon-buttons_icon-button-wrapper:hover))),
-.css-page:hover:not(:has(:global(.icon-buttons_icon-button-wrapper:hover))) .css-page-button {
-    background-color: var(--inf-grey3);
+.css-page:hover:not(:has(:global(.icon-buttons_icon-button-wrapper:hover)))
+  .css-page-button {
+  background-color: var(--inf-grey3);
 }
 
 .css-page :global(.icon-buttons_icon-button-wrapper) {
-    margin-left: -5px;
-    margin-right: 0px;
+  margin-left: -5px;
+  margin-right: 0px;
 }
 
 .css-page :global(.icon-buttons_button-icon) {
-    padding: 5px;
+  padding: 5px;
 }
 
 .css-page :global(.icon-buttons_icon-button-wrapper:hover),
-.css-page :global(.icon-buttons_icon-button-wrapper:hover) :global(.icon-buttons_button-icon) {
-    background-color: var(--inf-grey3);
+.css-page
+  :global(.icon-buttons_icon-button-wrapper:hover)
+  :global(.icon-buttons_button-icon) {
+  background-color: var(--inf-grey3);
 }
 
 .css-page-button {
-    height: 100%;
-    margin: 0px;
+  height: 100%;
+  margin: 0px;
 }
 
 .css-page-active {
-    border-bottom: 4px solid var(--inf-blue1);
+  border-bottom: 4px solid var(--inf-blue1);
 }
 
 #css-wrapper {
-    display: inline-flex;
-    align-items: center;
-    height: 100%;
-    width: 100%;
+  display: inline-flex;
+  align-items: center;
+  height: 100%;
+  width: 100%;
 }
 
 .excluded-tooltip {
-    height: fit-content;
-    left: -5px;
-    top: 62px;
+  height: fit-content;
+  left: -5px;
+  top: 62px;
 }
 
 .excluded-tooltip:hover {
-    visibility: visible;
-    z-index: initial;
+  visibility: visible;
+  z-index: initial;
 }
 
 .css-tooltip {
-    height: 100%;
-    left: 35px;
+  height: 100%;
+  left: 35px;
 }
 
 .css-character-display {
-    padding: 2px;
+  padding: 2px;
 }
 
 .css-character-display img {
-    display: block;
-    width: 35px;
-    height: 35px;
-    object-fit: cover;
-    cursor: grab;
+  display: block;
+  width: 35px;
+  height: 35px;
+  object-fit: cover;
+  cursor: grab;
 }
 
 .css-character-display span:not(.css-character-display .css-tooltip span) {
-    display: block;
-    font-size: 8pt;
-    text-align: center;
-    width: 35px;
-    overflow: hidden;
-    text-wrap: nowrap;
-    cursor: grab;
+  display: block;
+  font-size: 8pt;
+  text-align: center;
+  width: 35px;
+  overflow: hidden;
+  text-wrap: nowrap;
+  cursor: grab;
 }
 
 .css-column-header :global(.icon-buttons_icon-button-wrapper) {
-    margin: -2.5px 0px;
+  margin: -2.5px 0px;
 }
 
 .css-column-header {
-    height: 17px;
+  height: 17px;
 }
 
 .css-row-header :global(.icon-buttons_icon-button-wrapper) {
-    margin: 0px -5px;
+  margin: 0px -5px;
 }
 
 .css-row-header {
-    height: 51px;
+  height: 51px;
 }
 
 .css-table {
-    overflow: hidden;
+  overflow: hidden;
 }
 
 .add-css-page input[type="text"],
 .css-page-edit {
-    margin: 2px 0px 0px 2px;
+  margin: 2px 0px 0px 2px;
 }
 
 .add-css-page :global(.icon-buttons_icon-button-wrapper) {
-    margin-left: 0px;
+  margin-left: 0px;
 }
 
 .series-name {
-    display: flex;
-    align-items: center;
-    height: calc(72px + 2.2em);
+  display: flex;
+  align-items: center;
+  height: calc(72px + 2.2em);
 }
 
 .series-name span {
-    padding: 5px 10px;
-    height: 100%;
-    text-align: left;
-    white-space: normal;
-    writing-mode: vertical-lr;
-    transform: rotate(180deg);
+  padding: 5px 10px;
+  height: 100%;
+  text-align: left;
+  white-space: normal;
+  writing-mode: vertical-lr;
+  transform: rotate(180deg);
 }
 
 #excluded-search,
 .add-css-page input[type="text"],
 .css-page-edit {
-    width: 150px;
+  width: 150px;
 }
 
 .add-css-page :global(.icon-buttons_icon-button-tooltip) {
-    right: 28px;
+  right: 28px;
+}
+
+/* Multi-select styles */
+.css-character-display {
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+}
+
+.css-selected-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(100, 150, 255, 0.3);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.css-drag-over-indicator {
+  box-shadow: inset 0 0 0 3px var(--inf-blue1);
+}
+
+.css-character-display:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.css-character-display.selected {
+  background-color: rgba(100, 150, 255, 0.2);
+}
+
+.css-character-display.drag-over::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border: 3px solid var(--inf-blue1);
+  pointer-events: none;
+  z-index: 2;
 }
