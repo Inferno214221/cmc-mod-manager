@@ -51,6 +51,21 @@ export function TabCharacterSelectionScreen({
     [CssData | null, Dispatch<SetStateAction<CssData | null>>]
     = useState(null);
 
+    const [selectedPositions, setSelectedPositions]: [
+        Set<string>,
+        Dispatch<SetStateAction<Set<string>>>,
+    ] = useState(new Set());
+
+    const [lastSelectedPosition, setLastSelectedPosition]: [
+        { x: number; y: number } | null,
+        Dispatch<SetStateAction<{ x: number; y: number } | null>>,
+    ] = useState(null);
+
+    const [dragOverPosition, setDragOverPosition]: [
+        { x: number; y: number } | null,
+        Dispatch<SetStateAction<{ x: number; y: number } | null>>,
+    ] = useState(null);
+
     api.on("updateCharacterPages", getInfo);
     api.on("updateStagePages", () => null);
 
@@ -141,23 +156,161 @@ export function TabCharacterSelectionScreen({
 
     function characterDragAndDrop(from: DndData, to: DndData): void {
         console.log(from, to);
+        // Clear drag over indicator
+        setDragOverPosition(null);
+
         // Can't be called unless cssData has a value
-        const newCssData: CssData = [...cssData!];
+        const newCssData: CssData = cssData!.map((row) => [...row]); // Deep copy
+
         if (from.type == DndDataType.SS_NUMBER) {
             if (to.type == DndDataType.SS_NUMBER) {
-                newCssData[(from as DndDataSsNumber).y][(from as DndDataSsNumber).x] = to.number;
-                newCssData[(to as DndDataSsNumber).y][(to as DndDataSsNumber).x] = from.number;
+                const fromData = from as DndDataSsNumber;
+                const toData = to as DndDataSsNumber;
+
+                // Check if we're dragging multiple selected items
+                const fromKey = `${fromData.x},${fromData.y}`;
+                const isMultiSelect =
+                    selectedPositions.has(fromKey) && selectedPositions.size > 1;
+
+                if (isMultiSelect) {
+                    // Multi-select drag: collect all selected characters
+                    const flat: string[] = newCssData.flat();
+                    const rowLength = newCssData[0].length;
+
+                    // Get all selected positions and their characters
+                    const selectedItems: Array<{ index: number; character: string }> = [];
+                    selectedPositions.forEach((posKey) => {
+                        const [x, y] = posKey.split(",").map(Number);
+                        const index = y * rowLength + x;
+                        selectedItems.push({ index, character: flat[index] });
+                    });
+
+                    // Sort by index (ascending) to maintain order
+                    selectedItems.sort((a, b) => a.index - b.index);
+
+                    // Extract characters in correct order
+                    const characters = selectedItems.map((item) => item.character);
+
+                    // Remove from back to front to maintain indices
+                    for (let i = selectedItems.length - 1; i >= 0; i--) {
+                        flat.splice(selectedItems[i].index, 1);
+                    }
+
+                    // Calculate adjusted target index
+                    const toIndex = toData.y * rowLength + toData.x;
+                    const removedBefore = selectedItems.filter(
+                        (item) => item.index < toIndex,
+                    ).length;
+                    const adjustedToIndex = toIndex - removedBefore + 1;
+
+                    // Insert all characters at target
+                    flat.splice(adjustedToIndex, 0, ...characters);
+
+                    // Reshape back to 2D array
+                    for (let i = 0; i < newCssData.length; i++) {
+                        for (let j = 0; j < rowLength; j++) {
+                            newCssData[i][j] = flat[i * rowLength + j];
+                        }
+                    }
+
+                    // Clear selection after drop
+                    setSelectedPositions(new Set());
+                } else {
+                    // Single item drag (original behavior)
+                    const flat: string[] = newCssData.flat();
+                    const rowLength = newCssData[0].length;
+                    const fromIndex = fromData.y * rowLength + fromData.x;
+                    const toIndex = toData.y * rowLength + toData.x;
+
+                    if (fromIndex === toIndex) {
+                        return;
+                    }
+
+                    const character = flat[fromIndex];
+                    flat.splice(fromIndex, 1);
+                    const adjustedToIndex = fromIndex < toIndex ? toIndex : toIndex + 1;
+                    flat.splice(adjustedToIndex, 0, character);
+
+                    for (let i = 0; i < newCssData.length; i++) {
+                        for (let j = 0; j < rowLength; j++) {
+                            newCssData[i][j] = flat[i * rowLength + j];
+                        }
+                    }
+
+                    // Clear selection after drop
+                    setSelectedPositions(new Set());
+                }
             } else {
-                newCssData[(from as DndDataSsNumber).y][(from as DndDataSsNumber).x] = "0000";
+                newCssData[(from as DndDataSsNumber).y][(from as DndDataSsNumber).x] =
+                    "0000";
+                setSelectedPositions(new Set());
             }
         } else {
             if (to.type == DndDataType.SS_NUMBER) {
-                newCssData[(to as DndDataSsNumber).y][(to as DndDataSsNumber).x] = from.number;
+                const toData = to as DndDataSsNumber;
+                const flat: string[] = newCssData.flat();
+                const rowLength = newCssData[0].length;
+                const toIndex = toData.y * rowLength + toData.x;
+
+                flat.splice(toIndex + 1, 0, from.number);
+                flat.pop();
+
+                for (let i = 0; i < newCssData.length; i++) {
+                    for (let j = 0; j < rowLength; j++) {
+                        newCssData[i][j] = flat[i * rowLength + j];
+                    }
+                }
             } else {
                 return;
             }
         }
         updateCssData(newCssData);
+    }
+
+    function handleCellClick(
+        x: number,
+        y: number,
+        event: React.MouseEvent,
+    ): void {
+        const posKey = `${x},${y}`;
+
+        if (event.ctrlKey || event.metaKey) {
+            // Ctrl+click: toggle selection
+            setSelectedPositions((prev) => {
+                const newSet = new Set(prev);
+                if (newSet.has(posKey)) {
+                    newSet.delete(posKey);
+                } else {
+                    newSet.add(posKey);
+                }
+                return newSet;
+            });
+            setLastSelectedPosition({ x, y });
+        } else if (event.shiftKey && lastSelectedPosition) {
+            // Shift+click: select range
+            const rowLength = cssData![0].length;
+            const lastIndex =
+                lastSelectedPosition.y * rowLength + lastSelectedPosition.x;
+            const currentIndex = y * rowLength + x;
+            const [start, end] =
+                lastIndex < currentIndex
+                    ? [lastIndex, currentIndex]
+                    : [currentIndex, lastIndex];
+
+            setSelectedPositions((prev) => {
+                const newSet = new Set(prev);
+                for (let i = start; i <= end; i++) {
+                    const row = Math.floor(i / rowLength);
+                    const col = i % rowLength;
+                    newSet.add(`${col},${row}`);
+                }
+                return newSet;
+            });
+        } else {
+            // Regular click: clear selection and select only this
+            setSelectedPositions(new Set([posKey]));
+            setLastSelectedPosition({ x, y });
+        }
     }
 
     return (
@@ -185,6 +338,10 @@ export function TabCharacterSelectionScreen({
                                     characterList={characterList}
                                     updateCssData={updateCssData}
                                     characterDragAndDrop={characterDragAndDrop}
+                                    selectedPositions={selectedPositions}
+                                    handleCellClick={handleCellClick}
+                                    dragOverPosition={dragOverPosition}
+                                    setDragOverPosition={setDragOverPosition}
                                 />
                             </tbody>
                         </table>
@@ -637,7 +794,7 @@ function CssPageDisplay({
                 iconSize={"18px"}
                 tooltip={message("tooltip.ss.deletePage")}
                 onClick={async () => {
-                    if (!await api.confirmDestructiveAction()) return;
+                    if (!(await api.confirmDestructiveAction())) return;
                     let operationId: number;
                     setOperations((prev: Operation[]) => {
                         const newOperations: Operation[] = [...prev];
@@ -670,13 +827,23 @@ function CssTableContents({
     setCssData,
     characterList,
     updateCssData,
-    characterDragAndDrop
+    characterDragAndDrop,
+    selectedPositions,
+    handleCellClick,
+    dragOverPosition,
+    setDragOverPosition,
 }: {
-    cssData: CssData | null,
-    setCssData: Dispatch<SetStateAction<CssData | null>>,
-    characterList: CharacterList | null,
-    updateCssData: (data: CssData) => Promise<void>,
-    characterDragAndDrop: (from: DndData, to: DndData) => void
+    cssData: CssData | null;
+    setCssData: Dispatch<SetStateAction<CssData | null>>;
+    characterList: CharacterList | null;
+    updateCssData: (data: CssData) => Promise<void>;
+    characterDragAndDrop: (from: DndData, to: DndData) => void;
+    selectedPositions: Set<string>;
+    handleCellClick: (x: number, y: number, event: React.MouseEvent) => void;
+    dragOverPosition: { x: number; y: number } | null;
+    setDragOverPosition: Dispatch<
+        SetStateAction<{ x: number; y: number } | null>
+    >;
 }): JSX.Element | null {
     return (cssData == null || characterList == null) ? null : (
         <>
@@ -721,6 +888,12 @@ function CssTableContents({
                             x={xIndex}
                             y={yIndex}
                             characterDragAndDrop={characterDragAndDrop}
+                            isSelected={selectedPositions.has(`${xIndex},${yIndex}`)}
+                            handleCellClick={handleCellClick}
+                            isDragOver={
+                                dragOverPosition?.x === xIndex && dragOverPosition?.y === yIndex
+                            }
+                            setDragOverPosition={setDragOverPosition}
                             key={xIndex}
                         />
                     )}
@@ -750,13 +923,25 @@ function CssTableContents({
 function CssCharacterDisplay({
     cell,
     characterList,
-    x, y,
-    characterDragAndDrop
+    x,
+    y,
+    characterDragAndDrop,
+    isSelected,
+    handleCellClick,
+    isDragOver,
+    setDragOverPosition,
 }: {
-    cell: string,
-    characterList: CharacterList,
-    x: number, y: number,
-    characterDragAndDrop: (from: DndData, to: DndData) => void
+    cell: string;
+    characterList: CharacterList;
+    x: number;
+    y: number;
+    characterDragAndDrop: (from: DndData, to: DndData) => void;
+    isSelected: boolean;
+    handleCellClick: (x: number, y: number, event: React.MouseEvent) => void;
+    isDragOver: boolean;
+    setDragOverPosition: Dispatch<
+        SetStateAction<{ x: number; y: number } | null>
+    >;
 }): JSX.Element {
     const dndData: DndData = {
         type: DndDataType.SS_NUMBER,
@@ -771,6 +956,10 @@ function CssCharacterDisplay({
                 className={styles.cssCharacterDisplay}
                 onDragOver={(event: any) => {
                     event.preventDefault();
+                    setDragOverPosition({ x, y });
+                }}
+                onDragLeave={() => {
+                    setDragOverPosition(null);
                 }}
                 onDrop={(event: any) => {
                     characterDragAndDrop(
@@ -778,12 +967,62 @@ function CssCharacterDisplay({
                         dndData
                     );
                 }}
+                style={{
+                    position: "relative",
+                }}
             >
+                {isDragOver && (
+                    <div
+                        style={{
+                            position: "absolute",
+                            right: 0,
+                            top: 0,
+                            bottom: 0,
+                            width: "4px",
+                            backgroundColor: "var(--inf-blue1)",
+                            zIndex: 10,
+                        }}
+                    />
+                )}
             </td>
         );
     }
+
     return (
-        <td className={styles.cssCharacterDisplay}>
+        <td
+            className={styles.cssCharacterDisplay}
+            onClick={(event: React.MouseEvent) => handleCellClick(x, y, event)}
+            style={{
+                position: "relative",
+            }}
+        >
+            {isSelected && (
+                <div
+                    style={{
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        backgroundColor: "rgba(100, 150, 255, 0.3)",
+                        pointerEvents: "none",
+                        zIndex: 1,
+                    }}
+                />
+            )}
+            {isDragOver && (
+                <div
+                    style={{
+                        position: "absolute",
+                        right: 0,
+                        top: 0,
+                        bottom: 0,
+                        width: "4px",
+                        backgroundColor: "var(--inf-blue1)",
+                        zIndex: 10,
+                    }}
+                />
+            )}
             <div className={styles.tooltipWrapper}>
                 <div
                     draggable={true}
@@ -792,6 +1031,10 @@ function CssCharacterDisplay({
                     }}
                     onDragOver={(event: any) => {
                         event.preventDefault();
+                        setDragOverPosition({ x, y });
+                    }}
+                    onDragLeave={() => {
+                        setDragOverPosition(null);
                     }}
                     onDrop={(event: any) => {
                         characterDragAndDrop(
