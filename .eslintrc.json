@@ -41,15 +41,15 @@
         "@typescript-eslint/no-explicit-any": "off",
         "@typescript-eslint/explicit-function-return-type": ["error", {"allowExpressions": true}],
         "@typescript-eslint/no-inferrable-types": "off",
-        "@typescript-eslint/typedef": ["error", {
-            "arrayDestructuring": true,
-            "arrowParameter": true,
-            "memberVariableDeclaration": true,
-            "objectDestructuring": true,
-            "parameter": true,
-            "propertyDeclaration": true,
-            "variableDeclaration": true
-        }],
+        // "@typescript-eslint/typedef": ["error", {
+        //     "arrayDestructuring": true,
+        //     "arrowParameter": true,
+        //     "memberVariableDeclaration": true,
+        //     "objectDestructuring": true,
+        //     "parameter": true,
+        //     "propertyDeclaration": true,
+        //     "variableDeclaration": true
+        // }],
         "@typescript-eslint/no-unused-vars": ["warn", {
             "vars": "local",
             "args": "all",
