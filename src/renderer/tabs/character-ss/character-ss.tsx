@@ -169,10 +169,7 @@ export function TabCharacterSelectionScreen({
 
                 // Check if we're dragging multiple selected items
                 const fromKey = `${fromData.x},${fromData.y}`;
-                const isMultiSelect =
-                    selectedPositions.has(fromKey) && selectedPositions.size > 1;
-
-                if (isMultiSelect) {
+                if (selectedPositions.has(fromKey) && selectedPositions.size > 1) {
                     // Multi-select drag: collect all selected characters
                     const flat: string[] = newCssData.flat();
                     const rowLength = newCssData[0].length;
@@ -181,7 +178,7 @@ export function TabCharacterSelectionScreen({
                     const selectedItems: Array<{ index: number; character: string }> = [];
                     selectedPositions.forEach((posKey) => {
                         const [x, y] = posKey.split(",").map(Number);
-                        const index = y * rowLength + x;
+                        const index = (y * rowLength) + x;
                         selectedItems.push({ index, character: flat[index] });
                     });
 
@@ -197,7 +194,7 @@ export function TabCharacterSelectionScreen({
                     }
 
                     // Calculate adjusted target index
-                    const toIndex = toData.y * rowLength + toData.x;
+                    const toIndex = (toData.y * rowLength) + toData.x;
                     const removedBefore = selectedItems.filter(
                         (item) => item.index < toIndex,
                     ).length;
@@ -209,7 +206,7 @@ export function TabCharacterSelectionScreen({
                     // Reshape back to 2D array
                     for (let i = 0; i < newCssData.length; i++) {
                         for (let j = 0; j < rowLength; j++) {
-                            newCssData[i][j] = flat[i * rowLength + j];
+                            newCssData[i][j] = flat[(i * rowLength) + j];
                         }
                     }
 
@@ -219,8 +216,8 @@ export function TabCharacterSelectionScreen({
                     // Single item drag (original behavior)
                     const flat: string[] = newCssData.flat();
                     const rowLength = newCssData[0].length;
-                    const fromIndex = fromData.y * rowLength + fromData.x;
-                    const toIndex = toData.y * rowLength + toData.x;
+                    const fromIndex = (fromData.y * rowLength) + fromData.x;
+                    const toIndex = (toData.y * rowLength) + toData.x;
 
                     if (fromIndex === toIndex) {
                         return;
@@ -233,7 +230,7 @@ export function TabCharacterSelectionScreen({
 
                     for (let i = 0; i < newCssData.length; i++) {
                         for (let j = 0; j < rowLength; j++) {
-                            newCssData[i][j] = flat[i * rowLength + j];
+                            newCssData[i][j] = flat[(i * rowLength) + j];
                         }
                     }
 
@@ -241,8 +238,7 @@ export function TabCharacterSelectionScreen({
                     setSelectedPositions(new Set());
                 }
             } else {
-                newCssData[(from as DndDataSsNumber).y][(from as DndDataSsNumber).x] =
-                    "0000";
+                newCssData[(from as DndDataSsNumber).y][(from as DndDataSsNumber).x] = "0000";
                 setSelectedPositions(new Set());
             }
         } else {
@@ -250,14 +246,14 @@ export function TabCharacterSelectionScreen({
                 const toData = to as DndDataSsNumber;
                 const flat: string[] = newCssData.flat();
                 const rowLength = newCssData[0].length;
-                const toIndex = toData.y * rowLength + toData.x;
+                const toIndex = (toData.y * rowLength) + toData.x;
 
                 flat.splice(toIndex + 1, 0, from.number);
                 flat.pop();
 
                 for (let i = 0; i < newCssData.length; i++) {
                     for (let j = 0; j < rowLength; j++) {
-                        newCssData[i][j] = flat[i * rowLength + j];
+                        newCssData[i][j] = flat[(i * rowLength) + j];
                     }
                 }
             } else {
@@ -289,13 +285,9 @@ export function TabCharacterSelectionScreen({
         } else if (event.shiftKey && lastSelectedPosition) {
             // Shift+click: select range
             const rowLength = cssData![0].length;
-            const lastIndex =
-                lastSelectedPosition.y * rowLength + lastSelectedPosition.x;
-            const currentIndex = y * rowLength + x;
-            const [start, end] =
-                lastIndex < currentIndex
-                    ? [lastIndex, currentIndex]
-                    : [currentIndex, lastIndex];
+            const lastIndex = (lastSelectedPosition.y * rowLength) + lastSelectedPosition.x;
+            const currentIndex = (y * rowLength) + x;
+            const [start, end] = [currentIndex, lastIndex].sort();
 
             setSelectedPositions((prev) => {
                 const newSet = new Set(prev);
