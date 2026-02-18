@@ -88,6 +88,11 @@ export function TabCharacterSelectionScreen({
     Dispatch<SetStateAction<boolean>>,
   ] = useState(false);
 
+  const [selectedExcluded, setSelectedExcluded]: [
+    Set<string>,
+    Dispatch<SetStateAction<Set<string>>>,
+  ] = useState(new Set());
+
   api.on("updateCharacterPages", getInfo);
   api.on("updateStagePages", () => null);
 
@@ -297,8 +302,33 @@ export function TabCharacterSelectionScreen({
       }
     } else {
       if (to.type == DndDataType.SS_NUMBER) {
-        newCssData[(to as DndDataSsNumber).y][(to as DndDataSsNumber).x] =
-          from.number;
+        const isMultiSelectPool =
+          selectedExcluded.has(from.number) && selectedExcluded.size > 1;
+
+        if (isMultiSelectPool) {
+          const toData = to as DndDataSsNumber;
+          const flat: string[] = newCssData.flat();
+          const rowLength = newCssData[0].length;
+          let toIndex = toData.y * rowLength + toData.x;
+          const selectedNumbers = [...selectedExcluded];
+
+          for (const num of selectedNumbers) {
+            if (toIndex < flat.length) {
+              flat[toIndex] = num;
+              toIndex++;
+            }
+          }
+
+          for (let i = 0; i < newCssData.length; i++) {
+            for (let j = 0; j < rowLength; j++) {
+              newCssData[i][j] = flat[i * rowLength + j];
+            }
+          }
+        } else {
+          newCssData[(to as DndDataSsNumber).y][(to as DndDataSsNumber).x] =
+            from.number;
+        }
+        setSelectedExcluded(new Set());
       } else {
         return;
       }
@@ -394,6 +424,8 @@ export function TabCharacterSelectionScreen({
         excluded={excluded}
         characterDragAndDrop={characterDragAndDrop}
         setIsDraggingFromPool={setIsDraggingFromPool}
+        selectedExcluded={selectedExcluded}
+        setSelectedExcluded={setSelectedExcluded}
       />
     </section>
   );
@@ -404,11 +436,15 @@ function ExcludedCharacters({
   excluded,
   characterDragAndDrop,
   setIsDraggingFromPool,
+  selectedExcluded,
+  setSelectedExcluded,
 }: {
   characters: Character[];
   excluded: Character[];
   characterDragAndDrop: (from: DndData, to: DndData) => void;
   setIsDraggingFromPool: Dispatch<SetStateAction<boolean>>;
+  selectedExcluded: Set<string>;
+  setSelectedExcluded: Dispatch<SetStateAction<Set<string>>>;
 }): JSX.Element {
   const [searchValue, setSearchValue]: [
     string,
@@ -525,6 +561,8 @@ function ExcludedCharacters({
                       character={character}
                       characterDragAndDrop={characterDragAndDrop}
                       setIsDraggingFromPool={setIsDraggingFromPool}
+                      isSelected={selectedExcluded.has(("0000" + character.number).slice(-4))}
+                      setSelectedExcluded={setSelectedExcluded}
                       key={character.name}
                     />
                   );
@@ -551,6 +589,8 @@ function ExcludedCharacters({
                       character={character}
                       characterDragAndDrop={characterDragAndDrop}
                       setIsDraggingFromPool={setIsDraggingFromPool}
+                      isSelected={selectedExcluded.has(("0000" + character.number).slice(-4))}
+                      setSelectedExcluded={setSelectedExcluded}
                       key={character.name}
                     />
                   ),
@@ -566,10 +606,14 @@ function CharacterDisplay({
   character,
   characterDragAndDrop,
   setIsDraggingFromPool,
+  isSelected,
+  setSelectedExcluded,
 }: {
   character: Character;
   characterDragAndDrop: (from: DndData, to: DndData) => void;
   setIsDraggingFromPool: Dispatch<SetStateAction<boolean>>;
+  isSelected: boolean;
+  setSelectedExcluded: Dispatch<SetStateAction<Set<string>>>;
 }): JSX.Element {
   const dndData: DndData = {
     type: DndDataType.EXCLUDED,
@@ -578,10 +622,40 @@ function CharacterDisplay({
   return (
     <div
       className={styles.excludedDisplayWrapper + " " + styles.tooltipWrapper}
+      style={{ position: "relative" }}
     >
+      {isSelected && (
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(100, 150, 255, 0.3)",
+            pointerEvents: "none",
+            zIndex: 1,
+          }}
+        />
+      )}
       <div
         className={styles.excludedDisplayMug}
         draggable={true}
+        onClick={(event: React.MouseEvent) => {
+          if (event.ctrlKey || event.metaKey) {
+            setSelectedExcluded((prev) => {
+              const newSet = new Set(prev);
+              if (newSet.has(dndData.number)) {
+                newSet.delete(dndData.number);
+              } else {
+                newSet.add(dndData.number);
+              }
+              return newSet;
+            });
+          } else {
+            setSelectedExcluded(new Set([dndData.number]));
+          }
+        }}
         onDragStart={(event: any) => {
           event.dataTransfer.setData("data", JSON.stringify(dndData));
           setIsDraggingFromPool(true);
