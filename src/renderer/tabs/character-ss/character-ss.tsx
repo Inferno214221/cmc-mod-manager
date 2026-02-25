@@ -66,6 +66,11 @@ export function TabCharacterSelectionScreen({
         Dispatch<SetStateAction<{ x: number; y: number } | null>>,
     ] = useState(null);
 
+    const [isDraggingFromPool, setIsDraggingFromPool]: [
+        boolean,
+        Dispatch<SetStateAction<boolean>>,
+    ] = useState(false);
+
     api.on("updateCharacterPages", getInfo);
     api.on("updateStagePages", () => null);
 
@@ -158,6 +163,7 @@ export function TabCharacterSelectionScreen({
         console.log(from, to);
         // Clear drag over indicator
         setDragOverPosition(null);
+        setIsDraggingFromPool(false);
 
         // Can't be called unless cssData has a value
         const newCssData: CssData = cssData!.map((row) => [...row]); // Deep copy
@@ -243,19 +249,8 @@ export function TabCharacterSelectionScreen({
             }
         } else {
             if (to.type == DndDataType.SS_NUMBER) {
-                const toData = to as DndDataSsNumber;
-                const flat: string[] = newCssData.flat();
-                const rowLength = newCssData[0].length;
-                const toIndex = (toData.y * rowLength) + toData.x;
-
-                flat.splice(toIndex, 0, from.number);
-                flat.pop();
-
-                for (let i = 0; i < newCssData.length; i++) {
-                    for (let j = 0; j < rowLength; j++) {
-                        newCssData[i][j] = flat[(i * rowLength) + j];
-                    }
-                }
+                newCssData[(to as DndDataSsNumber).y][(to as DndDataSsNumber).x] =
+                    from.number;
             } else {
                 return;
             }
@@ -334,6 +329,7 @@ export function TabCharacterSelectionScreen({
                                     handleCellClick={handleCellClick}
                                     dragOverPosition={dragOverPosition}
                                     setDragOverPosition={setDragOverPosition}
+                                    isDraggingFromPool={isDraggingFromPool}
                                 />
                             </tbody>
                         </table>
@@ -345,6 +341,7 @@ export function TabCharacterSelectionScreen({
                 characters={characters}
                 excluded={excluded}
                 characterDragAndDrop={characterDragAndDrop}
+                setIsDraggingFromPool={setIsDraggingFromPool}
             />
         </section>
     );
@@ -353,11 +350,13 @@ export function TabCharacterSelectionScreen({
 function ExcludedCharacters({
     characters,
     excluded,
-    characterDragAndDrop
+    characterDragAndDrop,
+    setIsDraggingFromPool
 }: {
     characters: Character[],
     excluded: Character[],
-    characterDragAndDrop: (from: DndData, to: DndData) => void
+    characterDragAndDrop: (from: DndData, to: DndData) => void,
+    setIsDraggingFromPool: Dispatch<SetStateAction<boolean>>
 }): JSX.Element {
     const [searchValue, setSearchValue]:
     [string, Dispatch<SetStateAction<string>>]
@@ -466,6 +465,7 @@ function ExcludedCharacters({
                                     <CharacterDisplay
                                         character={character}
                                         characterDragAndDrop={characterDragAndDrop}
+                                        setIsDraggingFromPool={setIsDraggingFromPool}
                                         key={character.name}
                                     />
                                 );
@@ -492,6 +492,7 @@ function ExcludedCharacters({
                                 <CharacterDisplay
                                     character={character}
                                     characterDragAndDrop={characterDragAndDrop}
+                                    setIsDraggingFromPool={setIsDraggingFromPool}
                                     key={character.name}
                                 />
                             )
@@ -505,10 +506,12 @@ function ExcludedCharacters({
 
 function CharacterDisplay({
     character,
-    characterDragAndDrop
+    characterDragAndDrop,
+    setIsDraggingFromPool
 }: {
     character: Character,
-    characterDragAndDrop: (from: DndData, to: DndData) => void
+    characterDragAndDrop: (from: DndData, to: DndData) => void,
+    setIsDraggingFromPool: Dispatch<SetStateAction<boolean>>
 }): JSX.Element {
     const dndData: DndData = {
         type: DndDataType.EXCLUDED,
@@ -521,6 +524,7 @@ function CharacterDisplay({
                 draggable={true}
                 onDragStart={(event: any) => {
                     event.dataTransfer.setData("data", JSON.stringify(dndData));
+                    setIsDraggingFromPool(true);
                 }}
                 onDragOver={(event: any) => {
                     event.preventDefault();
@@ -824,6 +828,7 @@ function CssTableContents({
     handleCellClick,
     dragOverPosition,
     setDragOverPosition,
+    isDraggingFromPool,
 }: {
     cssData: CssData | null;
     setCssData: Dispatch<SetStateAction<CssData | null>>;
@@ -836,6 +841,7 @@ function CssTableContents({
     setDragOverPosition: Dispatch<
         SetStateAction<{ x: number; y: number } | null>
     >;
+    isDraggingFromPool: boolean;
 }): JSX.Element | null {
     return (cssData == null || characterList == null) ? null : (
         <>
@@ -883,6 +889,7 @@ function CssTableContents({
                             isSelected={selectedPositions.has(`${xIndex},${yIndex}`)}
                             handleCellClick={handleCellClick}
                             isDragOver={
+                                !isDraggingFromPool &&
                                 dragOverPosition?.x === xIndex && dragOverPosition?.y === yIndex
                             }
                             setDragOverPosition={setDragOverPosition}
