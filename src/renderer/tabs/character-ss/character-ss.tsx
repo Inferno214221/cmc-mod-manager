@@ -244,7 +244,19 @@ export function TabCharacterSelectionScreen({
                     setSelectedPositions(new Set());
                 }
             } else {
-                newCssData[(from as DndDataSsNumber).y][(from as DndDataSsNumber).x] = "0000";
+                const fromData = from as DndDataSsNumber;
+                const fromKey = `${fromData.x},${fromData.y}`;
+                const isMultiSelect =
+                    selectedPositions.has(fromKey) && selectedPositions.size > 1;
+
+                if (isMultiSelect) {
+                    selectedPositions.forEach((posKey) => {
+                        const [x, y] = posKey.split(",").map(Number);
+                        newCssData[y][x] = "0000";
+                    });
+                } else {
+                    newCssData[fromData.y][fromData.x] = "0000";
+                }
                 setSelectedPositions(new Set());
             }
         } else {
