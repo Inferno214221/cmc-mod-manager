@@ -22,15 +22,24 @@ export async function loadAppData(): Promise<void> {
             config: DEFAULT_CONFIG
         };
     } else {
-        global.appData = await readJSON(DATA_FILE);
-        if (global.appData.config == undefined) {
-            global.appData.config = DEFAULT_CONFIG;
-        } else {
-            Object.keys(DEFAULT_CONFIG).forEach((key: keyof AppConfig) => {
-                if (global.appData.config[key] == undefined) {
-                    global.appData.config[key] = DEFAULT_CONFIG[key];
-                }
-            });
+        try {
+            global.appData = await readJSON(DATA_FILE);
+            if (global.appData.config == undefined) {
+                global.appData.config = DEFAULT_CONFIG;
+            } else {
+                Object.keys(DEFAULT_CONFIG).forEach((key: keyof AppConfig) => {
+                    if (global.appData.config[key] == undefined) {
+                        global.appData.config[key] = DEFAULT_CONFIG[key];
+                    }
+                });
+            }
+        } catch (error: any) {
+            // If data.json is corrupted, reset to defaults
+            console.error(`Failed to load ${DATA_FILE}, resetting to defaults:`, error.message);
+            global.appData = {
+                dir: "",
+                config: DEFAULT_CONFIG
+            };
         }
     }
     return await writeAppData(global.appData);
@@ -41,7 +50,8 @@ export async function readJSON(file: string): Promise<any> {
 }
 
 export async function writeJSON(file: string, data: object): Promise<void> {
-    await fs.writeFile(file, JSON.stringify(data, null, 2), "utf-8");
+    await fs.writeFile(file + ".tmp", JSON.stringify(data, null, 2), "utf-8");
+    await fs.move(file + ".tmp", file, { overwrite: true });
     return;
 }
 
@@ -49,8 +59,11 @@ export function readAppData(): AppData {
     return global.appData;
 }
 
+let writeQueue: Promise<void> = Promise.resolve();
+
 export async function writeAppData(data: AppData): Promise<void> {
     global.appData = data;
-    await writeJSON(DATA_FILE, data);
-    return;
+    // Queue writes to prevent concurrent write corruption
+    writeQueue = writeQueue.then(() => writeJSON(DATA_FILE, data));
+    return writeQueue;
 }

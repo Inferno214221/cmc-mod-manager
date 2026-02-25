@@ -563,7 +563,6 @@ export async function selectGameDir(): Promise<string | null> {
         fs.chmod(file, 0o777);
     });
     global.gameDir = dir.filePaths[0];
-    global.appData = await basic.readJSON(basic.DATA_FILE);
     global.appData.dir = global.gameDir;
     // I feel that not awaiting this could be bad, its already cause one problem.
     await basic.writeAppData(global.appData);
