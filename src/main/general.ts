@@ -559,9 +559,6 @@ export async function selectGameDir(): Promise<string | null> {
         return null;
     }
 
-    (await getAllFiles(dir.filePaths[0])).forEach((file: string) => {
-        fs.chmod(file, 0o777);
-    });
     global.gameDir = dir.filePaths[0];
     global.appData.dir = global.gameDir;
     // I feel that not awaiting this could be bad, its already cause one problem.
