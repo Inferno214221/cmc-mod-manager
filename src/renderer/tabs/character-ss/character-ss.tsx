@@ -198,7 +198,7 @@ export function TabCharacterSelectionScreen({
                     const removedBefore = selectedItems.filter(
                         (item) => item.index < toIndex,
                     ).length;
-                    const adjustedToIndex = toIndex - removedBefore + 1;
+                    const adjustedToIndex = toIndex - removedBefore;
 
                     // Insert all characters at target
                     flat.splice(adjustedToIndex, 0, ...characters);
@@ -225,7 +225,7 @@ export function TabCharacterSelectionScreen({
 
                     const character = flat[fromIndex];
                     flat.splice(fromIndex, 1);
-                    const adjustedToIndex = fromIndex < toIndex ? toIndex : toIndex + 1;
+                    const adjustedToIndex = fromIndex < toIndex ? toIndex - 1 : toIndex;
                     flat.splice(adjustedToIndex, 0, character);
 
                     for (let i = 0; i < newCssData.length; i++) {
@@ -248,7 +248,7 @@ export function TabCharacterSelectionScreen({
                 const rowLength = newCssData[0].length;
                 const toIndex = (toData.y * rowLength) + toData.x;
 
-                flat.splice(toIndex + 1, 0, from.number);
+                flat.splice(toIndex, 0, from.number);
                 flat.pop();
 
                 for (let i = 0; i < newCssData.length; i++) {
@@ -967,7 +967,7 @@ function CssCharacterDisplay({
                     <div
                         style={{
                             position: "absolute",
-                            right: 0,
+                            left: 0,
                             top: 0,
                             bottom: 0,
                             width: "4px",
@@ -1006,7 +1006,7 @@ function CssCharacterDisplay({
                 <div
                     style={{
                         position: "absolute",
-                        right: 0,
+                        left: 0,
                         top: 0,
                         bottom: 0,
                         width: "4px",
