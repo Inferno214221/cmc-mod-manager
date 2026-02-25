@@ -38,6 +38,11 @@ export async function getAllFiles(dirPath: string, arrayOfFiles: string[] = []):
     const contents: string[] = await fs.readdir(dirPath);
 
     for (const file of contents) {
+        // Yield to event loop every 100 files to prevent blocking
+        if (arrayOfFiles.length % 100 === 0) {
+            await new Promise((resolve: (value: void) => void) => setImmediate(resolve));
+        }
+
         if ((await fs.stat(dirPath + "/" + file)).isDirectory()) {
             arrayOfFiles = await getAllFiles(dirPath + "/" + file, arrayOfFiles);
         } else {
@@ -642,10 +647,15 @@ export async function matchFs(
         try {
             const contents: string[] = await fs.readdir(dir.full);
             const retVal: string[] = [];
-            for (const subDir of contents) {
+            for (let i: number = 0; i < contents.length; i++) {
+                // Yield to event loop every 20 directories to prevent blocking
+                if (i % 20 === 0) {
+                    await new Promise((resolve: (value: void) => void) => setImmediate(resolve));
+                }
+
                 retVal.push(...(await matchFs(
                     node.contents!,
-                    { name: subDir, full: path.join(dir.full, subDir) }
+                    { name: contents[i], full: path.join(dir.full, contents[i]) }
                 )));
             }
             return retVal;

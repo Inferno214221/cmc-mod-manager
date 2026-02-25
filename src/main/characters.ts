@@ -34,8 +34,13 @@ export async function readCharacterList(dir: string = global.gameDir): Promise<C
         "ascii"
     )).trim().split(/\r?\n/);
     charactersTxt.shift(); // Drop the number
-    for (const index in charactersTxt) {
-        const character: string = charactersTxt[index];
+    for (let i: number = 0; i < charactersTxt.length; i++) {
+        // Yield to event loop every 10 characters to prevent blocking
+        if (i % 10 === 0) {
+            await new Promise((resolve: (value: void) => void) => setImmediate(resolve));
+        }
+
+        const character: string = charactersTxt[i];
         if (await fs.exists(path.join(dir, "data", "dats", character + ".dat"))) {
             const characterDat: CharacterDat | null = await readCharacterDat(character, dir);
             characterList.add({
@@ -43,7 +48,7 @@ export async function readCharacterList(dir: string = global.gameDir): Promise<C
                 menuName: characterDat?.menuName ?? character,
                 series: characterDat?.series ?? "",
                 randomSelection: true, // Assume true and then iterate through false list
-                number: parseInt(index) + 1,
+                number: i + 1,
                 alts: alts.filter((alt: Alt) => alt.base == character),
                 mug: path.join(dir, "gfx", "mugs", character + ".png")
             });
@@ -288,7 +293,13 @@ export async function ensureAllAltsAreCharacters(
     dir: string = global.gameDir
 ): Promise<void> {
     const alts: Alt[] = await readAlts(dir);
-    for (const alt of alts) {
+    for (let i: number = 0; i < alts.length; i++) {
+        // Yield to event loop every 5 alts to prevent blocking
+        if (i % 5 === 0) {
+            await new Promise((resolve: (value: void) => void) => setImmediate(resolve));
+        }
+
+        const alt: Alt = alts[i];
         console.log(alt);
         if (areCharacters) {
             await ensureAltIsCharacter(alt, dir);
