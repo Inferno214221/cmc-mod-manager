@@ -31,6 +31,12 @@ const sortTypes: SortTypeOptions[] = [
   SortTypeOptions.MENU_NAME,
 ];
 
+enum DndMode {
+  AUTO = "auto",
+  INSERT = "insert",
+  SWAP = "swap",
+}
+
 export function TabCharacterSelectionScreen({
   setOperations,
   handle,
@@ -87,6 +93,11 @@ export function TabCharacterSelectionScreen({
     boolean,
     Dispatch<SetStateAction<boolean>>,
   ] = useState(false);
+
+  const [dndMode, setDndMode]: [
+    DndMode,
+    Dispatch<SetStateAction<DndMode>>,
+  ] = useState(DndMode.AUTO);
 
   const [selectedExcluded, setSelectedExcluded]: [
     Set<string>,
@@ -206,6 +217,10 @@ export function TabCharacterSelectionScreen({
     // Can't be called unless cssData has a value
     const newCssData: CssData = cssData!.map((row) => [...row]); // Deep copy
 
+    const useInsert =
+      dndMode == DndMode.INSERT ||
+      (dndMode == DndMode.AUTO && from.type == DndDataType.SS_NUMBER);
+
     if (from.type == DndDataType.SS_NUMBER) {
       if (to.type == DndDataType.SS_NUMBER) {
         const fromData = from as DndDataSsNumber;
@@ -216,74 +231,100 @@ export function TabCharacterSelectionScreen({
         const isMultiSelect =
           selectedPositions.has(fromKey) && selectedPositions.size > 1;
 
-        if (isMultiSelect) {
-          // Multi-select drag: collect all selected characters
-          const flat: string[] = newCssData.flat();
-          const rowLength = newCssData[0].length;
+        if (useInsert) {
+          if (isMultiSelect) {
+            // Multi-select insert
+            const flat: string[] = newCssData.flat();
+            const rowLength = newCssData[0].length;
 
-          // Get all selected positions and their characters
-          const selectedItems: Array<{ index: number; character: string }> = [];
-          selectedPositions.forEach((posKey) => {
-            const [x, y] = posKey.split(",").map(Number);
-            const index = y * rowLength + x;
-            selectedItems.push({ index, character: flat[index] });
-          });
+            const selectedItems: Array<{ index: number; character: string }> = [];
+            selectedPositions.forEach((posKey) => {
+              const [x, y] = posKey.split(",").map(Number);
+              const index = y * rowLength + x;
+              selectedItems.push({ index, character: flat[index] });
+            });
 
-          // Sort by index (ascending) to maintain order
-          selectedItems.sort((a, b) => a.index - b.index);
+            selectedItems.sort((a, b) => a.index - b.index);
+            const characters = selectedItems.map((item) => item.character);
 
-          // Extract characters in correct order
-          const characters = selectedItems.map((item) => item.character);
+            for (let i = selectedItems.length - 1; i >= 0; i--) {
+              flat.splice(selectedItems[i].index, 1);
+            }
 
-          // Remove from back to front to maintain indices
-          for (let i = selectedItems.length - 1; i >= 0; i--) {
-            flat.splice(selectedItems[i].index, 1);
-          }
+            const toIndex = toData.y * rowLength + toData.x;
+            const removedBefore = selectedItems.filter(
+              (item) => item.index < toIndex,
+            ).length;
+            const adjustedToIndex = toIndex - removedBefore;
 
-          // Calculate adjusted target index
-          const toIndex = toData.y * rowLength + toData.x;
-          const removedBefore = selectedItems.filter(
-            (item) => item.index < toIndex,
-          ).length;
-          const adjustedToIndex = toIndex - removedBefore;
+            flat.splice(adjustedToIndex, 0, ...characters);
 
-          // Insert all characters at target
-          flat.splice(adjustedToIndex, 0, ...characters);
+            for (let i = 0; i < newCssData.length; i++) {
+              for (let j = 0; j < rowLength; j++) {
+                newCssData[i][j] = flat[i * rowLength + j];
+              }
+            }
+          } else {
+            // Single item insert
+            const flat: string[] = newCssData.flat();
+            const rowLength = newCssData[0].length;
+            const fromIndex = fromData.y * rowLength + fromData.x;
+            const toIndex = toData.y * rowLength + toData.x;
 
-          // Reshape back to 2D array
-          for (let i = 0; i < newCssData.length; i++) {
-            for (let j = 0; j < rowLength; j++) {
-              newCssData[i][j] = flat[i * rowLength + j];
+            if (fromIndex === toIndex) {
+              return;
+            }
+
+            const character = flat[fromIndex];
+            flat.splice(fromIndex, 1);
+            const adjustedToIndex = fromIndex < toIndex ? toIndex - 1 : toIndex;
+            flat.splice(adjustedToIndex, 0, character);
+
+            for (let i = 0; i < newCssData.length; i++) {
+              for (let j = 0; j < rowLength; j++) {
+                newCssData[i][j] = flat[i * rowLength + j];
+              }
             }
           }
-
-          // Clear selection after drop
-          setSelectedPositions(new Set());
         } else {
-          // Single item drag (original behavior)
-          const flat: string[] = newCssData.flat();
-          const rowLength = newCssData[0].length;
-          const fromIndex = fromData.y * rowLength + fromData.x;
-          const toIndex = toData.y * rowLength + toData.x;
+          // Swap mode for roster→roster
+          if (isMultiSelect) {
+            const flat: string[] = newCssData.flat();
+            const rowLength = newCssData[0].length;
 
-          if (fromIndex === toIndex) {
-            return;
-          }
+            const selectedItems: Array<{ index: number; character: string }> = [];
+            selectedPositions.forEach((posKey) => {
+              const [x, y] = posKey.split(",").map(Number);
+              const index = y * rowLength + x;
+              selectedItems.push({ index, character: flat[index] });
+            });
 
-          const character = flat[fromIndex];
-          flat.splice(fromIndex, 1);
-          const adjustedToIndex = fromIndex < toIndex ? toIndex - 1 : toIndex;
-          flat.splice(adjustedToIndex, 0, character);
+            selectedItems.sort((a, b) => a.index - b.index);
 
-          for (let i = 0; i < newCssData.length; i++) {
-            for (let j = 0; j < rowLength; j++) {
-              newCssData[i][j] = flat[i * rowLength + j];
+            const toIndex = toData.y * rowLength + toData.x;
+
+            for (let i = 0; i < selectedItems.length; i++) {
+              const targetIndex = toIndex + i;
+              if (targetIndex < flat.length) {
+                const fromIdx = selectedItems[i].index;
+                const temp = flat[fromIdx];
+                flat[fromIdx] = flat[targetIndex];
+                flat[targetIndex] = temp;
+              }
             }
-          }
 
-          // Clear selection after drop
-          setSelectedPositions(new Set());
+            for (let i = 0; i < newCssData.length; i++) {
+              for (let j = 0; j < rowLength; j++) {
+                newCssData[i][j] = flat[i * rowLength + j];
+              }
+            }
+          } else {
+            newCssData[fromData.y][fromData.x] = to.number;
+            newCssData[toData.y][toData.x] = from.number;
+          }
         }
+
+        setSelectedPositions(new Set());
       } else {
         const fromData = from as DndDataSsNumber;
         const fromKey = `${fromData.x},${fromData.y}`;
@@ -305,28 +346,63 @@ export function TabCharacterSelectionScreen({
         const isMultiSelectPool =
           selectedExcluded.has(from.number) && selectedExcluded.size > 1;
 
-        if (isMultiSelectPool) {
-          const toData = to as DndDataSsNumber;
-          const flat: string[] = newCssData.flat();
-          const rowLength = newCssData[0].length;
-          let toIndex = toData.y * rowLength + toData.x;
-          const selectedNumbers = [...selectedExcluded];
+        if (useInsert) {
+          // Insert mode for pool→roster
+          if (isMultiSelectPool) {
+            const toData = to as DndDataSsNumber;
+            const flat: string[] = newCssData.flat();
+            const rowLength = newCssData[0].length;
+            const toIndex = toData.y * rowLength + toData.x;
+            const selectedNumbers = [...selectedExcluded];
 
-          for (const num of selectedNumbers) {
-            if (toIndex < flat.length) {
-              flat[toIndex] = num;
-              toIndex++;
+            flat.splice(toIndex, 0, ...selectedNumbers);
+            flat.splice(flat.length - selectedNumbers.length);
+
+            for (let i = 0; i < newCssData.length; i++) {
+              for (let j = 0; j < rowLength; j++) {
+                newCssData[i][j] = flat[i * rowLength + j];
+              }
             }
-          }
+          } else {
+            const flat: string[] = newCssData.flat();
+            const rowLength = newCssData[0].length;
+            const toIndex =
+              (to as DndDataSsNumber).y * rowLength + (to as DndDataSsNumber).x;
 
-          for (let i = 0; i < newCssData.length; i++) {
-            for (let j = 0; j < rowLength; j++) {
-              newCssData[i][j] = flat[i * rowLength + j];
+            flat.splice(toIndex, 0, from.number);
+            flat.pop();
+
+            for (let i = 0; i < newCssData.length; i++) {
+              for (let j = 0; j < rowLength; j++) {
+                newCssData[i][j] = flat[i * rowLength + j];
+              }
             }
           }
         } else {
-          newCssData[(to as DndDataSsNumber).y][(to as DndDataSsNumber).x] =
-            from.number;
+          // Swap mode for pool→roster
+          if (isMultiSelectPool) {
+            const toData = to as DndDataSsNumber;
+            const flat: string[] = newCssData.flat();
+            const rowLength = newCssData[0].length;
+            let toIndex = toData.y * rowLength + toData.x;
+            const selectedNumbers = [...selectedExcluded];
+
+            for (const num of selectedNumbers) {
+              if (toIndex < flat.length) {
+                flat[toIndex] = num;
+                toIndex++;
+              }
+            }
+
+            for (let i = 0; i < newCssData.length; i++) {
+              for (let j = 0; j < rowLength; j++) {
+                newCssData[i][j] = flat[i * rowLength + j];
+              }
+            }
+          } else {
+            newCssData[(to as DndDataSsNumber).y][(to as DndDataSsNumber).x] =
+              from.number;
+          }
         }
         setSelectedExcluded(new Set());
       } else {
@@ -412,9 +488,31 @@ export function TabCharacterSelectionScreen({
                   dragOverPosition={dragOverPosition}
                   setDragOverPosition={setDragOverPosition}
                   isDraggingFromPool={isDraggingFromPool}
+                  dndMode={dndMode}
                 />
               </tbody>
             </table>
+          </div>
+        </div>
+      </div>
+      <div id={styles.cssDivControls}>
+        <div className={styles.center}>
+          <div className={styles.inlineSortOptions}>
+            <label>{"Drag Mode "}</label>
+            <select
+              value={dndMode}
+              onInput={(event: any) => setDndMode(event.target.value)}
+            >
+              <option value={DndMode.AUTO}>
+                {"Auto"}
+              </option>
+              <option value={DndMode.INSERT}>
+                {"Insert"}
+              </option>
+              <option value={DndMode.SWAP}>
+                {"Swap"}
+              </option>
+            </select>
           </div>
         </div>
       </div>
@@ -997,6 +1095,7 @@ function CssTableContents({
   dragOverPosition,
   setDragOverPosition,
   isDraggingFromPool,
+  dndMode,
 }: {
   cssData: CssData | null;
   setCssData: Dispatch<SetStateAction<CssData | null>>;
@@ -1010,7 +1109,14 @@ function CssTableContents({
     SetStateAction<{ x: number; y: number } | null>
   >;
   isDraggingFromPool: boolean;
+  dndMode: DndMode;
 }): JSX.Element | null {
+  const showInsertIndicator =
+    dndMode == DndMode.INSERT ||
+    (dndMode == DndMode.AUTO && !isDraggingFromPool);
+  const showSwapIndicator =
+    dndMode == DndMode.SWAP ||
+    (dndMode == DndMode.AUTO && isDraggingFromPool);
   return cssData == null || characterList == null ? null : (
     <>
       <tr>
@@ -1059,7 +1165,11 @@ function CssTableContents({
               isSelected={selectedPositions.has(`${xIndex},${yIndex}`)}
               handleCellClick={handleCellClick}
               isDragOver={
-                !isDraggingFromPool &&
+                showInsertIndicator &&
+                dragOverPosition?.x === xIndex && dragOverPosition?.y === yIndex
+              }
+              isSwapDragOver={
+                showSwapIndicator &&
                 dragOverPosition?.x === xIndex && dragOverPosition?.y === yIndex
               }
               setDragOverPosition={setDragOverPosition}
@@ -1100,6 +1210,7 @@ function CssCharacterDisplay({
   isSelected,
   handleCellClick,
   isDragOver,
+  isSwapDragOver,
   setDragOverPosition,
 }: {
   cell: string;
@@ -1110,6 +1221,7 @@ function CssCharacterDisplay({
   isSelected: boolean;
   handleCellClick: (x: number, y: number, event: React.MouseEvent) => void;
   isDragOver: boolean;
+  isSwapDragOver: boolean;
   setDragOverPosition: Dispatch<
     SetStateAction<{ x: number; y: number } | null>
   >;
@@ -1157,6 +1269,20 @@ function CssCharacterDisplay({
             }}
           />
         )}
+        {isSwapDragOver && (
+          <div
+            style={{
+              position: "absolute",
+              left: 0,
+              top: 0,
+              right: 0,
+              bottom: 0,
+              border: "3px solid var(--inf-blue1)",
+              pointerEvents: "none",
+              zIndex: 10,
+            }}
+          />
+        )}
       </td>
     );
   }
@@ -1192,6 +1318,20 @@ function CssCharacterDisplay({
             bottom: 0,
             width: "4px",
             backgroundColor: "var(--inf-blue1)",
+            zIndex: 10,
+          }}
+        />
+      )}
+      {isSwapDragOver && (
+        <div
+          style={{
+            position: "absolute",
+            left: 0,
+            top: 0,
+            right: 0,
+            bottom: 0,
+            border: "3px solid var(--inf-blue1)",
+            pointerEvents: "none",
             zIndex: 10,
           }}
         />

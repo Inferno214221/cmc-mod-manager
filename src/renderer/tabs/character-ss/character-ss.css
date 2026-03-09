@@ -27,6 +27,11 @@
   padding: 0px 5px;
 }
 
+#css-div-controls {
+  padding: 5px;
+  flex-shrink: 0;
+}
+
 #css-div {
   flex-grow: 1;
   flex-shrink: 1;
