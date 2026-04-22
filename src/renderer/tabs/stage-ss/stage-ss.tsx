@@ -51,6 +51,10 @@ export function TabStageSelectionScreen({
     [SssData | null, Dispatch<SetStateAction<SssData | null>>]
     = useState(null);
 
+    const [dragOverPosition, setDragOverPosition]:
+    [{ x: number; y: number } | null, Dispatch<SetStateAction<{ x: number; y: number } | null>>]
+    = useState(null);
+
     api.on("updateCharacterPages", () => null);
     api.on("updateStagePages", getInfo);
 
@@ -99,8 +103,10 @@ export function TabStageSelectionScreen({
 
     function stageDragAndDrop(from: DndData, to: DndData): void {
         console.log(from, to);
+        // Clear drag over indicator
+        setDragOverPosition(null);
         // Can't be called unless sssData has a value
-        const newSssData: SssData = [...sssData!];
+        const newSssData: SssData = sssData!.map((row) => [...row]);
         if (from.type == DndDataType.SS_NUMBER) {
             if (to.type == DndDataType.SS_NUMBER) {
                 newSssData[(from as DndDataSsNumber).y][(from as DndDataSsNumber).x] = to.number;
@@ -174,6 +180,8 @@ export function TabStageSelectionScreen({
                                     sssData={sssData}
                                     stageList={stageList}
                                     stageDragAndDrop={stageDragAndDrop}
+                                    dragOverPosition={dragOverPosition}
+                                    setDragOverPosition={setDragOverPosition}
                                 />
                             </tbody>
                         </table>
@@ -655,11 +663,15 @@ function SssPageDisplay({
 function SssTableContents({
     sssData,
     stageList,
-    stageDragAndDrop
+    stageDragAndDrop,
+    dragOverPosition,
+    setDragOverPosition
 }: {
     sssData: SssData | null,
     stageList: StageList | null,
-    stageDragAndDrop: (from: DndData, to: DndData) => void
+    stageDragAndDrop: (from: DndData, to: DndData) => void,
+    dragOverPosition: { x: number; y: number } | null,
+    setDragOverPosition: Dispatch<SetStateAction<{ x: number; y: number } | null>>
 }): JSX.Element | null {
     return (sssData == null || stageList == null) ? null : (
         <>
@@ -679,6 +691,10 @@ function SssTableContents({
                             x={xIndex}
                             y={yIndex}
                             stageDragAndDrop={stageDragAndDrop}
+                            isSwapDragOver={
+                                dragOverPosition?.x === xIndex && dragOverPosition?.y === yIndex
+                            }
+                            setDragOverPosition={setDragOverPosition}
                             key={xIndex}
                         />
                     )}
@@ -692,12 +708,16 @@ function SssStageDisplay({
     cell,
     stageList,
     x, y,
-    stageDragAndDrop
+    stageDragAndDrop,
+    isSwapDragOver,
+    setDragOverPosition
 }: {
     cell: string,
     stageList: StageList,
     x: number, y: number,
-    stageDragAndDrop: (from: DndData, to: DndData) => void
+    stageDragAndDrop: (from: DndData, to: DndData) => void,
+    isSwapDragOver: boolean,
+    setDragOverPosition: Dispatch<SetStateAction<{ x: number; y: number } | null>>
 }): JSX.Element {
     const dndData: DndData = {
         type: DndDataType.SS_NUMBER,
@@ -712,6 +732,10 @@ function SssStageDisplay({
                 className={styles.sssStageDisplay}
                 onDragOver={(event: any) => {
                     event.preventDefault();
+                    setDragOverPosition({ x, y });
+                }}
+                onDragLeave={() => {
+                    setDragOverPosition(null);
                 }}
                 onDrop={(event: any) => {
                     stageDragAndDrop(
@@ -719,12 +743,25 @@ function SssStageDisplay({
                         dndData
                     );
                 }}
+                style={{ position: "relative" }}
             >
+                {isSwapDragOver && (
+                    <div style={{
+                        position: "absolute", left: 0, top: 0, right: 0, bottom: 0,
+                        border: "3px solid var(--inf-blue1)", pointerEvents: "none", zIndex: 10,
+                    }} />
+                )}
             </td>
         );
     }
     return (
-        <td className={styles.sssStageDisplay}>
+        <td className={styles.sssStageDisplay} style={{ position: "relative" }}>
+            {isSwapDragOver && (
+                <div style={{
+                    position: "absolute", left: 0, top: 0, right: 0, bottom: 0,
+                    border: "3px solid var(--inf-blue1)", pointerEvents: "none", zIndex: 10,
+                }} />
+            )}
             <div className={styles.tooltipWrapper}>
                 <div
                     draggable={true}
@@ -733,6 +770,10 @@ function SssStageDisplay({
                     }}
                     onDragOver={(event: any) => {
                         event.preventDefault();
+                        setDragOverPosition({ x, y });
+                    }}
+                    onDragLeave={() => {
+                        setDragOverPosition(null);
                     }}
                     onDrop={(event: any) => {
                         stageDragAndDrop(
