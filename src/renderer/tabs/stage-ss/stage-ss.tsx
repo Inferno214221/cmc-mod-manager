@@ -69,6 +69,18 @@ export function TabStageSelectionScreen({
     [DndMode, Dispatch<SetStateAction<DndMode>>]
     = useState(DndMode.AUTO);
 
+    const [selectedPositions, setSelectedPositions]:
+    [Set<string>, Dispatch<SetStateAction<Set<string>>>]
+    = useState(new Set());
+
+    const [lastSelectedPosition, setLastSelectedPosition]:
+    [{ x: number; y: number } | null, Dispatch<SetStateAction<{ x: number; y: number } | null>>]
+    = useState(null);
+
+    const [selectedExcluded, setSelectedExcluded]:
+    [Set<string>, Dispatch<SetStateAction<Set<string>>>]
+    = useState(new Set());
+
     api.on("updateCharacterPages", () => null);
     api.on("updateStagePages", getInfo);
 
@@ -129,56 +141,184 @@ export function TabStageSelectionScreen({
 
         if (from.type == DndDataType.SS_NUMBER) {
             if (to.type == DndDataType.SS_NUMBER) {
+                const fromData = from as DndDataSsNumber;
+                const toData = to as DndDataSsNumber;
+
+                const fromKey = `${fromData.x},${fromData.y}`;
+                const isMultiSelect =
+                    selectedPositions.has(fromKey) && selectedPositions.size > 1;
+
                 if (useInsert) {
-                    // Insert mode for roster→roster
-                    const fromData = from as DndDataSsNumber;
-                    const toData = to as DndDataSsNumber;
-                    const flat: string[] = newSssData.flat();
-                    const rowLength = newSssData[0].length;
-                    const fromIndex = fromData.y * rowLength + fromData.x;
-                    const toIndex = toData.y * rowLength + toData.x;
+                    if (isMultiSelect) {
+                        // Multi-select insert
+                        const flat: string[] = newSssData.flat();
+                        const rowLength = newSssData[0].length;
 
-                    if (fromIndex === toIndex) return;
+                        const selectedItems: Array<{ index: number; stage: string }> = [];
+                        selectedPositions.forEach((posKey) => {
+                            const [x, y] = posKey.split(",").map(Number);
+                            const index = y * rowLength + x;
+                            selectedItems.push({ index, stage: flat[index] });
+                        });
 
-                    const stage = flat[fromIndex];
-                    flat.splice(fromIndex, 1);
-                    const adjustedToIndex = fromIndex < toIndex ? toIndex - 1 : toIndex;
-                    flat.splice(adjustedToIndex, 0, stage);
+                        selectedItems.sort((a, b) => a.index - b.index);
+                        const stages = selectedItems.map((item) => item.stage);
 
-                    for (let i = 0; i < newSssData.length; i++) {
-                        for (let j = 0; j < rowLength; j++) {
-                            newSssData[i][j] = flat[i * rowLength + j];
+                        for (let i = selectedItems.length - 1; i >= 0; i--) {
+                            flat.splice(selectedItems[i].index, 1);
+                        }
+
+                        const toIndex = toData.y * rowLength + toData.x;
+                        const removedBefore = selectedItems.filter(
+                            (item) => item.index < toIndex
+                        ).length;
+                        const adjustedToIndex = toIndex - removedBefore;
+
+                        flat.splice(adjustedToIndex, 0, ...stages);
+
+                        for (let i = 0; i < newSssData.length; i++) {
+                            for (let j = 0; j < rowLength; j++) {
+                                newSssData[i][j] = flat[i * rowLength + j];
+                            }
+                        }
+                    } else {
+                        // Single item insert
+                        const flat: string[] = newSssData.flat();
+                        const rowLength = newSssData[0].length;
+                        const fromIndex = fromData.y * rowLength + fromData.x;
+                        const toIndex = toData.y * rowLength + toData.x;
+
+                        if (fromIndex === toIndex) return;
+
+                        const stage = flat[fromIndex];
+                        flat.splice(fromIndex, 1);
+                        const adjustedToIndex = fromIndex < toIndex ? toIndex - 1 : toIndex;
+                        flat.splice(adjustedToIndex, 0, stage);
+
+                        for (let i = 0; i < newSssData.length; i++) {
+                            for (let j = 0; j < rowLength; j++) {
+                                newSssData[i][j] = flat[i * rowLength + j];
+                            }
                         }
                     }
                 } else {
                     // Swap mode for roster→roster
-                    newSssData[(from as DndDataSsNumber).y][(from as DndDataSsNumber).x] = to.number;
-                    newSssData[(to as DndDataSsNumber).y][(to as DndDataSsNumber).x] = from.number;
+                    if (isMultiSelect) {
+                        const flat: string[] = newSssData.flat();
+                        const rowLength = newSssData[0].length;
+
+                        const selectedItems: Array<{ index: number; stage: string }> = [];
+                        selectedPositions.forEach((posKey) => {
+                            const [x, y] = posKey.split(",").map(Number);
+                            const index = y * rowLength + x;
+                            selectedItems.push({ index, stage: flat[index] });
+                        });
+
+                        selectedItems.sort((a, b) => a.index - b.index);
+
+                        const toIndex = toData.y * rowLength + toData.x;
+
+                        for (let i = 0; i < selectedItems.length; i++) {
+                            const targetIndex = toIndex + i;
+                            if (targetIndex < flat.length) {
+                                const fromIdx = selectedItems[i].index;
+                                const temp = flat[fromIdx];
+                                flat[fromIdx] = flat[targetIndex];
+                                flat[targetIndex] = temp;
+                            }
+                        }
+
+                        for (let i = 0; i < newSssData.length; i++) {
+                            for (let j = 0; j < rowLength; j++) {
+                                newSssData[i][j] = flat[i * rowLength + j];
+                            }
+                        }
+                    } else {
+                        newSssData[fromData.y][fromData.x] = to.number;
+                        newSssData[toData.y][toData.x] = from.number;
+                    }
                 }
+
+                setSelectedPositions(new Set());
             } else {
-                newSssData[(from as DndDataSsNumber).y][(from as DndDataSsNumber).x] = "0000";
+                const fromData = from as DndDataSsNumber;
+                const fromKey = `${fromData.x},${fromData.y}`;
+                const isMultiSelect =
+                    selectedPositions.has(fromKey) && selectedPositions.size > 1;
+
+                if (isMultiSelect) {
+                    selectedPositions.forEach((posKey) => {
+                        const [x, y] = posKey.split(",").map(Number);
+                        newSssData[y][x] = "0000";
+                    });
+                } else {
+                    newSssData[fromData.y][fromData.x] = "0000";
+                }
+                setSelectedPositions(new Set());
             }
         } else {
             if (to.type == DndDataType.SS_NUMBER) {
+                const isMultiSelectPool =
+                    selectedExcluded.has(from.number) && selectedExcluded.size > 1;
+
                 if (useInsert) {
                     // Insert mode for pool→roster
-                    const flat: string[] = newSssData.flat();
-                    const rowLength = newSssData[0].length;
-                    const toIndex =
-                        (to as DndDataSsNumber).y * rowLength + (to as DndDataSsNumber).x;
+                    if (isMultiSelectPool) {
+                        const toData = to as DndDataSsNumber;
+                        const flat: string[] = newSssData.flat();
+                        const rowLength = newSssData[0].length;
+                        const toIndex = toData.y * rowLength + toData.x;
+                        const selectedNumbers = [...selectedExcluded];
 
-                    flat.splice(toIndex, 0, from.number);
-                    flat.pop();
+                        flat.splice(toIndex, 0, ...selectedNumbers);
+                        flat.splice(flat.length - selectedNumbers.length);
 
-                    for (let i = 0; i < newSssData.length; i++) {
-                        for (let j = 0; j < rowLength; j++) {
-                            newSssData[i][j] = flat[i * rowLength + j];
+                        for (let i = 0; i < newSssData.length; i++) {
+                            for (let j = 0; j < rowLength; j++) {
+                                newSssData[i][j] = flat[i * rowLength + j];
+                            }
+                        }
+                    } else {
+                        const flat: string[] = newSssData.flat();
+                        const rowLength = newSssData[0].length;
+                        const toIndex =
+                            (to as DndDataSsNumber).y * rowLength + (to as DndDataSsNumber).x;
+
+                        flat.splice(toIndex, 0, from.number);
+                        flat.pop();
+
+                        for (let i = 0; i < newSssData.length; i++) {
+                            for (let j = 0; j < rowLength; j++) {
+                                newSssData[i][j] = flat[i * rowLength + j];
+                            }
                         }
                     }
                 } else {
                     // Swap mode for pool→roster
-                    newSssData[(to as DndDataSsNumber).y][(to as DndDataSsNumber).x] = from.number;
+                    if (isMultiSelectPool) {
+                        const toData = to as DndDataSsNumber;
+                        const flat: string[] = newSssData.flat();
+                        const rowLength = newSssData[0].length;
+                        let toIndex = toData.y * rowLength + toData.x;
+                        const selectedNumbers = [...selectedExcluded];
+
+                        for (const num of selectedNumbers) {
+                            if (toIndex < flat.length) {
+                                flat[toIndex] = num;
+                                toIndex++;
+                            }
+                        }
+
+                        for (let i = 0; i < newSssData.length; i++) {
+                            for (let j = 0; j < rowLength; j++) {
+                                newSssData[i][j] = flat[i * rowLength + j];
+                            }
+                        }
+                    } else {
+                        newSssData[(to as DndDataSsNumber).y][(to as DndDataSsNumber).x] = from.number;
+                    }
                 }
+                setSelectedExcluded(new Set());
             } else {
                 return;
             }
@@ -219,6 +359,52 @@ export function TabStageSelectionScreen({
         });
     }, [sssData]);
 
+    function handleCellClick(
+        x: number,
+        y: number,
+        event: React.MouseEvent
+    ): void {
+        const posKey = `${x},${y}`;
+
+        if (event.ctrlKey || event.metaKey) {
+            // Ctrl+click: toggle selection
+            setSelectedPositions((prev) => {
+                const newSet = new Set(prev);
+                if (newSet.has(posKey)) {
+                    newSet.delete(posKey);
+                } else {
+                    newSet.add(posKey);
+                }
+                return newSet;
+            });
+            setLastSelectedPosition({ x, y });
+        } else if (event.shiftKey && lastSelectedPosition) {
+            // Shift+click: select range
+            const rowLength = sssData![0].length;
+            const lastIndex =
+                lastSelectedPosition.y * rowLength + lastSelectedPosition.x;
+            const currentIndex = y * rowLength + x;
+            const [start, end] =
+                lastIndex < currentIndex
+                    ? [lastIndex, currentIndex]
+                    : [currentIndex, lastIndex];
+
+            setSelectedPositions((prev) => {
+                const newSet = new Set(prev);
+                for (let i = start; i <= end; i++) {
+                    const row = Math.floor(i / rowLength);
+                    const col = i % rowLength;
+                    newSet.add(`${col},${row}`);
+                }
+                return newSet;
+            });
+        } else {
+            // Regular click: clear selection and select only this
+            setSelectedPositions(new Set([posKey]));
+            setLastSelectedPosition({ x, y });
+        }
+    }
+
     return (
         <section>
             <div id={styles.pagesDiv}>
@@ -242,6 +428,8 @@ export function TabStageSelectionScreen({
                                     sssData={sssData}
                                     stageList={stageList}
                                     stageDragAndDrop={stageDragAndDrop}
+                                    selectedPositions={selectedPositions}
+                                    handleCellClick={handleCellClick}
                                     dragOverPosition={dragOverPosition}
                                     setDragOverPosition={setDragOverPosition}
                                     isDraggingFromPool={isDraggingFromPool}
@@ -279,6 +467,8 @@ export function TabStageSelectionScreen({
                 excluded={excluded}
                 stageDragAndDrop={stageDragAndDrop}
                 setIsDraggingFromPool={setIsDraggingFromPool}
+                selectedExcluded={selectedExcluded}
+                setSelectedExcluded={setSelectedExcluded}
             />
         </section>
     );
@@ -288,12 +478,16 @@ function ExcludedStages({
     stages,
     excluded,
     stageDragAndDrop,
-    setIsDraggingFromPool
+    setIsDraggingFromPool,
+    selectedExcluded,
+    setSelectedExcluded
 }: {
     stages: Stage[],
     excluded: Stage[],
     stageDragAndDrop: (from: DndData, to: DndData) => void,
-    setIsDraggingFromPool: Dispatch<SetStateAction<boolean>>
+    setIsDraggingFromPool: Dispatch<SetStateAction<boolean>>,
+    selectedExcluded: Set<string>,
+    setSelectedExcluded: Dispatch<SetStateAction<Set<string>>>
 }): JSX.Element {
     const [searchValue, setSearchValue]:
     [string, Dispatch<SetStateAction<string>>]
@@ -403,6 +597,8 @@ function ExcludedStages({
                                         stage={stage}
                                         stageDragAndDrop={stageDragAndDrop}
                                         setIsDraggingFromPool={setIsDraggingFromPool}
+                                        isSelected={selectedExcluded.has(("0000" + stage.number).slice(-4))}
+                                        setSelectedExcluded={setSelectedExcluded}
                                         key={stage.name}
                                     />
                                 );
@@ -432,6 +628,8 @@ function ExcludedStages({
                                     stage={stage}
                                     stageDragAndDrop={stageDragAndDrop}
                                     setIsDraggingFromPool={setIsDraggingFromPool}
+                                    isSelected={selectedExcluded.has(("0000" + stage.number).slice(-4))}
+                                    setSelectedExcluded={setSelectedExcluded}
                                     key={stage.name}
                                 />
                             )
@@ -446,21 +644,49 @@ function ExcludedStages({
 function StageDisplay({
     stage,
     stageDragAndDrop,
-    setIsDraggingFromPool
+    setIsDraggingFromPool,
+    isSelected,
+    setSelectedExcluded
 }: {
     stage: Stage,
     stageDragAndDrop: (from: DndData, to: DndData) => void,
-    setIsDraggingFromPool: Dispatch<SetStateAction<boolean>>
+    setIsDraggingFromPool: Dispatch<SetStateAction<boolean>>,
+    isSelected: boolean,
+    setSelectedExcluded: Dispatch<SetStateAction<Set<string>>>
 }): JSX.Element {
     const dndData: DndData = {
         type: DndDataType.EXCLUDED,
         number: ("0000" + stage.number).slice(-4)
     }
     return (
-        <div className={styles.excludedDisplayWrapper + " " + styles.tooltipWrapper}>
+        <div className={styles.excludedDisplayWrapper + " " + styles.tooltipWrapper}
+            style={{ position: "relative" }}
+        >
+            {isSelected && (
+                <div style={{
+                    position: "absolute", top: 0, left: 0, right: 0, bottom: 0,
+                    backgroundColor: "rgba(100, 150, 255, 0.3)",
+                    pointerEvents: "none", zIndex: 1,
+                }} />
+            )}
             <div
                 className={styles.excludedDisplayMug}
                 draggable={true}
+                onClick={(event: React.MouseEvent) => {
+                    if (event.ctrlKey || event.metaKey) {
+                        setSelectedExcluded((prev) => {
+                            const newSet = new Set(prev);
+                            if (newSet.has(dndData.number)) {
+                                newSet.delete(dndData.number);
+                            } else {
+                                newSet.add(dndData.number);
+                            }
+                            return newSet;
+                        });
+                    } else {
+                        setSelectedExcluded(new Set([dndData.number]));
+                    }
+                }}
                 onDragStart={(event: any) => {
                     event.dataTransfer.setData("data", JSON.stringify(dndData));
                     setIsDraggingFromPool(true);
@@ -757,6 +983,8 @@ function SssTableContents({
     sssData,
     stageList,
     stageDragAndDrop,
+    selectedPositions,
+    handleCellClick,
     dragOverPosition,
     setDragOverPosition,
     isDraggingFromPool,
@@ -765,6 +993,8 @@ function SssTableContents({
     sssData: SssData | null,
     stageList: StageList | null,
     stageDragAndDrop: (from: DndData, to: DndData) => void,
+    selectedPositions: Set<string>,
+    handleCellClick: (x: number, y: number, event: React.MouseEvent) => void,
     dragOverPosition: { x: number; y: number } | null,
     setDragOverPosition: Dispatch<SetStateAction<{ x: number; y: number } | null>>,
     isDraggingFromPool: boolean,
@@ -794,6 +1024,8 @@ function SssTableContents({
                             x={xIndex}
                             y={yIndex}
                             stageDragAndDrop={stageDragAndDrop}
+                            isSelected={selectedPositions.has(`${xIndex},${yIndex}`)}
+                            handleCellClick={handleCellClick}
                             isDragOver={
                                 showInsertIndicator &&
                                 dragOverPosition?.x === xIndex && dragOverPosition?.y === yIndex
@@ -817,6 +1049,8 @@ function SssStageDisplay({
     stageList,
     x, y,
     stageDragAndDrop,
+    isSelected,
+    handleCellClick,
     isDragOver,
     isSwapDragOver,
     setDragOverPosition
@@ -825,6 +1059,8 @@ function SssStageDisplay({
     stageList: StageList,
     x: number, y: number,
     stageDragAndDrop: (from: DndData, to: DndData) => void,
+    isSelected: boolean,
+    handleCellClick: (x: number, y: number, event: React.MouseEvent) => void,
     isDragOver: boolean,
     isSwapDragOver: boolean,
     setDragOverPosition: Dispatch<SetStateAction<{ x: number; y: number } | null>>
@@ -871,7 +1107,18 @@ function SssStageDisplay({
         );
     }
     return (
-        <td className={styles.sssStageDisplay} style={{ position: "relative" }}>
+        <td
+            className={styles.sssStageDisplay}
+            onClick={(event: React.MouseEvent) => handleCellClick(x, y, event)}
+            style={{ position: "relative" }}
+        >
+            {isSelected && (
+                <div style={{
+                    position: "absolute", top: 0, left: 0, right: 0, bottom: 0,
+                    backgroundColor: "rgba(100, 150, 255, 0.3)",
+                    pointerEvents: "none", zIndex: 1,
+                }} />
+            )}
             {isDragOver && (
                 <div style={{
                     position: "absolute", left: 0, top: 0, bottom: 0,
