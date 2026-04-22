@@ -20,6 +20,12 @@ const sortTypes: SortTypeOptions[] = [
     SortTypeOptions.MENU_NAME
 ];
 
+enum DndMode {
+    AUTO = "auto",
+    INSERT = "insert",
+    SWAP = "swap",
+}
+
 export function TabStageSelectionScreen({
     setOperations,
     handle
@@ -58,6 +64,10 @@ export function TabStageSelectionScreen({
     const [isDraggingFromPool, setIsDraggingFromPool]:
     [boolean, Dispatch<SetStateAction<boolean>>]
     = useState(false);
+
+    const [dndMode, setDndMode]:
+    [DndMode, Dispatch<SetStateAction<DndMode>>]
+    = useState(DndMode.AUTO);
 
     api.on("updateCharacterPages", () => null);
     api.on("updateStagePages", getInfo);
@@ -113,7 +123,9 @@ export function TabStageSelectionScreen({
         // Can't be called unless sssData has a value
         const newSssData: SssData = sssData!.map((row) => [...row]);
 
-        const useInsert = from.type == DndDataType.SS_NUMBER;
+        const useInsert =
+            dndMode == DndMode.INSERT ||
+            (dndMode == DndMode.AUTO && from.type == DndDataType.SS_NUMBER);
 
         if (from.type == DndDataType.SS_NUMBER) {
             if (to.type == DndDataType.SS_NUMBER) {
@@ -148,8 +160,25 @@ export function TabStageSelectionScreen({
             }
         } else {
             if (to.type == DndDataType.SS_NUMBER) {
-                // Swap mode for pool→roster
-                newSssData[(to as DndDataSsNumber).y][(to as DndDataSsNumber).x] = from.number;
+                if (useInsert) {
+                    // Insert mode for pool→roster
+                    const flat: string[] = newSssData.flat();
+                    const rowLength = newSssData[0].length;
+                    const toIndex =
+                        (to as DndDataSsNumber).y * rowLength + (to as DndDataSsNumber).x;
+
+                    flat.splice(toIndex, 0, from.number);
+                    flat.pop();
+
+                    for (let i = 0; i < newSssData.length; i++) {
+                        for (let j = 0; j < rowLength; j++) {
+                            newSssData[i][j] = flat[i * rowLength + j];
+                        }
+                    }
+                } else {
+                    // Swap mode for pool→roster
+                    newSssData[(to as DndDataSsNumber).y][(to as DndDataSsNumber).x] = from.number;
+                }
             } else {
                 return;
             }
@@ -216,9 +245,31 @@ export function TabStageSelectionScreen({
                                     dragOverPosition={dragOverPosition}
                                     setDragOverPosition={setDragOverPosition}
                                     isDraggingFromPool={isDraggingFromPool}
+                                    dndMode={dndMode}
                                 />
                             </tbody>
                         </table>
+                    </div>
+                </div>
+            </div>
+            <div id={styles.sssDivControls}>
+                <div className={styles.center}>
+                    <div className={styles.inlineSortOptions}>
+                        <label>{"Drag Mode "}</label>
+                        <select
+                            value={dndMode}
+                            onInput={(event: any) => setDndMode(event.target.value)}
+                        >
+                            <option value={DndMode.AUTO}>
+                                {"Auto"}
+                            </option>
+                            <option value={DndMode.INSERT}>
+                                {"Insert"}
+                            </option>
+                            <option value={DndMode.SWAP}>
+                                {"Swap"}
+                            </option>
+                        </select>
                     </div>
                 </div>
             </div>
@@ -708,15 +759,23 @@ function SssTableContents({
     stageDragAndDrop,
     dragOverPosition,
     setDragOverPosition,
-    isDraggingFromPool
+    isDraggingFromPool,
+    dndMode
 }: {
     sssData: SssData | null,
     stageList: StageList | null,
     stageDragAndDrop: (from: DndData, to: DndData) => void,
     dragOverPosition: { x: number; y: number } | null,
     setDragOverPosition: Dispatch<SetStateAction<{ x: number; y: number } | null>>,
-    isDraggingFromPool: boolean
+    isDraggingFromPool: boolean,
+    dndMode: DndMode
 }): JSX.Element | null {
+    const showInsertIndicator =
+        dndMode == DndMode.INSERT ||
+        (dndMode == DndMode.AUTO && !isDraggingFromPool);
+    const showSwapIndicator =
+        dndMode == DndMode.SWAP ||
+        (dndMode == DndMode.AUTO && isDraggingFromPool);
     return (sssData == null || stageList == null) ? null : (
         <>
             <tr>
@@ -736,11 +795,11 @@ function SssTableContents({
                             y={yIndex}
                             stageDragAndDrop={stageDragAndDrop}
                             isDragOver={
-                                !isDraggingFromPool &&
+                                showInsertIndicator &&
                                 dragOverPosition?.x === xIndex && dragOverPosition?.y === yIndex
                             }
                             isSwapDragOver={
-                                isDraggingFromPool &&
+                                showSwapIndicator &&
                                 dragOverPosition?.x === xIndex && dragOverPosition?.y === yIndex
                             }
                             setDragOverPosition={setDragOverPosition}
