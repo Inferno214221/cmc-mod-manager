@@ -55,6 +55,10 @@ export function TabStageSelectionScreen({
     [{ x: number; y: number } | null, Dispatch<SetStateAction<{ x: number; y: number } | null>>]
     = useState(null);
 
+    const [isDraggingFromPool, setIsDraggingFromPool]:
+    [boolean, Dispatch<SetStateAction<boolean>>]
+    = useState(false);
+
     api.on("updateCharacterPages", () => null);
     api.on("updateStagePages", getInfo);
 
@@ -105,17 +109,46 @@ export function TabStageSelectionScreen({
         console.log(from, to);
         // Clear drag over indicator
         setDragOverPosition(null);
+        setIsDraggingFromPool(false);
         // Can't be called unless sssData has a value
         const newSssData: SssData = sssData!.map((row) => [...row]);
+
+        const useInsert = from.type == DndDataType.SS_NUMBER;
+
         if (from.type == DndDataType.SS_NUMBER) {
             if (to.type == DndDataType.SS_NUMBER) {
-                newSssData[(from as DndDataSsNumber).y][(from as DndDataSsNumber).x] = to.number;
-                newSssData[(to as DndDataSsNumber).y][(to as DndDataSsNumber).x] = from.number;
+                if (useInsert) {
+                    // Insert mode for roster→roster
+                    const fromData = from as DndDataSsNumber;
+                    const toData = to as DndDataSsNumber;
+                    const flat: string[] = newSssData.flat();
+                    const rowLength = newSssData[0].length;
+                    const fromIndex = fromData.y * rowLength + fromData.x;
+                    const toIndex = toData.y * rowLength + toData.x;
+
+                    if (fromIndex === toIndex) return;
+
+                    const stage = flat[fromIndex];
+                    flat.splice(fromIndex, 1);
+                    const adjustedToIndex = fromIndex < toIndex ? toIndex - 1 : toIndex;
+                    flat.splice(adjustedToIndex, 0, stage);
+
+                    for (let i = 0; i < newSssData.length; i++) {
+                        for (let j = 0; j < rowLength; j++) {
+                            newSssData[i][j] = flat[i * rowLength + j];
+                        }
+                    }
+                } else {
+                    // Swap mode for roster→roster
+                    newSssData[(from as DndDataSsNumber).y][(from as DndDataSsNumber).x] = to.number;
+                    newSssData[(to as DndDataSsNumber).y][(to as DndDataSsNumber).x] = from.number;
+                }
             } else {
                 newSssData[(from as DndDataSsNumber).y][(from as DndDataSsNumber).x] = "0000";
             }
         } else {
             if (to.type == DndDataType.SS_NUMBER) {
+                // Swap mode for pool→roster
                 newSssData[(to as DndDataSsNumber).y][(to as DndDataSsNumber).x] = from.number;
             } else {
                 return;
@@ -182,6 +215,7 @@ export function TabStageSelectionScreen({
                                     stageDragAndDrop={stageDragAndDrop}
                                     dragOverPosition={dragOverPosition}
                                     setDragOverPosition={setDragOverPosition}
+                                    isDraggingFromPool={isDraggingFromPool}
                                 />
                             </tbody>
                         </table>
@@ -193,6 +227,7 @@ export function TabStageSelectionScreen({
                 stages={stages}
                 excluded={excluded}
                 stageDragAndDrop={stageDragAndDrop}
+                setIsDraggingFromPool={setIsDraggingFromPool}
             />
         </section>
     );
@@ -201,11 +236,13 @@ export function TabStageSelectionScreen({
 function ExcludedStages({
     stages,
     excluded,
-    stageDragAndDrop
+    stageDragAndDrop,
+    setIsDraggingFromPool
 }: {
     stages: Stage[],
     excluded: Stage[],
-    stageDragAndDrop: (from: DndData, to: DndData) => void
+    stageDragAndDrop: (from: DndData, to: DndData) => void,
+    setIsDraggingFromPool: Dispatch<SetStateAction<boolean>>
 }): JSX.Element {
     const [searchValue, setSearchValue]:
     [string, Dispatch<SetStateAction<string>>]
@@ -314,6 +351,7 @@ function ExcludedStages({
                                     <StageDisplay
                                         stage={stage}
                                         stageDragAndDrop={stageDragAndDrop}
+                                        setIsDraggingFromPool={setIsDraggingFromPool}
                                         key={stage.name}
                                     />
                                 );
@@ -342,6 +380,7 @@ function ExcludedStages({
                                 <StageDisplay
                                     stage={stage}
                                     stageDragAndDrop={stageDragAndDrop}
+                                    setIsDraggingFromPool={setIsDraggingFromPool}
                                     key={stage.name}
                                 />
                             )
@@ -355,10 +394,12 @@ function ExcludedStages({
 
 function StageDisplay({
     stage,
-    stageDragAndDrop
+    stageDragAndDrop,
+    setIsDraggingFromPool
 }: {
     stage: Stage,
-    stageDragAndDrop: (from: DndData, to: DndData) => void
+    stageDragAndDrop: (from: DndData, to: DndData) => void,
+    setIsDraggingFromPool: Dispatch<SetStateAction<boolean>>
 }): JSX.Element {
     const dndData: DndData = {
         type: DndDataType.EXCLUDED,
@@ -371,6 +412,7 @@ function StageDisplay({
                 draggable={true}
                 onDragStart={(event: any) => {
                     event.dataTransfer.setData("data", JSON.stringify(dndData));
+                    setIsDraggingFromPool(true);
                 }}
                 onDragOver={(event: any) => {
                     event.preventDefault();
@@ -665,13 +707,15 @@ function SssTableContents({
     stageList,
     stageDragAndDrop,
     dragOverPosition,
-    setDragOverPosition
+    setDragOverPosition,
+    isDraggingFromPool
 }: {
     sssData: SssData | null,
     stageList: StageList | null,
     stageDragAndDrop: (from: DndData, to: DndData) => void,
     dragOverPosition: { x: number; y: number } | null,
-    setDragOverPosition: Dispatch<SetStateAction<{ x: number; y: number } | null>>
+    setDragOverPosition: Dispatch<SetStateAction<{ x: number; y: number } | null>>,
+    isDraggingFromPool: boolean
 }): JSX.Element | null {
     return (sssData == null || stageList == null) ? null : (
         <>
@@ -691,7 +735,12 @@ function SssTableContents({
                             x={xIndex}
                             y={yIndex}
                             stageDragAndDrop={stageDragAndDrop}
+                            isDragOver={
+                                !isDraggingFromPool &&
+                                dragOverPosition?.x === xIndex && dragOverPosition?.y === yIndex
+                            }
                             isSwapDragOver={
+                                isDraggingFromPool &&
                                 dragOverPosition?.x === xIndex && dragOverPosition?.y === yIndex
                             }
                             setDragOverPosition={setDragOverPosition}
@@ -709,6 +758,7 @@ function SssStageDisplay({
     stageList,
     x, y,
     stageDragAndDrop,
+    isDragOver,
     isSwapDragOver,
     setDragOverPosition
 }: {
@@ -716,6 +766,7 @@ function SssStageDisplay({
     stageList: StageList,
     x: number, y: number,
     stageDragAndDrop: (from: DndData, to: DndData) => void,
+    isDragOver: boolean,
     isSwapDragOver: boolean,
     setDragOverPosition: Dispatch<SetStateAction<{ x: number; y: number } | null>>
 }): JSX.Element {
@@ -745,6 +796,12 @@ function SssStageDisplay({
                 }}
                 style={{ position: "relative" }}
             >
+                {isDragOver && (
+                    <div style={{
+                        position: "absolute", left: 0, top: 0, bottom: 0,
+                        width: "4px", backgroundColor: "var(--inf-blue1)", zIndex: 10,
+                    }} />
+                )}
                 {isSwapDragOver && (
                     <div style={{
                         position: "absolute", left: 0, top: 0, right: 0, bottom: 0,
@@ -756,6 +813,12 @@ function SssStageDisplay({
     }
     return (
         <td className={styles.sssStageDisplay} style={{ position: "relative" }}>
+            {isDragOver && (
+                <div style={{
+                    position: "absolute", left: 0, top: 0, bottom: 0,
+                    width: "4px", backgroundColor: "var(--inf-blue1)", zIndex: 10,
+                }} />
+            )}
             {isSwapDragOver && (
                 <div style={{
                     position: "absolute", left: 0, top: 0, right: 0, bottom: 0,
