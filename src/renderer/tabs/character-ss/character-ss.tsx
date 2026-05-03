@@ -451,28 +451,6 @@ export function TabCharacterSelectionScreen({
                     </div>
                 </div>
             </div>
-            {/*<div id={styles.cssDivControls}>
-                <div className={styles.center}>
-
-                    <div className={styles.inlineSortOptions}>
-                        <label>{"Drag Mode "}</label>
-                        <select
-                            value={dndMode}
-                            onInput={(event: any) => setDndMode(event.target.value)}
-                        >
-                            <option value={DndMode.AUTO}>
-                                {"Auto"}
-                            </option>
-                            <option value={DndMode.INSERT}>
-                                {"Insert"}
-                            </option>
-                            <option value={DndMode.SWAP}>
-                                {"Swap"}
-                            </option>
-                        </select>
-                    </div>
-                </div>
-            </div>*/}
             <hr/>
             <ExcludedCharacters
                 characters={characters}

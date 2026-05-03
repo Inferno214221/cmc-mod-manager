@@ -4,7 +4,7 @@ import ToggleIconButton from "../../icon-buttons/toggle-icon-button";
 import CycleIconButton from "../../icon-buttons/cycle-icon-button";
 import MISSING from "../../../assets/missing.png";
 import {
-    DndDataType, DndMode, OpDep, OpState, SortTypeOptions, StageList, finishOp
+    DndDataType, DndMode, OpDep, OpState, SortTypeOptions, StageList, dndModes, finishOp
 } from "../../../global/global";
 import appStyles from "../../app/app.css";
 import stageSsStyles from "./stage-ss.css";
@@ -60,8 +60,8 @@ export function TabStageSelectionScreen({
     = useState(false);
 
     const [dndMode, setDndMode]:
-    [DndMode, Dispatch<SetStateAction<DndMode>>]
-    = useState(DndMode.AUTO);
+    [number, Dispatch<SetStateAction<number>>]
+    = useState(0);
 
     const [selectedPositions, setSelectedPositions]:
     [Set<string>, Dispatch<SetStateAction<Set<string>>>]
@@ -129,9 +129,8 @@ export function TabStageSelectionScreen({
         // Can't be called unless sssData has a value
         const newSssData: SssData = sssData!.map((row) => [...row]);
 
-        const useInsert =
-            dndMode == DndMode.INSERT ||
-            (dndMode == DndMode.AUTO && from.type == DndDataType.SS_NUMBER);
+        const useInsert = dndModes[dndMode] == DndMode.INSERT ||
+            (dndModes[dndMode] == DndMode.AUTO && from.type == DndDataType.SS_NUMBER);
 
         if (from.type == DndDataType.SS_NUMBER) {
             if (to.type == DndDataType.SS_NUMBER) {
@@ -435,27 +434,6 @@ export function TabStageSelectionScreen({
                     </div>
                 </div>
             </div>
-            <div id={styles.sssDivControls}>
-                <div className={styles.center}>
-                    <div className={styles.inlineSortOptions}>
-                        <label>{"Drag Mode "}</label>
-                        <select
-                            value={dndMode}
-                            onInput={(event: any) => setDndMode(event.target.value)}
-                        >
-                            <option value={DndMode.AUTO}>
-                                {"Auto"}
-                            </option>
-                            <option value={DndMode.INSERT}>
-                                {"Insert"}
-                            </option>
-                            <option value={DndMode.SWAP}>
-                                {"Swap"}
-                            </option>
-                        </select>
-                    </div>
-                </div>
-            </div>
             <hr/>
             <ExcludedStages
                 stages={stages}
@@ -464,6 +442,8 @@ export function TabStageSelectionScreen({
                 setIsDraggingFromPool={setIsDraggingFromPool}
                 selectedExcluded={selectedExcluded}
                 setSelectedExcluded={setSelectedExcluded}
+                dndMode={dndMode}
+                setDndMode={setDndMode}
             />
         </section>
     );
@@ -475,14 +455,18 @@ function ExcludedStages({
     stageDragAndDrop,
     setIsDraggingFromPool,
     selectedExcluded,
-    setSelectedExcluded
+    setSelectedExcluded,
+    dndMode,
+    setDndMode,
 }: {
     stages: Stage[],
     excluded: Stage[],
     stageDragAndDrop: (from: DndData, to: DndData) => void,
     setIsDraggingFromPool: Dispatch<SetStateAction<boolean>>,
     selectedExcluded: Set<string>,
-    setSelectedExcluded: Dispatch<SetStateAction<Set<string>>>
+    setSelectedExcluded: Dispatch<SetStateAction<Set<string>>>,
+    dndMode: number,
+    setDndMode: Dispatch<SetStateAction<number>>
 }): JSX.Element {
     const [searchValue, setSearchValue]:
     [string, Dispatch<SetStateAction<string>>]
@@ -574,6 +558,17 @@ function ExcludedStages({
                             falseTooltip={message("tooltip.stage.showing.excluded")}
                             iconSize={"30px"}
                             setter={setShowAllStages}
+                        />
+                        <CycleIconButton
+                            index={dndMode}
+                            icons={["moving", "flip", "swap_horiz"]}
+                            tooltips={[
+                                message("tooltip.dragMode.auto"),
+                                message("tooltip.dragMode.insert"),
+                                message("tooltip.dragMode.swap")
+                            ]}
+                            iconSize={"30px"}
+                            setter={setDndMode}
                         />
                     </div>
                 </div>
@@ -997,14 +992,14 @@ function SssTableContents({
     dragOverPosition: { x: number; y: number } | null,
     setDragOverPosition: Dispatch<SetStateAction<{ x: number; y: number } | null>>,
     isDraggingFromPool: boolean,
-    dndMode: DndMode
+    dndMode: number
 }): JSX.Element | null {
     const showInsertIndicator =
-        dndMode == DndMode.INSERT ||
-        (dndMode == DndMode.AUTO && !isDraggingFromPool);
+        dndModes[dndMode] == DndMode.INSERT ||
+        (dndModes[dndMode] == DndMode.AUTO && !isDraggingFromPool);
     const showSwapIndicator =
-        dndMode == DndMode.SWAP ||
-        (dndMode == DndMode.AUTO && isDraggingFromPool);
+        dndModes[dndMode] == DndMode.SWAP ||
+        (dndModes[dndMode] == DndMode.AUTO && isDraggingFromPool);
     return (sssData == null || stageList == null) ? null : (
         <>
             <tr>
