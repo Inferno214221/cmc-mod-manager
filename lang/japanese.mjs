@@ -504,6 +504,11 @@ export default {
             backwards: "ソート方向：後ろ",
             forwards: "ソート方向：前"
         },
+        dragMode: {
+            auto: "Drag Mode: Auto",
+            insert: "Drag Mode: Insert",
+            swap: "Drag Mode: Swap"
+        },
         installation: {
             filter: "インストール：必要なも",
             all: "インストール：全部もらいます"

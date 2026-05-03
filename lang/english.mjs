@@ -505,6 +505,11 @@ export default {
             backwards: "Sort Direction: Backwards",
             forwards: "Sort Direction: Forwards"
         },
+        dragMode: {
+            auto: "Drag Mode: Auto",
+            insert: "Drag Mode: Insert",
+            swap: "Drag Mode: Swap"
+        },
         installation: {
             filter: "Installation: Only Necessary Files",
             all: "Installation: All Files"

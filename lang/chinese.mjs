@@ -504,6 +504,11 @@ export default {
             backwards: "排序方向：后",
             forwards: "排序方向：前"
         },
+        dragMode: {
+            auto: "Drag Mode: Auto",
+            insert: "Drag Mode: Insert",
+            swap: "Drag Mode: Swap"
+        },
         installation: {
             filter: "安装：只需要必要的",
             all: "安装：全都要"

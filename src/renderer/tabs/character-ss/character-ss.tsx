@@ -602,9 +602,9 @@ function ExcludedCharacters({
                             index={dndMode}
                             icons={["moving", "flip", "swap_horiz"]}
                             tooltips={[
-                                "Drag Mode: Auto",
-                                "Drag Mode: Insert",
-                                "Drag Mode: Swap"
+                                message("tooltip.dragMode.auto"),
+                                message("tooltip.dragMode.insert"),
+                                message("tooltip.dragMode.swap")
                             ]}
                             iconSize={"30px"}
                             setter={setDndMode}
