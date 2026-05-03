@@ -157,7 +157,7 @@ export function TabStageSelectionScreen({
                         const selectedItems: Array<{ index: number; stage: string }> = [];
                         selectedPositions.forEach((posKey) => {
                             const [x, y] = posKey.split(",").map(Number);
-                            const index = y * rowLength + x;
+                            const index = (y * rowLength) + x;
                             selectedItems.push({ index, stage: flat[index] });
                         });
 
@@ -168,7 +168,7 @@ export function TabStageSelectionScreen({
                             flat.splice(selectedItems[i].index, 1);
                         }
 
-                        const toIndex = toData.y * rowLength + toData.x;
+                        const toIndex = (toData.y * rowLength) + toData.x;
                         const removedBefore = selectedItems.filter(
                             (item) => item.index < toIndex
                         ).length;
@@ -178,15 +178,15 @@ export function TabStageSelectionScreen({
 
                         for (let i = 0; i < newSssData.length; i++) {
                             for (let j = 0; j < rowLength; j++) {
-                                newSssData[i][j] = flat[i * rowLength + j];
+                                newSssData[i][j] = flat[(i * rowLength) + j];
                             }
                         }
                     } else {
                         // Single item insert
                         const flat: string[] = newSssData.flat();
                         const rowLength = newSssData[0].length;
-                        const fromIndex = fromData.y * rowLength + fromData.x;
-                        const toIndex = toData.y * rowLength + toData.x;
+                        const fromIndex = (fromData.y * rowLength) + fromData.x;
+                        const toIndex = (toData.y * rowLength) + toData.x;
 
                         if (fromIndex === toIndex) return;
 
@@ -197,7 +197,7 @@ export function TabStageSelectionScreen({
 
                         for (let i = 0; i < newSssData.length; i++) {
                             for (let j = 0; j < rowLength; j++) {
-                                newSssData[i][j] = flat[i * rowLength + j];
+                                newSssData[i][j] = flat[(i * rowLength) + j];
                             }
                         }
                     }
@@ -210,13 +210,13 @@ export function TabStageSelectionScreen({
                         const selectedItems: Array<{ index: number; stage: string }> = [];
                         selectedPositions.forEach((posKey) => {
                             const [x, y] = posKey.split(",").map(Number);
-                            const index = y * rowLength + x;
+                            const index = (y * rowLength) + x;
                             selectedItems.push({ index, stage: flat[index] });
                         });
 
                         selectedItems.sort((a, b) => a.index - b.index);
 
-                        const toIndex = toData.y * rowLength + toData.x;
+                        const toIndex = (toData.y * rowLength) + toData.x;
 
                         for (let i = 0; i < selectedItems.length; i++) {
                             const targetIndex = toIndex + i;
@@ -230,7 +230,7 @@ export function TabStageSelectionScreen({
 
                         for (let i = 0; i < newSssData.length; i++) {
                             for (let j = 0; j < rowLength; j++) {
-                                newSssData[i][j] = flat[i * rowLength + j];
+                                newSssData[i][j] = flat[(i * rowLength) + j];
                             }
                         }
                     } else {
@@ -267,7 +267,7 @@ export function TabStageSelectionScreen({
                         const toData = to as DndDataSsNumber;
                         const flat: string[] = newSssData.flat();
                         const rowLength = newSssData[0].length;
-                        const toIndex = toData.y * rowLength + toData.x;
+                        const toIndex = (toData.y * rowLength) + toData.x;
                         const selectedNumbers = [...selectedExcluded];
 
                         flat.splice(toIndex, 0, ...selectedNumbers);
@@ -275,21 +275,21 @@ export function TabStageSelectionScreen({
 
                         for (let i = 0; i < newSssData.length; i++) {
                             for (let j = 0; j < rowLength; j++) {
-                                newSssData[i][j] = flat[i * rowLength + j];
+                                newSssData[i][j] = flat[(i * rowLength) + j];
                             }
                         }
                     } else {
                         const flat: string[] = newSssData.flat();
                         const rowLength = newSssData[0].length;
-                        const toIndex =
-                            (to as DndDataSsNumber).y * rowLength + (to as DndDataSsNumber).x;
+                        const toIndex = ((to as DndDataSsNumber).y * rowLength)
+                            + (to as DndDataSsNumber).x;
 
                         flat.splice(toIndex, 0, from.number);
                         flat.pop();
 
                         for (let i = 0; i < newSssData.length; i++) {
                             for (let j = 0; j < rowLength; j++) {
-                                newSssData[i][j] = flat[i * rowLength + j];
+                                newSssData[i][j] = flat[(i * rowLength) + j];
                             }
                         }
                     }
@@ -299,7 +299,7 @@ export function TabStageSelectionScreen({
                         const toData = to as DndDataSsNumber;
                         const flat: string[] = newSssData.flat();
                         const rowLength = newSssData[0].length;
-                        let toIndex = toData.y * rowLength + toData.x;
+                        let toIndex = (toData.y * rowLength) + toData.x;
                         const selectedNumbers = [...selectedExcluded];
 
                         for (const num of selectedNumbers) {
@@ -311,11 +311,12 @@ export function TabStageSelectionScreen({
 
                         for (let i = 0; i < newSssData.length; i++) {
                             for (let j = 0; j < rowLength; j++) {
-                                newSssData[i][j] = flat[i * rowLength + j];
+                                newSssData[i][j] = flat[(i * rowLength) + j];
                             }
                         }
                     } else {
-                        newSssData[(to as DndDataSsNumber).y][(to as DndDataSsNumber).x] = from.number;
+                        newSssData[(to as DndDataSsNumber).y][(to as DndDataSsNumber).x]
+                            = from.number;
                     }
                 }
                 setSelectedExcluded(new Set());
@@ -382,8 +383,8 @@ export function TabStageSelectionScreen({
             // Shift+click: select range
             const rowLength = sssData![0].length;
             const lastIndex =
-                lastSelectedPosition.y * rowLength + lastSelectedPosition.x;
-            const currentIndex = y * rowLength + x;
+                (lastSelectedPosition.y * rowLength) + lastSelectedPosition.x;
+            const currentIndex = (y * rowLength) + x;
             const [start, end] =
                 lastIndex < currentIndex
                     ? [lastIndex, currentIndex]
@@ -597,7 +598,9 @@ function ExcludedStages({
                                         stage={stage}
                                         stageDragAndDrop={stageDragAndDrop}
                                         setIsDraggingFromPool={setIsDraggingFromPool}
-                                        isSelected={selectedExcluded.has(("0000" + stage.number).slice(-4))}
+                                        isSelected={selectedExcluded.has(
+                                            ("0000" + stage.number).slice(-4)
+                                        )}
                                         setSelectedExcluded={setSelectedExcluded}
                                         key={stage.name}
                                     />
@@ -628,7 +631,9 @@ function ExcludedStages({
                                     stage={stage}
                                     stageDragAndDrop={stageDragAndDrop}
                                     setIsDraggingFromPool={setIsDraggingFromPool}
-                                    isSelected={selectedExcluded.has(("0000" + stage.number).slice(-4))}
+                                    isSelected={selectedExcluded.has(
+                                        ("0000" + stage.number).slice(-4)
+                                    )}
                                     setSelectedExcluded={setSelectedExcluded}
                                     key={stage.name}
                                 />
@@ -941,7 +946,7 @@ function SssPageDisplay({
             {page.name}
         </button>
     );
-    
+
     return (
         <div className={styles.sssPage + (activePage == pageIndex ?
             " " + styles.sssPageActive : "")}>
