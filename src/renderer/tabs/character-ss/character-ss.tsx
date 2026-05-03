@@ -4,7 +4,7 @@ import ToggleIconButton from "../../icon-buttons/toggle-icon-button";
 import CycleIconButton from "../../icon-buttons/cycle-icon-button";
 import MISSING from "../../../assets/missing.png";
 import {
-    CharacterList, DndDataType, OpDep, OpState, SortTypeOptions, finishOp
+    CharacterList, DndDataType, DndMode, OpDep, OpState, SortTypeOptions, dndModes, finishOp
 } from "../../../global/global";
 import appStyles from "../../app/app.css";
 import characterSsStyles from "./character-ss.css";
@@ -19,12 +19,6 @@ const sortTypes: SortTypeOptions[] = [
     SortTypeOptions.SERIES,
     SortTypeOptions.MENU_NAME
 ];
-
-enum DndMode {
-    AUTO = "auto",
-    INSERT = "insert",
-    SWAP = "swap",
-}
 
 export function TabCharacterSelectionScreen({
     setOperations,
@@ -78,9 +72,9 @@ export function TabCharacterSelectionScreen({
     ] = useState(false);
 
     const [dndMode, setDndMode]: [
-        DndMode,
-        Dispatch<SetStateAction<DndMode>>,
-    ] = useState(DndMode.AUTO);
+        number,
+        Dispatch<SetStateAction<number>>,
+    ] = useState(0);
 
     const [selectedExcluded, setSelectedExcluded]: [
         Set<string>,
@@ -184,8 +178,8 @@ export function TabCharacterSelectionScreen({
         // Can't be called unless cssData has a value
         const newCssData: CssData = cssData!.map((row) => [...row]); // Deep copy
 
-        const useInsert = dndMode == DndMode.INSERT ||
-            (dndMode == DndMode.AUTO && from.type == DndDataType.SS_NUMBER);
+        const useInsert = dndModes[dndMode] == DndMode.INSERT ||
+            (dndModes[dndMode] == DndMode.AUTO && from.type == DndDataType.SS_NUMBER);
 
         if (from.type == DndDataType.SS_NUMBER) {
             if (to.type == DndDataType.SS_NUMBER) {
@@ -457,8 +451,9 @@ export function TabCharacterSelectionScreen({
                     </div>
                 </div>
             </div>
-            <div id={styles.cssDivControls}>
+            {/*<div id={styles.cssDivControls}>
                 <div className={styles.center}>
+
                     <div className={styles.inlineSortOptions}>
                         <label>{"Drag Mode "}</label>
                         <select
@@ -477,7 +472,7 @@ export function TabCharacterSelectionScreen({
                         </select>
                     </div>
                 </div>
-            </div>
+            </div>*/}
             <hr/>
             <ExcludedCharacters
                 characters={characters}
@@ -486,6 +481,8 @@ export function TabCharacterSelectionScreen({
                 setIsDraggingFromPool={setIsDraggingFromPool}
                 selectedExcluded={selectedExcluded}
                 setSelectedExcluded={setSelectedExcluded}
+                dndMode={dndMode}
+                setDndMode={setDndMode}
             />
         </section>
     );
@@ -497,14 +494,18 @@ function ExcludedCharacters({
     characterDragAndDrop,
     setIsDraggingFromPool,
     selectedExcluded,
-    setSelectedExcluded
+    setSelectedExcluded,
+    dndMode,
+    setDndMode,
 }: {
     characters: Character[],
     excluded: Character[],
     characterDragAndDrop: (from: DndData, to: DndData) => void,
     setIsDraggingFromPool: Dispatch<SetStateAction<boolean>>,
     selectedExcluded: Set<string>,
-    setSelectedExcluded: Dispatch<SetStateAction<Set<string>>>
+    setSelectedExcluded: Dispatch<SetStateAction<Set<string>>>,
+    dndMode: number,
+    setDndMode: Dispatch<SetStateAction<number>>,
 }): JSX.Element {
     const [searchValue, setSearchValue]:
     [string, Dispatch<SetStateAction<string>>]
@@ -596,6 +597,17 @@ function ExcludedCharacters({
                             falseTooltip={message("tooltip.character.showing.excluded")}
                             iconSize={"30px"}
                             setter={setShowAllCharacters}
+                        />
+                        <CycleIconButton
+                            index={dndMode}
+                            icons={["moving", "flip", "swap_horiz"]}
+                            tooltips={[
+                                "Drag Mode: Auto",
+                                "Drag Mode: Insert",
+                                "Drag Mode: Swap"
+                            ]}
+                            iconSize={"30px"}
+                            setter={setDndMode}
                         />
                     </div>
                 </div>
@@ -1033,15 +1045,14 @@ function CssTableContents({
         SetStateAction<{ x: number; y: number } | null>
     >,
     isDraggingFromPool: boolean,
-    dndMode: DndMode,
+    dndMode: number,
 }): JSX.Element | null {
-    const showInsertIndicator = dndMode == DndMode.INSERT ||
-        (dndMode == DndMode.AUTO && !isDraggingFromPool);
+    const showInsertIndicator = dndModes[dndMode] == DndMode.INSERT ||
+        (dndModes[dndMode] == DndMode.AUTO && !isDraggingFromPool);
+    const showSwapIndicator = dndModes[dndMode] == DndMode.SWAP ||
+        (dndModes[dndMode] == DndMode.AUTO && isDraggingFromPool);
 
-    const showSwapIndicator = dndMode == DndMode.SWAP ||
-        (dndMode == DndMode.AUTO && isDraggingFromPool);
-
-    return (cssData == null || characterList == null) ? null : (
+    return cssData == null || characterList == null ? null : (
         <>
             <tr>
                 <th></th>

@@ -3,6 +3,18 @@ export enum DndDataType {
     EXCLUDED = "excluded"
 }
 
+export enum DndMode {
+    AUTO = "auto",
+    INSERT = "insert",
+    SWAP = "swap",
+}
+
+export const dndModes: DndMode[] = [
+    DndMode.AUTO,
+    DndMode.INSERT,
+    DndMode.SWAP,
+];
+
 export enum ModTypes {
     CHARACTER = "character",
     STAGE = "stage"

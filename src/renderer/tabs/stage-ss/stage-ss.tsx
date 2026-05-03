@@ -4,7 +4,7 @@ import ToggleIconButton from "../../icon-buttons/toggle-icon-button";
 import CycleIconButton from "../../icon-buttons/cycle-icon-button";
 import MISSING from "../../../assets/missing.png";
 import {
-    DndDataType, OpDep, OpState, SortTypeOptions, StageList, finishOp
+    DndDataType, DndMode, OpDep, OpState, SortTypeOptions, StageList, finishOp
 } from "../../../global/global";
 import appStyles from "../../app/app.css";
 import stageSsStyles from "./stage-ss.css";
@@ -19,12 +19,6 @@ const sortTypes: SortTypeOptions[] = [
     SortTypeOptions.SERIES,
     SortTypeOptions.MENU_NAME
 ];
-
-enum DndMode {
-    AUTO = "auto",
-    INSERT = "insert",
-    SWAP = "swap",
-}
 
 export function TabStageSelectionScreen({
     setOperations,
