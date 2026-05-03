@@ -604,7 +604,9 @@ function ExcludedCharacters({
                                         character={character}
                                         characterDragAndDrop={characterDragAndDrop}
                                         setIsDraggingFromPool={setIsDraggingFromPool}
-                                        isSelected={selectedExcluded.has(("0000" + character.number).slice(-4))}
+                                        isSelected={selectedExcluded.has(
+                                            ("0000" + character.number).slice(-4)
+                                        )}
                                         setSelectedExcluded={setSelectedExcluded}
                                         key={character.name}
                                     />
@@ -666,24 +668,8 @@ function CharacterDisplay({
         number: ("0000" + character.number).slice(-4)
     }
     return (
-        <div
-            className={styles.excludedDisplayWrapper + " " + styles.tooltipWrapper}
-            style={{ position: "relative" }}
-        >
-            {isSelected && (
-                <div
-                    style={{
-                        position: "absolute",
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        backgroundColor: "rgba(100, 150, 255, 0.3)",
-                        pointerEvents: "none",
-                        zIndex: 1,
-                    }}
-                />
-            )}
+        <div className={styles.excludedDisplayWrapper + " " + styles.tooltipWrapper}>
+            {isSelected && <div className={styles.cssSelected}/>}
             <div
                 className={styles.excludedDisplayMug}
                 draggable={true}
@@ -1159,37 +1145,9 @@ function CssCharacterDisplay({
                         dndData
                     );
                 }}
-                style={{
-                    position: "relative",
-                }}
             >
-                {isDragOver && (
-                    <div
-                        style={{
-                            position: "absolute",
-                            left: 0,
-                            top: 0,
-                            bottom: 0,
-                            width: "4px",
-                            backgroundColor: "var(--inf-blue1)",
-                            zIndex: 10,
-                        }}
-                    />
-                )}
-                {isSwapDragOver && (
-                    <div
-                        style={{
-                            position: "absolute",
-                            left: 0,
-                            top: 0,
-                            right: 0,
-                            bottom: 0,
-                            border: "3px solid var(--inf-blue1)",
-                            pointerEvents: "none",
-                            zIndex: 10,
-                        }}
-                    />
-                )}
+                {isDragOver && <div className={styles.cssDragOver}/>}
+                {isSwapDragOver && <div className={styles.cssSwapDragOver}/>}
             </td>
         );
     }
@@ -1198,51 +1156,10 @@ function CssCharacterDisplay({
         <td
             className={styles.cssCharacterDisplay}
             onClick={(event: React.MouseEvent) => handleCellClick(x, y, event)}
-            style={{
-                position: "relative",
-            }}
         >
-            {isSelected && (
-                <div
-                    style={{
-                        position: "absolute",
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        backgroundColor: "rgba(100, 150, 255, 0.3)",
-                        pointerEvents: "none",
-                        zIndex: 1,
-                    }}
-                />
-            )}
-            {isDragOver && (
-                <div
-                    style={{
-                        position: "absolute",
-                        left: 0,
-                        top: 0,
-                        bottom: 0,
-                        width: "4px",
-                        backgroundColor: "var(--inf-blue1)",
-                        zIndex: 10,
-                    }}
-                />
-            )}
-            {isSwapDragOver && (
-                <div
-                    style={{
-                        position: "absolute",
-                        left: 0,
-                        top: 0,
-                        right: 0,
-                        bottom: 0,
-                        border: "3px solid var(--inf-blue1)",
-                        pointerEvents: "none",
-                        zIndex: 10,
-                    }}
-                />
-            )}
+            {isSelected && <div className={styles.cssSelected}/>}
+            {isDragOver && <div className={styles.cssDragOver}/>}
+            {isSwapDragOver && <div className={styles.cssSwapDragOver}/>}
             <div className={styles.tooltipWrapper}>
                 <div
                     draggable={true}

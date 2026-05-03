@@ -59,6 +59,7 @@
     width: 62px;
     margin: 5px;
     height: calc(62px + 2.2em);
+    position: relative;
 }
 
 .excluded-display-mug,
@@ -142,6 +143,7 @@
 
 .css-character-display {
     padding: 2px;
+    position: relative;
 }
 
 .css-character-display img {
@@ -160,6 +162,38 @@
     overflow: hidden;
     text-wrap: nowrap;
     cursor: grab;
+}
+
+.css-drag-over {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 4px;
+    background-color: var(--inf-blue1);
+    z-index: 10;
+}
+
+.css-swap-drag-over {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    border: 3px solid var(--inf-blue1);
+    pointer-events: none;
+    z-index: 10;
+}
+
+.css-selected {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background-color: rgba(100, 150, 255, 0.3);
+    pointer-events: none;
+    z-index: 1;
 }
 
 .css-column-header :global(.icon-buttons_icon-button-wrapper) {
