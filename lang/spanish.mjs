@@ -4,33 +4,33 @@ export default {
         update: {
             download: {
                 started: {
-                    title: "Descargar actualización",
+                    title: "Descargar Actualización",
                     body: "Descargando la versión más reciente de CMC Mod Manager.",
                 },
                 finished: {
-                    title: "Actualización descargada",
-                    body: "Versión más reciente de CMC Mod Manager descargada."
+                    title: "Actualización Descargada",
+                    body: "Descargada la versión más reciente de CMC Mod Manager."
                 }
             },
             install: {
                 started: {
-                    title: "Instalar actualización",
+                    title: "Instalar Actualización",
                     body: "Instalando la versión más reciente de CMC Mod Manager."
                 },
                 finished: {
-                    body: "Cierre CMC Mod Manager para completar la actualización."
+                    body: "Por favor, cierre CMC Mod Manager para completar la actualización."
                 }
             }
         },
         mod: {
             download: {
                 started: {
-                    title: "Descargar mod",
+                    title: "Descargar Mod",
                     body: "Descargando un mod de GameBanana."
                 },
                 progress: {
                     0: {
-                        title: "Descarga de {0}",
+                        title: "Descargando {0}",
                         body: "Descargando mod: '{0}' de GameBanana.",
                     },
                     1: {
@@ -45,16 +45,16 @@ export default {
         character: {
             bulkInstallation: {
                 started: {
-                    title: "Instalación masiva de personajes",
-                    body: "Seleccionando personajes para instalar en '{0}'."
+                    title: "Instalación en Lote de Personajes",
+                    body: "Seleccionando personajes para instalar de '{0}'."
                 },
                 finished: {
-                    body: "Personajes seleccionados para instalación en '{0}'."
+                    body: "Personajes seleccionados para instalar de '{0}'."
                 }
             },
             installation: {
                 started: {
-                    title: "Instalación de personaje",
+                    title: "Instalación de Personaje",
                     body: "Instalando un personaje de {0}."
                 },
                 finished: {
@@ -63,16 +63,16 @@ export default {
             },
             randomSelection: {
                 started: {
-                    title: "Selección de personaje",
-                    body: "Alternando la habilidad para que el personaje: '{0}' sea seleccionado aleatoriamente."
+                    title: "Selección de Personaje",
+                    body: "Alternando la posibilidad del personaje: '{0}' de ser seleccionado aleatoriamente."
                 },
                 finished: {
-                    body: "Habilidad alternada para que el personaje: '{0}' sea seleccionado aleatoriamente."
+                    body: "Alternada la posibilidad del personaje: '{0}' de ser seleccionado aleatoriamente."
                 }
             },
             deletion: {
                 started: {
-                    title: "Eliminar personaje",
+                    title: "Eliminación de Personaje",
                     body: "Eliminando personaje: '{0}'."
                 },
                 finished: {
@@ -81,7 +81,7 @@ export default {
             },
             extraction: {
                 started: {
-                    title: "Extracción de personaje",
+                    title: "Extracción de Personaje",
                     body: "Extrayendo personaje: '{0}'."
                 },
                 finished: {
@@ -90,27 +90,27 @@ export default {
             },
             seriesDeletion: {
                 started: {
-                    title: "Eliminar serie",
+                    title: "Eliminación de Serie",
                     body: "Eliminando todos los personajes de la serie: '{0}'."
                 },
                 finished: {
-                    body: "Todos los personajes de la serie eliminados: '{0}'."
+                    body: "Todos los personajes de la serie: '{0}' fueron eliminados."
                 }
             }
         },
         stage: {
             bulkInstallation: {
                 started: {
-                    title: "Instalación masiva de escenarios",
-                    body: "Seleccionando escenarios para instalar desde '{0}'."
+                    title: "Instalación en Lote de Escenarios",
+                    body: "Seleccionando escenarios para instalar de '{0}'."
                 },
                 finished: {
-                    body: "Escenarios seleccionados para instalación desde '{0}'."
+                    body: "Escenarios seleccionados para instalar de '{0}'."
                 }
             },
             installation: {
                 started: {
-                    title: "Instalación de escenario",
+                    title: "Instalación de Escenario",
                     body: "Instalando un escenario de {0}."
                 },
                 finished: {
@@ -119,16 +119,16 @@ export default {
             },
             randomSelection: {
                 started: {
-                    title: "Selección de escenario",
-                    body: "Alternando la habilidad para que el escenario: '{0}' sea seleccionado aleatoriamente."
+                    title: "Selección de Escenario",
+                    body: "Alternando la posibilidad del escenario: '{0}' de ser seleccionado aleatoriamente."
                 },
                 finished: {
-                    body: "Habilidad alternada para que el escenario: '{0}' sea seleccionado aleatoriamente."
+                    body: "Alternada la posibilidad del escenario: '{0}' de ser seleccionado aleatoriamente."
                 }
             },
             deletion: {
                 started: {
-                    title: "Eliminar escenario",
+                    title: "Eliminación de Escenario",
                     body: "Eliminando escenario: '{0}'."
                 },
                 finished: {
@@ -137,7 +137,7 @@ export default {
             },
             extraction: {
                 started: {
-                    title: "Extracción de escenario",
+                    title: "Extracción de Escenario",
                     body: "Extrayendo escenario: '{0}'."
                 },
                 finished: {
@@ -146,74 +146,74 @@ export default {
             },
             seriesDeletion: {
                 started: {
-                    title: "Eliminar serie",
+                    title: "Eliminación de Serie",
                     body: "Eliminando todos los escenarios de la serie: '{0}'."
                 },
                 finished: {
-                    body: "Todos los escenarios de la serie eliminados: '{0}'."
+                    body: "Todos los escenarios de la serie: '{0}' fueron eliminados."
                 }
             }
         },
         alt: {
             include: {
                 started: {
-                    title: "Inclusión de alternativos",
-                    body: "Asegurando que los personajes alternativos estén incluidos en la lista de personajes."
+                    title: "Inclusión de Alternativos",
+                    body: "Asegurando que los alternativos sean incluidos en la lista de personajes."
                 },
                 finished: {
-                    body: "Se aseguró que los personajes alternativos fueron incluidos en la lista de personajes."
+                    body: "Asegurado que los alternativos sean incluidos en la lista de personajes."
                 }
             },
             exclude: {
                 started: {
-                    title: "Exclusión de alternativos",
-                    body: "Asegurando que los personajes alternativos sean excluidos de la lista de personajes."
+                    title: "Exclusión de Alternativos",
+                    body: "Asegurando que los alternativos sean excluidos de la lista de personajes."
                 },
                 finished: {
-                    body: "Se aseguró que los personajes alternativos fueran excluidos de la lista de personajes."
+                    body: "Asegurado que los alternativos sean excluidos de la lista de personajes."
                 }
             },
             removal: {
                 started: {
-                    title: "Remoción de alternativo",
-                    body: "Eliminando personaje alternativo: '{0}' del personaje: '{1}'."
+                    title: "Eliminación de Alternativo",
+                    body: "Eliminando alternativo: '{0}' del personaje: '{1}'."
                 },
                 finished: {
-                    body: "Personaje alternativo eliminado: '{0}' del personaje: '{1}'."
+                    body: "Alternativo eliminado: '{0}' del personaje: '{1}'."
                 }
             },
             addition: {
                 started: {
-                    title: "Añadir alternativo",
-                    body: "Añadiendo personaje alternativo: '{0}' al personaje: '{1}'."
+                    title: "Adición de Alternativo",
+                    body: "Añadiendo alternativo: '{0}' al personaje: '{1}'."
                 },
                 finished: {
-                    body: "Personaje alternativo añadido: '{0}' al personaje: '{1}'."
+                    body: "Alternativo añadido: '{0}' al personaje: '{1}'."
                 }
             }
         },
         css: {
             writeData: {
                 started: {
-                    title: "Escribir datos CSS",
-                    body: "Grabando datos CSS modificados en la página: '{0}'."
+                    title: "Guardar Datos CSS",
+                    body: "Guardando datos CSS modificados en la página: '{0}'."
                 },
                 finished: {
-                    body: "Datos CSS modificados grabados en la página: '{0}'."
+                    body: "Datos CSS modificados guardados en la página: '{0}'."
                 }
             },
             reorderPages: {
                 started: {
-                    title: "Reordenar páginas CSS",
-                    body: "Moviendo página CSS: '{0}' al índice: {1}."
+                    title: "Reordenar Páginas CSS",
+                    body: "Moviendo página CSS: '{0}' a la posición: {1}."
                 },
                 finished: {
-                    body: "Página CSS movida: '{0}' al índice: {1}."
+                    body: "Página CSS: '{0}' movida a la posición: {1}."
                 }
             },
             pageAddition: {
                 started: {
-                    title: "Añadir página CSS",
+                    title: "Adición de Página CSS",
                     body: "Añadiendo nueva página CSS: '{0}'."
                 },
                 finished: {
@@ -222,7 +222,7 @@ export default {
             },
             renamePage: {
                 started: {
-                    title: "Renombrar página CSS",
+                    title: "Renombrar Página CSS",
                     body: "Renombrando página CSS: '{0}' a '{1}'."
                 },
                 finished: {
@@ -231,7 +231,7 @@ export default {
             },
             pageDeletion: {
                 started: {
-                    title: "Eliminar página CSS",
+                    title: "Eliminación de Página CSS",
                     body: "Eliminando página CSS: '{0}'."
                 },
                 finished: {
@@ -242,25 +242,25 @@ export default {
         sss: {
             writeData: {
                 started: {
-                    title: "Escribir datos SSS",
-                    body: "Grabando datos SSS modificados en la página: '{0}'."
+                    title: "Guardar Datos SSS",
+                    body: "Guardando datos SSS modificados en la página: '{0}'."
                 },
                 finished: {
-                    body: "Datos SSS modificados grabados en la página: '{0}'."
+                    body: "Datos SSS modificados guardados en la página: '{0}'."
                 }
             },
             reorderPages: {
                 started: {
-                    title: "Reordenar páginas SSS",
-                    body: "Moviendo página SSS: '{0}' al índice: {1}."
+                    title: "Reordenar Páginas SSS",
+                    body: "Moviendo página SSS: '{0}' a la posición: {1}."
                 },
                 finished: {
-                    body: "Página SSS movida: '{0}' al índice: {1}."
+                    body: "Página SSS: '{0}' movida a la posición: {1}."
                 }
             },
             pageAddition: {
                 started: {
-                    title: "Añadir página SSS",
+                    title: "Adición de Página SSS",
                     body: "Añadiendo nueva página SSS: '{0}'."
                 },
                 finished: {
@@ -269,7 +269,7 @@ export default {
             },
             renamePage: {
                 started: {
-                    title: "Renombrar página SSS",
+                    title: "Renombrar Página SSS",
                     body: "Renombrando página SSS: '{0}' a '{1}'."
                 },
                 finished: {
@@ -278,7 +278,7 @@ export default {
             },
             pageDeletion: {
                 started: {
-                    title: "Eliminar página SSS",
+                    title: "Eliminación de Página SSS",
                     body: "Eliminando página SSS: '{0}'."
                 },
                 finished: {
@@ -290,252 +290,252 @@ export default {
     dialog: {
         alert: {
             selfContainedDir: {
-                title: "Advertencia de ubicación de juego inválida",
-                body: "El directorio de juego seleccionado está dentro de la carpeta de CMC Mod Manager. CMC Mod Manager elimina TODOS los archivos de esta carpeta durante actualizaciones, por lo que NO puede usarse para almacenar sus archivos de juego. Por favor, muévalos a otra ubicación."
+                title: "Alerta de Ubicación de Juego Inválida",
+                body: "El directorio de juego seleccionado está contenido dentro del propio directorio de CMC Mod Manager. CMC Mod Manager elimina todos los archivos de este directorio al actualizar, por lo que no puede usarse para almacenar sus archivos de juego. Por favor, muévalos a una ubicación diferente."
             },
             invalidGameDir: {
-                title: "Directorio seleccionado inválido",
-                body: "El directorio seleccionado es inválido porque no contiene uno de los archivos ejecutables de identificación."
+                title: "Directorio Inválido Seleccionado",
+                body: "El directorio seleccionado es inválido, ya que no contiene uno de los ejecutables de identificación."
             },
             postUpdate: {
-                title: "Mensaje post-actualización",
-                body: "¡Gracias por actualizar CMC Mod Manager! El sitio web de CMC Mod Manager también ha sido actualizado, considere visitarlo: https://inferno214221.com/cmc-mod-manager/ (un enlace también está disponible en la pestaña 'Inicio'). ¡También he creado una página en 'Buy Me A Coffee' si desea apoyar el proyecto!"
+                title: "Mensaje Post-Actualización",
+                body: "¡Gracias por actualizar CMC Mod Manager! El sitio web de CMC Mod Manager también ha sido actualizado, así que considere echarle un vistazo: https://inferno214221.com/cmc-mod-manager/ (también hay un enlace disponible en la pestaña 'Inicio'). ¡También he creado una página 'Buy Me A Coffee' si desea apoyar el proyecto!"
             },
             noDirSelected: {
-                title: "Ningún directorio seleccionado",
-                body: "Seleccione su directorio CMC+ antes de continuar."
+                title: "Ningún Directorio Seleccionado",
+                body: "Por favor, seleccione su directorio CMC+ antes de continuar."
             },
             languageUpdated: {
                 title: "Idioma Actualizado",
-                body: "Cierre y reinicie CMC Mod Manager para aplicar los cambios. ¡Gracias a SpringTrap Crusader por la traducción!"
+                body: "Por favor, cierre y reinicie CMC Mod Manager para aplicar los cambios."
             },
             licenseNotice: {
-                title: "Aviso de licencia",
+                title: "Aviso de Licencia",
             }
         },
         confirm: {
             programUpdate: {
-                title: "Actualización del programa",
-                body: "CMC Mod Manager requiere una actualización. Esta actualización se instalará automáticamente. Advertencia: esta actualización eliminará todos los archivos del directorio de CMC Mod Manager. Si esto es problemático, cancele la actualización y elimine manualmente los archivos afectados.",
+                title: "Actualización del Programa",
+                body: "CMC Mod Manager necesita una actualización. Esta actualización se instalará automáticamente ahora. Eliminará todos los archivos dentro del directorio de CMC Mod Manager. Si esto es un problema, cancele esta actualización y elimine cualquier archivo afectado.",
                 okLabel: "Continuar"
             },
             destructiveAction: {
-                title: "Confirmación de acción destructiva",
-                body: "Esta acción es destructiva y no puede deshacerse. ¿Está seguro de que desea continuar?",
+                title: "Confirmación de Acción Destructiva",
+                body: "Esta acción es destructiva y no se puede deshacer. ¿Está seguro de que desea continuar?",
                 okLabel: "Continuar"
             },
             closeUnfinishedOperations: {
-                title: "Operaciones incompletas",
-                body: "¿Está seguro de que desea cerrar CMC Mod Manager? Algunas operaciones aún están en curso y se cancelarán si cierra (o recarga) el programa.",
-                okLabel: "Cerrar de todos modos"
+                title: "Operaciones Inacabadas",
+                body: "¿Está seguro de que desea cerrar CMC Mod Manager? Algunas operaciones están en curso y se cancelarán si cierra (o recarga) el programa.",
+                okLabel: "Cerrar de Todos Modos"
             },
             beginCharacterInput: {
-                title: "Instalación de personaje",
-                body: "El archivo .dat del personaje que se está instalando utiliza el formato vanilla, y será necesario proporcionar información para la instalación. Esta información generalmente puede encontrarse en un archivo .txt en el directorio principal del mod.",
+                title: "Instalación de Personaje",
+                body: "El archivo dat del personaje que se está instalando usa el formato vanilla y deberá ingresar información para la instalación. Esta información generalmente se puede encontrar en un archivo txt en el directorio principal del mod.",
                 okLabel: "Continuar"
             },
             openCharacterDir: {
-                title: "Instalación de personaje",
-                body: "¿Desea abrir el directorio del mod para buscar archivos .txt manualmente?",
+                title: "Instalación de Personaje",
+                body: "¿Desea abrir el directorio del mod para buscar archivos txt manualmente?",
                 okLabel: "Sí",
                 cancelLabel: "No"
             },
             beginStageInput: {
-                title: "Instalación de escenario",
-                body: "Debido al formato actual de modding de CMC+, será necesario ingresar información sobre el escenario que está instalando. Esta información generalmente puede encontrarse en un archivo .txt en el directorio principal del mod. (Si este archivo .txt existe y contiene cuatro líneas, la primera probablemente sea innecesaria.)",
+                title: "Instalación de Escenario",
+                body: "Debido al formato de modding actual de CMC+, deberá ingresar información sobre el escenario que está instalando. Esta información generalmente se puede encontrar en un archivo txt en el directorio principal del mod. (Si dicho archivo txt existe y contiene cuatro líneas, la primera probablemente sea innecesaria.)",
                 okLabel: "Continuar"
             },
             openStageDir: {
-                title: "Instalación de escenario",
-                body: "¿Desea abrir el directorio del mod para buscar archivos .txt manualmente?",
+                title: "Instalación de Escenario",
+                body: "¿Desea abrir el directorio del mod para buscar archivos txt manualmente?",
                 okLabel: "Sí",
                 cancelLabel: "No"
             }
         },
         prompt: {
             characterMenuName: {
-                title: "Instalación de personaje",
-                body: "Por favor, ingrese el 'nombre en menú' del personaje. (Este es el nombre mostrado cuando el personaje es seleccionado en la pantalla de selección de personajes.)",
-                placeholder: "Nombre del personaje en menú"
+                title: "Instalación de Personaje",
+                body: "Por favor, ingrese el 'nombre de menú' del personaje. (Este es el nombre que se muestra cuando el personaje es seleccionado en la pantalla de selección de personajes.)",
+                placeholder: "Nombre de Menú del Personaje"
             },
             characterBattleName: {
-                title: "Instalación de personaje",
-                body: "Por favor, ingrese el 'nombre en batalla' del personaje. (Este es el nombre mostrado como parte del HUD durante un combate.)",
-                placeholder: "Nombre del personaje en batalla",
+                title: "Instalación de Personaje",
+                body: "Por favor, ingrese el 'nombre de batalla' del personaje. (Este es el nombre que se muestra como parte del HUD durante una partida.)",
+                placeholder: "Nombre de Batalla del Personaje",
             },
             characterSeries: {
-                title: "Instalación de personaje",
-                body: "Por favor, ingrese la 'serie' del personaje. (Este nombre se usará para seleccionar el ícono en la pantalla de selección de personajes. Normalmente es un valor corto en minúsculas.)",
-                placeholder: "Serie del personaje",
+                title: "Instalación de Personaje",
+                body: "Por favor, ingrese la 'serie' del personaje. (Este nombre se usará para seleccionar el ícono a usar en la pantalla de selección de personajes. Este valor generalmente es corto y en letras minúsculas.)",
+                placeholder: "Serie del Personaje",
             },
             stageMenuName: {
-                title: "Instalación de escenario",
-                body: "Por favor, ingrese el 'nombre en menú' del escenario. (El nombre que se mostrará en la pantalla de selección de escenarios.)",
-                placeholder: "Nombre del escenario en menú"
+                title: "Instalación de Escenario",
+                body: "Por favor, ingrese el 'nombre de menú' del escenario. (El nombre que se mostrará en la pantalla de selección de escenarios.)",
+                placeholder: "Nombre de Menú del Escenario"
             },
             stageSource: {
-                title: "Instalación de escenario",
-                body: "Por favor, ingrese la 'fuente' del escenario. (El nombre del contenido original del que proviene el escenario, como el título del juego.)",
-                placeholder: "Fuente del escenario",
+                title: "Instalación de Escenario",
+                body: "Por favor, ingrese el 'origen' del escenario. (El nombre del contenido de origen del escenario, como el título del juego.)",
+                placeholder: "Origen del Escenario",
             },
             stageSeries: {
-                title: "Instalación de escenario",
-                body: "Por favor, ingrese la 'serie' del escenario. (Este nombre se usará para seleccionar el ícono en la pantalla de selección de escenarios. Normalmente es un valor corto en minúsculas.)",
-                placeholder: "Serie del escenario",
+                title: "Instalación de Escenario",
+                body: "Por favor, ingrese la 'serie' del escenario. (Este nombre se usará para seleccionar el ícono a usar en la pantalla de selección de escenarios. Este valor generalmente es corto y en letras minúsculas.)",
+                placeholder: "Serie del Escenario",
             }
         },
         defaults: {
-            okLabel: "Aceptar",
+            okLabel: "OK",
             cancelLabel: "Cancelar"
         },
         notification: {
             oneClickDownload: {
-                title: "Descarga en 1 clic iniciada",
+                title: "Descarga con 1 Clic Iniciada",
                 body: "Descargando mod con ID: '{0}' de GameBanana."
             }
         },
         installation: {
             character: {
-                title: "Seleccione personajes para instalar"
+                title: "Seleccionar Personajes para Instalar"
             },
             stage: {
-                title: "Seleccione escenarios para instalar"
+                title: "Seleccionar Escenarios para Instalar"
             }
         }
     },
     error: {
-        noStringFound: "No se pudo obtener la cadena para la clave: '{0}'.",
-        invalidStringArgs: "Número inválido de argumentos al sustituir en la cadena.",
+        noStringFound: "No se pudo encontrar el texto para la clave: '{0}'.",
+        invalidStringArgs: "Número inválido de argumentos al sustituir en el texto.",
         missingDialogOptions: "Opciones de diálogo no encontradas.",
         unsupportedArchiveType: "Tipo de archivo no soportado: '{0}'.",
         unknownModType: "Tipo de mod desconocido: '{0}'.",
-        invalidSemverString: "Cadena semver inválida: '{0}'.",
-        cantUpdateDevMode: "No se puede actualizar en modo desarrollo.",
+        invalidSemverString: "Formato de versión inválido: '{0}'.",
+        cantUpdateDevMode: "No se puede actualizar en modo de desarrollo.",
         missingUpdateFiles: "Archivos de actualización no encontrados.",
-        streamError: "Ocurrió un error de flujo: '{0}'.",
+        streamError: "Ocurrió un error en la transferencia: '{0}'.",
         noSingleInstanceLock: "Fallo en el bloqueo de instancia única.",
-        noRecursiveAlts: "Un personaje con alternativos no puede asignarse como alternativo.",
+        noRecursiveAlts: "Un personaje con alternativos no puede ser asignado como un alternativo.",
         maxAltsReached: "El personaje ya tiene el número máximo de alternativos.",
         characterNotFound: "Personaje no encontrado: '{0}'.",
         stageNotFound: "Escenario no encontrado: '{0}'.",
-        incompleteDat: "Archivo dat del personaje incompleto: '{0}'.",
-        characterInstallTargetSelf: "No se pueden instalar personajes desde el mismo directorio de destino.",
-        stageInstallTargetSelf: "No se pueden instalar escenarios desde el mismo directorio de destino.",
+        incompleteDat: "Dat del personaje está incompleto: '{0}'.",
+        characterInstallTargetSelf: "No se pueden instalar personajes desde el directorio al que se están instalando.",
+        stageInstallTargetSelf: "No se pueden instalar escenarios desde el directorio al que se están instalando.",
         noValidCharactersFound: "No se encontraron personajes válidos en el directorio: '{0}'.",
         noValidStagesFound: "No se encontraron escenarios válidos en el directorio: '{0}'.",
         noTopDir: "La ruta del archivo no tiene directorio: '{0}'.",
-        noFighterSubdir: "No se encontró subdirectorio 'fighter' en: '{0}'.",
-        noStageSubdir: "No se encontró subdirectorio 'stage' en: '{0}'.",
-        noUpdateCharacter: "Personaje ya instalado, actualizaciones deshabilitadas.",
-        noUpdateStage: "Escenario ya instalado, actualizaciones deshabilitadas.",
+        noFighterSubdir: "No se encontró el subdirectorio 'fighter' en el directorio: '{0}'.",
+        noStageSubdir: "No se encontró el subdirectorio 'stage' en el directorio: '{0}'.",
+        noUpdateCharacter: "Personaje ya instalado, actualizaciones desactivadas.",
+        noUpdateStage: "Escenario ya instalado, actualizaciones desactivadas.",
         noDatFile: "El personaje no tiene archivo dat.",
-        customCssDisabled: "Páginas CSS personalizadas deshabilitadas en game_settings.",
+        customCssDisabled: "Páginas CSS personalizadas desactivadas en game_settings.",
         operationCallNotFound: "Función de operación no encontrada: '{0}'."
     },
     tooltip: {
         character: {
-            install: "Instalar personaje",
-            update: "Actualizar personaje",
-            search: "Buscar personaje",
-            installDir: "Instalar personaje desde directorio",
-            installArch: "Instalar personaje desde archivo",
-            delete: "Eliminar personaje",
-            extract: "Extraer personaje",
-            deleteSeries: "Eliminar todos los personajes de la serie",
+            install: "Instalar Personaje",
+            update: "Actualizar Personaje",
+            search: "Buscar Personajes",
+            installDir: "Instalar Personaje desde un Directorio",
+            installArch: "Instalar Personaje desde un Archivo",
+            delete: "Eliminar Personaje",
+            extract: "Extraer Personaje",
+            deleteSeries: "Eliminar Todos los Personajes de la Serie",
             showing: {
-                all: "Mostrando: Todos los personajes",
-                new: "Mostrando: Nuevos personajes",
-                excluded: "Mostrando: Personajes excluidos"
+                all: "Mostrando: Todos los Personajes",
+                new: "Mostrando: Personajes Nuevos",
+                excluded: "Mostrando: Personajes Excluidos"
             },
             existing: {
-                update: "Personajes existentes: Actualizar",
-                abort: "Personajes existentes: Abortar"
+                update: "Personajes Existentes: Actualizar",
+                abort: "Personajes Existentes: Abortar"
             }
         },
         stage: {
-            install: "Instalar escenario",
-            update: "Actualizar escenario",
-            search: "Buscar escenario",
-            installDir: "Instalar escenario desde directorio",
-            installArch: "Instalar escenario desde archivo",
-            delete: "Eliminar escenario",
-            extract: "Extraer escenario",
-            deleteSeries: "Eliminar todos los escenarios de la serie",
+            install: "Instalar Escenario",
+            update: "Actualizar Escenario",
+            search: "Buscar Escenarios",
+            installDir: "Instalar Escenario desde un Directorio",
+            installArch: "Instalar Escenario desde un Archivo",
+            delete: "Eliminar Escenario",
+            extract: "Extraer Escenario",
+            deleteSeries: "Eliminar Todos los Escenarios de la Serie",
             showing: {
-                all: "Mostrando: Todos los escenarios",
-                new: "Mostrando: Nuevos escenarios",
-                excluded: "Mostrando: Escenarios excluidos"
+                all: "Mostrando: Todos los Escenarios",
+                new: "Mostrando: Escenarios Nuevos",
+                excluded: "Mostrando: Escenarios Excluidos"
             },
             existing: {
-                update: "Escenarios existentes: Actualizar",
-                abort: "Escenarios existentes: Abortar"
+                update: "Escenarios Existentes: Actualizar",
+                abort: "Escenarios Existentes: Abortar"
             }
         },
         alt: {
-            remove: "Eliminar alternativos",
+            remove: "Eliminar Alternativo",
             addition: {
-                toThis: "Añadir personaje alternativo a este personaje",
-                thisFor: "Añadir como personaje alternativo al personaje seleccionado",
-                cancel: "Cancelar adición de personaje alternativo"
+                toThis: "Añadir Alternativo a Este Personaje",
+                thisFor: "Añadir Este Personaje como Alternativo",
+                cancel: "Cancelar Adición de Alternativo"
             },
             asCharacters: {
-                included: "Alternativos: Incluidos como personajes",
-                excluded: "Alternativos: Excluidos de personajes"
+                included: "Alternativos: Incluidos Como Personajes",
+                excluded: "Alternativos: Excluidos Como Personajes"
             }
         },
         ss: {
-            addPage: "Añadir página",
-            deletePage: "Eliminar página",
+            addPage: "Añadir Página",
+            deletePage: "Eliminar Página",
             column: {
-                add: "Añadir columna",
-                remove: "Eliminar columna"
+                add: "Añadir Columna",
+                remove: "Eliminar Columna"
             },
             row: {
-                add: "Añadir fila",
-                remove: "Eliminar fila"
+                add: "Añadir Fila",
+                remove: "Eliminar Fila"
             }
         },
         sortBy: {
-            number: "Ordenar por: Número interno",
-            series: "Ordenar por: Serie",
-            alphabetical: "Ordenar por: Orden alfabético"
+            number: "Ordenar Por: Número Interno",
+            series: "Ordenar Por: Serie",
+            alphabetical: "Ordenar Por: Orden Alfabético"
         },
         sortDirection: {
-            backwards: "Dirección de orden: Hacia atrás",
-            forwards: "Dirección de orden: Hacia adelante"
+            backwards: "Dirección de Ordenación: Inversa",
+            forwards: "Dirección de Ordenación: Normal"
         },
         dragMode: {
-            auto: "Drag Mode: Auto",
-            insert: "Drag Mode: Insert",
-            swap: "Drag Mode: Swap"
+            auto: "Modo de Arrastre: Automático",
+            insert: "Modo de Arrastre: Insertar",
+            swap: "Modo de Arrastre: Intercambiar"
         },
         installation: {
-            filter: "Instalación: Solo archivos necesarios",
-            all: "Instalación: Todos los archivos"
+            filter: "Instalación: Solo Archivos Necesarios",
+            all: "Instalación: Todos los Archivos"
         },
         randomSelection: {
-            enabled: "Selección aleatoria: Activada",
-            disabled: "Selección aleatoria: Desactivada"
+            enabled: "Selección Aleatoria: Activada",
+            disabled: "Selección Aleatoria: Desactivada"
         },
         operationPanel: {
-            show: "Mostrar operaciones",
-            hide: "Ocultar operaciones"
+            show: "Mostrar Operaciones",
+            hide: "Ocultar Operaciones"
         },
         operation: {
-            cancel: "Cancelar operación"
+            cancel: "Cancelar Operación"
         },
         gameDir: {
-            noneSelected: "(Ninguno seleccionado)",
-            change: "Cambiar directorio de CMC+",
-            open: "Abrir directorio de CMC+",
+            noneSelected: "(Ninguno Seleccionado)",
+            change: "Cambiar Directorio CMC+",
+            open: "Abrir Directorio CMC+",
             run: "Ejecutar CMC+"
         },
         site: {
-            homepage: "Página principal"
+            homepage: "Inicio"
         },
-        closeWindow: "Cerrar ventana",
-        openExtractionDir: "Abrir directorio de extracción",
-        openExtractedFiles: "Abrir archivos extraídos"
+        closeWindow: "Cerrar Ventana",
+        openExtractionDir: "Abrir Directorio de Extracción",
+        openExtractedFiles: "Abrir Archivos Extraídos"
     },
     ui: {
         tabs: {
@@ -544,26 +544,26 @@ export default {
             },
             characters: {
                 title: "Personajes",
-                desc: "Instalar, extraer o eliminar personajes de CMC+."
+                desc: "Instale, extraiga o elimine personajes de CMC+."
             },
             characterSelectionScreen: {
-                title: "Pantalla de selección de personajes",
-                desc: "Modificar la pantalla de selección de personajes de CMC+."
+                title: "Pantalla de Selección de Personajes",
+                desc: "Modifique la pantalla de selección de personajes de CMC+."
             },
             stages: {
                 title: "Escenarios",
-                desc: "Instalar, extraer o eliminar escenarios de CMC+."
+                desc: "Instale, extraiga o elimine escenarios de CMC+."
             },
             stageSelectionScreen: {
-                title: "Pantalla de selección de escenarios",
-                desc: "Modificar la pantalla de selección de escenarios de CMC+."
+                title: "Pantalla de Selección de Escenarios",
+                desc: "Modifique la pantalla de selección de escenarios de CMC+."
             }
         },
-        currentGameDir: "Directorio Actual de CMC+: ",
+        currentGameDir: "Directorio CMC+ Actual: ",
         searchPlaceholder: "Buscar",
-        pagePlaceholder: "Nombre de página",
-        showLicense: "Mostrar licencia (GNU GPLv3)",
-        errorDisplay: "Un error mostrado aquí indica que no está asociado a una operación y está impidiendo que se muestre la pestaña.",
+        pagePlaceholder: "Nombre de la Página",
+        showLicense: "Mostrar Licencia (GNU GPLv3)",
+        errorDisplay: "Un error mostrado aquí significa que no está asociado a una operación y está impidiendo que la pestaña se renderice.",
         operations: "Operaciones"
     },
     enumDisplayName: {
@@ -572,19 +572,19 @@ export default {
     },
     other: {
         dat: {
-            homeStages: "---Escenarios de Inicio (Modo clásico)---",
+            homeStages: "---Escenarios (Modo Clásico)---",
             randomData: "---Otra Información---",
-            paletteNumber: "---Numero de Paleta---",
-            paletteData: "---Datos de Pyaleta---",
+            paletteNumber: "---Cantidad de Paletas---",
+            paletteData: "---Datos de las Paletas---",
             formatUpdated: "Actualizado al formato dat de CMC+ v8 por CMC Mod Manager.",
         },
         selector: {
             archives: "Archivos",
-            all: "Todos los archivos"
+            all: "Todos los Archivos",
         },
-        autoUpdateFailed: "Debido a cómo se instaló CMC Mod Manager, no se puede actualizar automáticamente. Por favor, descargue la versión más reciente manualmente desde GitHub o GameBanana. (Consulte la pestaña 'Inicio' para los enlaces.)",
+        autoUpdateFailed: "Debido a la forma en que CMC Mod Manager ha sido instalado, no se puede actualizar automáticamente. Por favor, descargue la versión más reciente de GitHub o GameBanana. (Consulte la pestaña Inicio para los enlaces.)",
         defaultPageName: "Predeterminado",
-        languageName: "Español (Spanish)",
-        by: "de"
+        languageName: "Inglés",
+        by: "por"
     }
 };
