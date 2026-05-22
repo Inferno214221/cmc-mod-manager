@@ -505,9 +505,9 @@ export default {
             forwards: "排序方向：前"
         },
         dragMode: {
-            auto: "Drag Mode: Auto",
-            insert: "Drag Mode: Insert",
-            swap: "Drag Mode: Swap"
+            auto: "拖拽模式：自动",
+            insert: "拖拽模式：插入",
+            swap: "拖拽模式：切换"
         },
         installation: {
             filter: "安装：只需要必要的",

@@ -505,9 +505,9 @@ export default {
             forwards: "ソート方向：前"
         },
         dragMode: {
-            auto: "Drag Mode: Auto",
-            insert: "Drag Mode: Insert",
-            swap: "Drag Mode: Swap"
+            auto: "ドラッグモード:自動",
+            insert: "ドラッグモード:挿入",
+            swap: "ドラッグモード:切り替え"
         },
         installation: {
             filter: "インストール：必要なも",
