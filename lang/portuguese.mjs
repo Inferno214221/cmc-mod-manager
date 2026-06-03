@@ -584,7 +584,7 @@ export default {
         },
         autoUpdateFailed: "Devido à forma como o CMC Mod Manager foi instalado, ele não pode ser atualizado automaticamente. Por favor, baixe a versão mais recente do GitHub ou GameBanana. (Consulte a aba Início para os links.)",
         defaultPageName: "Padrão",
-        languageName: "Inglês",
+        languageName: "Português Brasil (Portuguese Brazil)",
         by: "por"
     }
 };
