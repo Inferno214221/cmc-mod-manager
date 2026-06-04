@@ -15,6 +15,7 @@ body:
       label: CMC Mod Manager Version
       description: What version of CMC Mod Manager are you using? Have you tried the latest version?
       options:
+        - v3.3.0
         - v3.2.1
         - v3.2.0
         - v3.1.2
