@@ -26,6 +26,7 @@ import * as customDialogs from "./custom-dialogs";
 const SUPPORTED_VERSIONS: string[] = [
     "CMC_v8",
     "CMC+ v8",
+    "SSBC Remix",
 ];
 
 export * from "./basic-fs";
